@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="description" content="Labverse - Next Project in Development">
+  <meta name="description" content="We are busy cooking up our next project">
   <meta name="keywords" content="Labverse, Next Project, South Africa">
   <meta name="author" content="Labverse Founder">
   <meta property="og:title" content="Labverse">
-  <meta property="og:description" content="Labverse is busy cooking up our next project.">
+  <meta property="og:description" content="We are busy cooking up our next project.">
   <meta property="og:image" content="/assets/labverse-og-image.png">
   <meta property="og:url" content="https://labverse.co.za">
   <meta name="twitter:card" content="summary_large_image">
@@ -63,6 +63,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center; /* Center vertically */
       width: 100%;
       flex: 1;
       padding: 20px 10px;
@@ -89,7 +90,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      position: relative;
+      position: absolute;
+      top: 0;
     }
     .branding-wrapper {
       display: flex;
@@ -168,6 +170,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: 1.5rem;
       position: relative;
       z-index: 15;
     }
@@ -178,6 +181,39 @@
       text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
       text-align: center;
     }
+    .futuristic-wheel {
+      width: 100px;
+      height: 100px;
+      border: 2px solid var(--cosmic-cyan);
+      border-radius: 50%;
+      position: relative;
+      animation: spin 10s linear infinite; /* Slow rotation */
+    }
+    .futuristic-wheel::before,
+    .futuristic-wheel::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+    }
+    .futuristic-wheel::before {
+      width: 80px;
+      height: 80px;
+      border: 2px dashed var(--matrix-blue);
+      opacity: 0.6;
+    }
+    .futuristic-wheel::after {
+      width: 60px;
+      height: 60px;
+      border: 1px solid var(--cosmic-cyan);
+      box-shadow: 0 0 15px var(--cosmic-cyan);
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
     footer {
       width: 100%;
       text-align: center;
@@ -186,6 +222,8 @@
       color: #8492b4;
       padding: 1.5rem 0;
       z-index: 10;
+      position: absolute;
+      bottom: 0;
     }
     footer a {
       color: #00f2fe;
@@ -229,6 +267,18 @@
       .message-text {
         font-size: clamp(1rem, 2vw, 1.5rem);
       }
+      .futuristic-wheel {
+        width: 80px;
+        height: 80px;
+      }
+      .futuristic-wheel::before {
+        width: 64px;
+        height: 64px;
+      }
+      .futuristic-wheel::after {
+        width: 48px;
+        height: 48px;
+      }
     }
     @media (max-width: 480px) {
       .main-wrapper {
@@ -252,6 +302,18 @@
       .message-text {
         font-size: clamp(0.9rem, 1.8vw, 1.2rem);
       }
+      .futuristic-wheel {
+        width: 60px;
+        height: 60px;
+      }
+      .futuristic-wheel::before {
+        width: 48px;
+        height: 48px;
+      }
+      .futuristic-wheel::after {
+        width: 36px;
+        height: 36px;
+      }
     }
     @media (min-width: 1440px) {
       .main-wrapper {
@@ -272,6 +334,18 @@
       }
       .message-text {
         font-size: clamp(1.5rem, 3vw, 2.5rem);
+      }
+      .futuristic-wheel {
+        width: 120px;
+        height: 120px;
+      }
+      .futuristic-wheel::before {
+        width: 96px;
+        height: 96px;
+      }
+      .futuristic-wheel::after {
+        width: 72px;
+        height: 72px;
       }
     }
   </style>
@@ -296,7 +370,8 @@
         </a>
       </header>
       <div class="message-card">
-        <div class="message-text">Labverse is busy cooking up next project</div>
+        <div class="message-text">We are busy cooking up next project</div>
+        <div class="futuristic-wheel"></div>
       </div>
     </div>
   </div>
