@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Labverse - Next Project in Development">
+  <meta name="keywords" content="Labverse, Next Project, South Africa">
+  <meta name="author" content="Labverse Founder">
+  <meta property="og:title" content="Labverse">
+  <meta property="og:description" content="Labverse is busy cooking up our next project.">
+  <meta property="og:image" content="/assets/labverse-og-image.png">
+  <meta property="og:url" content="https://labverse.co.za">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Labverse</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Source+Code+Pro&family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --matrix-blue: #00b7eb;
+      --cosmic-cyan: #00f2fe;
+      --light-aura: #e6f0ff;
+      --dark-bg: #070b1a;
+      --card-bg: rgba(13, 20, 43, 0.7);
+      --glow-radius: 15px;
+      --neon-border: rgba(79, 172, 254, 0.3);
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Source Code Pro', monospace;
+    }
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background: var(--dark-bg);
+      color: var(--light-aura);
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    #vanta-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      z-index: 1;
+      opacity: 0.5;
+      transition: opacity 1s ease-in-out;
+    }
+    #background-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      opacity: 0.8;
+    }
+    .main-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      flex: 1;
+      padding: 20px 10px;
+      box-sizing: border-box;
+      position: relative;
+      z-index: 3;
+    }
+    .container {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 1rem;
+      gap: 1rem;
+    }
+    header {
+      width: 100%;
+      padding: 1rem 0;
+      background: transparent;
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .branding-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+    }
+    .branding-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .logo-title-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .branding-logo {
+      height: clamp(1.2rem, 3.5vw, 2rem);
+      min-height: 1rem;
+      max-height: 2.5rem;
+      width: auto;
+      transition: transform 0.3s ease;
+    }
+    .branding-logo:hover {
+      transform: scale(1.1);
+    }
+    .branding-link {
+      display: inline-block;
+      text-decoration: none;
+      border-radius: 10px;
+      padding: 0.5rem 1rem;
+      transition: background 0.3s ease;
+    }
+    .branding-link:hover {
+      background: rgba(79, 172, 254, 0.2);
+    }
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.2rem, 3.5vw, 2rem);
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #4facfe, #00f2fe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+      animation: glow 2s ease-in-out infinite alternate;
+      margin: 0;
+      position: relative;
+    }
+    .powered-by {
+      font-family: 'Exo 2', sans-serif;
+      font-size: clamp(0.7rem, 1vw, 0.9rem);
+      color: #a3a5b7;
+      position: absolute;
+      bottom: -0.5rem;
+      right: 0;
+      margin: 0;
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 15px var(--cosmic-cyan); }
+      to { text-shadow: 0 0 30px var(--cosmic-cyan); }
+    }
+    .message-card {
+      background: var(--card-bg);
+      border-radius: 15px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 50px rgba(73, 115, 255, 0.15) inset;
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--neon-border);
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 15;
+    }
+    .message-text {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.2rem, 2.5vw, 2rem);
+      color: #00f2fe;
+      text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+      text-align: center;
+    }
+    footer {
+      width: 100%;
+      text-align: center;
+      font-family: 'Exo 2', sans-serif;
+      font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+      color: #8492b4;
+      padding: 1.5rem 0;
+      z-index: 10;
+    }
+    footer a {
+      color: #00f2fe;
+      text-decoration: none;
+      padding: 0.3rem 0.5rem;
+      border-radius: 5px;
+      transition: background 0.3s ease;
+    }
+    footer a:hover {
+      background: rgba(79, 172, 254, 0.2);
+    }
+    .footer-powered-by {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+    }
+    @media (max-width: 768px) {
+      .main-wrapper {
+        padding: 10px 10px;
+      }
+      .branding-wrapper {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      .logo-title-container {
+        flex-direction: row;
+        align-items: center;
+      }
+      .branding-logo {
+        height: clamp(1.2rem, 4vw, 2.2rem);
+        max-height: 2.5rem;
+      }
+      .branding-text h1 {
+        font-size: clamp(1.2rem, 4vw, 2.2rem);
+      }
+      .powered-by {
+        font-size: clamp(0.6rem, 0.9vw, 0.8rem);
+        bottom: -0.4rem;
+      }
+      .message-text {
+        font-size: clamp(1rem, 2vw, 1.5rem);
+      }
+    }
+    @media (max-width: 480px) {
+      .main-wrapper {
+        padding: 10px 5px;
+      }
+      .container {
+        width: 95%;
+        padding: 0.5rem;
+      }
+      .branding-logo {
+        height: clamp(1.4rem, 5vw, 2.4rem);
+        max-height: 2.8rem;
+      }
+      .branding-text h1 {
+        font-size: clamp(1.4rem, 5vw, 2.4rem);
+      }
+      .powered-by {
+        font-size: clamp(0.5rem, 0.8vw, 0.7rem);
+        bottom: -0.3rem;
+      }
+      .message-text {
+        font-size: clamp(0.9rem, 1.8vw, 1.2rem);
+      }
+    }
+    @media (min-width: 1440px) {
+      .main-wrapper {
+        padding: 30px 20px;
+      }
+      .container {
+        max-width: 900px;
+      }
+      .branding-logo {
+        height: clamp(1.5rem, 4vw, 2.5rem);
+        max-height: 3rem;
+      }
+      .branding-text h1 {
+        font-size: clamp(1.5rem, 4vw, 2.5rem);
+      }
+      .powered-by {
+        bottom: -0.6rem;
+      }
+      .message-text {
+        font-size: clamp(1.5rem, 3vw, 2.5rem);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="vanta-bg"></div>
+  <canvas id="background-canvas"></canvas>
+
+  <div class="main-wrapper">
+    <div class="container">
+      <header>
+        <a href="https://onefar.co.za" target="_blank" rel="noopener" class="branding-link">
+          <div class="branding-wrapper">
+            <div class="branding-text">
+              <div class="logo-title-container">
+                <img src="/assets/labverse-og-image.png" alt="Labverse Logo" class="branding-logo">
+                <h1>Labverse</h1>
+              </div>
+              <div class="powered-by">by 1FAR</div>
+            </div>
+          </div>
+        </a>
+      </header>
+      <div class="message-card">
+        <div class="message-text">Labverse is busy cooking up next project</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 Labverse | All rights reserved | <span class="footer-powered-by">Powered by <a href="https://onefar.co.za" target="_blank" rel="noopener">1FAR</a></span>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.net.min.js"></script>
+  <script>
+    "use strict";
+    const vantaEffect = VANTA.NET({
+      el: "#vanta-bg",
+      mouseControls: true,
+      touchControls: true,
+      minHeight: 200,
+      minWidth: 200,
+      scale: 1,
+      scaleMobile: 1,
+      color: 0x00ffff,
+      backgroundColor: 0x070b1a,
+      points: 10,
+      maxDistance: 20,
+      spacing: 15,
+      speed: 1
+    });
+
+    let particles = [];
+    let mousePos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const particleCanvas = document.getElementById('background-canvas');
+    const particleCtx = particleCanvas.getContext('2d');
+    const devicePixelRatio = window.devicePixelRatio || 1;
+
+    function resizeParticleCanvas() {
+      particleCanvas.width = window.innerWidth * devicePixelRatio;
+      particleCanvas.height = window.innerHeight * devicePixelRatio;
+      particleCtx.scale(devicePixelRatio, devicePixelRatio);
+    }
+    resizeParticleCanvas();
+
+    document.addEventListener('mousemove', (e) => {
+      mousePos.x = e.clientX;
+      mousePos.y = e.clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) {
+        mousePos.x = e.touches[0].clientX;
+        mousePos.y = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    function createParticle(index) {
+      const theta = index * 2 * Math.PI * ((1 + Math.sqrt(5)) / 2);
+      const r = Math.sqrt(index) * 10;
+      return {
+        x: window.innerWidth / 2 + r * Math.cos(theta),
+        y: window.innerHeight / 2 + r * Math.sin(theta),
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 0.5) * 2,
+        life: 600,
+        color: `hsl(${Math.random() * 360}, 70%, 70%)`,
+        size: Math.random() * 2 + 1
+      };
+    }
+
+    function initParticles() {
+      particles = Array.from({ length: 15 }, (_, i) => createParticle(i));
+    }
+    initParticles();
+
+    function animateParticles() {
+      particleCtx.clearRect(0, 0, particleCanvas.width / devicePixelRatio, particleCanvas.height / devicePixelRatio);
+      particles = particles.filter(p => {
+        if (p.life <= 0) return false;
+        p.life--;
+        p.x += p.vx + (mousePos.x - window.innerWidth / 2) * 0.0001;
+        p.y += p.vy + (mousePos.y - window.innerHeight / 2) * 0.0001;
+        p.vx *= 0.98;
+        p.vy *= 0.98;
+        particleCtx.beginPath();
+        particleCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        particleCtx.fillStyle = p.color;
+        particleCtx.globalAlpha = p.life / 600;
+        particleCtx.fill();
+        return true;
+      });
+      if (particles.length < 15 && Math.random() < 0.1) particles.push(createParticle(particles.length));
+      particleCtx.globalAlpha = 1;
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    window.addEventListener('resize', () => {
+      resizeParticleCanvas();
+    }, { passive: true });
+  </script>
+</body>
+</html>
