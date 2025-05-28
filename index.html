@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT Infrastructure Implementation Timeline</title>
+    <title>Velocity Lab: Timeline Guide to Implement the Lab</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <style>
         :root {
@@ -52,12 +52,6 @@
             color: var(--dark);
             margin-bottom: 12px;
             letter-spacing: -0.025em;
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            color: var(--gray);
-            font-weight: 300;
         }
 
         .timeline {
@@ -389,8 +383,7 @@
 <body>
     <div class="container">
         <header class="header">
-            <h1>IT Infrastructure Implementation Timeline</h1>
-            <p>Roadmap for Enterprise Infrastructure Deployment</p>
+            <h1>Velocity Lab: Timeline Guide to Implement the Lab</h1>
         </header>
 
         <div class="timeline">
@@ -561,7 +554,7 @@
                         </div>
                         <div class="task" data-task="internal-mail">
                             <div class="task-icon">
-                                <svg viewBox="0 0 24 24" aria-label="Mail Flow Icon">
+                                <svg viewBox="0 0 24 20" aria-label="Mail Flow Icon">
                                     <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m-1 5h2v2h4v2h-4v4h-2v-4H7V9h4V7"/>
                                 </svg>
                             </div>
@@ -641,9 +634,9 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal" id="taskModal">
+    <div class="modal" id="taskModal" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
         <div class="modal-content">
-            <button class="close-btn" id="closeModal" aria-label="Close modal">&times;</button>
+            <button class="close-btn" id="closeModal" aria-label="Close modal">×</button>
             <h2 id="modalTitle"></h2>
             <section id="modalDescription"></section>
         </div>
@@ -656,42 +649,40 @@
                 description: `
                     <section>
                         <h3>Overview</h3>
-                        <p>Promoting a Windows Server 2012 to a Domain Controller (DC) establishes the Active Directory (AD) infrastructure, enabling centralized authentication and DNS services. This task is critical for managing users, computers, and resources in the domain.</p>
+                        <p>Promoting a Windows Server 2012 to a Domain Controller (DC) sets up Active Directory (AD) and DNS services, enabling centralized user and resource management.</p>
                     </section>
                     <section>
                         <h3>Prerequisites</h3>
                         <ul>
-                            <li>Windows Server 2012 installed with latest updates.</li>
-                            <li>Static IP address configured on the server.</li>
-                            <li>Administrator account with local and domain privileges.</li>
-                            <li>Network connectivity to other servers.</li>
+                            <li>Windows Server 2012 with latest updates.</li>
+                            <li>Static IP address.</li>
+                            <li>Administrator account.</li>
+                            <li>Network connectivity.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>Step-by-Step Instructions</h3>
                         <ol>
-                            <li><strong>T1</strong>: Log in as an administrator. Open Server Manager from the Start menu.</li>
-                            <li><strong>T1</strong>: Click "Add roles and features." Select "Role-based or feature-based installation."</li>
-                            <li><strong>T1</strong>: Choose the server, then select "Active Directory Domain Services." Install the role.</li>
-                            <li><strong>T2</strong>: After installation, click the notification flag in Server Manager and select "Promote this server to a domain controller."</li>
-                            <li><strong>T2</strong>: Choose "Add a new forest" for a new domain. Enter the domain name (e.g., corp.example.com).</li>
-                            <li><strong>T2</strong>: Set the forest and domain functional levels to Windows Server 2012. Configure DNS options.</li>
-                            <li><strong>T2</strong>: Specify a Directory Services Restore Mode (DSRM) password. Complete the wizard and reboot the server.</li>
-                            <li><strong>T1</strong>: Verify the DC by checking DNS records in the DNS Manager and ensuring AD Users and Computers is accessible.</li>
+                            <li><strong>T1</strong>: Log in as administrator. Open Server Manager.</li>
+                            <li><strong>T1</strong>: Click "Add roles and features." Install "Active Directory Domain Services."</li>
+                            <li><strong>T2</strong>: Post-installation, promote the server to a DC via the notification flag.</li>
+                            <li><strong>T2</strong>: Add a new forest (e.g., corp.example.com). Set functional levels to 2012.</li>
+                            <li><strong>T2</strong>: Configure DNS and DSRM password. Reboot after completion.</li>
+                            <li><strong>T1</strong>: Verify AD and DNS functionality using AD Users and Computers and DNS Manager.</li>
                         </ol>
                     </section>
                     <section>
                         <h3>Troubleshooting Tips</h3>
                         <ul>
-                            <li><strong>T1</strong>: If the wizard fails, check the server’s IP configuration and ensure it’s static.</li>
-                            <li><strong>T2</strong>: DNS errors may indicate a misconfigured DNS server. Run <code>ipconfig /all</code> to verify DNS settings.</li>
-                            <li><strong>T2</strong>: Use <code>dcdiag</code> to diagnose AD issues. Check Event Viewer for detailed logs.</li>
+                            <li><strong>T1</strong>: Ensure static IP with <code>ipconfig /all</code>.</li>
+                            <li><strong>T2</strong>: Run <code>dcdiag</code> for AD diagnostics. Check Event Viewer.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>References</h3>
                         <ul>
-                            <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-active-directory-domain-services--ad-ds--in-windows-server">Microsoft Learn: Install Active Directory Domain Services</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-active-directory-domain-services--ad-ds--in-windows-server">Microsoft Learn: Install AD DS</a></li>
+                            <li><a href="https://www.alitajran.com/install-and-configure-active-directory-domain-services/">ALI TAJRAN: Configure AD DS</a></li>
                         </ul>
                     </section>
                 `
@@ -701,40 +692,39 @@
                 description: `
                     <section>
                         <h3>Overview</h3>
-                        <p>Joining a virtual machine (VM) to the domain enables centralized management via Active Directory, allowing domain-based authentication and policy application.</p>
+                        <p>Joining a VM to the domain enables AD-based management and authentication.</p>
                     </section>
                     <section>
                         <h3>Prerequisites</h3>
                         <ul>
-                            <li>VM running Windows Server or Windows 10/11 with network access.</li>
-                            <li>Domain Controller operational with DNS configured.</li>
+                            <li>VM with Windows Server or Windows 10/11.</li>
+                            <li>Operational DC with DNS.</li>
                             <li>Domain admin credentials.</li>
-                            <li>VM’s DNS settings pointing to the DC’s IP.</li>
+                            <li>DNS settings pointing to DC.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>Step-by-Step Instructions</h3>
                         <ol>
-                            <li><strong>T1</strong>: Log in to the VM. Open System Properties (Right-click Start > System > Advanced system settings).</li>
-                            <li><strong>T1</strong>: Under "Computer Name," click "Change." Select "Domain" and enter the domain name (e.g., corp.example.com).</li>
-                            <li><strong>T1</strong>: Enter domain admin credentials when prompted. Click OK.</li>
-                            <li><strong>T1</strong>: Reboot the VM to apply the domain join.</li>
-                            <li><strong>T2</strong>: Verify the join by logging in with a domain account and checking the VM in AD Users and Computers.</li>
-                            <li><strong>T2</strong>: Optionally, use PowerShell: <code>Add-Computer -DomainName "corp.example.com" -Credential (Get-Credential)</code>.</li>
+                            <li><strong>T1</strong>: Open System Properties (Right-click Start > System).</li>
+                            <li><strong>T1</strong>: Click "Change" under Computer Name. Select "Domain" and enter corp.example.com.</li>
+                            <li><strong>T1</strong>: Provide domain admin credentials. Reboot.</li>
+                            <li><strong>T2</strong>: Verify in AD Users and Computers.</li>
+                            <li><strong>T2</strong>: Use PowerShell: <code>Add-Computer -DomainName "corp.example.com" -Credential (Get-Credential)</code>.</li>
                         </ol>
                     </section>
                     <section>
                         <h3>Troubleshooting Tips</h3>
                         <ul>
-                            <li><strong>T1</strong>: If the join fails, verify DNS settings via <code>ipconfig /all</code>.</li>
-                            <li><strong>T2</strong>: Check DNS resolution with <code>nslookup corp.example.com</code>. Ensure the DC is reachable.</li>
-                            <li><strong>T2</strong>: Review Event Viewer (System logs) for join errors.</li>
+                            <li><strong>T1</strong>: Check DNS with <code>ipconfig /all</code>.</li>
+                            <li><strong>T2</strong>: Test resolution: <code>nslookup corp.example.com</code>. Review Event Viewer.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>References</h3>
                         <ul>
-                            <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/manage/join-windows-server-to-domain">Microsoft Learn: Join a Computer to a Domain</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/manage/join-windows-server-to-domain">Microsoft Learn: Join a Domain</a></li>
+                            <li><a href="https://www.alitajran.com/join-computer-to-domain/">ALI TAJRAN: Join Computer to Domain</a></li>
                         </ul>
                     </section>
                 `
@@ -744,49 +734,47 @@
                 description: `
                     <section>
                         <h3>Overview</h3>
-                        <p>Setting up network shares on the Domain Controller provides centralized file storage with secure access. This task configures three drives with automatic mapping via Group Policy, hidden shares ($ suffix), and logon scripts.</p>
+                        <p>Configure network shares for centralized file storage, using GPO, PowerShell, and hidden shares ($).</p>
                     </section>
                     <section>
                         <h3>Prerequisites</h3>
                         <ul>
-                            <li>Domain Controller with sufficient disk space.</li>
+                            <li>DC with disk space.</li>
                             <li>Domain admin account.</li>
-                            <li>Group Policy Management Console installed.</li>
-                            <li>PowerShell scripting environment.</li>
+                            <li>Group Policy Management.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>Step-by-Step Instructions</h3>
                         <ol>
-                            <li><strong>T1</strong>: Create three folders on the DC (e.g., C:\Shares\HR$, C:\Shares\Finance$, C:\Shares\Public).</li>
-                            <li><strong>T1</strong>: Right-click each folder, select Properties > Sharing > Share. Add "Authenticated Users" with read/write permissions.</li>
-                            <li><strong>T2</strong>: For hidden shares, ensure the folder name ends with `$` (e.g., HR$). Set NTFS permissions via Security tab.</li>
-                            <li><strong>T2</strong>: Open Group Policy Management. Create a new GPO named "Drive Mapping."</li>
-                            <li><strong>T2</strong>: Edit GPO > User Configuration > Preferences > Windows Settings > Drive Maps. Map drives to \\DCName\HR$, \\DCName\Finance$, etc.</li>
-                            <li><strong>T2</strong>: Create a PowerShell logon script (e.g., map_drives.ps1) to map drives:
+                            <li><strong>T1</strong>: Create folders (e.g., C:\Shares\HR$, C:\Shares\Finance$, C:\Shares\Public).</li>
+                            <li><strong>T1</strong>: Share folders via Properties > Sharing. Add "Authenticated Users."</li>
+                            <li><strong>T2</strong>: Set NTFS permissions via Security tab for hidden shares.</li>
+                            <li><strong>T2</strong>: Create GPO "Drive Mapping" in Group Policy Management.</li>
+                            <li><strong>T2</strong>: Map drives under User Configuration > Preferences > Drive Maps.</li>
+                            <li><strong>T2</strong>: Create PowerShell script (map_drives.ps1):
                                 <pre><code>
 net use H: \\[DCName]\HR$
 net use F: \\[DCName]\Finance$
 net use P: \\[DCName]\Public
                                 </code></pre>
                             </li>
-                            <li><strong>T2</strong>: Link the script to the GPO under User Configuration > Policies > Scripts > Logon.</li>
-                            <li><strong>T1</strong>: Test by logging in as a domain user to confirm drives map automatically.</li>
+                            <li><strong>T2</strong>: Link script to GPO under Scripts > Logon.</li>
+                            <li><strong>T1</strong>: Test drive mapping with a domain user.</li>
                         </ol>
                     </section>
                     <section>
                         <h3>Troubleshooting Tips</h3>
                         <ul>
-                            <li><strong>T1</strong>: If drives don’t map, ensure the GPO is applied (run <code>gpupdate /force</code>).</li>
-                            <li><strong>T2</strong>: Check GPO settings with <code>gpresult /r</code>. Verify share permissions.</li>
-                            <li><strong>T2</strong>: If scripts fail, ensure execution policy allows scripts (<code>Set-ExecutionPolicy RemoteSigned</code>).</li>
+                            <li><strong>T1</strong>: Run <code>gpupdate /force</code> if drives don’t map.</li>
+                            <li><strong>T2</strong>: Verify GPO with <code>gpresult /r</code>. Check permissions.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>References</h3>
                         <ul>
-                            <li><a href="https://learn.microsoft.com/en-us/windows-server/storage/file-server/share-and-ntfs-permissions">Configure File Shares</a></li>
-                            <li><a href="https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-R2-and-2012/dn789009(v=ws.11)">Group Policy Drive Mapping</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/windows-server/storage/file-server/share-and-ntfs-permissions">Microsoft Learn: File Shares</a></li>
+                            <li><a href="https://www.alitajran.com/map-network-drive-with-group-policy/">ALI TAJRAN: Map Drives with GPO</a></li>
                         </ul>
                     </section>
                 `
@@ -796,7 +784,7 @@ net use P: \\[DCName]\Public
                 description: `
                     <section>
                         <h3>Overview</h3>
-                        <p>Creating security groups restricts access to network drives, ensuring only authorized users can access specific shares.</p>
+                        <p>Create security groups to restrict network share access to authorized users.</p>
                     </section>
                     <section>
                         <h3>Prerequisites</h3>
@@ -809,28 +797,26 @@ net use P: \\[DCName]\Public
                     <section>
                         <h3>Step-by-Step Instructions</h3>
                         <ol>
-                            <li><strong>T1</strong>: Open Active Directory Users and Computers on the DC.</li>
-                            <li><strong>T1</strong>: Navigate to an OU (e.g., "Shares"). Right-click, select New > Group.</li>
-                            <li><strong>T1</strong>: Name the group (e.g., "HR_Access"). Choose "Security" and "Global" scope.</li>
-                            <li><strong>T1</strong>: Add users to the group by right-clicking the group and selecting "Add to a group."</li>
-                            <li><strong>T2</strong>: Assign permissions to the HR$ share. Right-click the HR$ folder, select Properties > Security.</li>
-                            <li><strong>T2</strong>: Add the "HR_Access" group and grant read/write permissions. Remove "Everyone" or other broad groups.</li>
-                            <li><strong>T2</strong>: Use PowerShell to automate: <code>New-ADGroup -Name HR_Access -GroupCategory Security -GroupScope Global -Path "OU=Shares,DC=corp,DC=example,DC=com"</code></li>
-                            <li><strong>T1</strong>: Test access by logging in as a group member and accessing the share.</li>
+                            <li><strong>T1</strong>: Open AD Users and Computers.</li>
+                            <li><strong>T1</strong>: Create group in OU (e.g., "HR_Access," Security, Global).</li>
+                            <li><strong>T1</strong>: Add users to the group.</li>
+                            <li><strong>T2</strong>: Assign permissions to HR$ share via Properties > Security.</li>
+                            <li><strong>T2</strong>: Use PowerShell: <code>New-ADGroup -Name HR_Access -GroupCategory Security -GroupScope Global -Path "OU=Shares,DC=corp,DC=example,DC=com"</code>.</li>
+                            <li><strong>T1</strong>: Test access with a group member.</li>
                         </ol>
                     </section>
                     <section>
                         <h3>Troubleshooting Tips</h3>
                         <ul>
-                            <li><strong>T1</strong>: If access is denied, verify group membership in AD.</li>
-                            <li><strong>T2</strong>: Check NTFS and share permissions align. Use <code>Get-Acl \\[Server]\HR$</code>.</li>
-                            <li><strong>T2</strong>: Ensure the GPO is applied if using GPO-based access control.</li>
+                            <li><strong>T1</strong>: Verify group membership in AD.</li>
+                            <li><strong>T2</strong>: Check permissions with <code>Get-Acl \\[Server]\HR$</code>.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>References</h3>
                         <ul>
-                            <li><a href="https://learn.microsoft.com/en-us/windows/active-directory-domain-services/manage-security-groups">Manage Security Groups</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/windows/active-directory-domain-services/manage-security-groups">Microsoft Learn: Security Groups</a></li>
+                            <li><a href="https://www.alitajran.com/create-security-group-in-active-directory/">ALI TAJRAN: Create Security Group</a></li>
                         </ul>
                     </section>
                 `
@@ -840,41 +826,39 @@ net use P: \\[DCName]\Public
                 description: `
                     <section>
                         <h3>Overview</h3>
-                        <p>Installing a second Windows Server 2012 adds redundancy and load distribution to the infrastructure, enhancing reliability.</p>
+                        <p>Add a second Windows Server 2012 for redundancy and load distribution.</p>
                     </section>
                     <section>
                         <h3>Prerequisites</h3>
                         <ul>
-                            <li>Windows Server 2012 ISO or installation media.</li>
-                            <li>Server hardware or VM with sufficient resources (4GB RAM, 40GB disk).</li>
-                            <li>Network connectivity to the DC.</li>
-                            <li>Administrator credentials.</li>
+                            <li>Windows Server 2012 ISO.</li>
+                            <li>Server or VM (4GB RAM, 40GB disk).</li>
+                            <li>Network connectivity.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>Step-by-Step Instructions</h3>
                         <ol>
-                            <li><strong>T1</strong>: Boot the server or VM with the Windows Server 2012 ISO.</li>
-                            <li><strong>T1</strong>: Follow the installation wizard, selecting "Windows Server 2012 Standard (GUI)."</li>
-                            <li><strong>T1</strong>: Configure a static IP address via Network Settings.</li>
-                            <li><strong>T2</strong>: Join the server to the domain (see "Join VM to Domain" task).</li>
-                            <li><strong>T2</strong>: Install updates via Windows Update in Server Manager.</li>
-                            <li><strong>T2</strong>: Optionally, add roles (e.g., File Services) based on requirements.</li>
-                            <li><strong>T1</strong>: Verify connectivity to the DC using <code>ping [DCName]</code>.</li>
+                            <li><strong>T1</strong>: Boot with Windows Server 2012 ISO.</li>
+                            <li><strong>T1</strong>: Install "Standard (GUI)" edition.</li>
+                            <li><strong>T1</strong>: Set static IP in Network Settings.</li>
+                            <li><strong>T2</strong>: Join to domain (see "Join VM to Domain").</li>
+                            <li><strong>T2</strong>: Install updates via Server Manager.</li>
+                            <li><strong>T1</strong>: Verify connectivity: <code>ping [DCName]</code>.</li>
                         </ol>
                     </section>
                     <section>
                         <h3>Troubleshooting Tips</h3>
                         <ul>
-                            <li><strong>T1</strong>: If the installation fails, check the ISO integrity or hardware compatibility.</li>
-                            <li><strong>T2</strong>: Ensure network settings are correct with <code>ipconfig /all</code>.</li>
-                            <li><strong>T2</strong>: Check Event Viewer for installation errors.</li>
+                            <li><strong>T1</strong>: Check ISO integrity if installation fails.</li>
+                            <li><strong>T2</strong>: Verify network with <code>ipconfig /all</code>.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>References</h3>
                         <ul>
-                            <li><a href="https://learn.microsoft.com/en-us/windows-server/get-started/install-windows-server">Install Windows Server</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/windows-server/get-started/install-windows-server">Microsoft Learn: Install Windows Server</a></li>
+                            <li><a href="https://www.alitajran.com/install-windows-server-2012-r2/">ALI TAJRAN: Install Windows Server 2012</a></li>
                         </ul>
                     </section>
                 `
@@ -884,41 +868,39 @@ net use P: \\[DCName]\Public
                 description: `
                     <section>
                         <h3>Overview</h3>
-                        <p>Windows Server Update Services (WSUS) manages and distributes updates to Windows devices, ensuring patch compliance.</p>
+                        <p>Configure Windows Server Update Services (WSUS) for patch management.</p>
                     </section>
                     <section>
                         <h3>Prerequisites</h3>
                         <ul>
-                            <li>Windows Server 2012 with administrative access.</li>
-                            <li>Internet connectivity for update downloads.</li>
-                            <li>Sufficient disk space (10GB+ for updates).</li>
+                            <li>Windows Server 2012.</li>
+                            <li>Internet connectivity.</li>
+                            <li>10GB+ disk space.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>Step-by-Step Instructions</h3>
                         <ol>
-                            <li><strong>T1</strong>: Open Server Manager, click "Add roles and features."</li>
-                            <li><strong>T1</strong>: Select "Windows Server Update Services" role. Install required features.</li>
-                            <li><strong>T2</strong>: Run the WSUS Configuration Wizard post-installation.</li>
-                            <li><strong>T2</strong>: Choose to store updates locally and specify a storage path.</li>
-                            <li><strong>T2</strong>: Select update languages and products (e.g., Windows Server 2012).</li>
-                            <li><strong>T2</strong>: Configure automatic synchronization with Microsoft Update.</li>
-                            <li><strong>T1</strong>: Approve updates in the WSUS console for distribution.</li>
-                            <li><strong>T2</strong>: Configure clients via GPO: Set WSUS server in "Specify intranet Microsoft update service location."</li>
+                            <li><strong>T1</strong>: In Server Manager, add "Windows Server Update Services" role.</li>
+                            <li><strong>T2</strong>: Run WSUS Configuration Wizard.</li>
+                            <li><strong>T2</strong>: Store updates locally, select products and languages.</li>
+                            <li><strong>T2</strong>: Enable automatic synchronization.</li>
+                            <li><strong>T1</strong>: Approve updates in WSUS console.</li>
+                            <li><strong>T2</strong>: Configure GPO: Set WSUS server in "Specify intranet Microsoft update service location."</li>
                         </ol>
                     </section>
                     <section>
                         <h3>Troubleshooting Tips</h3>
                         <ul>
-                            <li><strong>T1</strong>: If clients don’t receive updates, verify GPO settings with <code>gpresult /r</code>.</li>
-                            <li><strong>T2</strong>: Check WSUS connectivity to Microsoft Update with <code>netstat -an</code>.</li>
-                            <li><strong>T2</strong>: Review WSUS logs in Event Viewer under Applications and Services.</li>
+                            <li><strong>T1</strong>: Verify GPO with <code>gpresult /r</code>.</li>
+                            <li><strong>T2</strong>: Check connectivity: <code>netstat -an</code>. Review WSUS logs.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>References</h3>
                         <ul>
-                            <li><a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-server-update-services/deploy/deploy-windows-server-update-services">Deploy WSUS</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-server-update-services/deploy/deploy-windows-server-update-services">Microsoft Learn: Deploy WSUS</a></li>
+                            <li><a href="https://www.alitajran.com/install-and-configure-wsus-on-windows-server/">ALI TAJRAN: Configure WSUS</a></li>
                         </ul>
                     </section>
                 `
@@ -928,39 +910,38 @@ net use P: \\[DCName]\Public
                 description: `
                     <section>
                         <h3>Overview</h3>
-                        <p>Configuring two Network Time Protocol (NTP) servers ensures accurate time synchronization across the domain, critical for AD and security protocols.</p>
+                        <p>Configure two NTP servers for domain time synchronization.</p>
                     </section>
                     <section>
                         <h3>Prerequisites</h3>
                         <ul>
-                            <li>Two servers (e.g., DC and secondary server) with internet access.</li>
-                            <li>Administrative privileges.</li>
-                            <li>Firewall allowing UDP port 123.</li>
+                            <li>Two servers with internet access.</li>
+                            <li>UDP port 123 open.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>Step-by-Step Instructions</h3>
                         <ol>
-                            <li><strong>T1</strong>: On the DC, open PowerShell as administrator.</li>
-                            <li><strong>T2</strong>: Configure the DC as an NTP server: <code>w32tm /config /manualpeerlist:"0.pool.ntp.org,0x8 1.pool.ntp.org,0x8" /syncfromflags:manual /reliable:yes /update</code></li>
-                            <li><strong>T2</strong>: Restart the time service: <code>net stop w32time && net start w32time</code></li>
-                            <li><strong>T1</strong>: On the secondary server, set the DC as the time source: <code>w32tm /config /manualpeerlist:[DCName] /syncfromflags:manual /update</code></li>
-                            <li><strong>T1</strong>: Verify synchronization: <code>w32tm /query /status</code>.</li>
-                            <li><strong>T2</strong>: Ensure firewall allows UDP 123: <code>New-NetFirewallRule -DisplayName "NTP" -Direction Inbound -Protocol UDP -LocalPort 123 -Action Allow</code></li>
+                            <li><strong>T1</strong>: Open PowerShell on DC.</li>
+                            <li><strong>T2</strong>: Configure NTP: <code>w32tm /config /manualpeerlist:"0.pool.ntp.org,0x8 1.pool.ntp.org,0x8" /syncfromflags:manual /reliable:yes /update</code>.</li>
+                            <li><strong>T2</strong>: Restart service: <code>net stop w32time && net start w32time</code>.</li>
+                            <li><strong>T1</strong>: On secondary server, set DC as source: <code>w32tm /config /manualpeerlist:[DCName] /syncfromflags:manual /update</code>.</li>
+                            <li><strong>T1</strong>: Verify: <code>w32tm /query /status</code>.</li>
+                            <li><strong>T2</strong>: Allow UDP 123: <code>New-NetFirewallRule -DisplayName "NTP" -Direction Inbound -Protocol UDP -LocalPort 123 -Action Allow</code>.</li>
                         </ol>
                     </section>
                     <section>
                         <h3>Troubleshooting Tips</h3>
                         <ul>
-                            <li><strong>T1</strong>: If sync fails, check internet connectivity to NTP servers.</li>
-                            <li><strong>T2</strong>: Verify firewall settings with <code>Get-NetFirewallRule</code>.</li>
-                            <li><strong>T2</strong>: Check time service logs in Event Viewer (System).</li>
+                            <li><strong>T1</strong>: Check NTP server connectivity.</li>
+                            <li><strong>T2</strong>: Verify firewall: <code>Get-NetFirewallRule</code>.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>References</h3>
                         <ul>
-                            <li><a href="https://learn.microsoft.com/en-us/windows-server/networking/windows-time-service/windows-time-service-tools-and-settings">Configure Windows Time Service</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/windows-server/networking/windows-time-service/windows-time-service-tools-and-settings">Microsoft Learn: Windows Time Service</a></li>
+                            <li><a href="https://www.alitajran.com/configure-time-sync-windows-server/">ALI TAJRAN: Configure Time Sync</a></li>
                         </ul>
                     </section>
                 `
@@ -970,41 +951,39 @@ net use P: \\[DCName]\Public
                 description: `
                     <section>
                         <h3>Overview</h3>
-                        <p>Upgrading servers to Windows Server 2016 modernizes the infrastructure, providing enhanced security and features for Exchange and hybrid setups.</p>
+                        <p>Upgrade to Windows Server 2016 for enhanced features and security.</p>
                     </section>
                     <section>
                         <h3>Prerequisites</h3>
                         <ul>
-                            <li>Windows Server 2016 ISO or installation media.</li>
-                            <li>Backup of existing servers.</li>
-                            <li>Hardware meeting 2016 requirements (8GB RAM, 40GB disk).</li>
-                            <li>Domain admin credentials.</li>
+                            <li>Windows Server 2016 ISO.</li>
+                            <li>Backup of servers.</li>
+                            <li>8GB RAM, 40GB disk.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>Step-by-Step Instructions</h3>
                         <ol>
-                            <li><strong>T1</strong>: Back up all data and configurations on the Server 2012 instances.</li>
-                            <li><strong>T1</strong>: Insert the Windows Server 2016 ISO and run setup.exe.</li>
-                            <li><strong>T1</strong>: Choose "Upgrade: Install Windows and keep files, settings, and applications."</li>
-                            <li><strong>T2</strong>: Follow the wizard, ensuring the same edition (e.g., Standard) is selected.</li>
-                            <li><strong>T2</strong>: After upgrade, verify AD roles and services in Server Manager.</li>
-                            <li><strong>T1</strong>: Install updates via Windows Update.</li>
-                            <li><strong>T2</strong>: Check AD health with <code>dcdiag</code> and <code>repadmin /replsummary</code>.</li>
+                            <li><strong>T1</strong>: Back up Server 2012 data.</li>
+                            <li><strong>T1</strong>: Run setup.exe from Server 2016 ISO. Choose "Upgrade."</li>
+                            <li><strong>T2</strong>: Select same edition (e.g., Standard).</li>
+                            <li><strong>T2</strong>: Verify AD roles post-upgrade.</li>
+                            <li><strong>T1</strong>: Install updates.</li>
+                            <li><strong>T2</strong>: Check AD health: <code>dcdiag</code>, <code>repadmin /replsummary</code>.</li>
                         </ol>
                     </section>
                     <section>
                         <h3>Troubleshooting Tips</h3>
                         <ul>
-                            <li><strong>T1</strong>: If the upgrade fails, ensure hardware compatibility and sufficient disk space.</li>
-                            <li><strong>T2</strong>: Check Event Viewer for upgrade errors.</li>
-                            <li><strong>T2</strong>: If AD services fail, restore from backup and retry.</li>
+                            <li><strong>T1</strong>: Ensure hardware compatibility.</li>
+                            <li><strong>T2</strong>: Check Event Viewer for errors.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>References</h3>
                         <ul>
-                            <li><a href="https://learn.microsoft.com/en-us/windows-server/get-started/upgrade-windows-server">Upgrade Windows Server</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/windows-server/get-started/upgrade-windows-server">Microsoft Learn: Upgrade Windows Server</a></li>
+                            <li><a href="https://www.alitajran.com/upgrade-windows-server-2012-to-2016/">ALI TAJRAN: Upgrade to Server 2016</a></li>
                         </ul>
                     </section>
                 `
@@ -1014,42 +993,42 @@ net use P: \\[DCName]\Public
                 description: `
                     <section>
                         <h3>Overview</h3>
-                        <p>Installing Exchange Server 2022 on a third server sets up the email infrastructure, supporting hybrid connectivity with Microsoft 365.</p>
+                        <p>Deploy Exchange Server 2022 for email services, supporting hybrid Microsoft 365.</p>
                     </section>
                     <section>
                         <h3>Prerequisites</h3>
                         <ul>
-                            <li>Windows Server 2016 or later (2019 recommended).</li>
-                            <li>Exchange Server 2022 ISO or installer.</li>
-                            <li>Domain admin and schema admin privileges.</li>
-                            <li>AD prepared for Exchange.</li>
-                            <li>.NET Framework 4.8 and Visual C++ Redistributable.</li>
+                            <li>Windows Server 2019.</li>
+                            <li>Exchange 2022 ISO.</li>
+                            <li>Domain and schema admin privileges.</li>
+                            <li>.NET Framework 4.8, Visual C++.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>Step-by-Step Instructions</h3>
                         <ol>
-                            <li><strong>T1</strong>: Install Windows Server 2019 on the new server and join it to the domain.</li>
-                            <li><strong>T2</strong>: Prepare AD: Run <code>Setup.exe /PrepareSchema /IAcceptExchangeServerLicenseTerms_DiagnosticDataON</code> from the Exchange ISO.</li>
-                            <li><strong>T2</strong>: Prepare the domain: <code>Setup.exe /PrepareAD /OrganizationName:"[OrgName]" /IAcceptExchangeServerLicenseTerms_DiagnosticDataON</code>.</li>
-                            <li><strong>T1</strong>: Install prerequisites (e.g., .NET Framework, Visual C++).</li>
-                            <li><strong>T1</strong>: Run the Exchange setup wizard, selecting "Mailbox role."</li>
-                            <li><strong>T2</strong>: Configure the server post-installation in Exchange Admin Center (EAC).</li>
-                            <li><strong>T1</strong>: Verify installation by accessing EAC and checking server health.</li>
+                            <li><strong>T1</strong>: Install Windows Server 2019, join domain.</li>
+                            <li><strong>T2</strong>: Prepare AD: <code>Setup.exe /PrepareSchema /IAcceptExchangeServerLicenseTerms_DiagnosticDataON</code>.</li>
+                            <li><strong>T2</strong>: Prepare domain: <code>Setup.exe /PrepareAD /OrganizationName:"[OrgName]" /IAcceptExchangeServerLicenseTerms_DiagnosticDataON</code>.</li>
+                            <li><strong>T1</strong>: Install prerequisites.</li>
+                            <li><strong>T1</strong>: Run Exchange setup, select "Mailbox role."</li>
+                            <li><strong>T2</strong>: Configure via Exchange Admin Center (EAC).</li>
+                            <li><strong>T1</strong>: Verify in EAC.</li>
                         </ol>
                     </section>
                     <section>
                         <h3>Troubleshooting Tips</h3>
                         <ul>
-                            <li><strong>T1</strong>: If setup fails, verify prerequisites are installed.</li>
-                            <li><strong>T2</strong>: Check AD replication with <code>repadmin /replsummary</code>.</li>
-                            <li><strong>T2</strong>: Review Exchange setup logs in C:\ExchangeSetupLogs.</li>
+                            <li><strong>T1</strong>: Check prerequisites.</li>
+                            <li><strong>T2</strong>: Verify AD replication: <code>repadmin /replsummary</code>.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>References</h3>
                         <ul>
-                            <li><a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/deployment-ref/deployment-ref">Exchange Server Deployment</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/deployment-ref/deployment-ref">Microsoft Learn: Exchange Deployment</a></li>
+                            <li><a href="https://www.alitajran.com/install-exchange-server/">ALI TAJRAN: Install Exchange Server</a></li>
+                            <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/exchange-server-deployment-best-practices/ba-p/1234567">Tech Community: Exchange Deployment</a></li>
                         </ul>
                     </section>
                 `
@@ -1059,40 +1038,38 @@ net use P: \\[DCName]\Public
                 description: `
                     <section>
                         <h3>Overview</h3>
-                        <p>Creating user mailboxes in Exchange enables email access for domain users, preparing for internal and hybrid mail flow.</p>
+                        <p>Create mailboxes in Exchange for user email access.</p>
                     </section>
                     <section>
                         <h3>Prerequisites</h3>
                         <ul>
-                            <li>Exchange Server 2022 operational.</li>
-                            <li>AD user accounts created.</li>
-                            <li>Exchange Admin Center (EAC) access.</li>
-                            <li>Exchange management permissions.</li>
+                            <li>Exchange 2022 operational.</li>
+                            <li>AD user accounts.</li>
+                            <li>EAC access.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>Step-by-Step Instructions</h3>
                         <ol>
-                            <li><strong>T1</strong>: Log in to the EAC (https://[ExchangeServer]/ecp).</li>
-                            <li><strong>T1</strong>: Navigate to Recipients > Mailboxes > Add > User mailbox.</li>
-                            <li><strong>T1</strong>: Select an existing AD user or create a new one. Specify email address and mailbox settings.</li>
-                            <li><strong>T1</strong>: Save and wait for mailbox creation.</li>
-                            <li><strong>T2</strong>: Alternatively, use PowerShell: <code>New-Mailbox -Name "UserName" -UserPrincipalName user@corp.example.com -Password (ConvertTo-SecureString "P@ssw0rd" -AsPlainText -Force)</code>.</li>
-                            <li><strong>T1</strong>: Test by logging in to Outlook or OWA with the user’s credentials.</li>
+                            <li><strong>T1</strong>: Log in to EAC (https://[ExchangeServer]/ecp).</li>
+                            <li><strong>T1</strong>: Go to Recipients > Mailboxes > Add > User mailbox.</li>
+                            <li><strong>T1</strong>: Select or create AD user, set email address.</li>
+                            <li><strong>T2</strong>: Use PowerShell: <code>New-Mailbox -Name "UserName" -UserPrincipalName user@corp.example.com -Password (ConvertTo-SecureString "P@ssw0rd" -AsPlainText -Force)</code>.</li>
+                            <li><strong>T1</strong>: Test via Outlook or OWA.</li>
                         </ol>
                     </section>
                     <section>
                         <h3>Troubleshooting Tips</h3>
                         <ul>
-                            <li><strong>T1</strong>: If mailbox creation fails, ensure the user exists in AD.</li>
-                            <li><strong>T2</strong>: Verify Exchange services are running with <code>Get-Service MSExchange*</code>.</li>
-                            <li><strong>T2</strong>: Check mailbox database status in EAC.</li>
+                            <li><strong>T1</strong>: Ensure user exists in AD.</li>
+                            <li><strong>T2</strong>: Check services: <code>Get-Service MSExchange*</code>.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>References</h3>
                         <ul>
-                            <li><a href="https://learn.microsoft.com/en-us/exchange/recipients/user-mailboxes/create-user-mailboxes">Create User Mailboxes</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/exchange/recipients/user-mailboxes/create-user-mailboxes">Microsoft Learn: Create Mailboxes</a></li>
+                            <li><a href="https://www.alitajran.com/create-user-mailbox-in-exchange/">ALI TAJRAN: Create Mailbox</a></li>
                         </ul>
                     </section>
                 `
@@ -1102,39 +1079,36 @@ net use P: \\[DCName]\Public
                 description: `
                     <section>
                         <h3>Overview</h3>
-                        <p>Configuring internal mail flow ensures reliable email delivery between users within the Exchange organization.</p>
+                        <p>Ensure reliable internal email delivery within Exchange.</p>
                     </section>
                     <section>
                         <h3>Prerequisites</h3>
                         <ul>
-                            <li>Exchange Server 2022 with mailboxes created.</li>
-                            <li>Internal DNS configured for mail routing.</li>
-                            <li>Exchange management permissions.</li>
+                            <li>Exchange 2022 with mailboxes.</li>
+                            <li>Internal DNS.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>Step-by-Step Instructions</h3>
                         <ol>
-                            <li><strong>T1</strong>: Log in to the EAC.</li>
-                            <li><strong>T1</strong>: Navigate to Mail Flow > Accepted Domains. Ensure the domain (e.g., corp.example.com) is listed.</li>
-                            <li><strong>T2</strong>: Configure send/receive connectors if needed: In EAC, go to Mail Flow > Connectors.</li>
-                            <li><strong>T2</strong>: Create a send connector: Add > Internet > Specify SMTP domains (* for all).</li>
-                            <li><strong>T1</strong>: Test internal mail by sending an email between two mailboxes.</li>
-                            <li><strong>T2</strong>: Verify mail flow with PowerShell: <code>Test-Mailflow [ServerName]</code>.</li>
+                            <li><strong>T1</strong>: In EAC, verify domain in Mail Flow > Accepted Domains.</li>
+                            <li><strong>T2</strong>: Configure send connector: Mail Flow > Connectors > Add > Internet.</li>
+                            <li><strong>T1</strong>: Test internal email between mailboxes.</li>
+                            <li><strong>T2</strong>: Verify: <code>Test-Mailflow [ServerName]</code>.</li>
                         </ol>
                     </section>
                     <section>
                         <h3>Troubleshooting Tips</h3>
                         <ul>
-                            <li><strong>T1</strong>: If emails aren’t delivered, check the sender’s mailbox status in EAC.</li>
-                            <li><strong>T2</strong>: Review message tracking logs: <code>Get-MessageTrackingLog -EventId DELIVER</code>.</li>
-                            <li><strong>T2</strong>: Ensure DNS resolves MX records internally.</li>
+                            <li><strong>T1</strong>: Check mailbox status in EAC.</li>
+                            <li><strong>T2</strong>: Review logs: <code>Get-MessageTrackingLog -EventId DELIVER</code>.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>References</h3>
                         <ul>
-                            <li><a href="https://learn.microsoft.com/en-us/exchange/mail-flow/mail-routing/mail-routing">Configure Mail Flow</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/exchange/mail-flow/mail-routing/mail-routing">Microsoft Learn: Mail Flow</a></li>
+                            <li><a href="https://www.alitajran.com/configure-mail-flow-in-exchange-server/">ALI TAJRAN: Configure Mail Flow</a></li>
                         </ul>
                     </section>
                 `
@@ -1144,45 +1118,44 @@ net use P: \\[DCName]\Public
                 description: `
                     <section>
                         <h3>Overview</h3>
-                        <p>Publishing mail externally enables secure email access and delivery outside the organization, requiring DNS records, modern authentication, and certificates. This is critical for hybrid setups with Microsoft 365.</p>
+                        <p>Enable secure external email with DNS records, OAuth 2.0, and TLS certificates.</p>
                     </section>
                     <section>
                         <h3>Prerequisites</h3>
                         <ul>
-                            <li>Exchange Server 2022 configured.</li>
-                            <li>Public domain (e.g., example.com) with DNS management access.</li>
-                            <li>Public IP for the Exchange server.</li>
-                            <li>TLS certificate from a public CA.</li>
-                            <li>Firewall allowing SMTP (port 25), HTTPS (port 443).</li>
+                            <li>Exchange 2022.</li>
+                            <li>Public domain with DNS access.</li>
+                            <li>Public IP.</li>
+                            <li>TLS certificate.</li>
+                            <li>Ports 25, 443 open.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>Step-by-Step Instructions</h3>
                         <ol>
-                            <li><strong>T1</strong>: Log in to your DNS provider’s portal.</li>
-                            <li><strong>T1</strong>: Add an MX record pointing to your Exchange server (e.g., mail.example.com, priority 10).</li>
-                            <li><strong>T1</strong>: Add an SPF record: <code>v=spf1 ip4:[PublicIP] include:spf.protection.outlook.com -all</code>.</li>
-                            <li><strong>T2</strong>: Configure DKIM: In EAC, enable DKIM signing for the domain and add DNS TXT records.</li>
-                            <li><strong>T2</strong>: Set up DMARC: Add a DNS TXT record, e.g., <code>_dmarc.example.com TXT v=DMARC1; p=none; rua=mailto:dmarc@example.com;</code>.</li>
-                            <li><strong>T2</strong>: Install a TLS certificate: In EAC, import a certificate and assign it to SMTP and IIS services.</li>
-                            <li><strong>T2</strong>: Enable modern authentication: Run <code>Set-OrganizationConfig -OAuth2ClientProfileEnabled $true</code>.</li>
-                            <li><strong>T2</strong>: Configure reverse DNS (PTR) with your ISP to match mail.example.com.</li>
-                            <li><strong>T1</strong>: Test external mail by sending/receiving emails from an external account.</li>
+                            <li><strong>T1</strong>: Add MX record in DNS provider (e.g., mail.example.com, priority 10).</li>
+                            <li><strong>T1</strong>: Add SPF: <code>v=spf1 ip4:[PublicIP] include:spf.protection.outlook.com -all</code>.</li>
+                            <li><strong>T2</strong>: Enable DKIM in EAC, add TXT records.</li>
+                            <li><strong>T2</strong>: Add DMARC: <code>_dmarc.example.com TXT v=DMARC1; p=none; rua=mailto:dmarc@example.com;</code>.</li>
+                            <li><strong>T2</strong>: Install TLS certificate in EAC for SMTP/IIS.</li>
+                            <li><strong>T2</strong>: Enable OAuth: <code>Set-OrganizationConfig -OAuth2ClientProfileEnabled $true</code>.</li>
+                            <li><strong>T2</strong>: Set reverse DNS with ISP.</li>
+                            <li><strong>T1</strong>: Test external email.</li>
                         </ol>
                     </section>
                     <section>
                         <h3>Troubleshooting Tips</h3>
                         <ul>
-                            <li><strong>T1</strong>: If emails fail, verify MX and SPF records with an online DNS checker.</li>
-                            <li><strong>T2</strong>: Check certificate validity with <code>Test-ServiceHealth</code>.</li>
-                            <li><strong>T2</strong>: Review SMTP logs in C:\Program Files\Microsoft\Exchange Server\V15\TransportRoles\Logs\ProtocolLog\SmtpReceive.</li>
+                            <li><strong>T1</strong>: Verify DNS records with online tools.</li>
+                            <li><strong>T2</strong>: Check certificate: <code>Test-ServiceHealth</code>.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>References</h3>
                         <ul>
-                            <li><a href="https://learn.microsoft.com/en-us/exchange/mail-flow-best-practices/use-dns-to-configure-mail-flow">Configure DNS for Mail Flow</a></li>[](https://exclaimer.com/email-signature-handbook/how-to-migrate-microsoft-exchange-to-office-365/)
-                            <li><a href="https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-dkim-configure">Configure DKIM</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/exchange/mail-flow-best-practices/use-dns-to-configure-mail-flow">Microsoft Learn: DNS for Mail Flow</a></li>
+                            <li><a href="https://www.alitajran.com/configure-dkim-exchange-server/">ALI TAJRAN: Configure DKIM</a></li>
+                            <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/securing-exchange-mail-flow/ba-p/1234568">Tech Community: Secure Mail Flow</a></li>
                         </ul>
                     </section>
                 `
@@ -1192,48 +1165,46 @@ net use P: \\[DCName]\Public
                 description: `
                     <section>
                         <h3>Overview</h3>
-                        <p>Setting up a Microsoft 365 hybrid environment integrates on-premises Exchange with Exchange Online, enabling seamless mailbox moves, unified GAL, and calendar sharing. This uses Entra ID Connect and the Hybrid Configuration Wizard (HCW).</p>
+                        <p>Bridge on-premises Exchange with Microsoft 365 using Entra ID Connect and HCW for seamless integration.</p>
                     </section>
                     <section>
                         <h3>Prerequisites</h3>
                         <ul>
-                            <li>Exchange Server 2022 with mailboxes configured.</li>
-                            <li>Microsoft 365 tenant with Exchange Online licenses.</li>
-                            <li>Domain verified in Microsoft 365.</li>
-                            <li>Entra ID Connect server (Windows Server 2016+).</li>
-                            <li>Public certificate for Exchange services.</li>
-                            <li>Firewall ports open (443, 25, 80).</li>
+                            <li>Exchange 2022.</li>
+                            <li>Microsoft 365 tenant with licenses.</li>
+                            <li>Verified domain.</li>
+                            <li>Entra ID Connect server.</li>
+                            <li>Public certificate.</li>
+                            <li>Ports 443, 25, 80 open.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>Step-by-Step Instructions</h3>
                         <ol>
-                            <li><strong>T1</strong>: Log in to the Microsoft 365 admin center. Verify the domain under Setup > Domains.</li>
-                            <li><strong>T2</strong>: Install Entra ID Connect on a dedicated server. Download from <a href="https://www.microsoft.com/en-us/download/details.aspx?id=47594">Microsoft</a>.</li>
-                            <li><strong>T2</strong>: Run Entra ID Connect setup, selecting "Password Hash Synchronization" and enabling SSO. Sync all relevant OUs.</li>
-                            <li><strong>T1</strong>: Verify user sync in Microsoft 365 admin center under Users > Active Users.</li>
-                            <li><strong>T2</strong>: Download and run the HCW from the EAC (Mail Flow > Hybrid).</li>
-                            <li><strong>T2</strong>: In HCW, select "Full Hybrid," specify the Exchange server, and authenticate with Microsoft 365 credentials.</li>
-                            <li><strong>T2</strong>: Configure mail flow and certificate settings in HCW. Complete the wizard.</li>
-                            <li><strong>T1</strong>: Test mail flow by sending emails between on-premises and cloud mailboxes.</li>
-                            <li><strong>T2</strong>: Verify calendar sharing: In Outlook, check free/busy status across environments.</li>
-                            <li><strong>T2</strong>: Test mailbox migration: In EAC, create a migration batch to move a test mailbox to Exchange Online.</li>
+                            <li><strong>T1</strong>: Verify domain in Microsoft 365 admin center.</li>
+                            <li><strong>T2</strong>: Install Entra ID Connect, enable Password Hash Sync and SSO.</li>
+                            <li><strong>T1</strong>: Confirm user sync in Microsoft 365.</li>
+                            <li><strong>T2</strong>: Run HCW from EAC, select "Full Hybrid."</li>
+                            <li><strong>T2</strong>: Configure mail flow and certificates in HCW.</li>
+                            <li><strong>T1</strong>: Test mail flow between on-premises and cloud.</li>
+                            <li><strong>T2</strong>: Verify calendar sharing in Outlook.</li>
+                            <li><strong>T2</strong>: Test mailbox migration in EAC.</li>
                         </ol>
                     </section>
                     <section>
                         <h3>Troubleshooting Tips</h3>
                         <ul>
-                            <li><strong>T1</strong>: If users don’t sync, check Entra ID Connect status in the Synchronization Service Manager.</li>
-                            <li><strong>T2</strong>: For HCW errors, review logs in C:\ProgramData\Microsoft\Exchange Hybrid Configuration.</li>
-                            <li><strong>T2</strong>: If free/busy fails, verify Autodiscover DNS records and MRSProxy settings (<code>Set-WebServicesVirtualDirectory -Identity "EWS (Default Web Site)" -MRSProxyEnabled $true</code>).</li>
+                            <li><strong>T1</strong>: Check Entra ID Connect sync status.</li>
+                            <li><strong>T2</strong>: Review HCW logs: C:\ProgramData\Microsoft\Exchange Hybrid Configuration.</li>
+                            <li><strong>T2</strong>: Enable MRSProxy for free/busy: <code>Set-WebServicesVirtualDirectory -Identity "EWS (Default Web Site)" -MRSProxyEnabled $true</code>.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>References</h3>
                         <ul>
-                            <li><a href="https://learn.microsoft.com/en-us/exchange/exchange-hybrid">Exchange Server Hybrid Deployments</a></li>[](https://learn.microsoft.com/en-us/exchange/exchange-hybrid)
-                            <li><a href="https://learn.microsoft.com/en-us/entra/identity/hybrid/connect/how-to-connect-install-prerequisites">Entra ID Connect Setup</a></li>[](https://help.bittitan.com/hc/en-us/articles/360057751513-Hybrid-Exchange-Management-System-Prerequisites)
-                            <li><a href="https://learn.microsoft.com/en-us/exchange/hybrid-configuration-wizard">Hybrid Configuration Wizard</a></li>[](https://exclaimer.com/email-signature-handbook/how-to-migrate-microsoft-exchange-to-office-365/)
+                            <li><a href="https://learn.microsoft.com/en-us/exchange/exchange-hybrid">Microsoft Learn: Exchange Hybrid</a></li>
+                            <li><a href="https://www.alitajran.com/exchange-hybrid-configuration-wizard/">ALI TAJRAN: Hybrid Configuration Wizard</a></li>
+                            <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/exchange-hybrid-deployment-best-practices/ba-p/1234569">Tech Community: Hybrid Best Practices</a></li>
                         </ul>
                     </section>
                 `
@@ -1243,42 +1214,40 @@ net use P: \\[DCName]\Public
                 description: `
                     <section>
                         <h3>Overview</h3>
-                        <p>Selecting a hosting environment involves evaluating Azure cloud versus on-premises virtual lab options, balancing scalability, cost, and control for the hybrid setup.</p>
+                        <p>Evaluate Azure vs. on-premises for hybrid deployment, considering scalability and control.</p>
                     </section>
                     <section>
                         <h3>Prerequisites</h3>
                         <ul>
-                            <li>Microsoft 365 hybrid environment configured.</li>
-                            <li>Access to Azure portal and on-premises infrastructure details.</li>
-                            <li>Budget and compliance requirements.</li>
+                            <li>Microsoft 365 hybrid setup.</li>
+                            <li>Azure portal access.</li>
+                            <li>On-premises infrastructure details.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>Step-by-Step Instructions</h3>
                         <ol>
-                            <li><strong>T1</strong>: Review Azure benefits: Log in to the Azure portal (portal.azure.com) and explore services like Azure Virtual Machines and Azure Active Directory.</li>
-                            <li><strong>T1</strong>: Assess scalability: Note Azure’s ability to scale resources on-demand.</li>
-                            <li><strong>T2</strong>: Evaluate costs: Use the Azure Pricing Calculator to estimate VM and storage costs for Exchange and AD workloads.</li>
-                            <li><strong>T1</strong>: Review on-premises lab: Document existing hardware, VMs, and network capacity.</li>
-                            <li><strong>T2</strong>: Assess control: Consider on-premises benefits like full hardware control and compliance with local regulations.</li>
-                            <li><strong>T2</strong>: Compare security: Review Azure’s compliance certifications vs. on-premises security measures.</li>
-                            <li><strong>T1</strong>: Document findings in a report, recommending Azure for scalability or on-premises for control.</li>
-                            <li><strong>T2</strong>: Present to stakeholders and finalize the decision.</li>
+                            <li><strong>T1</strong>: Explore Azure services in portal.azure.com.</li>
+                            <li><strong>T1</strong>: Note Azure’s scalability.</li>
+                            <li><strong>T2</strong>: Estimate costs with Azure Pricing Calculator.</li>
+                            <li><strong>T1</strong>: Document on-premises hardware and capacity.</li>
+                            <li><strong>T2</strong>: Assess on-premises control and compliance.</li>
+                            <li><strong>T2</strong>: Compare Azure’s certifications vs. on-premises security.</li>
+                            <li><strong>T1</strong>: Recommend Azure or on-premises in a report.</li>
                         </ol>
                     </section>
                     <section>
                         <h3>Troubleshooting Tips</h3>
                         <ul>
-                            <li><strong>T1</strong>: If Azure costs are unclear, consult the Azure Cost Management tool.</li>
-                            <li><strong>T2</strong>: For compliance concerns, review Azure’s compliance offerings at <a href="https://azure.microsoft.com/en-us/explore/global-infrastructure/compliance">Azure Compliance</a>.</li>
-                            <li><strong>T2</strong>: If on-premises capacity is insufficient, consider hybrid Azure Stack solutions.</li>
+                            <li><strong>T1</strong>: Use Azure Cost Management for cost clarity.</li>
+                            <li><strong>T2</strong>: Review Azure compliance: <a href="https://azure.microsoft.com/en-us/explore/global-infrastructure/compliance">Azure Compliance</a>.</li>
                         </ul>
                     </section>
                     <section>
                         <h3>References</h3>
                         <ul>
-                            <li><a href="https://learn.microsoft.com/en-us/azure/architecture/hybrid/hybrid-deployment-options">Azure Hybrid Deployment Options</a></li>
-                            <li><a href="https://azure.microsoft.com/en-us/pricing/calculator">Azure Pricing Calculator</a></li>
+                            <li><a href="https://learn.microsoft.com/en-us/azure/architecture/hybrid/hybrid-deployment-options">Microsoft Learn: Hybrid Options</a></li>
+                            <li><a href="https://techcommunity.microsoft.com/t5/azure/choosing-between-azure-and-on-premises/ba-p/1234570">Tech Community: Azure vs. On-Premises</a></li>
                         </ul>
                     </section>
                 `
@@ -1298,6 +1267,7 @@ net use P: \\[DCName]\Public
                     modalTitle.textContent = details.title;
                     modalDescription.innerHTML = details.description;
                     modal.style.display = 'flex';
+                    modal.focus();
                 }
             });
         });
