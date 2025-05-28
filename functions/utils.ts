@@ -1,4 +1,4 @@
-utilsimport { nanoid } from 'nanoid';
+import { nanoid } from 'nanoid';
 
 export async function generateCSRFToken(env: Env): Promise<string> {
   const token = nanoid(32);
