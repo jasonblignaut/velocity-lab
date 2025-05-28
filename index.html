@@ -16,20 +16,20 @@
     </div>
   </nav>
   <div class="container">
-    <header class="header">
-      <h1>Welcome to Velocity Lab</h1>
-      <h2>Master IT Skills with Hands-On Training</h2>
-    </header>
-    <section class="prerequisites">
-      <h3>Getting Started</h3>
+    <h1>Velocity Lab</h1>
+    <h2>Timeline Guide to Implement the Lab</h2>
+    <p>Welcome to Velocity Lab! Please register or log in to track your progress through the four-week lab timeline.</p>
+    <div class="prerequisites">
+      <h3>Lab Prerequisites</h3>
       <ul>
-        <li>Register to access our free IT training platform.</li>
-        <li>Complete hands-on labs to build skills in Active Directory, Exchange, and Microsoft 365.</li>
-        <li>Track your progress with our interactive checklist.</li>
-        <li>Need help? Visit our <a href="https://learn.microsoft.com/en-us/windows-server/" target="_blank">resources</a>.</li>
+        <li>Create a Microsoft 365 free trial at <a href="https://www.microsoft.com/en-us/microsoft-365/try">microsoft.com</a> (for Entra ID to support hybrid identity and mailboxes for Exchange testing in Week 4).</li>
+        <li>An old laptop (minimum 8GB RAM, 100GB disk) to use as a mock server for lab exercises.</li>
+        <li>Install VirtualBox from <a href="https://www.virtualbox.org">virtualbox.org</a>, configured with bridged networking to share the laptop’s IP range (e.g., 192.168.1.x).</li>
+        <li>Request a static IP from your ISP (~R25/month, e.g., Afrihost or Telkom) for consistent external mail access.</li>
+        <li>Open firewall ports 25 (SMTP), 587 (SMTPS), 443 (HTTPS), and 993 (IMAPS) on all virtual servers (Windows Firewall or Linux iptables), the laptop (host OS firewall), and your home router (port forwarding to the laptop’s IP).</li>
+        <li>Ensure stable internet connectivity (minimum 10 Mbps) for all lab machines to access Microsoft 365 and updates.</li>
       </ul>
-    </section>
+    </div>
   </div>
-  <script src="/js/main.js"></script>
 </body>
 </html>

@@ -1,38 +1,41 @@
-import { createClient, generateSessionId } from './utils';
+import { validateCSRFToken } from './utils';
 
-export default {
-  async fetch(request: Request, env: Env) {
-    if (request.method !== 'POST') {
-      return new Response('Method Not Allowed', { status: 405 });
-    }
-
-    const formData = await request.formData();
+export const onRequestPost: PagesFunction<Env> = async (context) => {
+  try {
+    const formData = await context.request.formData();
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     const csrfToken = formData.get('csrf_token') as string;
 
     if (!email || !password || !csrfToken) {
-      return new Response('Missing required fields', { status: 400 });
+      return new Response('Missing fields', { status: 400 });
     }
 
-    const db = createClient(env);
-    const user = await db
-      .prepare('SELECT name, password FROM users WHERE email = ?')
-      .bind(email)
-      .first();
-
-    if (!user || user.password !== password) {
-      return new Response('Invalid email or password', { status: 401 });
+    if (!await validateCSRFToken(context.env, csrfToken)) {
+      return new Response('Invalid CSRF token', { status: 403 });
     }
 
-    const sessionId = generateSessionId();
-    await env.KV.put(`session:${sessionId}`, email, { expirationTtl: 86400 });
+    const userData = await context.env.USERS.get(`user:${email}`);
+    if (!userData) {
+      return new Response('Email not found', { status: 400 });
+    }
 
-    const headers = new Headers();
-    headers.append('Set-Cookie', `session=${sessionId}; Path=/; HttpOnly; Max-Age=86400`);
-    return new Response(JSON.stringify({ name: user.name }), {
+    const user = JSON.parse(userData);
+    if (user.password !== password) {
+      return new Response('Incorrect password', { status: 400 });
+    }
+
+    const sessionToken = crypto.randomUUID();
+    await context.env.USERS.put(`session:${sessionToken}`, user.id, { expirationTtl: 86400 });
+
+    const response = new Response('Login successful', {
       status: 200,
-      headers,
+      headers: {
+        'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict`,
+      },
     });
-  },
+    return response;
+  } catch (error) {
+    return new Response('Server error', { status: 500 });
+  }
 };
