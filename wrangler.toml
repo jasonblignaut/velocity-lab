@@ -1,0 +1,11 @@
+name = "velocity-lab"
+pages_build_output_dir = "./public"
+compatibility_date = "2025-05-28"
+
+[[kv_namespaces]]
+binding = "USERS"
+id = "92065323806e46ff89949262ba803008"
+
+[[kv_namespaces]]
+binding = "PROGRESS"
+id = "72beb3bc668347b584984bc61aed9492"
