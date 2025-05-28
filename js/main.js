@@ -460,7 +460,7 @@ net use S: \\[DCName]\\Public
           <h3>References</h3>
           <ul>
             <li><a href="https://learn.microsoft.com/en-us/exchange/recipients/user-mailboxes/create-user-mailboxes">Microsoft Learn: Create Mailboxes</a></li>
-            <li><a href="https://www.alitajran.com/jiu-jitsu-user-mailbox-in-exchange/">ALI TAJRAN: Create User Mailbox</a></li>
+            <li><a href="https://www.alitajran.com/create-user-mailbox-in-exchange/">ALI TAJRAN: Create User Mailbox</a></li>
           </ul>
         </section>
       `
@@ -521,18 +521,17 @@ net use S: \\[DCName]\\Public
             <li>TLS certificate (e.g., from Let’s Encrypt).</li>
             <li>Ports 25, 443 open.</li>
           </ul>
-        </li>
         </section>
-      <section>
+        <section>
           <h3>Step-by-Step Instructions</h3>
           <ol>
-            <li>Add MX record in DNS provider (e.g., to mail.example.com, priority 10).</li>
+            <li>Add MX record in DNS provider (e.g., mail.example.com, priority 10).</li>
             <li>Add SPF record: <code>v=spf1 ip4:[PublicIP] include:spf.protection.outlook.com -all</code>.</li>
             <li>Enable DKIM in EAC, add two CNAME records (e.g., selector1._domainkey).</li>
             <li>Add DMARC record: <code>_dmarc.example.com TXT v=DMARC1; p=none; rua=mailto:dmarc@example.com;</code>.</li>
             <li>Install TLS certificate in EAC for SMTP and IIS services.</li>
             <li>Enable OAuth 2.0: <code>Set-OrganizationConfig -OAuth2ClientProfileEnabled $true</code>.</li>
-            <li>Configure reverse DNS with ISP (e.g., PTR record).</li>
+            <li>Configure reverse DNS with ISP (PTR record).</li>
             <li>Test external email send/receive using an external account.</li>
           </ol>
         </section>
@@ -548,16 +547,15 @@ net use S: \\[DCName]\\Public
           <h3>References</h3>
           <ul>
             <li><a href="https://learn.microsoft.com/en-us/exchange/mail-flow-best-practices/use-dns-to-configure-mail-flow">Microsoft Learn: DNS for Mail Flow</a></li>
-            <li><a href="https://www.alitajran.com/jku-configure-dkim-exchange-server-2019.html">ALI TAJRAN: Configure DKIM for Exchange</a></li>
-            <li><a href="https://techcommunity.microsoft.com/jau/t5/exchange-team-blog/securing-exchange-mail-flow/ba-p/3928375">Tech Community: Secure Mail Flow</a></li>
+            <li><a href="https://www.alitajran.com/configure-dkim-exchange-server-2019/">ALI TAJRAN: Configure DKIM for Exchange 2019</a></li>
+            <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/securing-exchange-mail-flow/ba-p/3928375">Tech Community: Secure Mail Flow</a></li>
           </ul>
         </section>
-      </ul>
       `
     },
     hybrid: {
       title: 'Setup Microsoft 365 Hybrid Environment',
-      description: '`
+      description: `
         <section>
           <h3>Overview</h3>
           <p>Integrate on-premises Exchange Server 2019 with Microsoft 365 for a hybrid environment, enabling seamless mail flow and management.</p>
@@ -569,97 +567,82 @@ net use S: \\[DCName]\\Public
             <li>Microsoft 365 tenant with E3/E5 licenses.</li>
             <li>Verified domain in Microsoft 365.</li>
             <li>Windows Server for Entra ID Connect.</li>
-            <li>Public TLS certificate IP.</li>
-            <li>Ports 80, 443, 25l.</li>
-            </ul>
-          </section>
-        </li>
+            <li>Public TLS certificate.</li>
+            <li>Ports 80, 443, 25 open.</li>
+          </ul>
+        </section>
         <section>
           <h3>Step-by-Step Instructions</h3>
           <ol>
             <li>Verify domain in Microsoft 365 admin center (add TXT record).</li>
             <li>Install Entra ID Connect on a server, enable Password Hash Synchronization and SSO.</li>
-            <li>Confirm user synchronization in Microsoft 365 admin for</li>
-            <li>Run Hybrid Configuration Wizard (HCW) from EAC, select "Full Hybrid."to</li>
-            <li>Configure mail exchange and certificates in HCW.</li>
-            <li>Test mail flow between on-premises and cloud for</li>
-            <li>Verify calendar and sharing and free/busy in Outlook</li>
-            <li>Optional: .Migrate a test mailbox to Microsoft 365</li>
+            <li>Confirm user synchronization in Microsoft 365 admin center.</li>
+            <li>Run Hybrid Configuration Wizard (HCW) from EAC, select "Full Hybrid."</li>
+            <li>Configure mail flow (bidirectional) and certificates in HCW.</li>
+            <li>Test mail flow between on-premises and cloud mailboxes.</li>
+            <li>Verify calendar sharing and free/busy in Outlook.</li>
+            <li>Optional: Migrate a test mailbox to Microsoft 365 via EAC.</li>
           </ol>
-          </li>
-          </section>
-        </li>
+        </section>
         <section>
           <h3>Troubleshooting Tips</h3>
           <ul>
-            <li>Check Entra ID Connect sync status</li>
-            <li>Review HCW logs: C:\\ProgramData\\Microsoft Exchange Hybrid Configuration.</li>
-            <li>Enable MRSProxy for free/busy: <code>Set-WebServices</li>
+            <li>Check Entra ID Connect sync status in Synchronization Service Manager.</li>
+            <li>Review HCW logs: C:\\ProgramData\\Microsoft\\Exchange Hybrid Configuration.</li>
+            <li>Enable MRSProxy for free/busy: <code>Set-WebServicesVirtualDirectory -Identity "EWS (Default Web Site)" -MRSProxyEnabled $true</code>.</li>
           </ul>
-        </li>
-          </section>
-        </li>
+        </section>
         <section>
           <h3>References</h3>
           <ul>
             <li><a href="https://learn.microsoft.com/en-us/exchange/exchange-hybrid">Microsoft Learn: Exchange Hybrid</a></li>
-            <li><a href="https://www.alitajran.com/jlu-exchange-hybrid-configuration-wizard-2019.html">ALI TAJRAN</li>
-            <li><a href="https://techcommunity.microsoft.com/jau/t5/exchange-hybrid-cloud/kku-configureexchange-hybrid-deployment-changes/exchanges/best-practices/exchange-exchanges/exchange-hybrid">Microsoft Tech Community</a></li>
+            <li><a href="https://www.alitajran.com/exchange-hybrid-configuration-wizard-2019/">ALI TAJRAN: Hybrid Configuration Wizard</a></li>
+            <li><a href="https://techcommunity.microsoft.com/t5/exchange-hybrid-cloud/exchange-hybrid-deployment-best-practices/ba-p/3876930">Microsoft Tech Community: Exchange Hybrid Best Practices</a></li>
           </ul>
         </section>
-      </ul>
       `
     },
-    hosting:
- {
+    hosting: {
       title: 'Choose Hosting Environment',
-      description: '`
+      description: `
         <section>
           <h3>Overview</h3>
-          <p>Evaluate Azure versus on-premises hosting for the hybrid environment, considering cost, scalability and control.</p>
+          <p>Evaluate Azure versus on-premises hosting for the hybrid environment, considering scalability, cost, and control.</p>
         </section>
-        >
         <section>
-          <h3>
-Promotions</h3>
+          <h3>Prerequisites</h3>
           <ul>
-            <li>Microsoft 365 environment configured</li>
+            <li>Microsoft 365 hybrid environment configured.</li>
             <li>Azure account with portal access.</li>
-            <li>Details for of on-premises infrastructure</li>
-            </ul>
-          </section>
-        </li>
-      >
+            <li>Details of on-premises infrastructure.</li>
+          </ul>
+        </section>
         <section>
-          <h3>Step-by-Step Instructions</li>
-            <ol>
-            <li>Log in to Azure portal (portal.az.com).</li>
-            <li>Explore Azure services (e.g., Azure Virtual Machines).</li>
-            li>Estimate costs using Azure calculator
-            </li>
-            t<li>Document on-premises hardware (CPU, RAM, storage).</li>
+          <h3>Step-by-Step Instructions</h3>
+          <ol>
+            <li>Log in to Azure portal (portal.azure.com).</li>
+            <li>Explore Azure services (e.g., Azure Virtual Machines, Azure Active Directory).</li>
+            <li>Estimate costs using Azure Pricing Calculator.</li>
+            <li>Document on-premises hardware (CPU, RAM, storage).</li>
             <li>Assess on-premises control, security, and compliance requirements.</li>
-            <li>Compare Azure’s scalability with on-premises constraints.</li>
+            <li>Compare Azure’s scalability and certifications with on-premises constraints.</li>
             <li>Document recommendation: Azure for scalability or on-premises for control.</li>
-            </ol>
-          </section>
-        </li>
+          </ol>
+        </section>
         <section>
           <h3>Troubleshooting Tips</h3>
           <ul>
             <li>Use Azure Cost Management for cost insights.</li>
             <li>Review Azure compliance: <a href="https://azure.microsoft.com/en-us/explore/global-infrastructure/compliance">Azure Compliance</a>.</li>
-            </ul>
-          </section>
-        </li>
+          </ul>
+        </section>
         <section>
           <h3>References</h3>
           <ul>
             <li><a href="https://learn.microsoft.com/en-us/azure/architecture/hybrid/hybrid-deployment-options">Microsoft Learn: Hybrid Options</a></li>
-            <li><a href="https://techcommunity.microsoft.com/jau/t5/azure/jku/choosing-between/exchange-hybrid/azure/exchange-hybrid/and-exchanges/on-premises/ba-p/1876930">Tech Community</a></li>
+            <li><a href="https://techcommunity.microsoft.com/t5/azure/choosing-between-azure-and-on-premises/ba-p/1876930">Tech Community: Azure vs. On-Premises</a></li>
           </ul>
         </section>
-      </ul>
       `
     }
   };
