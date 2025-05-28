@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Velocity Lab</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <nav>
+    <div class="brand">Velocity Lab</div>
+    <div class="auth">
+      <a href="#" id="logout">Logout</a>
+    </div>
+  </nav>
+  <div class="container">
+    <h1>Velocity Lab</h1>
+    <h2>Timeline Guide to Implement the Lab</h2>
+    <div class="timeline">
+      <div class="week">
+        <div class="week-title">Week 1: Foundation Setup</div>
+        <div class="task">
+          <input type="checkbox" id="week1-dc" data-week="week1" data-task="dc">
+          <label for="week1-dc">Promote Server 2012 to Domain Controller</label>
+        </div>
+        <div class="task">
+          <input type="checkbox" id="week1-vm" data-week="week1" data-task="vm">
+          <label for="week1-vm">Join VM to Domain</label>
+        </div>
+        <div class="task">
+          <input type="checkbox" id="week1-share" data-week="week1" data-task="share">
+          <label for="week1-share">Configure Network Share on DC</label>
+        </div>
+        <div class="task">
+          <input type="checkbox" id="week1-group" data-week="week1" data-task="group">
+          <label for="week1-group">Create Security Group</label>
+        </div>
+      </div>
+      <div class="week">
+        <div class="week-title">Week 2: Infrastructure Expansion</div>
+        <div class="task">
+          <input type="checkbox" id="week2-server" data-week="week2" data-task="server">
+          <label for="week2-server">Install Second Server 2012</label>
+        </div>
+        <div class="task">
+          <input type="checkbox" id="week2-wsus" data-week="week2" data-task="wsus">
+          <label for="week2-wsus">Setup WSUS</label>
+        </div>
+        <div class="task">
+          <input type="checkbox" id="week2-time" data-week="week2" data-task="time">
+          <label for="week2-time">Configure Two Time Servers</label>
+        </div>
+      </div>
+      <div class="week">
+        <div class="week-title">Week 3: Email & Messaging</div>
+        <div class="task">
+          <input type="checkbox" id="week3-upgrade" data-week="week3" data-task="upgrade">
+          <label for="week3-upgrade">Upgrade Servers to 2016</label>
+        </div>
+        <div class="task">
+          <input type="checkbox" id="week3-exchange" data-week="week3" data-task="exchange">
+          <label for="week3-exchange">Install Exchange Server 2019</label>
+        </div>
+        <div class="task">
+          <input type="checkbox" id="week3-mailbox" data-week="week3" data-task="mailbox">
+          <label for="week3-mailbox">Create User Mailboxes</label>
+        </div>
+        <div class="task">
+          <input type="checkbox" id="week3-mail" data-week="week3" data-task="mail">
+          <label for="week3-mail">Setup Internal Mail Flow</label>
+        </div>
+      </div>
+      <div class="week">
+        <div class="week-title">Week 4: Cloud Integration</div>
+        <div class="task">
+          <input type="checkbox" id="week4-external" data-week="week4" data-task="external">
+          <label for="week4-external">Publish Mail Externally</label>
+        </div>
+        <div class="task">
+          <input type="checkbox" id="week4-hybrid" data-week="week4" data-task="hybrid">
+          <label for="week4-hybrid">Setup Microsoft 365 Hybrid Environment</label>
+        </div>
+        <div class="task">
+          <input type="checkbox" id="week4-hosting" data-week="week4" data-task="hosting">
+          <label for="week4-hosting">Choose Hosting Environment</label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/js/main.js"></script>
+</body>
+</html>
