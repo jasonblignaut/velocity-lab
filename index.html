@@ -1,474 +1,556 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="description" content="We are busy cooking up our next project">
-  <meta name="keywords" content="Labverse, Next Project, South Africa">
-  <meta name="author" content="Labverse Founder">
-  <meta property="og:title" content="Labverse">
-  <meta property="og:description" content="We are busy cooking up our next project.">
-  <meta property="og:image" content="/assets/labverse-og-image.png">
-  <meta property="og:url" content="https://labverse.co.za">
-  <meta name="twitter:card" content="summary_large_image">
-  <title>Labverse</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Source+Code+Pro&family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --matrix-blue: #00b7eb;
-      --cosmic-cyan: #00f2fe;
-      --light-aura: #e6f0ff;
-      --dark-bg: #070b1a;
-      --card-bg: rgba(13, 20, 43, 0.7);
-      --glow-radius: 15px;
-      --neon-border: rgba(79, 172, 254, 0.3);
-    }
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Source Code Pro', monospace;
-    }
-    html, body {
-      width: 100%;
-      min-height: 100vh;
-      background: var(--dark-bg);
-      color: var(--light-aura);
-      overflow-x: hidden;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-    }
-    #vanta-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 100%;
-      z-index: 1;
-      opacity: 0.5;
-      transition: opacity 1s ease-in-out;
-    }
-    #background-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 2;
-      opacity: 0.8;
-    }
-    .main-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center; /* Center vertically */
-      width: 100%;
-      flex: 1;
-      padding: 20px 10px;
-      box-sizing: border-box;
-      position: relative;
-      z-index: 3;
-    }
-    .container {
-      width: 100%;
-      max-width: 800px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 1rem;
-      gap: 1rem;
-    }
-    header {
-      width: 100%;
-      padding: 1rem 0;
-      background: transparent;
-      z-index: 100;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: absolute;
-      top: 0;
-    }
-    .branding-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      position: relative;
-    }
-    .branding-text {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-    }
-    .logo-title-container {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 0.3rem;
-    }
-    .branding-logo {
-      height: clamp(1.2rem, 3.5vw, 2rem);
-      min-height: 1rem;
-      max-height: 2.5rem;
-      width: auto;
-      transition: transform 0.3s ease;
-    }
-    .branding-logo:hover {
-      transform: scale(1.1);
-    }
-    .branding-link {
-      display: inline-block;
-      text-decoration: none;
-      border-radius: 10px;
-      padding: 0.5rem 1rem;
-      transition: background 0.3s ease;
-    }
-    .branding-link:hover {
-      background: rgba(79, 172, 254, 0.2);
-    }
-    h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: clamp(1.2rem, 3.5vw, 2rem);
-      text-transform: uppercase;
-      background: linear-gradient(90deg, #4facfe, #00f2fe);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: 2px;
-      animation: glow 2s ease-in-out infinite alternate;
-      margin: 0;
-      position: relative;
-    }
-    .powered-by {
-      font-family: 'Exo 2', sans-serif;
-      font-size: clamp(0.7rem, 1vw, 0.9rem);
-      color: #a3a5b7;
-      position: absolute;
-      bottom: -0.5rem;
-      right: 0;
-      margin: 0;
-    }
-    @keyframes glow {
-      from { text-shadow: 0 0 15px var(--cosmic-cyan); }
-      to { text-shadow: 0 0 30px var(--cosmic-cyan); }
-    }
-    .message-card {
-      background: var(--card-bg);
-      border-radius: 15px;
-      padding: 2rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 50px rgba(73, 115, 255, 0.15) inset;
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--neon-border);
-      width: 100%;
-      max-width: 600px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.5rem;
-      position: relative;
-      z-index: 15;
-    }
-    .message-text {
-      font-family: 'Orbitron', sans-serif;
-      font-size: clamp(1.2rem, 2.5vw, 2rem);
-      color: #00f2fe;
-      text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
-      text-align: center;
-    }
-    .futuristic-wheel {
-      width: 100px;
-      height: 100px;
-      border: 2px solid var(--cosmic-cyan);
-      border-radius: 50%;
-      position: relative;
-      animation: spin 10s linear infinite; /* Slow rotation */
-    }
-    .futuristic-wheel::before,
-    .futuristic-wheel::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
-    }
-    .futuristic-wheel::before {
-      width: 80px;
-      height: 80px;
-      border: 2px dashed var(--matrix-blue);
-      opacity: 0.6;
-    }
-    .futuristic-wheel::after {
-      width: 60px;
-      height: 60px;
-      border: 1px solid var(--cosmic-cyan);
-      box-shadow: 0 0 15px var(--cosmic-cyan);
-    }
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    footer {
-      width: 100%;
-      text-align: center;
-      font-family: 'Exo 2', sans-serif;
-      font-size: clamp(0.9rem, 1.2vw, 1.1rem);
-      color: #8492b4;
-      padding: 1.5rem 0;
-      z-index: 10;
-      position: absolute;
-      bottom: 0;
-    }
-    footer a {
-      color: #00f2fe;
-      text-decoration: none;
-      padding: 0.3rem 0.5rem;
-      border-radius: 5px;
-      transition: background 0.3s ease;
-    }
-    footer a:hover {
-      background: rgba(79, 172, 254, 0.2);
-    }
-    .footer-powered-by {
-      display: inline-flex;
-      align-items: center;
-      gap: 0;
-    }
-    @media (max-width: 768px) {
-      .main-wrapper {
-        padding: 10px 10px;
-      }
-      .branding-wrapper {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-      }
-      .logo-title-container {
-        flex-direction: row;
-        align-items: center;
-      }
-      .branding-logo {
-        height: clamp(1.2rem, 4vw, 2.2rem);
-        max-height: 2.5rem;
-      }
-      .branding-text h1 {
-        font-size: clamp(1.2rem, 4vw, 2.2rem);
-      }
-      .powered-by {
-        font-size: clamp(0.6rem, 0.9vw, 0.8rem);
-        bottom: -0.4rem;
-      }
-      .message-text {
-        font-size: clamp(1rem, 2vw, 1.5rem);
-      }
-      .futuristic-wheel {
-        width: 80px;
-        height: 80px;
-      }
-      .futuristic-wheel::before {
-        width: 64px;
-        height: 64px;
-      }
-      .futuristic-wheel::after {
-        width: 48px;
-        height: 48px;
-      }
-    }
-    @media (max-width: 480px) {
-      .main-wrapper {
-        padding: 10px 5px;
-      }
-      .container {
-        width: 95%;
-        padding: 0.5rem;
-      }
-      .branding-logo {
-        height: clamp(1.4rem, 5vw, 2.4rem);
-        max-height: 2.8rem;
-      }
-      .branding-text h1 {
-        font-size: clamp(1.4rem, 5vw, 2.4rem);
-      }
-      .powered-by {
-        font-size: clamp(0.5rem, 0.8vw, 0.7rem);
-        bottom: -0.3rem;
-      }
-      .message-text {
-        font-size: clamp(0.9rem, 1.8vw, 1.2rem);
-      }
-      .futuristic-wheel {
-        width: 60px;
-        height: 60px;
-      }
-      .futuristic-wheel::before {
-        width: 48px;
-        height: 48px;
-      }
-      .futuristic-wheel::after {
-        width: 36px;
-        height: 36px;
-      }
-    }
-    @media (min-width: 1440px) {
-      .main-wrapper {
-        padding: 30px 20px;
-      }
-      .container {
-        max-width: 900px;
-      }
-      .branding-logo {
-        height: clamp(1.5rem, 4vw, 2.5rem);
-        max-height: 3rem;
-      }
-      .branding-text h1 {
-        font-size: clamp(1.5rem, 4vw, 2.5rem);
-      }
-      .powered-by {
-        bottom: -0.6rem;
-      }
-      .message-text {
-        font-size: clamp(1.5rem, 3vw, 2.5rem);
-      }
-      .futuristic-wheel {
-        width: 120px;
-        height: 120px;
-      }
-      .futuristic-wheel::before {
-        width: 96px;
-        height: 96px;
-      }
-      .futuristic-wheel::after {
-        width: 72px;
-        height: 72px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Infrastructure Implementation Timeline</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <style>
+        :root {
+            --primary: #0052cc; /* Microsoft 365 blue */
+            --secondary: #6f42c1; /* Purple for futuristic accent */
+            --accent: #06d6a0; /* Green for highlights */
+            --dark: #1a1a1a;
+            --gray: #64748b;
+            --white: #ffffff;
+            --glass: rgba(255, 255, 255, 0.95); /* Acrylic effect */
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.15);
+            --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--white);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 12px;
+            letter-spacing: -0.025em;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--gray);
+            font-weight: 300;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 40px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background: var(--gradient);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+            border-radius: 3px;
+            box-shadow: 0 0 15px rgba(111, 66, 193, 0.3);
+        }
+
+        .week {
+            position: relative;
+            margin-bottom: 50px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .week.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .week-content {
+            position: relative;
+            width: calc(50% - 40px);
+            padding: 0;
+        }
+
+        .week:nth-child(odd) .week-content {
+            margin-left: auto;
+            text-align: left;
+        }
+
+        .week:nth-child(even) .week-content {
+            margin-right: auto;
+            text-align: right;
+        }
+
+        .week-badge {
+            position: absolute;
+            top: 20px;
+            width: 40px;
+            height: 40px;
+            background: var(--white);
+            border: 4px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--primary);
+            z-index: 10;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .week:nth-child(odd) .week-badge {
+            right: -52px;
+        }
+
+        .week:nth-child(even) .week-badge {
+            left: -52px;
+        }
+
+        .week-badge:hover {
+            transform: scale(1.1);
+            border-color: var(--secondary);
+            color: var(--secondary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .week-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .week-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .week-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .week-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .week-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--white);
+        }
+
+        .task {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 12px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .task:hover {
+            background: rgba(6, 214, 160, 0.05);
+            transform: translateX(5px);
+        }
+
+        .task-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .task-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--white);
+        }
+
+        .task:hover .task-icon {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(6, 214, 160, 0.2);
+        }
+
+        .task-content h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .task-details {
+            font-size: 0.9rem;
+            color: var(--gray);
+            line-height: 1.4;
+        }
+
+        .subtasks {
+            margin-top: 8px;
+            padding-left: 12px;
+        }
+
+        .subtask {
+            position: relative;
+            font-size: 0.85rem;
+ dto
+            color: var(--gray);
+            margin-bottom: 6px;
+            padding-left: 12px;
+            line-height: 1.4;
+        }
+
+        .subtask::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .timeline::before {
+                left: 25px;
+                margin-left: 0;
+            }
+
+            .week-content {
+                width: calc(100% - 60px);
+                margin-left: 60px !important;
+                text-align: left !important;
+            }
+
+            .week-badge {
+                left: 5px !important;
+                right: auto !important;
+            }
+
+            .week-card {
+                padding: 20px;
+            }
+
+            .task:hover {
+                transform: none;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="vanta-bg"></div>
-  <canvas id="background-canvas"></canvas>
-
-  <div class="main-wrapper">
     <div class="container">
-      <header>
-        <a href="https://labverse.co.za" target="_blank" rel="noopener" class="branding-link">
-          <div class="branding-wrapper">
-            <div class="branding-text">
-              <div class="logo-title-container">
-                <img src="/assets/labverse-og-image.png" alt="Labverse Logo" class="branding-logo">
-                <h1>Labverse</h1>
-              </div>
-              <div class="powered-by">by ONEFAR</div>
+        <header class="header">
+            <h1>IT Infrastructure Implementation Timeline</h1>
+            <p>Roadmap for Enterprise Infrastructure Deployment</p>
+        </header>
+
+        <div class="timeline">
+            <!-- Week 1 -->
+            <div class="week animate" data-week="1">
+                <div class="week-content">
+                    <div class="week-badge">1</div>
+                    <div class="week-card">
+                        <div class="week-title">
+                            <div class="week-icon">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M4 6h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2"/>
+                                </svg>
+                            </div>
+                            Foundation Setup
+                        </div>
+                        <div class="task">
+                            <div class="task-icon">
+                                <svg viewBox="0 0 24 24" aria-label="Domain Controller Icon">
+                                    <path d="M4 6h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2m0 2v4h16V8H4m8 1a1 1 0 1 1-1 1 1 1 0 0 1 1-1m-8 6h4v2H4v-2m6 0h4v2h-4v-2m6 0h4v2h-4v-2"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <h4>Promote Server 2012 to Domain Controller</h4>
+                                <div class="task-details">Establish Active Directory infrastructure and DNS services</div>
+                            </div>
+                        </div>
+                        <div class="task">
+                            <div class="task-icon">
+                                <svg viewBox="0 0 24 24" aria-label="VM Icon">
+                                    <path d="M4 4h16v12H4V4m2 2v8h12V6H6m2 8h8v2H8v-2"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <h4>Join VM to Domain</h4>
+                                <div class="task-details">Configure domain membership and authentication</div>
+                            </div>
+                        </div>
+                        <div class="task">
+                            <div class="task-icon">
+                                <svg viewBox="0 0 24 24" aria-label="Network Share Icon">
+                                    <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6m2 10h8v2H8v-2m0 4h5v2H8v-2"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <h4>Configure Network Share on DC</h4>
+                                <div class="task-details">Set up centralized file storage with secure access</div>
+                                <div class="subtasks">
+                                    <div class="subtask">Automatic drive mapping via Group Policy</div>
+                                    <div class="subtask">Implement hidden share with $ suffix</div>
+                                    <div class="subtask">Use GPO, PowerShell, and logon scripts for 3 drives</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task">
+                            <div class="task-icon">
+                                <svg viewBox="0 0 24 24" aria-label="Security Group Icon">
+                                    <path d="M12 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <h4>Create Security Group</h4>
+                                <div class="task-details">Restrict network drive access to authorized users</div>
+                                <div class="subtasks">
+                                    <div class="subtask">Configure access permissions for network drives</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </a>
-      </header>
-      <div class="message-card">
-        <div class="message-text">We are busy cooking up our next project</div>
-        <div class="futuristic-wheel"></div>
-      </div>
+
+            <!-- Week 2 -->
+            <div class="week animate" data-week="2">
+                <div class="week-content">
+                    <div class="week-badge">2</div>
+                    <div class="week-card">
+                        <div class="week-title">
+                            <div class="week-icon">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M4 6h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2"/>
+                                </svg>
+                            </div>
+                            Infrastructure Expansion
+                        </div>
+                        <div class="task">
+                            <div class="task-icon">
+                                <svg viewBox="0 0 24 24" aria-label="Server Icon">
+                                    <path d="M4 6h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2m0 2v4h16V8H4m8 1a1 1 0 1 1-1 1 1 1 0 0 1 1-1m-8 6h4v2H4v-2m6 0h4v2h-4v-2m6 0h4v2h-4v-2"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <h4>Install 2nd Server 2012</h4>
+                                <div class="task-details">Add redundancy and load distribution</div>
+                            </div>
+                        </div>
+                        <div class="task">
+                            <div class="task-icon">
+                                <svg viewBox="0 0 24 24" aria-label="WSUS Icon">
+                                    <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m1 5v4h4v2h-4v4h-2v-4H7v-2h4V9h2"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <h4>Setup WSUS</h4>
+                                <div class="task-details">Configure Windows Server Update Services for patch management</div>
+                            </div>
+                        </div>
+                        <div class="task">
+                            <div class="task-icon">
+                                <svg viewBox="0 0 24 24" aria-label="Time Server Icon">
+                                    <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m0 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16m0 2v6h4v2h-6V6h2"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <h4>Configure Time Servers (2)</h4>
+                                <div class="task-details">Implement dual NTP servers for time synchronization</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 3 -->
+            <div class="week animate" data-week="3">
+                <div class="week-content">
+                    <div class="week-badge">3</div>
+                    <div class="week-card">
+                        <div class="week-title">
+                            <div class="week-icon">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2"/>
+                                </svg>
+                            </div>
+                            Email & Messaging
+                        </div>
+                        <div class="task">
+                            <div class="task-icon">
+                                <svg viewBox="0 0 24 24" aria-label="Server Upgrade Icon">
+                                    <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m-1 3h2v4l4 4-1.41 1.41-3.59-3.59V11h-2V7"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <h4>Upgrade Servers to 2016</h4>
+                                <div class="task-details">Modernize infrastructure with enhanced features</div>
+                            </div>
+                        </div>
+                        <div class="task">
+                            <div class="task-icon">
+                                <svg viewBox="0 0 24 24" aria-label="Exchange Server Icon">
+                                    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <h4>Install 3rd Server with Exchange 2022</h4>
+                                <div class="task-details">Deploy Exchange Server 2022 for email services</div>
+                            </div>
+                        </div>
+                        <div class="task">
+                            <div class="task-icon">
+                                <svg viewBox="0 0 24 24" aria-label="Mailbox Icon">
+                                    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <h4>Create User Mailbox</h4>
+                                <div class="task-details">Configure email accounts for users</div>
+                            </div>
+                        </div>
+                        <div class="task">
+                            <div class="task-icon">
+                                <svg viewBox="0 0 24 24" aria-label="Mail Flow Icon">
+                                    <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m-1 5h2v2h4v2h-4v4h-2v-4H7V9h4V7"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <h4>Setup Internal Mail Flow</h4>
+                                <div class="task-details">Ensure reliable internal email delivery</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 4 -->
+            <div class="week animate" data-week="4">
+                <div class="week-content">
+                    <div class="week-badge">4</div>
+                    <div class="week-card">
+                        <div class="week-title">
+                            <div class="week-icon">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M19 18H6a4 4 0 0 1-4-4 4 4 0 0 1 4-4h.71a5.5 5.5 0 0 1 0-1A5.37 5.37 0 0 1 12 3.59a5.26 5.26 0 0 1 5.33 4.71A4.33 4.33 0 0 1 22 13a4.5 4.5 0 0 1-3 4.2"/>
+                                </svg>
+                            </div>
+                            Cloud Integration
+                        </div>
+                        <div class="task">
+                            <div class="task-icon">
+                                <svg viewBox="0 0 24 24" aria-label="External Mail Icon">
+                                    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <h4>Publish Mail Externally</h4>
+                                <div class="task-details">Enable secure external email access</div>
+                                <div class="subtasks">
+                                    <div class="subtask">Configure MX, SPF, DKIM, and DMARC records</div>
+                                    <div class="subtask">Enable modern authentication (OAuth 2.0)</div>
+                                    <div class="subtask">Set up TLS certificates and reverse DNS</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task">
+                            <div class="task-icon">
+                                <svg viewBox="0 0 24 24" aria-label="Microsoft 365 Hybrid Icon">
+                                    <path d="M19 18H6a4 4 0 0 1-4-4 4 4 0 0 1 4-4h.71a5.5 5.5 0 0 1 0-1A5.37 5.37 0 0 1 12 3.59a5.26 5.26 0 0 1 5.33 4.71A4.33 4.33 0 0 1 22 13a4.5 4.5 0 0 1-3 4.2"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <h4>Setup Microsoft 365 Hybrid Environment</h4>
+                                <div class="task-details">Bridge on-premises Exchange with Microsoft 365</div>
+                                <div class="subtasks">
+                                    <div class="subtask">Install and configure Entra ID Connect for hybrid identity</div>
+                                    <div class="subtask">Run Hybrid Configuration Wizard (HCW)</div>
+                                    <div class="subtask">Verify mail flow and calendar sharing</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task">
+                            <div class="task-icon">
+                                <svg viewBox="0 0 24 24" aria-label="Hosting Environment Icon">
+                                    <path d="M19 18H6a4 4 0 0 1-4-4 4 4 0 0 1 4-4h.71a5.5 5.5 0 0 1 0-1A5.37 5.37 0 0 1 12 3.59a5.26 5.26 0 0 1 5.33 4.71A4.33 4.33 0 0 1 22 13a4.5 4.5 0 0 1-3 4.2"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <h4>Choose Hosting Environment</h4>
+                                <div class="task-details">Select optimal platform for deployment</div>
+                                <div class="subtasks">
+                                    <div class="subtask">Evaluate Azure cloud for scalability</div>
+                                    <div class="subtask">Assess on-premises virtual lab for control</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-
-  <footer>
-    © 2025 Labverse | All rights reserved | <span class="footer-powered-by">Powered by <a href="https://speedtest.net.za" target="_blank" rel="noopener">ONEFAR</a></span>
-  </footer>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.net.min.js"></script>
-  <script>
-    "use strict";
-    const vantaEffect = VANTA.NET({
-      el: "#vanta-bg",
-      mouseControls: true,
-      touchControls: true,
-      minHeight: 200,
-      minWidth: 200,
-      scale: 1,
-      scaleMobile: 1,
-      color: 0x00ffff,
-      backgroundColor: 0x070b1a,
-      points: 10,
-      maxDistance: 20,
-      spacing: 15,
-      speed: 1
-    });
-
-    let particles = [];
-    let mousePos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    const particleCanvas = document.getElementById('background-canvas');
-    const particleCtx = particleCanvas.getContext('2d');
-    const devicePixelRatio = window.devicePixelRatio || 1;
-
-    function resizeParticleCanvas() {
-      particleCanvas.width = window.innerWidth * devicePixelRatio;
-      particleCanvas.height = window.innerHeight * devicePixelRatio;
-      particleCtx.scale(devicePixelRatio, devicePixelRatio);
-    }
-    resizeParticleCanvas();
-
-    document.addEventListener('mousemove', (e) => {
-      mousePos.x = e.clientX;
-      mousePos.y = e.clientY;
-    }, { passive: true });
-
-    document.addEventListener('touchmove', (e) => {
-      if (e.touches.length > 0) {
-        mousePos.x = e.touches[0].clientX;
-        mousePos.y = e.touches[0].clientY;
-      }
-    }, { passive: true });
-
-    function createParticle(index) {
-      const theta = index * 2 * Math.PI * ((1 + Math.sqrt(5)) / 2);
-      const r = Math.sqrt(index) * 10;
-      return {
-        x: window.innerWidth / 2 + r * Math.cos(theta),
-        y: window.innerHeight / 2 + r * Math.sin(theta),
-        vx: (Math.random() - 0.5) * 2,
-        vy: (Math.random() - 0.5) * 2,
-        life: 600,
-        color: `hsl(${Math.random() * 360}, 70%, 70%)`,
-        size: Math.random() * 2 + 1
-      };
-    }
-
-    function initParticles() {
-      particles = Array.from({ length: 15 }, (_, i) => createParticle(i));
-    }
-    initParticles();
-
-    function animateParticles() {
-      particleCtx.clearRect(0, 0, particleCanvas.width / devicePixelRatio, particleCanvas.height / devicePixelRatio);
-      particles = particles.filter(p => {
-        if (p.life <= 0) return false;
-        p.life--;
-        p.x += p.vx + (mousePos.x - window.innerWidth / 2) * 0.0001;
-        p.y += p.vy + (mousePos.y - window.innerHeight / 2) * 0.0001;
-        p.vx *= 0.98;
-        p.vy *= 0.98;
-        particleCtx.beginPath();
-        particleCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        particleCtx.fillStyle = p.color;
-        particleCtx.globalAlpha = p.life / 600;
-        particleCtx.fill();
-        return true;
-      });
-      if (particles.length < 15 && Math.random() < 0.1) particles.push(createParticle(particles.length));
-      particleCtx.globalAlpha = 1;
-      requestAnimationFrame(animateParticles);
-    }
-    animateParticles();
-
-    window.addEventListener('resize', () => {
-      resizeParticleCanvas();
-    }, { passive: true });
-  </script>
 </body>
 </html>
