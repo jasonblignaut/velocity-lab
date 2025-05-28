@@ -566,4 +566,23 @@ form button:hover {
     width: 95%;
     padding: 16px;
   }
+  .task-checkbox {
+  width: 24px;
+  height: 24px;
+  accent-color: #28a745; /* Green for completed tasks */
+  cursor: pointer;
+  margin-right: 12px;
+}
+
+.task.completed {
+  opacity: 1;
+}
+
+.task:not(.completed) {
+  opacity: 0.6; /* Greyed-out for unticked tasks */
+}
+
+.task.completed .task-content {
+  color: #28a745; /* Green text for completed tasks */
+  text-decoration: none; /* Optional: Remove strikethrough for cleaner look */
 }
