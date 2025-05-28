@@ -25,7 +25,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return new Response('Incorrect password', { status: 400 });
     }
 
-    const sessionToken = nanoid();
+    const sessionToken = crypto.randomUUID();
     await context.env.USERS.put(`session:${sessionToken}`, user.id, { expirationTtl: 86400 });
 
     const response = new Response('Login successful', {

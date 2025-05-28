@@ -2,8 +2,7 @@
   "name": "velocity-lab",
   "version": "1.0.0",
   "dependencies": {
-    "@cloudflare/workers-types": "^4.20241022.0",
-    "nanoid": "^5.0.7"
+    "@cloudflare/workers-types": "^4.20241022.0"
   },
   "devDependencies": {
     "wrangler": "^3.60.3"

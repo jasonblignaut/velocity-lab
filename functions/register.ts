@@ -1,4 +1,3 @@
-import { nanoid } from 'nanoid';
 import { validateCSRFToken, hashPassword } from './utils';
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
@@ -23,7 +22,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return new Response('Email already registered', { status: 400 });
     }
 
-    const id = nanoid();
+    const id = crypto.randomUUID();
     const user = { id, email, name, role, password: await hashPassword(password) };
     await context.env.USERS.put(`user:${email}`, JSON.stringify(user));
 
