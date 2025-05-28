@@ -10,32 +10,20 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const csrfToken = formData.get('csrf_token') as string;
 
     if (!email || !password || !repeatPassword || !name || !csrfToken) {
-      return new Response(JSON.stringify({ error: 'Missing fields' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response('Missing fields', { status: 400 });
     }
 
     if (password !== repeatPassword) {
-      return new Response(JSON.stringify({ error: 'Passwords do not match' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response('Passwords do not match', { status: 400 });
     }
 
     if (!await validateCSRFToken(context.env, csrfToken)) {
-      return new Response(JSON.stringify({ error: 'Invalid CSRF token' }), {
-        status: 403,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response('Invalid CSRF token', { status: 403 });
     }
 
     const existingUser = await context.env.USERS.get(`user:${email}`);
     if (existingUser) {
-      return new Response(JSON.stringify({ error: 'Email already registered' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response('Email already registered', { status: 400 });
     }
 
     const id = crypto.randomUUID();
@@ -50,14 +38,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     };
     await context.env.PROGRESS.put(`progress:${id}`, JSON.stringify(progress));
 
-    return new Response(JSON.stringify({ message: 'Registration successful' }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response('Registration successful', { status: 200 });
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Server error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response('Server error', { status: 500 });
   }
 };
