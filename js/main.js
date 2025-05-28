@@ -1,169 +1,103 @@
 async function fetchCSRFToken() {
   try {
     const response = await fetch('/api/csrf', { method: 'GET' });
-    const data = await response.json();
-    document.getElementById('csrf_token').value = data.csrf_token;
+    if (!response.ok) throw new Error('Failed to fetch CSRF token');
+    const { token } = await response.json();
+    document.getElementById('csrfToken').value = token;
   } catch (error) {
     console.error('Error fetching CSRF token:', error);
+    alert('Error initializing form. Try refreshing the page.');
   }
 }
 
-async function checkSession() {
+async function handleFormSubmit(event, url) {
+  event.preventDefault();
   try {
-    const response = await fetch('/api/session', {
-      method: 'GET',
-      credentials: 'include',
+    const formData = new FormData(event.target);
+    const response = await fetch(url, {
+      method: 'POST',
+      body: formData,
     });
-    if (response.ok) {
-      const data = await response.json();
-      if (data.user) {
-        const usernameEl = document.getElementById('username');
-        if (usernameEl) {
-          usernameEl.textContent = `Welcome, ${data.user.name}`;
-        }
-        return data.user;
-      }
+    const message = await response.text();
+    alert(message);
+    if (response.ok && url === '/register') {
+      window.location.href = '/login.html';
+    } else if (response.ok && url === '/login') {
+      window.location.href = '/dashboard.html';
+    } else {
+      throw new Error('Request failed');
     }
-    return null;
   } catch (error) {
-    console.error('Error checking session:', error);
-    return null;
+    console.error('Form submission error:', error);
+    alert('An error occurred. Please try again.');
   }
 }
 
-async function loadProgress(userId) {
-  try {
-    const response = await fetch(`/api/progress?userId=${userId}`, { method: 'GET' });
-    const progress = await response.json();
-    Object.keys(progress).forEach(week => {
-      Object.keys(progress[week]).forEach(task => {
-        const checkbox = document.querySelector(`input[data-task="${week}.${task}"]`);
-        if (checkbox) {
-          checkbox.checked = progress[week][task];
-          if (checkbox.checked) {
-            checkbox.parentElement.style.textDecoration = 'line-through';
-            checkbox.parentElement.style.color = '#28a745';
-          }
-        }
-      });
-    });
-  } catch (error) {
-    console.error('Error loading progress:', error);
-  }
+if (document.getElementById('registerForm')) {
+  fetchCSRFToken();
+  document.getElementById('registerForm').addEventListener('submit', (event) => handleFormSubmit(event, '/register'));
 }
 
-function displayMessage(message, isError = false) {
-  const messageEl = document.getElementById('message');
-  if (messageEl) {
-    messageEl.textContent = message;
-    messageEl.className = `message ${isError ? 'error' : 'success'}`;
-    messageEl.style.display = 'block';
-  }
+if (document.getElementById('loginForm')) {
+  fetchCSRFToken();
+  document.getElementById('loginForm').addEventListener('submit', (event) => handleFormSubmit(event, '/login'));
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const registerForm = document.getElementById('registerForm');
-  const loginForm = document.getElementById('loginForm');
-  const logoutLink = document.getElementById('logout');
-
-  if (registerForm || loginForm) {
-    await fetchCSRFToken();
-  }
-
-  const user = await checkSession();
-  if (user && (window.location.pathname === '/dashboard.html' || window.location.pathname === '/index.html')) {
-    await loadProgress(user.id);
-  } else if (user && (window.location.pathname === '/register.html' || window.location.pathname === '/login.html')) {
-    window.location.href = '/dashboard.html';
-  } else if (!user && window.location.pathname === '/dashboard.html') {
-    window.location.href = '/login.html';
-  }
-
-  if (registerForm) {
-    registerForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(registerForm);
-      try {
-        const response = await fetch('/register', {
-          method: 'POST',
-          body: formData,
-        });
-        const data = await response.json();
-        if (data.error) {
-          displayMessage(data.error, true);
-        } else {
-          displayMessage(data.message);
-          setTimeout(() => (window.location.href = '/login.html'), 2000);
-        }
-      } catch (error) {
-        displayMessage('Server error', true);
-      }
-    });
-  }
-
-  if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(loginForm);
-      try {
-        const response = await fetch('/login', {
-          method: 'POST',
-          body: formData,
-          credentials: 'include',
-        });
-        const data = await response.json();
-        if (data.error) {
-          displayMessage(data.error, true);
-        } else {
-          displayMessage(data.message);
-          localStorage.setItem('username', data.user.name);
-          setTimeout(() => (window.location.href = '/dashboard.html'), 2000);
-        }
-      } catch (error) {
-        displayMessage('Server error', true);
-      }
-    });
-  }
-
-  if (logoutLink) {
-    logoutLink.addEventListener('click', async (e) => {
-      e.preventDefault();
-      try {
-        await fetch('/api/logout', {
-          method: 'POST',
-          credentials: 'include',
-        });
-        localStorage.removeItem('username');
-        window.location.href = '/login.html';
-      } catch (error) {
-        console.error('Error logging out:', error);
-      }
-    });
-  }
-
-  document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-    checkbox.addEventListener('change', async () => {
-      const user = await checkSession();
-      if (!user) {
-        window.location.href = '/login.html';
-        return;
-      }
-      const taskPath = checkbox.dataset.task.split('.');
-      const week = taskPath[0];
-      const task = taskPath[1];
-      const isChecked = checkbox.checked;
-
-      try {
-        await fetch('/api/progress', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: user.id, week, task, completed: isChecked }),
-        });
-        checkbox.parentElement.style.textDecoration = isChecked ? 'line-through' : 'none';
-        checkbox.parentElement.style.color = isChecked ? '#28a745' : '';
-      } catch (error) {
-        console.error('Error updating progress:', error);
-      }
-    });
+if (document.getElementById('logout')) {
+  document.getElementById('logout').addEventListener('click', async () => {
+    document.cookie = 'session=; Max-Age=0; Path=/; SameSite=Strict';
+    window.location.href = '/index.html';
   });
-});
+}
+
+if (document.querySelector('.timeline')) {
+  async function loadProgress() {
+    try {
+      const response = await fetch('/api/progress', { credentials: 'include' });
+      if (response.ok) {
+        const progress = await response.json();
+        Object.keys(progress).forEach((week) => {
+          Object.keys(progress[week]).forEach((task) => {
+            const checkbox = document.querySelector(`input[data-week="${week}"][data-task="${task}"]`);
+            if (checkbox) {
+              checkbox.checked = progress[week][task];
+            }
+          });
+        });
+      } else {
+        console.error('Failed to load progress:', response.statusText);
+        alert('Please log in to view progress.');
+        window.location.href = '/login.html';
+      }
+    } catch (error) {
+      console.error('Error loading progress:', error);
+      alert('Error loading progress. Please try again.');
+    }
+  }
+
+  async function updateProgress(checkbox) {
+    try {
+      const formData = new FormData();
+      formData.append('week', checkbox.dataset.week);
+      formData.append('task', checkbox.dataset.task);
+      formData.append('checked', checkbox.checked.toString());
+      const response = await fetch('/progress', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update progress');
+      }
+    } catch (error) {
+      console.error('Error updating progress:', error);
+      alert('Error saving progress. Please try again.');
+      checkbox.checked = !checkbox.checked;
+    }
+  }
+
+  loadProgress();
+  document.querySelectorAll('.task input[type="checkbox"]').forEach((checkbox) => {
+    checkbox.addEventListener('change', () => updateProgress(checkbox));
+  });
+}
