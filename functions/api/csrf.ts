@@ -1,9 +1,12 @@
-// functions/api/csrf.ts
-export const onRequestGet: PagesFunction<Env> = async () => {
-  const csrfToken = "hardcoded-csrf-token-12345"; // hardcoded token
+import { generateCSRFToken } from '../utils';
 
-  return new Response(JSON.stringify({ csrfToken }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
+export const onRequestGet: PagesFunction<Env> = async (context) => {
+  try {
+    const token = await generateCSRFToken(context.env);
+    return new Response(JSON.stringify({ token }), {
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    return new Response('Server error', { status: 500 });
+  }
 };
