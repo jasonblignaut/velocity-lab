@@ -4,12 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - Velocity Lab</title>
+  <link rel="icon" href="/assets/favicon.ico" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
   <nav>
-    <div class="brand">Velocity Lab</div>
+    <nav class="nav-glass">
+	<div class="brand">
+		<img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="brand-logo" />
+	</div>
     <div class="auth">
       <a href="/register.html">Register</a>
       <a href="/login.html">Login</a>
@@ -29,7 +33,14 @@
         <input type="password" id="password" name="password" required aria-required="true">
       </div>
       <div class="form-group">
-        <button type="submit">Login</button>
+        <button type="submit" id="loginButton">
+          Login
+          <span class="spinner" style="display: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10 10 10 0 0 1-10-10A10 10 0 0 1 12 2z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-dasharray="15 45"/>
+            </svg>
+          </span>
+        </button>
       </div>
     </form>
   </div>

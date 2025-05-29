@@ -44,6 +44,80 @@ body {
   z-index: 100;
 }
 
+/* Spinner */
+.spinner {
+  display: inline-block;
+  margin-left: 8px;
+  width: 16px;
+  height: 16px;
+}
+
+.spinner.active {
+  display: inline-block !important;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Notification */
+.notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 14px;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.notification.show {
+  opacity: 1;
+}
+
+.notification.hide {
+  opacity: 0;
+}
+
+.notification.success {
+  background-color: #28a745;
+}
+
+.notification.error {
+  background-color: #dc3545;
+}
+
+.notification.loading {
+  background-color: #007bff;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .form-container {
+    margin: 2rem 1rem;
+    padding: 1.5rem;
+  }
+
+  nav {
+    padding: 1rem;
+  }
+
+  nav .brand {
+    font-size: 1.2rem;
+  }
+
+  nav .auth a {
+    margin-left: 1rem;
+    font-size: 0.9rem;
+  }
+}
+
 .nav-glass .brand {
   font-size: 1.5rem;
   font-weight: 600;
