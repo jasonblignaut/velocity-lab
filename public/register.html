@@ -3,15 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register - Velocity Lab</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <title>Velocity Lab: Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-  <nav>
+  <nav class="nav-glass">
     <div class="brand">Velocity Lab</div>
     <div class="auth">
-      <a href="/register.html">Register</a>
       <a href="/login.html">Login</a>
     </div>
   </nav>
@@ -20,20 +19,20 @@
     <form id="registerForm">
       <input type="hidden" name="csrf_token" id="csrfToken">
       <div class="form-group">
-        <label for="name">Name</label>
-        <input type="text" id="name" name="name" required aria-required="true">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
       </div>
       <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required aria-required="true">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
       </div>
       <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required aria-required="true">
+        <label for="role">Role:</label>
+        <input type="text" id="role" name="role" required>
       </div>
       <div class="form-group">
-        <label for="role">Role</label>
-        <input type="text" id="role" name="role" required aria-required="true">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
       </div>
       <div class="form-group">
         <button type="submit">Register</button>
