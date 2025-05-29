@@ -4,10 +4,13 @@ async function getCSRFToken() {
     if (!res.ok) throw new Error('Failed to fetch CSRF');
     const data = await res.json();
 
-    const csrfInput = document.getElementById('csrfToken');
-    if (csrfInput) {
-      csrfInput.value = data.token;
-    }
+    // Our hardcoded API returns { csrfToken: "..." } not { token: "..." }
+    const csrfToken = data.csrfToken;
+
+    // Set all inputs named csrf_token, safer than using id 'csrfToken'
+    const csrfInputs = document.querySelectorAll('input[name="csrf_token"]');
+    csrfInputs.forEach(input => input.value = csrfToken);
+
   } catch (err) {
     console.error('Error fetching CSRF token:', err);
     const note = document.getElementById('notification');
@@ -18,52 +21,29 @@ async function getCSRFToken() {
   }
 }
 
-// Call it after DOM loads since <script> uses defer
+// Call getCSRFToken on DOMContentLoaded (better than window.onload)
 document.addEventListener('DOMContentLoaded', () => {
   getCSRFToken();
-});
 
-
-
-async function handleFormSubmit(event, url) {
-  event.preventDefault();
-  try {
-    const formData = new FormData(event.target);
-    const response = await fetch(url, {
-      method: 'POST',
-      body: formData,
-    });
-    const message = await response.text();
-    alert(message);
-    if (response.ok && url === '/register') {
-      window.location.href = '/login.html';
-    } else if (response.ok && url === '/login') {
-      window.location.href = '/dashboard.html';
-    } else {
-      throw new Error('Request failed');
-    }
-  } catch (error) {
-    console.error('Form submission error:', error);
-    alert('An error occurred. Please try again.');
+  // Attach form handlers here as well so DOM is ready
+  const registerForm = document.getElementById('registerForm');
+  if (registerForm) {
+    registerForm.addEventListener('submit', (event) => handleFormSubmit(event, '/register'));
   }
-}
 
-if (document.getElementById('registerForm')) {
-  fetchCSRFToken();
-  document.getElementById('registerForm').addEventListener('submit', (event) => handleFormSubmit(event, '/register'));
-}
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', (event) => handleFormSubmit(event, '/login'));
+  }
 
-if (document.getElementById('loginForm')) {
-  fetchCSRFToken();
-  document.getElementById('loginForm').addEventListener('submit', (event) => handleFormSubmit(event, '/login'));
-}
-
-if (document.getElementById('logout')) {
-  document.getElementById('logout').addEventListener('click', async () => {
-    document.cookie = 'session=; Max-Age=0; Path=/; SameSite=Strict';
-    window.location.href = '/index.html';
-  });
-}
+  const logoutBtn = document.getElementById('logout');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      document.cookie = 'session=; Max-Age=0; Path=/; SameSite=Strict';
+      window.location.href = '/index.html';
+    });
+  }
+});
 
 if (document.querySelector('.timeline')) {
   async function loadProgress() {
