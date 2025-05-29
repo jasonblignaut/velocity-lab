@@ -1,14 +1,29 @@
-async function fetchCSRFToken() {
+async function getCSRFToken() {
   try {
-    const response = await fetch('/api/csrf', { method: 'GET' });
-    if (!response.ok) throw new Error('Failed to fetch CSRF token');
-    const { token } = await response.json();
-    document.getElementById('csrfToken').value = token;
-  } catch (error) {
-    console.error('Error fetching CSRF token:', error);
-    alert('Error initializing form. Try refreshing the page.');
+    const res = await fetch('/api/csrf');
+    if (!res.ok) throw new Error('Failed to fetch CSRF');
+    const data = await res.json();
+
+    const csrfInput = document.getElementById('csrfToken');
+    if (csrfInput) {
+      csrfInput.value = data.token;
+    }
+  } catch (err) {
+    console.error('Error fetching CSRF token:', err);
+    const note = document.getElementById('notification');
+    if (note) {
+      note.textContent = 'Could not fetch CSRF token.';
+      note.style.display = 'block';
+    }
   }
 }
+
+// Call it after DOM loads since <script> uses defer
+document.addEventListener('DOMContentLoaded', () => {
+  getCSRFToken();
+});
+
+
 
 async function handleFormSubmit(event, url) {
   event.preventDefault();

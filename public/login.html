@@ -1,37 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login - Velocity Lab</title>
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
   <script src="/js/main.js" defer></script>
 </head>
 <body>
   <nav class="nav-glass">
     <div class="brand">
-      <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="brand-logo">
+      <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="brand-logo" />
     </div>
     <div class="auth">
       <a href="/register.html">Register</a>
     </div>
   </nav>
+
   <div class="form-container">
     <h2>Login</h2>
-    <div class="notification" id="notification" style="display: none;"></div>
+    <div class="notification" id="notification" style="display: none; color: red; margin-bottom: 10px;"></div>
     <form id="loginForm" method="POST" action="">
       <input type="hidden" id="csrfToken" name="csrf_token" />
       <div class="form-group">
         <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
+        <input type="email" id="email" name="email" required />
       </div>
       <div class="form-group">
         <label for="password">Password:</label>
         <input type="password" name="password" required />
-		<button type="submit">Login</button>
-      </form>
-<div id="notification" style="display: none; color: red; margin-top: 10px;"></div>
+      </div>
+      <button type="submit">Login</button>
+    </form>
+  </div>
 </body>
 </html>
