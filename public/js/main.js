@@ -1,17 +1,12 @@
 // Function to show on-site notification
 function showNotification(message, type = 'success') {
-  console.log('showNotification called:', { message, type }); // Debug log
   const notification = document.getElementById('notification');
-  if (!notification) {
-    console.error('Notification element not found');
-    return;
-  }
+  if (!notification) return;
 
   notification.textContent = message;
   notification.classList.remove('success', 'error', 'loading', 'hide');
   notification.classList.add(type, 'show');
 
-  // Auto-hide after 3 seconds
   setTimeout(() => {
     notification.classList.remove('show');
     notification.classList.add('hide');
@@ -20,37 +15,26 @@ function showNotification(message, type = 'success') {
 
 // Fetch CSRF token
 async function fetchCSRFToken() {
-  console.log('fetchCSRFToken called'); // Debug log
   try {
     const response = await fetch('/api/csrf', { method: 'GET' });
-    if (!response.ok) {
-      throw new Error(`Failed to fetch CSRF token: ${response.status} ${response.statusText}`);
-    }
+    if (!response.ok) throw new Error('Failed to fetch CSRF token');
     const data = await response.json();
-    if (!data.token) {
-      throw new Error('CSRF token not found in response');
-    }
-    document.getElementById('csrfToken').value = data.token;
-    console.log('CSRF token fetched:', data.token); // Debug log
+    if (!data.csrf_token) throw new Error('CSRF token not found');
+    document.getElementById('csrfToken').value = data.csrf_token;
   } catch (error) {
-    console.error('Error fetching CSRF token:', error);
     showNotification('Error initializing form. Try refreshing the page.', 'error');
+    throw error;
   }
 }
 
 // Handle form submission with notification
 async function handleFormSubmit(event, url) {
-  console.log('handleFormSubmit called:', { url }); // Debug log
   event.preventDefault();
-
-  // Show loading notification
   showNotification('Processing...', 'loading');
 
-  // Password matching validation for registration
   if (url === '/register') {
     const password = event.target.querySelector('#password').value;
     const repeatPassword = event.target.querySelector('#repeatPassword').value;
-    console.log('Validating passwords:', { password, repeatPassword }); // Debug log
     if (password !== repeatPassword) {
       showNotification('Passwords do not match.', 'error');
       return;
@@ -59,7 +43,6 @@ async function handleFormSubmit(event, url) {
 
   try {
     const formData = new FormData(event.target);
-    console.log('Submitting form to:', url); // Debug log
     const response = await fetch(url, {
       method: 'POST',
       body: formData,
@@ -68,58 +51,49 @@ async function handleFormSubmit(event, url) {
       },
     });
 
-    console.log('Fetch response:', response); // Debug log
     if (!response.ok) {
-      let errorMessage = `Server error: ${response.status} ${response.statusText}`;
+      let errorMessage = `Server error: ${response.status}`;
       try {
         const data = await response.json();
-        errorMessage = data.message || errorMessage;
-      } catch (jsonError) {
-        console.error('Failed to parse error response as JSON:', jsonError);
+        errorMessage = data.error || errorMessage;
+      } catch {
+        // Ignore JSON parse error, use default message
       }
       throw new Error(errorMessage);
     }
 
     const data = await response.json();
-    console.log('Response data:', data); // Debug log
-
     if (url === '/register') {
       showNotification('Registration successful! Redirecting to login...', 'success');
       setTimeout(() => {
-        console.log('Redirecting to /login.html'); // Debug log
         window.location.href = '/login.html';
       }, 2000);
     } else if (url === '/login') {
-      localStorage.setItem('userName', data.userName);
+      localStorage.setItem('userName', data.name);
       showNotification('Login successful! Redirecting to dashboard...', 'success');
       setTimeout(() => {
-        console.log('Redirecting to /dashboard.html'); // Debug log
         window.location.href = '/dashboard.html';
       }, 2000);
     }
   } catch (error) {
-    console.error('Form submission error:', error);
     showNotification(error.message || 'An error occurred. Please try again.', 'error');
   }
 }
 
 // Initialize forms
 if (document.getElementById('registerForm')) {
-  console.log('Initializing registerForm'); // Debug log
   fetchCSRFToken();
   document.getElementById('registerForm').addEventListener('submit', (event) => handleFormSubmit(event, '/register'));
 }
 
 if (document.getElementById('loginForm')) {
-  console.log('Initializing loginForm'); // Debug log
   fetchCSRFToken();
   document.getElementById('loginForm').addEventListener('submit', (event) => handleFormSubmit(event, '/login'));
 }
 
 // Handle logout
 if (document.getElementById('logout')) {
-  console.log('Initializing logout'); // Debug log
-  document.getElementById('logout').addEventListener('click', async () => {
+  document.getElementById('logout').addEventListener('click', () => {
     document.cookie = 'session=; Max-Age=0; Path=/; SameSite=Strict';
     localStorage.removeItem('userName');
     window.location.href = '/index.html';
@@ -128,7 +102,6 @@ if (document.getElementById('logout')) {
 
 // Display user name on dashboard
 if (document.getElementById('userInfo')) {
-  console.log('Initializing userInfo'); // Debug log
   const userName = localStorage.getItem('userName');
   if (userName) {
     document.getElementById('userInfo').textContent = `Welcome, ${userName}`;
@@ -137,7 +110,7 @@ if (document.getElementById('userInfo')) {
   }
 }
 
-// Dashboard-specific functions (defined only once at the top level)
+// Dashboard-specific functions
 function updateProgress(checkboxes, totalTasks, progressBar, progressText) {
   const checkedTasks = document.querySelectorAll('.task input[type="checkbox"]:checked').length;
   const percentage = Math.round((checkedTasks / totalTasks) * 100);
@@ -158,14 +131,12 @@ async function loadProgress(checkboxes, updateProgressCallback) {
     });
     updateProgressCallback();
   } catch (error) {
-    console.error('Error loading progress:', error);
     showNotification('Failed to load progress. Please try again.', 'error');
   }
 }
 
-// Dashboard functionality (progress tracking, modals, etc.)
+// Dashboard functionality
 if (document.querySelector('.timeline')) {
-  console.log('Initializing dashboard timeline'); // Debug log
   const progressBar = document.getElementById('progressBar');
   const progressText = document.getElementById('progressText');
   const checkboxes = document.querySelectorAll('.task input[type="checkbox"]');
@@ -827,7 +798,6 @@ net use S: \\[DCName]\\Public
         if (!response.ok) throw new Error('Failed to save progress');
         updateProgress(checkboxes, totalTasks, progressBar, progressText);
       } catch (error) {
-        console.error('Error saving progress:', error);
         checkbox.checked = !checkbox.checked; // Revert on error
         showNotification('Failed to save progress. Please try again.', 'error');
       }
