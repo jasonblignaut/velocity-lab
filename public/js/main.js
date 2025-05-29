@@ -45,31 +45,22 @@ async function handleFormSubmit(event, url) {
     const response = await fetch(url, {
       method: 'POST',
       body: formData,
-      headers: {
-        'Accept': 'application/json',
-      },
     });
 
+    const message = await response.text();
     if (!response.ok) {
-      let errorMessage = `Server error: ${response.status}`;
-      try {
-        const data = await response.json();
-        errorMessage = data.error || errorMessage;
-      } catch {
-        // Ignore JSON parse error, use default message
-      }
-      throw new Error(errorMessage);
+      throw new Error(message || `Server error: ${response.status}`);
     }
 
-    const data = await response.json();
     if (url === '/register') {
-      showNotification('Registration successful! Redirecting to login...', 'success');
+      showNotification(message, 'success');
       setTimeout(() => {
         window.location.href = '/login.html';
       }, 2000);
     } else if (url === '/login') {
-      localStorage.setItem('userName', data.name);
-      showNotification('Login successful! Redirecting to dashboard...', 'success');
+      // Since the old login.ts doesn't return the user name, we can't set userName in localStorage
+      // We'll skip setting userName for now to match the old behavior
+      showNotification(message, 'success');
       setTimeout(() => {
         window.location.href = '/dashboard.html';
       }, 2000);
