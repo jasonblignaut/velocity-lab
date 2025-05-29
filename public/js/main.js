@@ -1,3 +1,20 @@
+// Function to show on-site notification
+function showNotification(message, type = 'success') {
+  const notification = document.getElementById('notification');
+  if (!notification) return;
+
+  notification.textContent = message;
+  notification.classList.remove('success', 'error', 'loading', 'hide');
+  notification.classList.add(type, 'show');
+
+  // Auto-hide after 3 seconds
+  setTimeout(() => {
+    notification.classList.remove('show');
+    notification.classList.add('hide');
+  }, 3000);
+}
+
+// Fetch CSRF token
 async function fetchCSRFToken() {
   try {
     const response = await fetch('/api/csrf', { method: 'GET' });
@@ -6,33 +23,60 @@ async function fetchCSRFToken() {
     document.getElementById('csrfToken').value = token;
   } catch (error) {
     console.error('Error fetching CSRF token:', error);
-    alert('Error initializing form. Try refreshing the page.');
+    showNotification('Error initializing form. Try refreshing the page.', 'error');
   }
 }
 
+// Handle form submission with notification
 async function handleFormSubmit(event, url) {
   event.preventDefault();
+
+  // Show loading notification
+  showNotification('Processing...', 'loading');
+
+  // Password matching validation for registration
+  if (url === '/register') {
+    const password = event.target.querySelector('#password').value;
+    const repeatPassword = event.target.querySelector('#repeatPassword').value;
+    if (password !== repeatPassword) {
+      showNotification('Passwords do not match.', 'error');
+      return;
+    }
+  }
+
   try {
     const formData = new FormData(event.target);
     const response = await fetch(url, {
       method: 'POST',
       body: formData,
     });
-    const message = await response.text();
-    alert(message);
-    if (response.ok && url === '/register') {
-      window.location.href = '/login.html';
-    } else if (response.ok && url === '/login') {
-      window.location.href = '/dashboard.html';
+
+    const data = await response.json(); // Expect JSON response with message and userName (for login)
+
+    if (response.ok) {
+      if (url === '/register') {
+        showNotification('Registration successful! Redirecting to login...', 'success');
+        setTimeout(() => {
+          window.location.href = '/login.html';
+        }, 2000);
+      } else if (url === '/login') {
+        // Store user name in localStorage for display
+        localStorage.setItem('userName', data.userName);
+        showNotification('Login successful! Redirecting to dashboard...', 'success');
+        setTimeout(() => {
+          window.location.href = '/dashboard.html';
+        }, 2000);
+      }
     } else {
-      throw new Error('Request failed');
+      showNotification(data.message || 'An error occurred. Please try again.', 'error');
     }
   } catch (error) {
     console.error('Form submission error:', error);
-    alert('An error occurred. Please try again.');
+    showNotification('An error occurred. Please try again.', 'error');
   }
 }
 
+// Initialize forms
 if (document.getElementById('registerForm')) {
   fetchCSRFToken();
   document.getElementById('registerForm').addEventListener('submit', (event) => handleFormSubmit(event, '/register'));
@@ -43,13 +87,27 @@ if (document.getElementById('loginForm')) {
   document.getElementById('loginForm').addEventListener('submit', (event) => handleFormSubmit(event, '/login'));
 }
 
+// Handle logout
 if (document.getElementById('logout')) {
   document.getElementById('logout').addEventListener('click', async () => {
     document.cookie = 'session=; Max-Age=0; Path=/; SameSite=Strict';
+    localStorage.removeItem('userName');
     window.location.href = '/index.html';
   });
 }
 
+// Display user name on dashboard
+if (document.getElementById('userInfo')) {
+  const userName = localStorage.getItem('userName');
+  if (userName) {
+    document.getElementById('userInfo').textContent = `Welcome, ${userName}`;
+  } else {
+    // Redirect to login if no user name is found
+    window.location.href = '/login.html';
+  }
+}
+
+// Dashboard functionality (progress tracking, modals, etc.)
 if (document.querySelector('.timeline')) {
   const progressBar = document.getElementById('progressBar');
   const progressText = document.getElementById('progressText');
@@ -100,7 +158,7 @@ if (document.querySelector('.timeline')) {
           <h3>Step-by-Step Instructions</h3>
           <ol>
             <li>Log in as administrator. Open Server Manager.</li>
-            <li>Click "Add roles and features." funziona Install "Active Directory Domain Services."</li>
+            <li>Click "Add roles and features." Install "Active Directory Domain Services."</li>
             <li>Post-installation, promote the server to a DC via the notification flag.</li>
             <li>Create a new forest (e.g., corp.example.com). Set functional levels to 2012.</li>
             <li>Configure DNS and DSRM password. Reboot after completion.</li>
@@ -379,6 +437,7 @@ net use S: \\[DCName]\\Public
         <section>
           <h3>References</h3>
           <ul>
+            <lirice: true;
             <li><a href="https://learn.microsoft.com/en-us/windows-server/networking/windows-time-service/windows-time-service-tools-and-settings">Microsoft Learn: Windows Time Service</a></li>
             <li><a href="https://www.alitajran.com/configure-time-sync-windows-server/">ALI TAJRAN: Configure Time Sync</a></li>
           </ul>
@@ -538,15 +597,16 @@ net use S: \\[DCName]\\Public
             <li>In EAC, verify domain under Mail Flow > Accepted Domains (e.g., corp.example.com).</li>
             <li>Ensure send/receive connectors are configured (default for internal).</li>
             <li>Test email between two mailboxes using Outlook or OWA.</li>
-            <li>Optional: Verify mail flow: <code>Test-Mailflow [ServerName]</code>.</li>
+            <li>Optional: Verify mail flow: <code>Test-Mailflow -Identity "Mailbox1" -TargetEmailAddress "Mailbox2@corp.example.com"</code>.</li>
+            <li>Monitor delivery in Message Tracking Logs via EAC.</li>
           </ol>
         </section>
         <section>
           <h3>Troubleshooting Tips</h3>
           <ul>
-            <li>Check mailbox status in EAC.</li>
-            <li>Review message tracking: <code>Get-MessageTrackingLog -EventId DELIVER</code>.</li>
-            <li>Ensure DNS resolves: <code>nslookup mail.corp.example.com</code>.</li>
+            <li>Check DNS resolution: <code>nslookup corp.example.com</code>.</li>
+            <li>Verify connectors: <code>Get-SendConnector</code>, <code>Get-ReceiveConnector</code>.</li>
+            <li>Review logs in C:\\Program Files\\Microsoft\\Exchange Server\\V15\\TransportRoles\\Logs.</li>
           </ul>
         </section>
         <section>
@@ -718,7 +778,7 @@ net use S: \\[DCName]\\Public
       updateProgress();
     } catch (error) {
       console.error('Error loading progress:', error);
-      alert('Failed to load progress. Please try again.');
+      showNotification('Failed to load progress. Please try again.', 'error');
     }
   }
 
@@ -741,7 +801,7 @@ net use S: \\[DCName]\\Public
       } catch (error) {
         console.error('Error saving progress:', error);
         checkbox.checked = !checkbox.checked; // Revert on error
-        alert('Failed to save progress. Please try again.');
+        showNotification('Failed to save progress. Please try again.', 'error');
       }
     });
   });

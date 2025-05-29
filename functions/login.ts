@@ -1,41 +1,46 @@
-import { validateCSRFToken } from './utils';
+import { hashPassword } from './utils';
 
-export const onRequestPost: PagesFunction<Env> = async (context) => {
-  try {
-    const formData = await context.request.formData();
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const csrfToken = formData.get('csrf_token') as string;
+interface LoginRequest {
+  email: string;
+  password: string;
+  csrf_token: string;
+}
 
-    if (!email || !password || !csrfToken) {
-      return new Response('Missing fields', { status: 400 });
-    }
+export async function handleLogin(request: Request, env: Env): Promise<Response> {
+  const formData = await request.formData();
+  const { email, password, csrf_token } = Object.fromEntries(formData) as unknown as LoginRequest;
 
-    if (!await validateCSRFToken(context.env, csrfToken)) {
-      return new Response('Invalid CSRF token', { status: 403 });
-    }
-
-    const userData = await context.env.USERS.get(`user:${email}`);
-    if (!userData) {
-      return new Response('Email not found', { status: 400 });
-    }
-
-    const user = JSON.parse(userData);
-    if (user.password !== password) {
-      return new Response('Incorrect password', { status: 400 });
-    }
-
-    const sessionToken = crypto.randomUUID();
-    await context.env.USERS.put(`session:${sessionToken}`, user.id, { expirationTtl: 86400 });
-
-    const response = new Response('Login successful', {
-      status: 200,
-      headers: {
-        'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict`,
-      },
-    });
-    return response;
-  } catch (error) {
-    return new Response('Server error', { status: 500 });
+  // Validate CSRF token
+  const sessionToken = request.headers.get('X-CSRF-Token') || '';
+  if (csrf_token !== sessionToken) {
+    return new Response(JSON.stringify({ message: 'Invalid CSRF token' }), { status: 403 });
   }
-};
+
+  // Validate input
+  if (!email || !password) {
+    return new Response(JSON.stringify({ message: 'Missing required fields' }), { status: 400 });
+  }
+
+  // Check if user exists
+  const userData = await env.KV.get(`user:${email}`);
+  if (!userData) {
+    return new Response(JSON.stringify({ message: 'User not found' }), { status: 400 });
+  }
+
+  // Verify password
+  const user = JSON.parse(userData);
+  if (user.password !== await hashPassword(password)) {
+    return new Response(JSON.stringify({ message: 'Incorrect password' }), { status: 400 });
+  }
+
+  // Set session cookie
+  const sessionId = crypto.randomUUID();
+  await env.KV.put(`session:${sessionId}`, email, { expirationTtl: 86400 });
+
+  return new Response(JSON.stringify({ message: 'Login successful', userName: user.name }), {
+    status: 200,
+    headers: {
+      'Set-Cookie': `session=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Strict`,
+    },
+  });
+}
