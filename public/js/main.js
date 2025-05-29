@@ -1,7 +1,11 @@
 // Function to show on-site notification
 function showNotification(message, type = 'success') {
+  console.log('showNotification called:', { message, type }); // Debug log
   const notification = document.getElementById('notification');
-  if (!notification) return;
+  if (!notification) {
+    console.error('Notification element not found');
+    return;
+  }
 
   notification.textContent = message;
   notification.classList.remove('success', 'error', 'loading', 'hide');
@@ -16,6 +20,7 @@ function showNotification(message, type = 'success') {
 
 // Fetch CSRF token
 async function fetchCSRFToken() {
+  console.log('fetchCSRFToken called'); // Debug log
   try {
     const response = await fetch('/api/csrf', { method: 'GET' });
     if (!response.ok) {
@@ -26,6 +31,7 @@ async function fetchCSRFToken() {
       throw new Error('CSRF token not found in response');
     }
     document.getElementById('csrfToken').value = data.token;
+    console.log('CSRF token fetched:', data.token); // Debug log
   } catch (error) {
     console.error('Error fetching CSRF token:', error);
     showNotification('Error initializing form. Try refreshing the page.', 'error');
@@ -34,6 +40,7 @@ async function fetchCSRFToken() {
 
 // Handle form submission with notification
 async function handleFormSubmit(event, url) {
+  console.log('handleFormSubmit called:', { url }); // Debug log
   event.preventDefault();
 
   // Show loading notification
@@ -43,6 +50,7 @@ async function handleFormSubmit(event, url) {
   if (url === '/register') {
     const password = event.target.querySelector('#password').value;
     const repeatPassword = event.target.querySelector('#repeatPassword').value;
+    console.log('Validating passwords:', { password, repeatPassword }); // Debug log
     if (password !== repeatPassword) {
       showNotification('Passwords do not match.', 'error');
       return;
@@ -51,6 +59,7 @@ async function handleFormSubmit(event, url) {
 
   try {
     const formData = new FormData(event.target);
+    console.log('Submitting form to:', url); // Debug log
     const response = await fetch(url, {
       method: 'POST',
       body: formData,
@@ -59,31 +68,32 @@ async function handleFormSubmit(event, url) {
       },
     });
 
-    // Check if the response is OK
+    console.log('Fetch response:', response); // Debug log
     if (!response.ok) {
       let errorMessage = `Server error: ${response.status} ${response.statusText}`;
       try {
         const data = await response.json();
         errorMessage = data.message || errorMessage;
       } catch (jsonError) {
-        // If JSON parsing fails, use the status text
         console.error('Failed to parse error response as JSON:', jsonError);
       }
       throw new Error(errorMessage);
     }
 
-    const data = await response.json(); // This should now work if the server returns JSON
+    const data = await response.json();
+    console.log('Response data:', data); // Debug log
 
     if (url === '/register') {
       showNotification('Registration successful! Redirecting to login...', 'success');
       setTimeout(() => {
+        console.log('Redirecting to /login.html'); // Debug log
         window.location.href = '/login.html';
       }, 2000);
     } else if (url === '/login') {
-      // Store user name in localStorage for display
       localStorage.setItem('userName', data.userName);
       showNotification('Login successful! Redirecting to dashboard...', 'success');
       setTimeout(() => {
+        console.log('Redirecting to /dashboard.html'); // Debug log
         window.location.href = '/dashboard.html';
       }, 2000);
     }
@@ -95,17 +105,20 @@ async function handleFormSubmit(event, url) {
 
 // Initialize forms
 if (document.getElementById('registerForm')) {
+  console.log('Initializing registerForm'); // Debug log
   fetchCSRFToken();
   document.getElementById('registerForm').addEventListener('submit', (event) => handleFormSubmit(event, '/register'));
 }
 
 if (document.getElementById('loginForm')) {
+  console.log('Initializing loginForm'); // Debug log
   fetchCSRFToken();
   document.getElementById('loginForm').addEventListener('submit', (event) => handleFormSubmit(event, '/login'));
 }
 
 // Handle logout
 if (document.getElementById('logout')) {
+  console.log('Initializing logout'); // Debug log
   document.getElementById('logout').addEventListener('click', async () => {
     document.cookie = 'session=; Max-Age=0; Path=/; SameSite=Strict';
     localStorage.removeItem('userName');
@@ -115,17 +128,44 @@ if (document.getElementById('logout')) {
 
 // Display user name on dashboard
 if (document.getElementById('userInfo')) {
+  console.log('Initializing userInfo'); // Debug log
   const userName = localStorage.getItem('userName');
   if (userName) {
     document.getElementById('userInfo').textContent = `Welcome, ${userName}`;
   } else {
-    // Redirect to login if no user name is found
     window.location.href = '/login.html';
+  }
+}
+
+// Dashboard-specific functions (defined only once at the top level)
+function updateProgress(checkboxes, totalTasks, progressBar, progressText) {
+  const checkedTasks = document.querySelectorAll('.task input[type="checkbox"]:checked').length;
+  const percentage = Math.round((checkedTasks / totalTasks) * 100);
+  progressBar.style.setProperty('--progress', `${percentage}%`);
+  progressText.textContent = `${percentage}% Completed`;
+}
+
+async function loadProgress(checkboxes, updateProgressCallback) {
+  try {
+    const response = await fetch('/api/progress', { method: 'GET' });
+    if (!response.ok) throw new Error('Failed to load progress');
+    const progress = await response.json();
+    Object.keys(progress).forEach(week => {
+      Object.keys(progress[week]).forEach(task => {
+        const checkbox = document.querySelector(`input[data-week="${week}"][data-task="${task}"]`);
+        if (checkbox) checkbox.checked = progress[week][task];
+      });
+    });
+    updateProgressCallback();
+  } catch (error) {
+    console.error('Error loading progress:', error);
+    showNotification('Failed to load progress. Please try again.', 'error');
   }
 }
 
 // Dashboard functionality (progress tracking, modals, etc.)
 if (document.querySelector('.timeline')) {
+  console.log('Initializing dashboard timeline'); // Debug log
   const progressBar = document.getElementById('progressBar');
   const progressText = document.getElementById('progressText');
   const checkboxes = document.querySelectorAll('.task input[type="checkbox"]');
@@ -136,7 +176,6 @@ if (document.querySelector('.timeline')) {
   const modalDescription = document.getElementById('modalDescription');
   const closeModal = document.getElementById('closeModal');
 
-  // Mapping of front-end task IDs to backend task keys for modal display
   const taskIdToModalId = {
     'dc': 'promote-dc',
     'vm': 'join-vm',
@@ -454,7 +493,6 @@ net use S: \\[DCName]\\Public
         <section>
           <h3>References</h3>
           <ul>
-            <lirice: true;
             <li><a href="https://learn.microsoft.com/en-us/windows-server/networking/windows-time-service/windows-time-service-tools-and-settings">Microsoft Learn: Windows Time Service</a></li>
             <li><a href="https://www.alitajran.com/configure-time-sync-windows-server/">ALI TAJRAN: Configure Time Sync</a></li>
           </ul>
@@ -772,33 +810,6 @@ net use S: \\[DCName]\\Public
     }
   };
 
-  // Function to update progress bar
-  function updateProgress() {
-    const checkedTasks = document.querySelectorAll('.task input[type="checkbox"]:checked').length;
-    const percentage = Math.round((checkedTasks / totalTasks) * 100);
-    progressBar.style.setProperty('--progress', `${percentage}%`);
-    progressText.textContent = `${percentage}% Completed`;
-  }
-
-  // Load saved progress
-  async function loadProgress() {
-    try {
-      const response = await fetch('/api/progress', { method: 'GET' });
-      if (!response.ok) throw new Error('Failed to load progress');
-      const progress = await response.json();
-      Object.keys(progress).forEach(week => {
-        Object.keys(progress[week]).forEach(task => {
-          const checkbox = document.querySelector(`input[data-week="${week}"][data-task="${task}"]`);
-          if (checkbox) checkbox.checked = progress[week][task];
-        });
-      });
-      updateProgress();
-    } catch (error) {
-      console.error('Error loading progress:', error);
-      showNotification('Failed to load progress. Please try again.', 'error');
-    }
-  }
-
   // Save progress on checkbox change
   checkboxes.forEach(checkbox => {
     checkbox.addEventListener('change', async () => {
@@ -814,58 +825,7 @@ net use S: \\[DCName]\\Public
           body: formData,
         });
         if (!response.ok) throw new Error('Failed to save progress');
-        updateProgress();
-      } catch (error) {
-        console.error('Error saving progress:', error);
-        checkbox.checked = !checkbox.checked; // Revert on error
-        showNotification('Failed to save progress. Please try again.', 'error');
-      }
-    });
-  });
-
-  // Function to update progress bar
-  function updateProgress() {
-    const checkedTasks = document.querySelectorAll('.task input[type="checkbox"]:checked').length;
-    const percentage = Math.round((checkedTasks / totalTasks) * 100);
-    progressBar.style.setProperty('--progress', `${percentage}%`);
-    progressText.textContent = `${percentage}% Completed`;
-  }
-  
-   // Load saved progress
-  async function loadProgress() {
-    try {
-      const response = await fetch('/api/progress', { method: 'GET' });
-      if (!response.ok) throw new Error('Failed to load progress');
-      const progress = await response.json();
-      Object.keys(progress).forEach(week => {
-        Object.keys(progress[week]).forEach(task => {
-          const checkbox = document.querySelector(`input[data-week="${week}"][data-task="${task}"]`);
-          if (checkbox) checkbox.checked = progress[week][task];
-        });
-      });
-      updateProgress();
-    } catch (error) {
-      console.error('Error loading progress:', error);
-      showNotification('Failed to load progress. Please try again.', 'error');
-    }
-  }
-  
-    // Save progress on checkbox change
-  checkboxes.forEach(checkbox => {
-    checkbox.addEventListener('change', async () => {
-      const week = checkbox.dataset.week;
-      const task = checkbox.dataset.task;
-      try {
-        const formData = new FormData();
-        formData.append('week', week);
-        formData.append('task', task);
-        formData.append('checked', checkbox.checked.toString());
-        const response = await fetch('/api/progress', {
-          method: 'POST',
-          body: formData,
-        });
-        if (!response.ok) throw new Error('Failed to save progress');
-        updateProgress();
+        updateProgress(checkboxes, totalTasks, progressBar, progressText);
       } catch (error) {
         console.error('Error saving progress:', error);
         checkbox.checked = !checkbox.checked; // Revert on error
@@ -907,7 +867,7 @@ net use S: \\[DCName]\\Public
   });
 
   // Load progress on page load
-  loadProgress();
+  loadProgress(checkboxes, () => updateProgress(checkboxes, totalTasks, progressBar, progressText));
 
   // Animate weeks on scroll
   const weeks = document.querySelectorAll('.week');

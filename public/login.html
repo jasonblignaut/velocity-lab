@@ -4,15 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Velocity Lab: Login</title>
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <link rel="icon" type="image/x-icon" href="/public/assets/favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 <body>
   <nav class="nav-glass">
     <div class="brand">
-      <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="brand-logo">
-      Velocity Lab
+      <img src="/public/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="brand-logo">
     </div>
     <div class="auth">
       <a href="/register.html">Register</a>
@@ -21,7 +20,7 @@
   <div class="form-container">
     <h2>Login</h2>
     <div class="notification" id="notification" style="display: none;"></div>
-    <form id="loginForm">
+    <form id="loginForm" method="POST" action="">
       <input type="hidden" name="csrf_token" id="csrfToken">
       <div class="form-group">
         <label for="email">Email:</label>
@@ -36,6 +35,6 @@
       </div>
     </form>
   </div>
-  <script src="/js/main.js"></script>
+  <script src="/public/js/main.js"></script>
 </body>
 </html>
