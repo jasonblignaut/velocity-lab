@@ -785,6 +785,92 @@ net use S: \\[DCName]\\Public
       `
     }
   };
+  
+  // Show messages in the notification box
+function showNotification(message) {
+  const note = document.getElementById('notification');
+  if (note) {
+    note.textContent = message;
+    note.style.display = 'block';
+  }
+}
+
+// Hide messages
+function hideNotification() {
+  const note = document.getElementById('notification');
+  if (note) {
+    note.textContent = '';
+    note.style.display = 'none';
+  }
+}
+
+// Inject CSRF token on page load
+window.addEventListener('DOMContentLoaded', async () => {
+  const csrfInput = document.getElementById('csrfToken');
+  if (csrfInput) {
+    try {
+      const res = await fetch('/api/csrf');
+      const token = await res.text();
+      csrfInput.value = token;
+    } catch (err) {
+      showNotification('Failed to load CSRF token.');
+    }
+  }
+});
+
+async function handleFormSubmit(event, endpoint) {
+  event.preventDefault();
+  const form = event.target;
+  const formData = new FormData(form);
+
+  showNotification('Processing...');
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      body: formData
+    });
+
+    const text = await response.text();
+
+    if (!response.ok) {
+      try {
+        const json = JSON.parse(text);
+        showNotification(json.error || 'Something went wrong');
+      } catch {
+        showNotification(text);
+      }
+      return;
+    }
+
+    showNotification('Success! Redirecting...');
+    setTimeout(() => {
+      window.location.href = '/dashboard.html';
+    }, 1000);
+
+  } catch (error) {
+    showNotification('Network error. Please try again.');
+  }
+}
+
+// Login form handler
+document.getElementById('loginForm')?.addEventListener('submit', (e) => {
+  handleFormSubmit(e, '/login');
+});
+
+// Register form handler
+document.getElementById('registerForm')?.addEventListener('submit', (e) => {
+  const pass = document.getElementById('password').value;
+  const repass = document.getElementById('repeatPassword').value;
+
+  if (pass !== repass) {
+    e.preventDefault();
+    showNotification('Passwords do not match.');
+    return;
+  }
+
+  handleFormSubmit(e, '/register');
+});
 
   // Save progress on checkbox change
   checkboxes.forEach(checkbox => {

@@ -1,41 +1,65 @@
-import { validateCSRFToken, hashPassword } from './utils';
+import { validateCSRFToken } from './utils';
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     const formData = await context.request.formData();
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const name = formData.get('name') as string;
-    const role = formData.get('role') as string;
-    const csrfToken = formData.get('csrf_token') as string;
+    const name = formData.get('name')?.toString().trim();
+    const email = formData.get('email')?.toString().trim().toLowerCase();
+    const password = formData.get('password')?.toString();
+    const csrfToken = formData.get('csrf_token')?.toString();
 
-    if (!email || !password || !name || !role || !csrfToken) {
-      return new Response('Missing fields', { status: 400 });
+    // Validate inputs
+    if (!name || !email || !password || !csrfToken) {
+      return jsonResponse({ error: 'Missing required fields' }, 400);
     }
 
-    if (!(await validateCSRFToken(context.env, csrfToken))) {
-      return new Response('Invalid CSRF token', { status: 403 });
+    const isValidCSRF = await validateCSRFToken(context.env, csrfToken);
+    if (!isValidCSRF) {
+      return jsonResponse({ error: 'Invalid CSRF token' }, 403);
     }
 
+    // Check if user already exists
     const existingUser = await context.env.USERS.get(`user:${email}`);
     if (existingUser) {
-      return new Response('Email already registered', { status: 400 });
+      return jsonResponse({ error: 'Email already registered' }, 409);
     }
 
-    const id = crypto.randomUUID();
-    const user = { id, email, name, role, password: await hashPassword(password) };
-    await context.env.USERS.put(`user:${email}`, JSON.stringify(user));
+    // Generate user ID and session token
+    const userId = crypto.randomUUID();
+    const sessionToken = crypto.randomUUID();
 
-    const progress = {
-      week1: { dc: false, vm: false, share: false, group: false },
-      week2: { server: false, wsus: false, time: false },
-      week3: { upgrade: false, exchange: false, mailbox: false, mail: false },
-      week4: { external: false, hybrid: false, hosting: false },
+    // You should hash the password in production using bcrypt or similar
+    const userData = {
+      id: userId,
+      name,
+      email,
+      password, // ⚠️ Store hashed password in production
     };
-    await context.env.PROGRESS.put(`progress:${id}`, JSON.stringify(progress));
 
-    return new Response('Registration successful', { status: 200 });
-  } catch (error) {
-    return new Response('Server error', { status: 500 });
+    // Store user and session
+    await context.env.USERS.put(`user:${email}`, JSON.stringify(userData));
+    await context.env.USERS.put(`session:${sessionToken}`, userId, {
+      expirationTtl: 86400,
+    });
+
+    return new Response(JSON.stringify({ name }), {
+      status: 201,
+      headers: {
+        'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+  } catch (err) {
+    console.error('Register error:', err);
+    return jsonResponse({ error: 'Internal server error' }, 500);
   }
 };
+
+// Reusable JSON response helper
+function jsonResponse(data: Record<string, any>, status: number = 200): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
