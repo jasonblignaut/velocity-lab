@@ -18,9 +18,8 @@ async function fetchCSRFToken() {
   try {
     const response = await fetch('/api/csrf', { method: 'GET' });
     if (!response.ok) throw new Error('Failed to fetch CSRF token');
-    const data = await response.json();
-    if (!data.csrf_token) throw new Error('CSRF token not found');
-    document.getElementById('csrfToken').value = data.csrf_token;
+    const { token } = await response.json();
+    document.getElementById('csrfToken').value = token;
   } catch (error) {
     showNotification('Error initializing form. Try refreshing the page.', 'error');
     throw error;
