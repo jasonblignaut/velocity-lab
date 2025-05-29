@@ -1,3 +1,20 @@
+// Function to show on-site notification
+function showNotification(message, type = 'success') {
+  const notification = document.getElementById('notification');
+  if (!notification) return;
+
+  notification.textContent = message;
+  notification.classList.remove('success', 'error', 'loading', 'hide');
+  notification.classList.add(type, 'show');
+
+  // Auto-hide after 3 seconds
+  setTimeout(() => {
+    notification.classList.remove('show');
+    notification.classList.add('hide');
+  }, 3000);
+}
+
+// Fetch CSRF token
 async function fetchCSRFToken() {
   try {
     const response = await fetch('/api/csrf', { method: 'GET' });
@@ -6,100 +23,57 @@ async function fetchCSRFToken() {
     document.getElementById('csrfToken').value = token;
   } catch (error) {
     console.error('Error fetching CSRF token:', error);
-    alert('Error initializing form. Try refreshing the page.');
+    showNotification('Error initializing form. Try refreshing the page.', 'error');
   }
 }
 
+// Handle form submission with notification
 async function handleFormSubmit(event, url) {
   event.preventDefault();
+
+  // Show loading notification
+  showNotification('Processing...', 'loading');
+
+  // Password matching validation for registration
+  if (url === '/register') {
+    const password = event.target.querySelector('#password').value;
+    const repeatPassword = event.target.querySelector('#repeatPassword').value;
+    if (password !== repeatPassword) {
+      showNotification('Passwords do not match.', 'error');
+      return;
+    }
+  }
+
   try {
     const formData = new FormData(event.target);
     const response = await fetch(url, {
       method: 'POST',
       body: formData,
     });
-    const message = await response.text();
-    alert(message);
-    if (response.ok && url === '/register') {
-      window.location.href = '/login.html';
-    } else if (response.ok && url === '/login') {
-      window.location.href = '/dashboard.html';
+
+    const data = await response.json(); // Expect JSON response with message and userName (for login)
+
+    if (response.ok) {
+      if (url === '/register') {
+        showNotification('Registration successful! Redirecting to login...', 'success');
+        setTimeout(() => {
+          window.location.href = '/login.html';
+        }, 2000);
+      } else if (url === '/login') {
+        // Store user name in localStorage for display
+        localStorage.setItem('userName', data.userName);
+        showNotification('Login successful! Redirecting to dashboard...', 'success');
+        setTimeout(() => {
+          window.location.href = '/dashboard.html';
+        }, 2000);
+      }
     } else {
-      throw new Error('Request failed');
+      showNotification(data.message || 'An error occurred. Please try again.', 'error');
     }
   } catch (error) {
     console.error('Form submission error:', error);
-    alert('An error occurred. Please try again.');
+    showNotification('An error occurred. Please try again.', 'error');
   }
-}
-
-if (document.getElementById('registerForm')) {
-  fetchCSRFToken();
-  document.getElementById('registerForm').addEventListener('submit', (event) => handleFormSubmit(event, '/register'));
-}
-
-if (document.getElementById('loginForm')) {
-  fetchCSRFToken();
-  document.getElementById('loginForm').addEventListener('submit', (event) => handleFormSubmit(event, '/login'));
-}
-
-if (document.getElementById('logout')) {
-  document.getElementById('logout').addEventListener('click', async () => {
-    document.cookie = 'session=; Max-Age=0; Path=/; SameSite=Strict';
-    window.location.href = '/index.html';
-  });
-}
-
-if (document.querySelector('.timeline')) {
-  async function loadProgress() {
-    try {
-      const response = await fetch('/api/progress', { credentials: 'include' });
-      if (response.ok) {
-        const progress = await response.json();
-        Object.keys(progress).forEach((week) => {
-          Object.keys(progress[week]).forEach((task) => {
-            const checkbox = document.querySelector(input[data-week="${week}"][data-task="${task}"]);
-            if (checkbox) {
-              checkbox.checked = progress[week][task];
-            }
-          });
-        });
-      } else {
-        console.error('Failed to load progress:', response.statusText);
-        alert('Please log in to view progress.');
-        window.location.href = '/login.html';
-      }
-    } catch (error) {
-      console.error('Error loading progress:', error);
-      alert('Error loading progress. Please try again.');
-    }
-  }
-
-  async function updateProgress(checkbox) {
-    try {
-      const formData = new FormData();
-      formData.append('week', checkbox.dataset.week);
-      formData.append('task', checkbox.dataset.task);
-      formData.append('checked', checkbox.checked.toString());
-      const response = await fetch('/progress', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        throw new Error('Failed to update progress');
-      }
-    } catch (error) {
-      console.error('Error updating progress:', error);
-      alert('Error saving progress. Please try again.');
-      checkbox.checked = !checkbox.checked;
-    }
-  }
-
-  loadProgress();
-  document.querySelectorAll('.task input[type="checkbox"]').forEach((checkbox) => {
-    checkbox.addEventListener('change', () => updateProgress(checkbox));
-  });
 }
 
 // Initialize forms
@@ -115,7 +89,7 @@ if (document.getElementById('loginForm')) {
 
 // Handle logout
 if (document.getElementById('logout')) {
-  document.getElementById('logout').addEventListener('click', () => {
+  document.getElementById('logout').addEventListener('click', async () => {
     document.cookie = 'session=; Max-Age=0; Path=/; SameSite=Strict';
     localStorage.removeItem('userName');
     window.location.href = '/index.html';
@@ -126,21 +100,14 @@ if (document.getElementById('logout')) {
 if (document.getElementById('userInfo')) {
   const userName = localStorage.getItem('userName');
   if (userName) {
-    document.getElementById('userInfo').textContent = Welcome, ${userName};
+    document.getElementById('userInfo').textContent = `Welcome, ${userName}`;
   } else {
+    // Redirect to login if no user name is found
     window.location.href = '/login.html';
   }
 }
 
-// Dashboard-specific functions
-function updateProgress(checkboxes, totalTasks, progressBar, progressText) {
-  const checkedTasks = document.querySelectorAll('.task input[type="checkbox"]:checked').length;
-  const percentage = Math.round((checkedTasks / totalTasks) * 100);
-  progressBar.style.setProperty('--progress', ${percentage}%);
-  progressText.textContent = ${percentage}% Completed;
-}
-
-// Dashboard functionality
+// Dashboard functionality (progress tracking, modals, etc.)
 if (document.querySelector('.timeline')) {
   const progressBar = document.getElementById('progressBar');
   const progressText = document.getElementById('progressText');
@@ -152,6 +119,7 @@ if (document.querySelector('.timeline')) {
   const modalDescription = document.getElementById('modalDescription');
   const closeModal = document.getElementById('closeModal');
 
+  // Mapping of front-end task IDs to backend task keys for modal display
   const taskIdToModalId = {
     'dc': 'promote-dc',
     'vm': 'join-vm',
@@ -172,7 +140,7 @@ if (document.querySelector('.timeline')) {
   const taskDetails = {
     "promote-dc": {
       title: "Promote Server 2012 to Domain Controller",
-      description: 
+      description: `
         <section>
           <h3>Overview</h3>
           <p>Promoting a Windows Server 2012 to a Domain Controller (DC) establishes Active Directory (AD) and DNS services for centralized management.</p>
@@ -212,11 +180,11 @@ if (document.querySelector('.timeline')) {
             <li><a href="https://www.alitajran.com/install-and-configure-active-directory-domain-services/">ALI TAJRAN: Configure AD DS</a></li>
           </ul>
         </section>
-      
+      `
     },
     "join-vm": {
       title: "Join VM to Domain",
-      description: 
+      description: `
         <section>
           <h3>Overview</h3>
           <p>Joining a VM to the domain enables centralized management and authentication via Active Directory.</p>
@@ -254,11 +222,11 @@ if (document.querySelector('.timeline')) {
             <li><a href="https://www.alitajran.com/join-computer-to-domain/">ALI TAJRAN: Join Computer to Domain</a></li>
           </ul>
         </section>
-      
+      `
     },
     "network-share": {
       title: "Configure Network Share on DC",
-      description: 
+      description: `
         <section>
           <h3>Overview</h3>
           <p>Create network shares for centralized file storage, mapped automatically on logon using three methods (GPO, PowerShell, logon script) with hidden shares ($).</p>
@@ -305,11 +273,11 @@ net use S: \\[DCName]\\Public
             <li><a href="https://www.alitajran.com/map-network-drive-with-group-policy/">ALI TAJRAN: Map Drives with GPO</a></li>
           </ul>
         </section>
-      
+      `
     },
     "security-group": {
       title: "Create Security Group",
-      description: 
+      description: `
         <section>
           <h3>Overview</h3>
           <p>Create a security group to restrict access to network shares, ensuring only authorized users can connect.</p>
@@ -347,11 +315,11 @@ net use S: \\[DCName]\\Public
             <li><a href="https://www.alitajran.com/create-security-group-in-active-directory/">ALI TAJRAN: Create Security Group</a></li>
           </ul>
         </section>
-      
+      `
     },
     "install-server": {
       title: "Install Second Server 2012",
-      description: 
+      description: `
         <section>
           <h3>Overview</h3>
           <p>Install a second Windows Server 2012 to enhance redundancy and distribute load.</p>
@@ -389,11 +357,11 @@ net use S: \\[DCName]\\Public
             <li><a href="https://www.alitajran.com/install-windows-server-2012-r2/">ALI TAJRAN: Install Windows Server 2012</a></li>
           </ul>
         </section>
-      
+      `
     },
     "setup-wsus": {
       title: "Setup WSUS",
-      description: 
+      description: `
         <section>
           <h3>Overview</h3>
           <p>Configure Windows Server Update Services (WSUS) to manage and distribute updates across the network.</p>
@@ -432,11 +400,11 @@ net use S: \\[DCName]\\Public
             <li><a href="https://www.alitajran.com/install-and-configure-wsus-on-windows-server/">ALI TAJRAN: Configure WSUS</a></li>
           </ul>
         </section>
-      
+      `
     },
     "time-servers": {
       title: "Configure Two Time Servers",
-      description: 
+      description: `
         <section>
           <h3>Overview</h3>
           <p>Configure two Network Time Protocol (NTP) servers to ensure accurate time synchronization across the domain.</p>
@@ -469,15 +437,16 @@ net use S: \\[DCName]\\Public
         <section>
           <h3>References</h3>
           <ul>
+            <lirice: true;
             <li><a href="https://learn.microsoft.com/en-us/windows-server/networking/windows-time-service/windows-time-service-tools-and-settings">Microsoft Learn: Windows Time Service</a></li>
             <li><a href="https://www.alitajran.com/configure-time-sync-windows-server/">ALI TAJRAN: Configure Time Sync</a></li>
           </ul>
         </section>
-      
+      `
     },
     "upgrade-servers": {
       title: "Upgrade Servers to 2016",
-      description: 
+      description: `
         <section>
           <h3>Overview</h3>
           <p>Upgrade both Windows Server 2012 instances to Windows Server 2016 for improved features and security.</p>
@@ -516,11 +485,11 @@ net use S: \\[DCName]\\Public
             <li><a href="https://www.alitajran.com/upgrade-windows-server-2012-to-2016/">ALI TAJRAN: Upgrade to Server 2016</a></li>
           </ul>
         </section>
-      
+      `
     },
     "install-exchange": {
       title: "Install Exchange Server 2019",
-      description: 
+      description: `
         <section>
           <h3>Overview</h3>
           <p>Deploy Exchange Server 2019 on a third server to provide email services, supporting hybrid integration.</p>
@@ -563,11 +532,11 @@ net use S: \\[DCName]\\Public
             <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/exchange-server-2019-deployment-best-practices/ba-p/3928374">Tech Community: Exchange 2019 Best Practices</a></li>
           </ul>
         </section>
-      
+      `
     },
     "create-mailbox": {
       title: "Create User Mailboxes",
-      description: 
+      description: `
         <section>
           <h3>Overview</h3>
           <p>Create mailboxes in Exchange Server 2019 to enable email access for users.</p>
@@ -606,11 +575,11 @@ net use S: \\[DCName]\\Public
             <li><a href="https://www.alitajran.com/create-user-mailbox-in-exchange/">ALI TAJRAN: Create Mailbox</a></li>
           </ul>
         </section>
-      
+      `
     },
     "internal-mail": {
       title: "Setup Internal Mail Flow",
-      description: 
+      description: `
         <section>
           <h3>Overview</h3>
           <p>Configure Exchange Server 2019 to enable reliable internal email delivery between users.</p>
@@ -628,7 +597,7 @@ net use S: \\[DCName]\\Public
             <li>In EAC, verify domain under Mail Flow > Accepted Domains (e.g., corp.example.com).</li>
             <li>Ensure send/receive connectors are configured (default for internal).</li>
             <li>Test email between two mailboxes using Outlook or OWA.</li>
-            <li>Optional: Verify mail flow: <code>Test-Mailflow -Identity "Mailbox1" -TargetEmailAddress "Mailbox2@corp.example.com"</code>.</li>
+			            <li>Optional: Verify mail flow: <code>Test-Mailflow -Identity "Mailbox1" -TargetEmailAddress "Mailbox2@corp.example.com"</code>.</li>
             <li>Monitor delivery in Message Tracking Logs via EAC.</li>
           </ol>
         </section>
@@ -647,11 +616,11 @@ net use S: \\[DCName]\\Public
             <li><a href="https://www.alitajran.com/configure-mail-flow-in-exchange-server/">ALI TAJRAN: Configure Mail Flow</a></li>
           </ul>
         </section>
-      
+      `
     },
     "external-mail": {
       title: "Publish Mail Externally",
-      description: 
+      description: `
         <section>
           <h3>Overview</h3>
           <p>Enable secure external email access by configuring DNS records, modern authentication, and TLS certificates.</p>
@@ -694,11 +663,11 @@ net use S: \\[DCName]\\Public
             <li><a href="https://www.alitajran.com/configure-exchange-server-for-external-mail/">ALI TAJRAN: Configure External Mail</a></li>
           </ul>
         </section>
-      
+      `
     },
     "m365-hybrid": {
       title: "Setup Microsoft 365 Hybrid Environment",
-      description: 
+      description: `
         <section>
           <h3>Overview</h3>
           <p>Integrate on-premises Exchange Server with Microsoft 365 for a hybrid environment, enabling seamless mail flow and identity management.</p>
@@ -739,11 +708,11 @@ net use S: \\[DCName]\\Public
             <li><a href="https://www.alitajran.com/configure-exchange-hybrid-with-office-365/">ALI TAJRAN: Configure Hybrid</a></li>
           </ul>
         </section>
-      
+      `
     },
     "hosting-env": {
       title: "Choose Hosting Environment",
-      description: 
+      description: `
         <section>
           <h3>Overview</h3>
           <p>Evaluate Azure versus on-premises hosting for the hybrid environment, considering scalability, cost, and control.</p>
@@ -782,9 +751,36 @@ net use S: \\[DCName]\\Public
             <li><a href="https://techcommunity.microsoft.com/t5/azure/choosing-between-azure-and-on-premises/ba-p/1876930">Tech Community: Azure vs. On-Premises</a></li>
           </ul>
         </section>
-      
+      `
     }
   };
+
+  // Function to update progress bar
+  function updateProgress() {
+    const checkedTasks = document.querySelectorAll('.task input[type="checkbox"]:checked').length;
+    const percentage = Math.round((checkedTasks / totalTasks) * 100);
+    progressBar.style.setProperty('--progress', `${percentage}%`);
+    progressText.textContent = `${percentage}% Completed`;
+  }
+
+  // Load saved progress
+  async function loadProgress() {
+    try {
+      const response = await fetch('/api/progress', { method: 'GET' });
+      if (!response.ok) throw new Error('Failed to load progress');
+      const progress = await response.json();
+      Object.keys(progress).forEach(week => {
+        Object.keys(progress[week]).forEach(task => {
+          const checkbox = document.querySelector(`input[data-week="${week}"][data-task="${task}"]`);
+          if (checkbox) checkbox.checked = progress[week][task];
+        });
+      });
+      updateProgress();
+    } catch (error) {
+      console.error('Error loading progress:', error);
+      showNotification('Failed to load progress. Please try again.', 'error');
+    }
+  }
 
   // Save progress on checkbox change
   checkboxes.forEach(checkbox => {
@@ -801,8 +797,9 @@ net use S: \\[DCName]\\Public
           body: formData,
         });
         if (!response.ok) throw new Error('Failed to save progress');
-        updateProgress(checkboxes, totalTasks, progressBar, progressText);
+        updateProgress();
       } catch (error) {
+        console.error('Error saving progress:', error);
         checkbox.checked = !checkbox.checked; // Revert on error
         showNotification('Failed to save progress. Please try again.', 'error');
       }
@@ -812,9 +809,10 @@ net use S: \\[DCName]\\Public
   // Modal functionality
   document.querySelectorAll('.task').forEach(task => {
     task.addEventListener('click', (e) => {
+      // Prevent modal from opening if clicking the checkbox
       if (e.target.type === 'checkbox') return;
       const taskId = task.dataset.task;
-      const modalId = taskIdToModalId[taskId];
+      const modalId = taskIdToModalId[taskId]; // Map backend task ID to modal task ID
       const details = taskDetails[modalId];
       if (details) {
         modalTitle.textContent = details.title;
@@ -842,7 +840,7 @@ net use S: \\[DCName]\\Public
   });
 
   // Load progress on page load
-  loadProgress(checkboxes, () => updateProgress(checkboxes, totalTasks, progressBar, progressText));
+  loadProgress();
 
   // Animate weeks on scroll
   const weeks = document.querySelectorAll('.week');

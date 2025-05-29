@@ -59,19 +59,6 @@ body {
 .brand-logo {
   height: 32px;
   width: auto;
-  max-width: 100%;
-}
-
-@media (max-width: 768px) {
-  .brand-logo {
-    height: 28px; /* Slightly smaller for tablets */
-  }
-}
-
-@media (max-width: 480px) {
-  .brand-logo {
-    height: 24px; /* Smaller for mobiles */
-  }
 }
 
 .nav-glass .auth {
@@ -433,16 +420,13 @@ body {
   margin-bottom: 8px;
 }
 
-.modal-content p,
-.modal-content ol,
-.modal-content ul {
+.modal-content p, .modal-content ol, .modal-content ul {
   font-size: 0.9rem;
   color: var(--gray);
   line-height: 1.5;
 }
 
-.modal-content ol li,
-.modal-content ul li {
+.modal-content ol li, .modal-content ul li {
   margin-bottom: 8px;
 }
 
@@ -536,40 +520,10 @@ body {
   width: 100%;
   font-size: 1rem;
   transition: transform 0.3s ease;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .form-group button:hover {
   transform: scale(1.02);
-}
-
-.form-group button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* Spinner */
-.spinner {
-  display: inline-block;
-  margin-left: 8px;
-  width: 16px;
-  height: 16px;
-}
-
-.spinner.active {
-  display: inline-block !important;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
 }
 
 /* Notification Styling */
