@@ -1,19 +1,3 @@
-// Function to show on-site notification
-function showNotification(message, type = 'success') {
-  const notification = document.getElementById('notification');
-  if (!notification) return;
-
-  notification.textContent = message;
-  notification.classList.remove('success', 'error', 'loading', 'hide');
-  notification.classList.add(type, 'show');
-
-  setTimeout(() => {
-    notification.classList.remove('show');
-    notification.classList.add('hide');
-  }, 3000);
-}
-
-// Fetch CSRF token
 async function fetchCSRFToken() {
   try {
     const response = await fetch('/api/csrf', { method: 'GET' });
@@ -21,53 +5,101 @@ async function fetchCSRFToken() {
     const { token } = await response.json();
     document.getElementById('csrfToken').value = token;
   } catch (error) {
-    showNotification('Error initializing form. Try refreshing the page.', 'error');
-    throw error;
+    console.error('Error fetching CSRF token:', error);
+    alert('Error initializing form. Try refreshing the page.');
   }
 }
 
-// Handle form submission with notification
 async function handleFormSubmit(event, url) {
   event.preventDefault();
-  showNotification('Processing...', 'loading');
-
-  if (url === '/register') {
-    const password = event.target.querySelector('#password').value;
-    const repeatPassword = event.target.querySelector('#repeatPassword').value;
-    if (password !== repeatPassword) {
-      showNotification('Passwords do not match.', 'error');
-      return;
-    }
-  }
-
   try {
     const formData = new FormData(event.target);
     const response = await fetch(url, {
       method: 'POST',
       body: formData,
     });
-
     const message = await response.text();
-    if (!response.ok) {
-      throw new Error(message || `Server error: ${response.status}`);
-    }
-
-    if (url === '/register') {
-      showNotification(message, 'success');
-      setTimeout(() => {
-        window.location.href = '/login.html';
-      }, 2000);
-    } else if (url === '/login') {
-      // Since the old login.ts doesn't return the user name, we can't set userName in localStorage
-      // We'll skip setting userName for now to match the old behavior
-      showNotification(message, 'success');
-      setTimeout(() => {
-        window.location.href = '/dashboard.html';
-      }, 2000);
+    alert(message);
+    if (response.ok && url === '/register') {
+      window.location.href = '/login.html';
+    } else if (response.ok && url === '/login') {
+      window.location.href = '/dashboard.html';
+    } else {
+      throw new Error('Request failed');
     }
   } catch (error) {
-    showNotification(error.message || 'An error occurred. Please try again.', 'error');
+    console.error('Form submission error:', error);
+    alert('An error occurred. Please try again.');
   }
+}
+
+if (document.getElementById('registerForm')) {
+  fetchCSRFToken();
+  document.getElementById('registerForm').addEventListener('submit', (event) => handleFormSubmit(event, '/register'));
+}
+
+if (document.getElementById('loginForm')) {
+  fetchCSRFToken();
+  document.getElementById('loginForm').addEventListener('submit', (event) => handleFormSubmit(event, '/login'));
+}
+
+if (document.getElementById('logout')) {
+  document.getElementById('logout').addEventListener('click', async () => {
+    document.cookie = 'session=; Max-Age=0; Path=/; SameSite=Strict';
+    window.location.href = '/index.html';
+  });
+}
+
+if (document.querySelector('.timeline')) {
+  async function loadProgress() {
+    try {
+      const response = await fetch('/api/progress', { credentials: 'include' });
+      if (response.ok) {
+        const progress = await response.json();
+        Object.keys(progress).forEach((week) => {
+          Object.keys(progress[week]).forEach((task) => {
+            const checkbox = document.querySelector(`input[data-week="${week}"][data-task="${task}"]`);
+            if (checkbox) {
+              checkbox.checked = progress[week][task];
+            }
+          });
+        });
+      } else {
+        console.error('Failed to load progress:', response.statusText);
+        alert('Please log in to view progress.');
+        window.location.href = '/login.html';
+      }
+    } catch (error) {
+      console.error('Error loading progress:', error);
+      alert('Error loading progress. Please try again.');
+    }
+  }
+
+  async function updateProgress(checkbox) {
+    try {
+      const formData = new FormData();
+      formData.append('week', checkbox.dataset.week);
+      formData.append('task', checkbox.dataset.task);
+      formData.append('checked', checkbox.checked.toString());
+      const response = await fetch('/progress', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update progress');
+      }
+    } catch (error) {
+      console.error('Error updating progress:', error);
+      alert('Error saving progress. Please try again.');
+      checkbox.checked = !checkbox.checked;
+    }
+  }
+
+  loadProgress();
+  document.querySelectorAll('.task input[type="checkbox"]').forEach((checkbox) => {
+    checkbox.addEventListener('change', () => updateProgress(checkbox));
+  });
 }
 
 // Initialize forms
@@ -106,23 +138,6 @@ function updateProgress(checkboxes, totalTasks, progressBar, progressText) {
   const percentage = Math.round((checkedTasks / totalTasks) * 100);
   progressBar.style.setProperty('--progress', `${percentage}%`);
   progressText.textContent = `${percentage}% Completed`;
-}
-
-async function loadProgress(checkboxes, updateProgressCallback) {
-  try {
-    const response = await fetch('/api/progress', { method: 'GET' });
-    if (!response.ok) throw new Error('Failed to load progress');
-    const progress = await response.json();
-    Object.keys(progress).forEach(week => {
-      Object.keys(progress[week]).forEach(task => {
-        const checkbox = document.querySelector(`input[data-week="${week}"][data-task="${task}"]`);
-        if (checkbox) checkbox.checked = progress[week][task];
-      });
-    });
-    updateProgressCallback();
-  } catch (error) {
-    showNotification('Failed to load progress. Please try again.', 'error');
-  }
 }
 
 // Dashboard functionality
