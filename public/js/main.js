@@ -18,9 +18,14 @@ function showNotification(message, type = 'success') {
 async function fetchCSRFToken() {
   try {
     const response = await fetch('/api/csrf', { method: 'GET' });
-    if (!response.ok) throw new Error('Failed to fetch CSRF token');
-    const { token } = await response.json();
-    document.getElementById('csrfToken').value = token;
+    if (!response.ok) {
+      throw new Error(`Failed to fetch CSRF token: ${response.status} ${response.statusText}`);
+    }
+    const data = await response.json();
+    if (!data.token) {
+      throw new Error('CSRF token not found in response');
+    }
+    document.getElementById('csrfToken').value = data.token;
   } catch (error) {
     console.error('Error fetching CSRF token:', error);
     showNotification('Error initializing form. Try refreshing the page.', 'error');
@@ -49,30 +54,42 @@ async function handleFormSubmit(event, url) {
     const response = await fetch(url, {
       method: 'POST',
       body: formData,
+      headers: {
+        'Accept': 'application/json',
+      },
     });
 
-    const data = await response.json(); // Expect JSON response with message and userName (for login)
-
-    if (response.ok) {
-      if (url === '/register') {
-        showNotification('Registration successful! Redirecting to login...', 'success');
-        setTimeout(() => {
-          window.location.href = '/login.html';
-        }, 2000);
-      } else if (url === '/login') {
-        // Store user name in localStorage for display
-        localStorage.setItem('userName', data.userName);
-        showNotification('Login successful! Redirecting to dashboard...', 'success');
-        setTimeout(() => {
-          window.location.href = '/dashboard.html';
-        }, 2000);
+    // Check if the response is OK
+    if (!response.ok) {
+      let errorMessage = `Server error: ${response.status} ${response.statusText}`;
+      try {
+        const data = await response.json();
+        errorMessage = data.message || errorMessage;
+      } catch (jsonError) {
+        // If JSON parsing fails, use the status text
+        console.error('Failed to parse error response as JSON:', jsonError);
       }
-    } else {
-      showNotification(data.message || 'An error occurred. Please try again.', 'error');
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json(); // This should now work if the server returns JSON
+
+    if (url === '/register') {
+      showNotification('Registration successful! Redirecting to login...', 'success');
+      setTimeout(() => {
+        window.location.href = '/login.html';
+      }, 2000);
+    } else if (url === '/login') {
+      // Store user name in localStorage for display
+      localStorage.setItem('userName', data.userName);
+      showNotification('Login successful! Redirecting to dashboard...', 'success');
+      setTimeout(() => {
+        window.location.href = '/dashboard.html';
+      }, 2000);
     }
   } catch (error) {
     console.error('Form submission error:', error);
-    showNotification('An error occurred. Please try again.', 'error');
+    showNotification(error.message || 'An error occurred. Please try again.', 'error');
   }
 }
 
@@ -806,13 +823,63 @@ net use S: \\[DCName]\\Public
     });
   });
 
+  // Function to update progress bar
+  function updateProgress() {
+    const checkedTasks = document.querySelectorAll('.task input[type="checkbox"]:checked').length;
+    const percentage = Math.round((checkedTasks / totalTasks) * 100);
+    progressBar.style.setProperty('--progress', `${percentage}%`);
+    progressText.textContent = `${percentage}% Completed`;
+  }
+  
+   // Load saved progress
+  async function loadProgress() {
+    try {
+      const response = await fetch('/api/progress', { method: 'GET' });
+      if (!response.ok) throw new Error('Failed to load progress');
+      const progress = await response.json();
+      Object.keys(progress).forEach(week => {
+        Object.keys(progress[week]).forEach(task => {
+          const checkbox = document.querySelector(`input[data-week="${week}"][data-task="${task}"]`);
+          if (checkbox) checkbox.checked = progress[week][task];
+        });
+      });
+      updateProgress();
+    } catch (error) {
+      console.error('Error loading progress:', error);
+      showNotification('Failed to load progress. Please try again.', 'error');
+    }
+  }
+  
+    // Save progress on checkbox change
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', async () => {
+      const week = checkbox.dataset.week;
+      const task = checkbox.dataset.task;
+      try {
+        const formData = new FormData();
+        formData.append('week', week);
+        formData.append('task', task);
+        formData.append('checked', checkbox.checked.toString());
+        const response = await fetch('/api/progress', {
+          method: 'POST',
+          body: formData,
+        });
+        if (!response.ok) throw new Error('Failed to save progress');
+        updateProgress();
+      } catch (error) {
+        console.error('Error saving progress:', error);
+        checkbox.checked = !checkbox.checked; // Revert on error
+        showNotification('Failed to save progress. Please try again.', 'error');
+      }
+    });
+  });
+
   // Modal functionality
   document.querySelectorAll('.task').forEach(task => {
     task.addEventListener('click', (e) => {
-      // Prevent modal from opening if clicking the checkbox
       if (e.target.type === 'checkbox') return;
       const taskId = task.dataset.task;
-      const modalId = taskIdToModalId[taskId]; // Map backend task ID to modal task ID
+      const modalId = taskIdToModalId[taskId];
       const details = taskDetails[modalId];
       if (details) {
         modalTitle.textContent = details.title;

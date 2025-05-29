@@ -59,6 +59,19 @@ body {
 .brand-logo {
   height: 32px;
   width: auto;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .brand-logo {
+    height: 28px; /* Slightly smaller for tablets */
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-logo {
+    height: 24px; /* Smaller for mobiles */
+  }
 }
 
 .nav-glass .auth {
