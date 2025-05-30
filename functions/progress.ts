@@ -1,7 +1,3 @@
-function sanitizeInput(input: string): string {
-  return input.replace(/[<>]/g, '');
-}
-
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   try {
     const cookies = context.request.headers.get('Cookie');
@@ -21,7 +17,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     });
   } catch (error) {
     console.error('Progress GET error:', error);
-    return jsonResponse({ error: 'Internal server error' }, 500);
+    return jsonResponse({ error: 'Server error' }, 500);
   }
 };
 
@@ -39,8 +35,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     const formData = await context.request.formData();
-    const task = sanitizeInput(formData.get('task')?.toString() || '');
-    const week = sanitizeInput(formData.get('week')?.toString() || '');
+    const task = formData.get('task')?.toString();
+    const week = formData.get('week')?.toString();
     const checked = formData.get('checked') === 'true';
 
     if (!task || !week) {
@@ -55,7 +51,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     return jsonResponse({ message: 'Progress updated' }, 200);
   } catch (error) {
     console.error('Progress POST error:', error);
-    return jsonResponse({ error: 'Internal server error' }, 500);
+    return jsonResponse({ error: 'Server error' }, 500);
   }
 };
 

@@ -1,54 +1,3 @@
-async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  const key = await crypto.subtle.importKey(
-    'raw',
-    encoder.encode(password),
-    { name: 'PBKDF2' },
-    false,
-    ['deriveBits']
-  );
-  const hash = await crypto.subtle.deriveBits(
-    {
-      name: 'PBKDF2',
-      salt,
-      iterations: 100000,
-      hash: 'SHA-256',
-    },
-    key,
-    256
-  );
-  const hashArray = Array.from(new Uint8Array(hash));
-  const saltArray = Array.from(salt);
-  return `${btoa(String.fromCharCode(...saltArray))}.${btoa(String.fromCharCode(...hashArray))}`;
-}
-
-async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
-  const [saltB64, hashB64] = hashedPassword.split('.');
-  const salt = Uint8Array.from(atob(saltB64), c => c.charCodeAt(0));
-  const hash = Uint8Array.from(atob(hashB64), c => c.charCodeAt(0));
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    'raw',
-    encoder.encode(password),
-    { name: 'PBKDF2' },
-    false,
-    ['deriveBits']
-  );
-  const derivedHash = await crypto.subtle.deriveBits(
-    {
-      name: 'PBKDF2',
-      salt,
-      iterations: 100000,
-      hash: 'SHA-256',
-    },
-    key,
-    256
-  );
-  const derivedHashArray = Array.from(new Uint8Array(derivedHash));
-  return derivedHashArray.every((byte, i) => byte === hash[i]);
-}
-
 function generateRandomString(length: number): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const array = new Uint8Array(length);
@@ -71,7 +20,14 @@ export async function validateCSRFToken(env: Env, token: string): Promise<boolea
   return false;
 }
 
-export { hashPassword, verifyPassword };
+export async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
 
 export interface Env {
   USERS: KVNamespace;

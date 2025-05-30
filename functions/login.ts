@@ -1,47 +1,44 @@
-import { validateCSRFToken, verifyPassword } from './utils';
-
-function sanitizeInput(input: string): string {
-  return input.replace(/[<>]/g, '');
-}
+import { validateCSRFToken, hashPassword } from './utils';
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     const formData = await context.request.formData();
-    const email = sanitizeInput(formData.get('email')?.toString().trim().toLowerCase() || '');
+    const email = formData.get('email')?.toString().trim().toLowerCase();
     const password = formData.get('password')?.toString();
-    const csrfToken = sanitizeInput(formData.get('csrf_token')?.toString() || '');
+    const csrfToken = formData.get('csrf_token')?.toString();
 
     if (!email || !password || !csrfToken) {
-      return jsonResponse({ error: 'Missing required fields' }, 400);
+      return jsonResponse({ error: 'Missing fields' }, 400);
     }
 
-    if (!await validateCSRFToken(context.env, csrfToken)) {
+    if (!(await validateCSRFToken(context.env, csrfToken))) {
       return jsonResponse({ error: 'Invalid CSRF token' }, 403);
     }
 
     const userData = await context.env.USERS.get(`user:${email}`);
     if (!userData) {
-      return jsonResponse({ error: 'Email not found' }, 404);
+      return jsonResponse({ error: 'Email not found' }, 400);
     }
 
     const user = JSON.parse(userData);
-    if (!(await verifyPassword(password, user.password))) {
-      return jsonResponse({ error: 'Incorrect password' }, 401);
+    const hashedPassword = await hashPassword(password);
+    if (user.password !== hashedPassword) {
+      return jsonResponse({ error: 'Incorrect password' }, 400);
     }
 
     const sessionToken = crypto.randomUUID();
     await context.env.USERS.put(`session:${sessionToken}`, user.id, { expirationTtl: 86400 });
 
-    return new Response(JSON.stringify({ name: user.name }), {
+    return new Response(JSON.stringify({ name: user.name, role: user.role }), {
       status: 200,
       headers: {
-        'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict; Secure`,
+        'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict`,
         'Content-Type': 'application/json',
       },
     });
   } catch (error) {
     console.error('Login error:', error);
-    return jsonResponse({ error: 'Internal server error' }, 500);
+    return jsonResponse({ error: 'Server error' }, 500);
   }
 };
 
