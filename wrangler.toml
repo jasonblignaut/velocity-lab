@@ -13,6 +13,3 @@ id = "72beb3bc668347b584984bc61aed9492"
 
 [vars]
 BCRYPT_SALT_ROUNDS = 12
-
-[build]
-command = "npx tsc"
