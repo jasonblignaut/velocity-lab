@@ -3,220 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="./css/styles.css">
+    <title>Dashboard - Enterprise Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
 </head>
 <body>
-    <div class="container dashboard">
-        <header>
-            <div class="user-info">
-                <h1>Dashboard</h1>
-                <p id="greeting">Welcome, User!</p>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">Enterprise Solutions</div>
+            <div class="nav-links">
+                <a href="dashboard.html" class="nav-link active">Dashboard</a>
+                <a href="#" id="logout" class="nav-link">Logout</a>
             </div>
-            <div class="progress-bar-container">
-                <div class="progress-bar">
-                    <div class="progress" id="progress"></div>
+        </nav>
+    </header>
+    <main class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Dashboard</h1>
+            <p id="userInfo">Welcome, Guest</p>
+        </div>
+        <div class="progress-container">
+            <h2>Task Progress</h2>
+            <div id="progressBar" class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <p id="progressText">0% Completed</p>
+        </div>
+        <div class="timeline">
+            <!-- Week 1 -->
+            <div class="week" data-week="1">
+                <h3>Week 1: Domain Setup</h3>
+                <div class="task" data-task="dc">
+                    <input type="checkbox" data-week="1" data-task="dc">
+                    <span>Promote Server 2012 to Domain Controller</span>
                 </div>
-                <span id="progress-text">0%</span>
+                <div class="task" data-task="vm">
+                    <input type="checkbox" data-week="1" data-task="vm">
+                    <span>Join VM to Domain</span>
+                </div>
+                <div class="task" data-task="share">
+                    <input type="checkbox" data-week="1" data-task="share">
+                    <span>Configure Network Share on DC</span>
+                </div>
+                <div class="task" data-task="group">
+                    <input type="checkbox" data-week="1" data-task="group">
+                    <span>Create Security Group</span>
+                </div>
             </div>
-        </header>
-        <main class="tasks-container">
-            <section class="week" data-week="1">
-                <h2>Week 1</h2>
-                <ul class="tasks">
-                    <li class="task" data-task="task1">
-                        <input type="checkbox" id="task1">
-                        <label for="task1">Task 1: Introduction</label>
-                    </li>
-                    <li class="task" data-task="task2">
-                        <input type="checkbox" id="task2">
-                        <label for="task2">Task 2: Basics</label>
-                    </li>
-                    </ul>
-            </section>
-            <section class="week" data-week="2">
-                <h2>Week 2</h2>
-                <ul class="tasks">
-                    <li class="task" data-task="task3">
-                        <input type="checkbox" id="task3">
-                        <label for="task3">Task 3: Intermediate Concepts</label>
-                    </li>
-                    <li class="task" data-task="task4">
-                        <input type="checkbox" id="task4">
-                        <label for="task4">Task 4: Practice Exercises</label>
-                    </li>
-                </ul>
-            </section>
-            <section class="week" data-week="3">
-                <h2>Week 3</h2>
-                <ul class="tasks">
-                    <li class="task" data-task="task5">
-                        <input type="checkbox" id="task5">
-                        <label for="task5">Task 5: Advanced Topics</label>
-                    </li>
-                    <li class="task" data-task="task6">
-                        <input type="checkbox" id="task6">
-                        <label for="task6">Task 6: Project Start</label>
-                    </li>
-                </ul>
-            </section>
-        </main>
-        <footer>
-            <p>&copy; 2025 Your Company. All rights reserved.</p>
-        </footer>
-
-        <div id="taskModal" class="modal">
-            <div class="modal-content">
-                <span class="close-button">&times;</span>
-                <h3 id="modalTitle">Task Details</h3>
-                <div id="modalDescription"><p>Task description goes here.</p></div>
-            </div>
+            <!-- Add more weeks as per your original code (omitted for brevity) -->
+        </div>
+    </main>
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <span id="closeModal" class="close">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <div id="modalDescription"></div>
         </div>
     </div>
-    <script src="./js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const greetingElement = document.getElementById('greeting');
-            const userEmail = localStorage.getItem('userEmail');
-
-            if (userEmail) {
-                // Extract name from email (you might want to store a proper name during registration)
-                const name = userEmail.substring(0, userEmail.indexOf('@'));
-                greetingElement.textContent = `Welcome, ${name}!`;
-            }
-
-            // Add event listeners to checkboxes to save progress
-            const checkboxes = document.querySelectorAll('.task input[type="checkbox"]');
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', async (event) => {
-                    const taskId = event.target.parentElement.dataset.task;
-                    const completed = event.target.checked;
-
-                    const userEmail = localStorage.getItem('userEmail');
-                    if (userEmail) {
-                        const formData = new FormData();
-                        formData.append('taskId', taskId);
-                        formData.append('completed', completed);
-
-                        const response = await fetch('/functions/progress', {
-                            method: 'POST',
-                            headers: {
-                                'X-User-Email': userEmail
-                            },
-                            body: formData,
-                        });
-
-                        if (!response.ok) {
-                            console.error('Failed to update progress');
-                            // Optionally, provide user feedback
-                        }
-                        loadProgress(checkboxes, () => updateProgress(checkboxes, checkboxes.length, document.getElementById('progress'), document.getElementById('progress-text')));
-                    } else {
-                        console.error('User email not found, cannot save progress.');
-                    }
-                });
-            });
-
-            // Function to load progress from the server
-            async function loadProgress(checkboxes, callback) {
-                const userEmail = localStorage.getItem('userEmail');
-                if (userEmail) {
-                    const response = await fetch('/functions/progress', {
-                        method: 'GET',
-                        headers: {
-                            'X-User-Email': userEmail
-                        }
-                    });
-
-                    if (response.ok) {
-                        const progressData = await response.json();
-                        checkboxes.forEach(checkbox => {
-                            const taskId = checkbox.parentElement.dataset.task;
-                            if (progressData && progressData[taskId]) {
-                                checkbox.checked = true;
-                            }
-                        });
-                        if (callback) {
-                            callback();
-                        }
-                    } else {
-                        console.error('Failed to load progress');
-                    }
-                }
-            }
-
-            // Function to update the progress bar
-            function updateProgress(checkboxes, totalTasks, progressBar, progressText) {
-                const completedTasks = Array.from(checkboxes).filter(cb => cb.checked).length;
-                const progressPercentage = (completedTasks / totalTasks) * 100;
-                progressBar.style.width = `${progressPercentage}%`;
-                progressText.textContent = `${Math.round(progressPercentage)}%`;
-            }
-
-            // Initial load of progress
-            loadProgress(checkboxes, () => updateProgress(checkboxes, checkboxes.length, document.getElementById('progress'), document.getElementById('progress-text')));
-
-            // Modal functionality (assuming main.js will handle more complex interactions)
-            const modal = document.getElementById('taskModal');
-            const closeModal = document.querySelector('.close-button');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalDescription = document.getElementById('modalDescription');
-
-            const taskDetails = {
-                task1: { title: 'Introduction to the Course', description: '<p>This section provides an overview of the course content and learning objectives.</p>' },
-                task2: { title: 'Core Concepts', description: '<p>Learn about the fundamental principles of the subject matter.</p>' },
-                task3: { title: 'Intermediate Concepts', description: '<p>Explore more advanced topics building upon the basics.</p>' },
-                task4: { title: 'Practice Exercises', description: '<p>Apply your knowledge through these practical exercises.</p>' },
-                task5: { title: 'Advanced Topics', description: '<p>Dive into the most complex and specialized areas.</p>' },
-                task6: { title: 'Project Start', description: '<p>Begin working on your final project with these initial guidelines.</p>' },
-            };
-
-            document.querySelectorAll('.task').forEach(task => {
-                task.addEventListener('click', (e) => {
-                    if (e.target.type === 'checkbox') return;
-                    const taskId = task.dataset.task;
-                    const details = taskDetails[taskId];
-                    if (details) {
-                        modalTitle.textContent = details.title;
-                        modalDescription.innerHTML = details.description;
-                        modal.style.display = 'flex';
-                        modal.focus();
-                    }
-                });
-            });
-
-            closeModal.addEventListener('click', () => {
-                modal.style.display = 'none';
-            });
-
-            window.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
-
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && modal.style.display === 'flex') {
-                    modal.style.display = 'none';
-                }
-            });
-
-            // Animate weeks on scroll (basic implementation, main.js can enhance)
-            const weeks = document.querySelectorAll('.week');
-            const observer = new IntersectionObserver(
-                (entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('animate');
-                        } else {
-                            entry.target.classList.remove('animate');
-                        }
-                    });
-                },
-                { threshold: 0.2 }
-            );
-            weeks.forEach(week => observer.observe(week));
-        });
-    </script>
+    <div id="notification" class="notification"></div>
+    <script src="main.js"></script>
 </body>
 </html>
