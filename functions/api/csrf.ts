@@ -1,4 +1,4 @@
-import { generateCSRFToken } from './utils';
+import { generateCSRFToken } from '../utils';
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   try {

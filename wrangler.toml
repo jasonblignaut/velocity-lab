@@ -10,6 +10,3 @@ id = "92065323806e46ff89949262ba803008"
 [[kv_namespaces]]
 binding = "PROGRESS"
 id = "72beb3bc668347b584984bc61aed9492"
-
-[vars]
-BCRYPT_SALT_ROUNDS = 12

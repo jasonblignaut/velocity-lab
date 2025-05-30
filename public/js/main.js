@@ -1,13 +1,15 @@
 const API_BASE = '/api';
-const notification = document.getElementById('notification');
 const NOTIFICATION_TIMEOUT = 5000;
 
 function showNotification(message, type = 'success') {
+  const notification = document.getElementById('notification');
   if (!notification) return;
   notification.textContent = message;
   notification.className = `notification show ${type}`;
+  notification.style.display = 'block';
   setTimeout(() => {
     notification.className = `notification hide ${type}`;
+    setTimeout(() => { notification.style.display = 'none'; }, 300);
   }, NOTIFICATION_TIMEOUT);
 }
 
@@ -446,7 +448,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setupThemeToggle();
 
-  // Handle password validation errors from server
   if (loginForm || registerForm) {
     const urlParams = new URLSearchParams(window.location.search);
     const error = urlParams.get('error');
@@ -454,17 +455,13 @@ document.addEventListener('DOMContentLoaded', () => {
       showNotification(decodeURIComponent(error), 'error');
       history.replaceState(null, '', window.location.pathname);
     }
-  }
 
-  // Ensure CSRF token is set for forms
-  if (loginForm || registerForm) {
     fetchCsrfToken().then(token => {
       const csrfInput = document.getElementById('csrfToken');
       if (csrfInput) csrfInput.value = token;
     }).catch(() => showNotification('Failed to initialize form security', 'error'));
   }
 
-  // Handle window resize for responsive timeline
   let resizeTimeout;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
@@ -475,7 +472,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 200);
   });
 
-  // Handle modal focus trapping
   const modal = document.getElementById('taskModal');
   if (modal) {
     const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
@@ -495,7 +491,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Lazy load images
   const images = document.querySelectorAll('img[loading="lazy"]');
   if ('IntersectionObserver' in window) {
     const imageObserver = new IntersectionObserver((entries, observer) => {
@@ -510,11 +505,9 @@ document.addEventListener('DOMContentLoaded', () => {
     images.forEach(img => imageObserver.observe(img));
   }
 
-  // Handle offline detection
   window.addEventListener('online', () => showNotification('Back online', 'success'));
   window.addEventListener('offline', () => showNotification('You are offline', 'error'));
 
-  // Prevent form resubmission on page refresh
   if (window.history.replaceState) {
     window.history.replaceState(null, null, window.location.href);
   }

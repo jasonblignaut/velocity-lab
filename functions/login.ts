@@ -1,12 +1,15 @@
 import { validateCSRFToken, verifyPassword } from './utils';
-import sanitizeHtml from 'sanitize-html';
+
+function sanitizeInput(input: string): string {
+  return input.replace(/[<>]/g, '');
+}
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     const formData = await context.request.formData();
-    const email = sanitizeHtml(formData.get('email')?.toString().trim().toLowerCase() || '');
+    const email = sanitizeInput(formData.get('email')?.toString().trim().toLowerCase() || '');
     const password = formData.get('password')?.toString();
-    const csrfToken = formData.get('csrf_token')?.toString();
+    const csrfToken = sanitizeInput(formData.get('csrf_token')?.toString() || '');
 
     if (!email || !password || !csrfToken) {
       return jsonResponse({ error: 'Missing required fields' }, 400);

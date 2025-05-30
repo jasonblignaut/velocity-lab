@@ -1,15 +1,17 @@
 import { validateCSRFToken, hashPassword } from './utils';
-import sanitizeHtml from 'sanitize-html';
+
+function sanitizeInput(input: string): string {
+  return input.replace(/[<>]/g, '');
+}
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     const formData = await context.request.formData();
-    const name = sanitizeHtml(formData.get('name')?.toString().trim() || '');
-    const email = sanitizeHtml(formData.get('email')?.toString().trim().toLowerCase() || '');
+    const name = sanitizeInput(formData.get('name')?.toString().trim() || '');
+    const email = sanitizeInput(formData.get('email')?.toString().trim().toLowerCase() || '');
     const password = formData.get('password')?.toString();
-    const csrfToken = formData.get('csrf_token')?.toString();
+    const csrfToken = sanitizeInput(formData.get('csrf_token')?.toString() || '');
 
-    // Input validation
     if (!name || !email || !password || !csrfToken) {
       return jsonResponse({ error: 'Missing required fields' }, 400);
     }
@@ -28,16 +30,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return jsonResponse({ error: 'Invalid CSRF token' }, 403);
     }
 
-    // Check if user exists
     const existingUser = await context.env.USERS.get(`user:${email}`);
     if (existingUser) {
       return jsonResponse({ error: 'Email already registered' }, 409);
     }
 
-    // Hash password
-    const hashedPassword = await hashPassword(password, context.env.BCRYPT_SALT_ROUNDS);
-
-    // Generate user ID and session token
+    const hashedPassword = await hashPassword(password);
     const userId = crypto.randomUUID();
     const sessionToken = crypto.randomUUID();
 
@@ -48,7 +46,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       password: hashedPassword,
     };
 
-    // Store user and session
     await Promise.all([
       context.env.USERS.put(`user:${email}`, JSON.stringify(userData)),
       context.env.USERS.put(`session:${sessionToken}`, userId, { expirationTtl: 86400 }),

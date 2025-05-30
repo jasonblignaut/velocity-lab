@@ -1,4 +1,53 @@
-import { hash, compare } from 'bcryptjs';
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(password),
+    { name: 'PBKDF2' },
+    false,
+    ['deriveBits']
+  );
+  const hash = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt,
+      iterations: 100000,
+      hash: 'SHA-256',
+    },
+    key,
+    256
+  );
+  const hashArray = Array.from(new Uint8Array(hash));
+  const saltArray = Array.from(salt);
+  return `${btoa(String.fromCharCode(...saltArray))}.${btoa(String.fromCharCode(...hashArray))}`;
+}
+
+async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
+  const [saltB64, hashB64] = hashedPassword.split('.');
+  const salt = Uint8Array.from(atob(saltB64), c => c.charCodeAt(0));
+  const hash = Uint8Array.from(atob(hashB64), c => c.charCodeAt(0));
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(password),
+    { name: 'PBKDF2' },
+    false,
+    ['deriveBits']
+  );
+  const derivedHash = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt,
+      iterations: 100000,
+      hash: 'SHA-256',
+    },
+    key,
+    256
+  );
+  const derivedHashArray = Array.from(new Uint8Array(derivedHash));
+  return derivedHashArray.every((byte, i) => byte === hash[i]);
+}
 
 function generateRandomString(length: number): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -22,16 +71,9 @@ export async function validateCSRFToken(env: Env, token: string): Promise<boolea
   return false;
 }
 
-export async function hashPassword(password: string, saltRounds: number = 12): Promise<string> {
-  return hash(password, saltRounds);
-}
-
-export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
-  return compare(password, hashedPassword);
-}
+export { hashPassword, verifyPassword };
 
 export interface Env {
   USERS: KVNamespace;
   PROGRESS: KVNamespace;
-  BCRYPT_SALT_ROUNDS: number;
 }

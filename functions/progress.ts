@@ -1,4 +1,6 @@
-import sanitizeHtml from 'sanitize-html';
+function sanitizeInput(input: string): string {
+  return input.replace(/[<>]/g, '');
+}
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   try {
@@ -37,8 +39,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     const formData = await context.request.formData();
-    const task = sanitizeHtml(formData.get('task')?.toString() || '');
-    const week = sanitizeHtml(formData.get('week')?.toString() || '');
+    const task = sanitizeInput(formData.get('task')?.toString() || '');
+    const week = sanitizeInput(formData.get('week')?.toString() || '');
     const checked = formData.get('checked') === 'true';
 
     if (!task || !week) {
