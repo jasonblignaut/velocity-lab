@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Enterprise Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">Enterprise Solutions</div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="login.html" class="nav-link active">Login</a>
+                <a href="register.html" class="nav-link">Register</a>
+            </div>
+        </nav>
+    </header>
+    <main class="form-container">
+        <div class="form-card">
+            <h2>Sign In</h2>
+            <form id="loginForm" method="POST" action="/login">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="submit-button">Sign In</button>
+            </form>
+            <p class="form-footer">Don't have an account? <a href="register.html">Register</a></p>
+        </div>
+    </main>
+    <div id="notification" class="notification"></div>
+    <script src="main.js"></script>
+</body>
+</html>

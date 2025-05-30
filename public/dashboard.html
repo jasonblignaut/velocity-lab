@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Enterprise Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">Enterprise Solutions</div>
+            <div class="nav-links">
+                <a href="dashboard.html" class="nav-link active">Dashboard</a>
+                <a href="#" id="logout" class="nav-link">Logout</a>
+            </div>
+        </nav>
+    </header>
+    <main class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Dashboard</h1>
+            <p id="userInfo">Welcome, Guest</p>
+        </div>
+        <div class="progress-container">
+            <h2>Task Progress</h2>
+            <div id="progressBar" class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <p id="progressText">0% Completed</p>
+        </div>
+        <div class="timeline">
+            <!-- Week 1 -->
+            <div class="week" data-week="1">
+                <h3>Week 1: Domain Setup</h3>
+                <div class="task" data-task="dc">
+                    <input type="checkbox" data-week="1" data-task="dc">
+                    <span>Promote Server 2012 to Domain Controller</span>
+                </div>
+                <div class="task" data-task="vm">
+                    <input type="checkbox" data-week="1" data-task="vm">
+                    <span>Join VM to Domain</span>
+                </div>
+                <div class="task" data-task="share">
+                    <input type="checkbox" data-week="1" data-task="share">
+                    <span>Configure Network Share on DC</span>
+                </div>
+                <div class="task" data-task="group">
+                    <input type="checkbox" data-week="1" data-task="group">
+                    <span>Create Security Group</span>
+                </div>
+            </div>
+            <!-- Add more weeks as per your original code (omitted for brevity) -->
+        </div>
+    </main>
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <span id="closeModal" class="close">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <div id="modalDescription"></div>
+        </div>
+    </div>
+    <div id="notification" class="notification"></div>
+    <script src="main.js"></script>
+</body>
+</html>
