@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Velocity Lab</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/main.js" defer></script>
+</head>
+<body>
+  <nav class="nav-glass" role="navigation" aria-label="Main navigation">
+    <div class="brand">
+      <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="brand-logo" loading="lazy">
+      <span>Velocity Lab</span>
+    </div>
+    <div class="auth">
+      <a href="/register.html" aria-label="Register for Velocity Lab">Register</a>
+      <a href="/login.html" aria-label="Login to Velocity Lab">Login</a>
+    </div>
+    <button class="theme-toggle" aria-label="Toggle dark mode">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+  </nav>
+  <div class="container">
+    <header class="header">
+      <h1>Velocity Lab</h1>
+      <h2>Timeline Guide to Implement the Lab</h2>
+    </header>
+    <main>
+      <p>Welcome to Velocity Lab! Please register or log in to track your progress through the four-week lab timeline.</p>
+      <section class="prerequisites" aria-labelledby="prerequisites-title">
+        <h3 id="prerequisites-title">Lab Prerequisites</h3>
+        <ul>
+          <li>Create a Microsoft 365 free trial at <a href="https://www.microsoft.com/en-us/microsoft-365/try" target="_blank" rel="noopener">microsoft.com</a> (for Entra ID to support hybrid identity and mailboxes for Exchange testing in Week 4).</li>
+          <li>An old laptop (minimum 8GB RAM, 100GB disk) to use as a mock server for lab exercises.</li>
+          <li>Install VirtualBox from <a href="https://www.virtualbox.org" target="_blank" rel="noopener">virtualbox.org</a>, configured with bridged networking to share the laptop’s IP range (e.g., 192.168.1.x).</li>
+          <li>Request a static IP from your ISP (~R25/month, e.g., Afrihost or Telkom) for consistent external mail access.</li>
+          <li>Open firewall ports 25 (SMTP), 587 (SMTPS), 443 (HTTPS), and 993 (IMAPS) on all virtual servers, the laptop, and your home router (port forwarding to the laptop’s IP).</li>
+          <li>Ensure stable internet connectivity (minimum 10 Mbps) for all lab machines to access Microsoft 365 and updates.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
