@@ -1,290 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Track your progress in Velocity Lab's 4-week Microsoft hybrid IT guide.">
-  <title>Velocity Lab: Dashboard</title>
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/styles.css">
-  <script src="/js/main.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="./css/styles.css">
 </head>
 <body>
-  <nav class="nav-glass">
-    <div class="brand">
-      <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="brand-logo">
-    </div>
-    <div class="user-info" id="userInfo"></div>
-    <div class="auth" id="authLinks">
-      <a href="#" id="logout" aria-label="Logout from Velocity Lab">Logout</a>
-    </div>
-  </nav>
-  <div class="container">
-    <header class="header">
-      <h1>Velocity Lab</h1>
-      <h2>Your 4-Week IT Mastery Timeline</h2>
-    </header>
-    <div class="progress-bar-container">
-      <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-      <span class="progress-text" id="progressText">0% Completed</span>
-    </div>
-    <div class="timeline">
-      <!-- Week 1 -->
-      <div class="week" data-week="week1">
-        <div class="week-content">
-          <div class="week-badge">1</div>
-          <div class="week-card">
-            <div class="week-title">
-              <div class="week-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 6h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2"/>
-                </svg>
-              </div>
-              Foundation Setup
+    <div class="container dashboard">
+        <header>
+            <div class="user-info">
+                <h1>Dashboard</h1>
+                <p id="greeting">Welcome, User!</p>
             </div>
-            <div class="task" data-task="dc" role="button" tabindex="0" aria-label="Promote Server 2012 to Domain Controller">
-              <input type="checkbox" data-week="week1" data-task="dc" id="dc-week1">
-              <div class="task-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 6h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2m0 2v4h16V8H4m8 1a1 1 0 1 1-1 1 1 1 0 0 1 1-1m-8 6h4v2H4v-2m6 0h4v2h-4v-2m6 0h4v2h-4v-2"/>
-                </svg>
-              </div>
-              <div class="task-content">
-                <h4>Promote Server 2012 to Domain Controller</h4>
-                <div class="task-details">Set up Active Directory and DNS services</div>
-              </div>
-            </div>
-            <div class="task" data-task="vm" role="button" tabindex="0" aria-label="Join VM to Domain">
-              <input type="checkbox" data-week="week1" data-task="vm" id="vm-week1">
-              <div class="task-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 4h16v12H4V4m2 2v8h12V6H6m2 8h8v2H8v-2"/>
-                </svg>
-              </div>
-              <div class="task-content">
-                <h4>Join VM to Domain</h4>
-                <div class="task-details">Enable domain-based management</div>
-              </div>
-            </div>
-            <div class="task" data-task="share" role="button" tabindex="0" aria-label="Configure Network Share on DC">
-              <input type="checkbox" data-week="week1" data-task="share" id="share-week1">
-              <div class="task-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6m2 10h8v2H8v-2m0 4h5v2H8v-2"/>
-                </svg>
-              </div>
-              <div class="task-content">
-                <h4>Configure Network Share on DC</h4>
-                <div class="task-details">Create centralized file storage with secure access</div>
-                <div class="subtasks">
-                  <div class="subtask">Map drives automatically on logon</div>
-                  <div class="subtask">Use hidden share with $ suffix</div>
-                  <div class="subtask">Map three drives using GPO, PowerShell, and logon scripts</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
                 </div>
-              </div>
+                <span id="progress-text">0%</span>
             </div>
-            <div class="task" data-task="group" role="button" tabindex="0" aria-label="Create Security Group">
-              <input type="checkbox" data-week="week1" data-task="group" id="group-week1">
-              <div class="task-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"/>
-                </svg>
-              </div>
-              <div class="task-content">
-                <h4>Create Security Group</h4>
-                <div class="task-details">Restrict network share access to authorized users</div>
-              </div>
+        </header>
+        <main class="tasks-container">
+            <section class="week" data-week="1">
+                <h2>Week 1</h2>
+                <ul class="tasks">
+                    <li class="task" data-task="task1">
+                        <input type="checkbox" id="task1">
+                        <label for="task1">Task 1: Introduction</label>
+                    </li>
+                    <li class="task" data-task="task2">
+                        <input type="checkbox" id="task2">
+                        <label for="task2">Task 2: Basics</label>
+                    </li>
+                    </ul>
+            </section>
+            <section class="week" data-week="2">
+                <h2>Week 2</h2>
+                <ul class="tasks">
+                    <li class="task" data-task="task3">
+                        <input type="checkbox" id="task3">
+                        <label for="task3">Task 3: Intermediate Concepts</label>
+                    </li>
+                    <li class="task" data-task="task4">
+                        <input type="checkbox" id="task4">
+                        <label for="task4">Task 4: Practice Exercises</label>
+                    </li>
+                </ul>
+            </section>
+            <section class="week" data-week="3">
+                <h2>Week 3</h2>
+                <ul class="tasks">
+                    <li class="task" data-task="task5">
+                        <input type="checkbox" id="task5">
+                        <label for="task5">Task 5: Advanced Topics</label>
+                    </li>
+                    <li class="task" data-task="task6">
+                        <input type="checkbox" id="task6">
+                        <label for="task6">Task 6: Project Start</label>
+                    </li>
+                </ul>
+            </section>
+        </main>
+        <footer>
+            <p>&copy; 2025 Your Company. All rights reserved.</p>
+        </footer>
+
+        <div id="taskModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h3 id="modalTitle">Task Details</h3>
+                <div id="modalDescription"><p>Task description goes here.</p></div>
             </div>
-          </div>
         </div>
-      </div>
-      <!-- Week 2 -->
-      <div class="week" data-week="week2">
-        <div class="week-content">
-          <div class="week-badge">2</div>
-          <div class="week-card">
-            <div class="week-title">
-              <div class="week-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 6h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2"/>
-                </svg>
-              </div>
-              Infrastructure Expansion
-            </div>
-            <div class="task" data-task="server" role="button" tabindex="0" aria-label="Install Second Server 2012">
-              <input type="checkbox" data-week="week2" data-task="server" id="server-week2">
-              <div class="task-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 6h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2m0 2v4h16V8H4m8 1a1 1 0 1 1-1 1 1 1 0 0 1 1-1m-8 6h4v2H4v-2m6 0h4v2h-4v-2m6 0h4v2h-4v-2"/>
-                </svg>
-              </div>
-              <div class="task-content">
-                <h4>Install Second Server 2012</h4>
-                <div class="task-details">Add redundancy to the environment</div>
-              </div>
-            </div>
-            <div class="task" data-task="wsus" role="button" tabindex="0" aria-label="Setup WSUS">
-              <input type="checkbox" data-week="week2" data-task="wsus" id="wsus-week2">
-              <div class="task-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m1 5v4h4v2h-4v4h-2v-4H7v-2h4V9h2"/>
-                </svg>
-              </div>
-              <div class="task-content">
-                <h4>Setup WSUS</h4>
-                <div class="task-details">Manage updates with Windows Server Update Services</div>
-              </div>
-            </div>
-            <div class="task" data-task="time" role="button" tabindex="0" aria-label="Configure Two Time Servers">
-              <input type="checkbox" data-week="week2" data-task="time" id="time-week2">
-              <div class="task-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m0 2a8 8 0 0 0 0 16 8 8 0 0 0 0-16m0 2v6h4v2h-6V6h2"/>
-                </svg>
-              </div>
-              <div class="task-content">
-                <h4>Configure Two Time Servers</h4>
-                <div class="task-details">Ensure time synchronization across the domain</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Week 3 -->
-      <div class="week" data-week="week3">
-        <div class="week-content">
-          <div class="week-badge">3</div>
-          <div class="week-card">
-            <div class="week-title">
-              <div class="week-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2"/>
-                </svg>
-              </div>
-              Email & Messaging
-            </div>
-            <div class="task" data-task="upgrade" role="button" tabindex="0" aria-label="Upgrade Servers to 2016">
-              <input type="checkbox" data-week="week3" data-task="upgrade" id="upgrade-week3">
-              <div class="task-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m-1 3h2v4l4 4-1.41 1.41-3.59-3.59V11h-2V7"/>
-                </svg>
-              </div>
-              <div class="task-content">
-                <h4>Upgrade Servers to 2016</h4>
-                <div class="task-details">Modernize infrastructure for enhanced capabilities</div>
-              </div>
-            </div>
-            <div class="task" data-task="exchange" role="button" tabindex="0" aria-label="Install Exchange Server 2019">
-              <input type="checkbox" data-week="week3" data-task="exchange" id="exchange-week3">
-              <div class="task-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2"/>
-                </svg>
-              </div>
-              <div class="task-content">
-                <h4>Install Exchange Server 2019</h4>
-                <div class="task-details">Deploy email services on a third server</div>
-              </div>
-            </div>
-            <div class="task" data-task="mailbox" role="button" tabindex="0" aria-label="Create User Mailboxes">
-              <input type="checkbox" data-week="week3" data-task="mailbox" id="mailbox-week3">
-              <div class="task-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2"/>
-                </svg>
-              </div>
-              <div class="task-content">
-                <h4>Create User Mailboxes</h4>
-                <div class="task-details">Set up email accounts for users</div>
-              </div>
-            </div>
-            <div class="task" data-task="mail" role="button" tabindex="0" aria-label="Setup Internal Mail Flow">
-              <input type="checkbox" data-week="week3" data-task="mail" id="mail-week3">
-              <div class="task-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2"/>
-                </svg>
-              </div>
-              <div class="task-content">
-                <h4>Setup Internal Mail Flow</h4>
-                <div class="task-details">Enable email delivery between users</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Week 4 -->
-      <div class="week" data-week="week4">
-        <div class="week-content">
-          <div class="week-badge">4</div>
-          <div class="week-card">
-            <div class="week-title">
-              <div class="week-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M19 18H6a4 4 0 0 1-4-4 4 4 0 0 1 4-4h.71a5.5 5.5 0 0 1 0-1A5.37 5.37 0 0 1 12 3.59a5.26 5.26 0 0 1 5.33 4.71A4.33 4.33 0 0 1 22 13a4.5 4.5 0 0 1-3 4.2"/>
-                </svg>
-              </div>
-              Cloud Integration
-            </div>
-            <div class="task" data-task="external" role="button" tabindex="0" aria-label="Publish Mail Externally">
-              <input type="checkbox" data-week="week4" data-task="external" id="external-week4">
-              <div class="task-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2"/>
-                </svg>
-              </div>
-              <div class="task-content">
-                <h4>Publish Mail Externally</h4>
-                <div class="task-details">Enable secure external email access</div>
-                <div class="subtasks">
-                  <div class="subtask">Configure MX, SPF, DKIM, and DMARC records</div>
-                  <div class="subtask">Enable modern authentication (OAuth 2.0)</div>
-                  <div class="subtask">Set up TLS certificates and reverse DNS</div>
-                </div>
-              </div>
-            </div>
-            <div class="task" data-task="hybrid" role="button" tabindex="0" aria-label="Setup Microsoft 365 Hybrid Environment">
-              <input type="checkbox" data-week="week4" data-task="hybrid" id="hybrid-week4">
-              <div class="task-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M19 18H6a4 4 0 0 1-4-4 4 4 0 0 1 4-4h.71a5.5 5.5 0 0 1 0-1A5.37 5.37 0 0 1 12 3.59a5.26 5.26 0 0 1 5.33 4.71A4.33 4.33 0 0 1 22 13a4.5 4.5 0 0 1-3 4.2"/>
-                </svg>
-              </div>
-              <div class="task-content">
-                <h4>Setup Microsoft 365 Hybrid Environment</h4>
-                <div class="task-details">Integrate on-premises Exchange with Microsoft 365</div>
-                <div class="subtasks">
-                  <div class="subtask">Configure Entra ID Connect for hybrid identity</div>
-                  <div class="subtask">Run Hybrid Configuration Wizard</div>
-                  <div class="subtask">Verify mail flow and calendar sharing</div>
-                </div>
-              </div>
-            </div>
-            <div class="task" data-task="hosting" role="button" tabindex="0" aria-label="Choose Hosting Environment">
-              <input type="checkbox" data-week="week4" data-task="hosting" id="hosting-week4">
-              <div class="task-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M19 18H6a4 4 0 0 1-4-4 4 4 0 0 1 4-4h.71a5.5 5.5 0 0 1 0-1A5.37 5.37 0 0 1 12 3.59a5.26 5.26 0 0 1 5.33 4.71A4.33 4.33 0 0 1 22 13a4.5 4.5 0 0 1-3 4.2"/>
-                </svg>
-              </div>
-              <div class="task-content">
-                <h4>Choose Hosting Environment</h4>
-                <div class="task-details">Select Azure or on-premises for deployment</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
-  <div class="modal" id="taskModal" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
-    <div class="modal-content">
-      <button class="close-btn" id="closeModal" aria-label="Close modal">×</button>
-      <h2 id="modalTitle"></h2>
-      <section id="modalDescription"></section>
-    </div>
-  </div>
+    <script src="./js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const greetingElement = document.getElementById('greeting');
+            const userEmail = localStorage.getItem('userEmail');
+
+            if (userEmail) {
+                // Extract name from email (you might want to store a proper name during registration)
+                const name = userEmail.substring(0, userEmail.indexOf('@'));
+                greetingElement.textContent = `Welcome, ${name}!`;
+            }
+
+            // Add event listeners to checkboxes to save progress
+            const checkboxes = document.querySelectorAll('.task input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', async (event) => {
+                    const taskId = event.target.parentElement.dataset.task;
+                    const completed = event.target.checked;
+
+                    const userEmail = localStorage.getItem('userEmail');
+                    if (userEmail) {
+                        const formData = new FormData();
+                        formData.append('taskId', taskId);
+                        formData.append('completed', completed);
+
+                        const response = await fetch('/functions/progress', {
+                            method: 'POST',
+                            headers: {
+                                'X-User-Email': userEmail
+                            },
+                            body: formData,
+                        });
+
+                        if (!response.ok) {
+                            console.error('Failed to update progress');
+                            // Optionally, provide user feedback
+                        }
+                        loadProgress(checkboxes, () => updateProgress(checkboxes, checkboxes.length, document.getElementById('progress'), document.getElementById('progress-text')));
+                    } else {
+                        console.error('User email not found, cannot save progress.');
+                    }
+                });
+            });
+
+            // Function to load progress from the server
+            async function loadProgress(checkboxes, callback) {
+                const userEmail = localStorage.getItem('userEmail');
+                if (userEmail) {
+                    const response = await fetch('/functions/progress', {
+                        method: 'GET',
+                        headers: {
+                            'X-User-Email': userEmail
+                        }
+                    });
+
+                    if (response.ok) {
+                        const progressData = await response.json();
+                        checkboxes.forEach(checkbox => {
+                            const taskId = checkbox.parentElement.dataset.task;
+                            if (progressData && progressData[taskId]) {
+                                checkbox.checked = true;
+                            }
+                        });
+                        if (callback) {
+                            callback();
+                        }
+                    } else {
+                        console.error('Failed to load progress');
+                    }
+                }
+            }
+
+            // Function to update the progress bar
+            function updateProgress(checkboxes, totalTasks, progressBar, progressText) {
+                const completedTasks = Array.from(checkboxes).filter(cb => cb.checked).length;
+                const progressPercentage = (completedTasks / totalTasks) * 100;
+                progressBar.style.width = `${progressPercentage}%`;
+                progressText.textContent = `${Math.round(progressPercentage)}%`;
+            }
+
+            // Initial load of progress
+            loadProgress(checkboxes, () => updateProgress(checkboxes, checkboxes.length, document.getElementById('progress'), document.getElementById('progress-text')));
+
+            // Modal functionality (assuming main.js will handle more complex interactions)
+            const modal = document.getElementById('taskModal');
+            const closeModal = document.querySelector('.close-button');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalDescription = document.getElementById('modalDescription');
+
+            const taskDetails = {
+                task1: { title: 'Introduction to the Course', description: '<p>This section provides an overview of the course content and learning objectives.</p>' },
+                task2: { title: 'Core Concepts', description: '<p>Learn about the fundamental principles of the subject matter.</p>' },
+                task3: { title: 'Intermediate Concepts', description: '<p>Explore more advanced topics building upon the basics.</p>' },
+                task4: { title: 'Practice Exercises', description: '<p>Apply your knowledge through these practical exercises.</p>' },
+                task5: { title: 'Advanced Topics', description: '<p>Dive into the most complex and specialized areas.</p>' },
+                task6: { title: 'Project Start', description: '<p>Begin working on your final project with these initial guidelines.</p>' },
+            };
+
+            document.querySelectorAll('.task').forEach(task => {
+                task.addEventListener('click', (e) => {
+                    if (e.target.type === 'checkbox') return;
+                    const taskId = task.dataset.task;
+                    const details = taskDetails[taskId];
+                    if (details) {
+                        modalTitle.textContent = details.title;
+                        modalDescription.innerHTML = details.description;
+                        modal.style.display = 'flex';
+                        modal.focus();
+                    }
+                });
+            });
+
+            closeModal.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.style.display === 'flex') {
+                    modal.style.display = 'none';
+                }
+            });
+
+            // Animate weeks on scroll (basic implementation, main.js can enhance)
+            const weeks = document.querySelectorAll('.week');
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('animate');
+                        } else {
+                            entry.target.classList.remove('animate');
+                        }
+                    });
+                },
+                { threshold: 0.2 }
+            );
+            weeks.forEach(week => observer.observe(week));
+        });
+    </script>
 </body>
 </html>

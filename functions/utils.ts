@@ -1,36 +1,33 @@
-// Generate a random string using Web Crypto API
-function generateRandomString(length: number): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const array = new Uint8Array(length);
-  crypto.getRandomValues(array);
-  return Array.from(array, byte => chars[byte % chars.length]).join('');
-}
-
-export async function generateCSRFToken(env: Env): Promise<string> {
-  const token = generateRandomString(32);
-  await env.USERS.put(`csrf:${token}`, 'valid', { expirationTtl: 3600 });
-  return token;
-}
-
-export async function validateCSRFToken(env: Env, token: string): Promise<boolean> {
-  const value = await env.USERS.get(`csrf:${token}`);
-  if (value === 'valid') {
-    await env.USERS.delete(`csrf:${token}`);
-    return true;
-  }
-  return false;
-}
-
-export async function hashPassword(password: string): Promise<string> {
+export async function generateCSRFToken(request: Request): Promise<string> {
+  const secretKey = await getCSRFSecretKey();
   const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hash = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hash))
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
+  const data = encoder.encode(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
+  const hmac = await crypto.subtle.sign('HMAC', secretKey, data);
+  const hashArray = Array.from(new Uint8Array(hmac));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex;
 }
 
-export interface Env {
-  USERS: KVNamespace;
-  PROGRESS: KVNamespace;
+export async function validateCSRFToken(request: Request, clientToken: string | null): Promise<boolean> {
+  if (!clientToken) {
+    return false;
+  }
+  const serverToken = request.headers.get('X-CSRF-Token');
+  return clientToken === serverToken;
+}
+
+async function getCSRFSecretKey(): Promise<CryptoKey> {
+  const secret = process.env.CSRF_SECRET;
+  if (!secret) {
+    throw new Error('CSRF_SECRET environment variable not set.');
+  }
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign', 'verify']
+  );
+  return keyMaterial;
 }

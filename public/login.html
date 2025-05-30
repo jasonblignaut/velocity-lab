@@ -1,58 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Log in to Velocity Lab to track your progress in the 4-week Microsoft hybrid IT guide.">
-  <title>Login - Velocity Lab</title>
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/styles.css">
-  <script src="/js/main.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="./css/styles.css">
 </head>
 <body>
-  <nav class="nav-glass">
-    <div class="brand">
-      <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="brand-logo">
+    <div class="container">
+        <header>
+            <h1>Login</h1>
+        </header>
+        <main>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <input type="hidden" id="csrf_token" name="csrf_token">
+                <button type="submit" class="button primary">Login</button>
+                <p class="register-link">Don't have an account? <a href="./register.html">Register</a></p>
+            </form>
+        </main>
+        <footer>
+            <p>&copy; 2025 Your Company. All rights reserved.</p>
+        </footer>
     </div>
-    <div class="user-info" id="userInfo"></div>
-    <div class="auth" id="authLinks">
-      <a href="/register.html" aria-label="Register for Velocity Lab">Register</a>
-      <a href="/login.html" aria-label="Login to Velocity Lab">Login</a>
-    </div>
-  </nav>
-  <div class="container">
-    <div class="form-container">
-      <h2>Login</h2>
-      <div class="notification" id="notification"></div>
-      <form id="loginForm" aria-label="Login form">
-        <input type="hidden" name="csrf_token" id="csrfToken">
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" required aria-required="true" placeholder="Enter your email">
-        </div>
-        <div class="form-group password-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password" required aria-required="true" placeholder="Enter your password">
-          <button type="button" class="toggle-password" aria-label="Toggle password visibility">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-              <circle cx="12" cy="12" r="3"/>
-            </svg>
-          </button>
-        </div>
-        <div class="form-group">
-          <button type="submit" id="loginButton">
-            Login
-            <span class="spinner">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10 10 10 0 0 1-10-10A10 10 0 0 1 12 2z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-dasharray="15 45"/>
-              </svg>
-            </span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const csrfResponse = await fetch('/functions/utils/csrf');
+            const csrfData = await csrfResponse.json();
+            document.getElementById('csrf_token').value = csrfData.token;
+
+            const loginForm = document.getElementById('loginForm');
+            loginForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const formData = new FormData(loginForm);
+                const response = await fetch('/functions/login', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    alert(data.message);
+                    localStorage.setItem('userEmail', formData.get('email')); // Store user email for future use
+                    window.location.href = './dashboard.html';
+                } else {
+                    const errorText = await response.text();
+                    alert(`Login failed: ${errorText}`);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
