@@ -8,6 +8,6 @@
     "wrangler": "^3.60.3"
   },
   "scripts": {
-    "deploy": "wrangler pages deploy public"
+    "deploy": "wrangler deploy && wrangler pages deploy public"
   }
 }
