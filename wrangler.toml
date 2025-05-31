@@ -19,12 +19,3 @@ id = "c70c0aa10bad4587b7c3f2272693044a"
 [vars]
 APP_NAME = "Velocity Lab"
 APP_VERSION = "1.0.0"
-
-# Custom error pages (optional)
-[site]
-bucket = "./public"
-
-# Build configuration
-[build]
-command = ""
-watch_paths = ["functions", "public"]
