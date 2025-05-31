@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Login to Velocity Lab - Microsoft Hybrid IT Training Platform">
+  <title>Login | Velocity Lab</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  
+  <nav class="nav-glass" role="navigation" aria-label="Main navigation">
+    <div class="brand">
+      <a href="/">
+        <img src="/assets/Velocity-Logo.png" alt="Velocity Lab" class="brand-logo" width="180" height="45">
+      </a>
+    </div>
+    <div class="auth">
+      <a href="/">Home</a>
+      <a href="/register.html">Register</a>
+    </div>
+  </nav>
+
+  <main id="main" class="container">
+    <header class="header">
+      <h1>Welcome Back</h1>
+      <h2>Login to Velocity Lab</h2>
+    </header>
+
+    <div class="form-container">
+      <div id="notification" class="notification" role="alert" aria-live="polite"></div>
+      
+      <form id="loginForm" novalidate>
+        <input type="hidden" id="csrfToken" name="csrf_token">
+        
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            required 
+            autocomplete="email"
+            placeholder="your@email.com"
+            aria-describedby="email-error"
+          >
+          <span id="email-error" class="error-text" role="alert"></span>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            required 
+            autocomplete="current-password"
+            placeholder="Enter your password"
+            aria-describedby="password-error"
+          >
+          <span id="password-error" class="error-text" role="alert"></span>
+        </div>
+        
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary">
+            <span>Login</span>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+        </div>
+        
+        <div style="text-align: center; margin-top: 1.5rem;">
+          <p style="color: var(--primary-gray);">
+            Don't have an account? 
+            <a href="/register.html" style="color: var(--primary-orange); font-weight: 500;">
+              Register here
+            </a>
+          </p>
+          <p style="margin-top: 1rem;">
+            <a href="/forgot-password" style="color: var(--primary-blue); font-size: 0.9rem;">
+              Forgot your password?
+            </a>
+          </p>
+        </div>
+      </form>
+    </div>
+
+    <div style="text-align: center; margin-top: 3rem;">
+      <p style="color: var(--primary-gray); font-size: 0.9rem;">
+        By logging in, you agree to our 
+        <a href="/terms" style="color: var(--primary-gray);">Terms of Service</a> and 
+        <a href="/privacy" style="color: var(--primary-gray);">Privacy Policy</a>
+      </p>
+    </div>
+  </main>
+
+  <script src="/js/main.js" defer></script>
+</body>
+</html>
