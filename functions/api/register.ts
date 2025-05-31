@@ -1,4 +1,4 @@
-import { validateCSRFToken } from '../utils';
+import { validateCSRFToken } from '../functions/utils';
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
@@ -6,7 +6,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const name = formData.get('name')?.toString().trim();
     const email = formData.get('email')?.toString().trim().toLowerCase();
     const password = formData.get('password')?.toString();
-    const role = 'user'; // Hardcode role to 'user' (admins are set manually)
+    const role = formData.get('role')?.toString().trim() || 'user'; // Default to 'user'
     const csrfToken = formData.get('csrf_token')?.toString();
 
     if (!name || !email || !password || !csrfToken) {
@@ -34,10 +34,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     };
 
     await context.env.USERS.put(`user:${email}`, JSON.stringify(userData));
-    await context.env.USERS.put(`user:${userId}`, JSON.stringify(userData)); // Store by ID for session lookup
     await context.env.USERS.put(`session:${sessionToken}`, userId, { expirationTtl: 86400 });
 
-    return new Response(JSON.stringify({ name, email }), {
+    return new Response(JSON.stringify({ name, role, email }), {
       status: 201,
       headers: {
         'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict`,

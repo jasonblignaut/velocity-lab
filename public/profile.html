@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Profile | Velocity Lab</title>
-  <link rel="icon" href="/assets/favicon.ico">
   <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
 </head>
 <body>
   <nav class="nav-glass">
@@ -13,51 +13,56 @@
     <div class="auth">
       <span id="userInfo" class="user-info"></span>
       <a href="/dashboard.html">Dashboard</a>
-      <a href="/profile.html">My Profile</a>
       <a href="#" id="logout">Logout</a>
     </div>
   </nav>
   <div class="container">
     <header class="header">
       <h1>My Profile</h1>
+      <h2>Manage your account</h2>
     </header>
     <div id="notification" class="notification"></div>
     <div class="profile-container">
       <div class="profile-section">
-        <h3>Profile Picture</h3>
+        <h3>Profile Information</h3>
         <div class="profile-info">
           <div class="avatar-container">
-            <img src="/assets/default-avatar.png" alt="Profile Picture" class="avatar" id="avatar">
-            <input type="file" id="avatarInput" accept="image/*" style="display: none;">
-            <button class="btn btn-primary" id="changeAvatar">Change Avatar</button>
+            <img id="avatarPreview" src="/assets/default-avatar.png" alt="User Avatar" class="avatar">
+            <form id="avatarForm">
+              <input type="file" id="avatarInput" name="avatar" accept="image/*" style="display: none;">
+              <button type="button" id="uploadAvatarBtn" class="btn btn-secondary">Upload Avatar</button>
+            </form>
           </div>
-        </div>
-      </div>
-      <div class="profile-section">
-        <h3>Account Details</h3>
-        <div class="profile-details">
-          <p><strong>Name:</strong> <span id="profileName"></span></p>
-          <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+          <div class="profile-details">
+            <p><strong>Name:</strong> <span id="profileName"></span></p>
+            <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+          </div>
         </div>
       </div>
       <div class="profile-section">
         <h3>Change Password</h3>
-        <form id="changePasswordForm" class="form-container">
+        <form id="passwordForm">
+          <input type="hidden" id="csrfToken" name="csrf_token">
           <div class="form-group">
             <label for="currentPassword">Current Password</label>
-            <input type="password" id="currentPassword" name="currentPassword" required autocomplete="current-password">
+            <input type="password" id="currentPassword" name="currentPassword" required>
           </div>
           <div class="form-group">
             <label for="newPassword">New Password</label>
-            <input type="password" id="newPassword" name="newPassword" required autocomplete="new-password">
+            <input type="password" id="newPassword" name="newPassword" required>
           </div>
           <div class="form-group">
-            <button type="submit">
-              <span>Change Password</span>
-              <svg class="spinner" viewBox="0 0 24 24">
-                <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z" opacity=".3"/>
-                <path d="M20 12h2A10 10 0 002 12h2a8 8 0 018 8v2a10 10 0 0010-10z"/>
-              </svg>
+            <label for="confirmPassword">Confirm New Password</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary">
+              Update Password
+              <span class="spinner">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 2a8 8 0 100 16 8 8 0 000-16z" fill="currentColor"/>
+                </svg>
+              </span>
             </button>
           </div>
         </form>

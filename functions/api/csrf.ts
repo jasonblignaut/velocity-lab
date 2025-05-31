@@ -1,4 +1,4 @@
-import { generateCSRFToken } from '../utils';
+import { generateCSRFToken } from '../functions/utils';
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   try {
@@ -9,13 +9,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     });
   } catch (error) {
     console.error('CSRF token error:', error);
-    return jsonResponse({ error: 'Internal server error' }, 500);
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 };
-
-function jsonResponse(data: Record<string, any>, status: number = 200): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-  });
-}

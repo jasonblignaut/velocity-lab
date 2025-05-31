@@ -1,232 +1,233 @@
-const notification = document.getElementById('notification');
-const userInfo = document.getElementById('userInfo');
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
-const changePasswordForm = document.getElementById('changePasswordForm');
-const logoutLink = document.getElementById('logout');
-const timeline = document.getElementById('timeline');
-const modal = document.getElementById('modal');
-const modalTitle = document.getElementById('modalTitle');
-const modalDescription = document.getElementById('modalDescription');
-const modalSubtasks = document.getElementById('modalSubtasks');
-const modalResources = document.getElementById('modalResources');
-const closeModalBtn = document.querySelector('.close-btn');
-const avatarInput = document.getElementById('avatarInput');
-const changeAvatarBtn = document.getElementById('changeAvatar');
-const avatarImg = document.getElementById('avatar');
-const profileName = document.getElementById('profileName');
-const profileEmail = document.getElementById('profileEmail');
-const leaderboard = document.getElementById('leaderboard');
+// Utility Functions
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  return parts.length === 2 ? parts.pop().split(';').shift() : null;
+}
 
-const showNotification = (message, type) => {
-  notification.textContent = message;
-  notification.classList.remove('success', 'error', 'info');
-  notification.classList.add(type, 'show');
-  setTimeout(() => notification.classList.remove('show'), 3000);
-};
+function setCookie(name, value) {
+  document.cookie = `${name}=${value}; Path=/; Max-Age=86400; SameSite=Strict`;
+}
 
-const updateProgressBar = (progress) => {
-  const progressBar = document.querySelector('.progress-bar');
-  const progressText = document.querySelector('.progress-text');
-  if (progressBar && progressText) {
-    progressBar.style.setProperty('--progress', `${progress}%`);
-    progressText.textContent = `${progress}% Complete`;
-  }
-};
+function showNotification(message, type, notificationElement) {
+  if (!notificationElement) return;
+  notificationElement.textContent = message;
+  notificationElement.className = `notification ${type} show`;
+  setTimeout(() => {
+    notificationElement.className = `notification ${type} hide`;
+  }, 3000);
+}
 
-const getUser = () => {
-  const user = localStorage.getItem('user');
-  return user ? JSON.parse(user) : null;
-};
+// Progress Bar Update
+function updateProgressBar(progress) {
+  const progressBar = document.querySelector('#progressBar');
+  const progressText = document.querySelector('#progressText');
+  if (!progressBar || !progressText) return; // Prevent error on pages without progress bar
+  progressBar.style.setProperty('--progress', `${progress}%`);
+  progressBar.setAttribute('aria-valuenow', progress);
+  progressText.textContent = `${progress}% Completed`;
+}
 
-const setUser = (user) => {
-  localStorage.setItem('user', JSON.stringify(user));
-};
-
-const clearUser = () => {
-  localStorage.removeItem('user');
-};
-
-const checkAuth = () => {
-  const user = getUser();
-  if (!user) {
-    window.location.href = '/login.html';
-    return false;
-  }
-  return true;
-};
-
-const initDashboard = async () => {
-  if (!checkAuth()) return;
-  const user = getUser();
-  userInfo.textContent = user.name;
+// Form Submission Handling
+async function handleFormSubmission(form, url, successMessage, errorMessage, notificationElement, redirectUrl) {
+  const formData = new FormData(form);
+  const spinner = form.querySelector('.spinner');
+  const button = form.querySelector('button[type="submit"]');
+  
+  button.disabled = true;
+  spinner.classList.add('active');
 
   try {
-    const response = await fetch('/api/progress');
+    const response = await fetch(url, {
+      method: 'POST',
+      body: formData,
+      credentials: 'same-origin', // Ensure cookies are sent
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      showNotification(successMessage, 'success', notificationElement);
+      if (url === '/api/register' || url === '/api/login') {
+        setCookie('user', JSON.stringify(data));
+      }
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 1500);
+    } else {
+      const errorData = await response.json();
+      showNotification(errorData.error || errorMessage, 'error', notificationElement);
+    }
+  } catch (error) {
+    console.error(`${url} error:`, error);
+    showNotification(errorMessage, 'error', notificationElement);
+  } finally {
+    button.disabled = false;
+    spinner.classList.remove('active');
+  }
+}
+
+// Fetch CSRF Token
+async function fetchCsrfToken() {
+  const response = await fetch('/api/csrf', {
+    credentials: 'same-origin',
+  });
+  const data = await response.json();
+  return data.token;
+}
+
+// Initialize Forms with CSRF Token
+async function initForms() {
+  const forms = document.querySelectorAll('#loginForm, #registerForm, #passwordForm');
+  for (const form of forms) {
+    const csrfInput = form.querySelector('#csrfToken');
+    if (csrfInput) {
+      csrfInput.value = await fetchCsrfToken();
+    }
+  }
+}
+
+// Dashboard Initialization
+async function initDashboard() {
+  const user = JSON.parse(getCookie('user') || '{}');
+  if (!user.name) {
+    window.location.href = '/login.html';
+    return;
+  }
+
+  const userInfo = document.querySelector('#userInfo');
+  userInfo.textContent = user.name;
+
+  if (user.role === 'admin') {
+    const adminLink = document.createElement('a');
+    adminLink.href = '/admin.html';
+    adminLink.textContent = 'Admin Dashboard';
+    userInfo.parentElement.insertBefore(adminLink, userInfo.nextSibling);
+  }
+
+  // Fetch and display progress
+  try {
+    const response = await fetch('/api/progress', {
+      credentials: 'same-origin',
+    });
     if (!response.ok) throw new Error('Failed to fetch progress');
     const progressData = await response.json();
-
-    let totalTasks = 0;
+    const totalTasks = 14; // Total number of tasks
     let completedTasks = 0;
-    Object.values(progressData).forEach((week) => {
-      Object.values(week).forEach((task) => {
-        totalTasks++;
-        if (task) completedTasks++;
-      });
+
+    Object.values(progressData).forEach(week => {
+      completedTasks += Object.values(week).filter(Boolean).length;
     });
 
-    const progress = totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0;
+    const progress = Math.round((completedTasks / totalTasks) * 100);
     updateProgressBar(progress);
 
-    timeline.innerHTML = '';
-    weeks.forEach((week, weekIndex) => {
-      const weekDiv = document.createElement('div');
-      weekDiv.classList.add('week');
-      weekDiv.innerHTML = `
-        <div class="week-content">
-          <div class="week-badge">${weekIndex + 1}</div>
-          <div class="week-card">
-            <div class="week-title">
-              <span class="week-icon">${week.icon}</span>
-              <h3>${week.title}</h3>
-            </div>
-            ${week.tasks
-              .map(
-                (task, taskIndex) => `
-                  <div class="task" data-week="${weekIndex}" data-task="${taskIndex}">
-                    <input type="checkbox" ${progressData[weekIndex]?.[taskIndex] ? 'checked' : ''}>
-                    <span class="task-icon">${task.icon}</span>
-                    <div class="task-content">
-                      <h4>${task.title}</h4>
-                      <p class="task-details">${task.details}</p>
-                    </div>
-                  </div>`
-              )
-              .join('')}
-          </div>
-        </div>
-      `;
-      timeline.appendChild(weekDiv);
+    // Populate checkboxes
+    document.querySelectorAll('.task input[type="checkbox"]').forEach(checkbox => {
+      const week = checkbox.dataset.week;
+      const task = checkbox.dataset.task;
+      if (progressData[week] && progressData[week][task]) {
+        checkbox.checked = true;
+      }
 
-      setTimeout(() => weekDiv.classList.add('animate'), 100 * weekIndex);
-    });
+      checkbox.addEventListener('change', async () => {
+        const formData = new FormData();
+        formData.append('week', week);
+        formData.append('task', task);
+        formData.append('checked', checkbox.checked);
 
-    document.querySelectorAll('.task input[type="checkbox"]').forEach((checkbox) => {
-      checkbox.addEventListener('change', async (e) => {
-        const taskDiv = e.target.closest('.task');
-        const weekIndex = taskDiv.dataset.week;
-        const taskIndex = taskDiv.dataset.task;
-        const checked = e.target.checked;
+        await fetch('/api/progress', {
+          method: 'POST',
+          body: formData,
+          credentials: 'same-origin',
+        });
 
-        try {
-          await fetch('/api/progress', {
-            method: 'POST',
-            body: new URLSearchParams({ week: weekIndex, task: taskIndex, checked: checked.toString() }),
-          });
-          const response = await fetch('/api/progress');
-          const updatedProgress = await response.json();
-          let total = 0;
-          let completed = 0;
-          Object.values(updatedProgress).forEach((week) => {
-            Object.values(week).forEach((task) => {
-              total++;
-              if (task) completed++;
-            });
-          });
-          const progress = total ? Math.round((completed / total) * 100) : 0;
-          updateProgressBar(progress);
-        } catch (error) {
-          console.error('Progress update error:', error);
-          showNotification('Failed to update progress', 'error');
-        }
+        const newCompletedTasks = checkbox.checked ? completedTasks + 1 : completedTasks - 1;
+        const newProgress = Math.round((newCompletedTasks / totalTasks) * 100);
+        updateProgressBar(newProgress);
       });
     });
 
-    document.querySelectorAll('.task').forEach((task) => {
+    // Animate timeline
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.week').forEach(week => observer.observe(week));
+
+    // Task modal
+    const modal = document.querySelector('#taskModal');
+    const modalTitle = document.querySelector('#modalTitle');
+    const modalDescription = document.querySelector('#modalDescription');
+    const closeModal = document.querySelector('#closeModal');
+
+    document.querySelectorAll('.task').forEach(task => {
       task.addEventListener('click', (e) => {
         if (e.target.type === 'checkbox') return;
-        const weekIndex = task.dataset.week;
-        const taskIndex = task.dataset.task;
-        const taskData = weeks[weekIndex].tasks[taskIndex];
-        modalTitle.textContent = taskData.title;
-        modalDescription.textContent = taskData.description || 'No description available.';
-        modalSubtasks.innerHTML = taskData.subtasks
-          ? taskData.subtasks.map((subtask, i) => `<li>${subtask}</li>`).join('')
-          : '';
-        modalResources.innerHTML = taskData.resources
-          ? taskData.resources.map((res) => `<a href="${res.url}" target="_blank">${res.name}</a>`).join('<br>')
-          : 'No resources available.';
+        const taskId = task.dataset.task;
+        const week = task.dataset.week;
+        const content = taskModalContent[week][taskId];
+        modalTitle.textContent = content.title;
+        modalDescription.innerHTML = content.description;
         modal.style.display = 'flex';
       });
     });
+
+    closeModal.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
   } catch (error) {
     console.error('Dashboard init error:', error);
-    showNotification('Failed to load dashboard', 'error');
   }
-};
+}
 
-const initAdminDashboard = async () => {
-  if (!checkAuth()) return;
-  const user = getUser();
-  if (user.role !== 'admin') {
-    window.location.href = '/dashboard.html';
+// Profile Initialization
+async function initProfile() {
+  const user = JSON.parse(getCookie('user') || '{}');
+  if (!user.name) {
+    window.location.href = '/login.html';
     return;
   }
-  userInfo.textContent = user.name;
 
-  try {
-    const response = await fetch('/api/admin/users-progress');
-    if (!response.ok) throw new Error('Failed to fetch users progress');
-    const usersProgress = await response.json();
+  const userInfo = document.querySelector('#userInfo');
+  const profileName = document.querySelector('#profileName');
+  const profileEmail = document.querySelector('#profileEmail');
+  const avatarPreview = document.querySelector('#avatarPreview');
+  const uploadAvatarBtn = document.querySelector('#uploadAvatarBtn');
+  const avatarInput = document.querySelector('#avatarInput');
+  const notification = document.querySelector('#notification');
 
-    leaderboard.innerHTML = '';
-    usersProgress
-      .sort((a, b) => b.progress - a.progress)
-      .forEach((user, index) => {
-        const item = document.createElement('div');
-        item.classList.add('leaderboard-item');
-        item.innerHTML = `
-          <div class="leaderboard-rank">${index + 1}</div>
-          <div class="leaderboard-avatar">
-            <img src="${user.avatar || '/assets/default-avatar.png'}" alt="${user.name}'s avatar">
-          </div>
-          <div class="leaderboard-details">
-            <h4>${user.name}</h4>
-            <p>Progress: ${user.progress}%</p>
-            <div class="progress-bar" style="--progress: ${user.progress}%"></div>
-          </div>
-        `;
-        leaderboard.appendChild(item);
-      });
-  } catch (error) {
-    console.error('Admin dashboard error:', error);
-    showNotification('Failed to load leaderboard', 'error');
-  }
-};
-
-const initProfile = async () => {
-  if (!checkAuth()) return;
-  const user = getUser();
   userInfo.textContent = user.name;
   profileName.textContent = user.name;
   profileEmail.textContent = user.email;
 
+  // Load existing avatar
   try {
-    const response = await fetch('/api/avatar');
+    const response = await fetch('/api/avatar', {
+      credentials: 'same-origin',
+    });
     if (response.ok) {
       const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      avatarImg.src = url;
+      avatarPreview.src = URL.createObjectURL(blob);
     }
   } catch (error) {
-    console.error('Avatar fetch error:', error);
+    console.error('Avatar load error:', error);
   }
 
-  changeAvatarBtn.addEventListener('click', () => avatarInput.click());
+  // Avatar upload
+  uploadAvatarBtn.addEventListener('click', () => avatarInput.click());
   avatarInput.addEventListener('change', async () => {
+    if (avatarInput.files.length === 0) return;
     const file = avatarInput.files[0];
-    if (!file) return;
-
     const formData = new FormData();
     formData.append('avatar', file);
 
@@ -234,164 +235,345 @@ const initProfile = async () => {
       const response = await fetch('/api/avatar', {
         method: 'POST',
         body: formData,
+        credentials: 'same-origin',
       });
-      if (!response.ok) throw new Error('Failed to upload avatar');
-      const blob = await fetch('/api/avatar').then((res) => res.blob());
-      avatarImg.src = URL.createObjectURL(blob);
-      showNotification('Avatar updated successfully', 'success');
+      if (response.ok) {
+        const blob = await (await fetch('/api/avatar', { credentials: 'same-origin' })).blob();
+        avatarPreview.src = URL.createObjectURL(blob);
+        showNotification('Avatar uploaded successfully', 'success', notification);
+      } else {
+        throw new Error('Failed to upload avatar');
+      }
     } catch (error) {
       console.error('Avatar upload error:', error);
-      showNotification('Failed to upload avatar', 'error');
+      showNotification('Failed to upload avatar', 'error', notification);
     }
   });
 
-  changePasswordForm.addEventListener('submit', async (e) => {
+  // Password change form
+  const passwordForm = document.querySelector('#passwordForm');
+  passwordForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const button = changePasswordForm.querySelector('button');
-    const spinner = button.querySelector('.spinner');
-    button.disabled = true;
-    spinner.classList.add('active');
+    const newPassword = passwordForm.querySelector('#newPassword').value;
+    const confirmPassword = passwordForm.querySelector('#confirmPassword').value;
 
-    const formData = new FormData(changePasswordForm);
-    try {
-      const response = await fetch('/api/change-password', {
-        method: 'POST',
-        body: formData,
-      });
-      if (!response.ok) throw new Error('Failed to change password');
-      showNotification('Password changed successfully', 'success');
-      changePasswordForm.reset();
-    } catch (error) {
-      console.error('Change password error:', error);
-      showNotification(error.message || 'Failed to change password', 'error');
-    } finally {
-      button.disabled = false;
-      spinner.classList.remove('active');
+    if (newPassword !== confirmPassword) {
+      showNotification('Passwords do not match', 'error', notification);
+      return;
     }
+
+    await handleFormSubmission(
+      passwordForm,
+      '/api/change-password',
+      'Password updated successfully',
+      'Failed to update password',
+      notification,
+      '/profile.html'
+    );
   });
-};
+}
 
-const weeks = [
-  {
-    title: 'Week 1: Ideation',
-    icon: '<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 00-10 10 10 10 0 0010 10 10 10 0 0010-10A10 10 0 0012 2zm1 15h-2v-2h2zm0-4h-2V7h2z"/></svg>',
-    tasks: [
-      {
-        title: 'Brainstorm Ideas',
-        details: 'Come up with 5 potential project ideas.',
-        icon: '<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 00-10 10 10 10 0 0010 10 10 10 0 0010-10A10 10 0 0012 2zm1 15h-2v-2h2zm0-4h-2V7h2z"/></svg>',
-        description: 'Generate a list of 5 project ideas that align with your goals.',
-        subtasks: ['Identify your interests', 'Research market needs', 'List 5 ideas'],
-        resources: [
-          { name: 'Ideation Guide', url: 'https://example.com/ideation' },
-        ],
-      },
-      {
-        title: 'Validate Ideas',
-        details: 'Select the top 2 ideas and validate them.',
-        icon: '<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 00-10 10 10 10 0 0010 10 10 10 0 0010-10A10 10 0 0012 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z"/></svg>',
-      },
-    ],
-  },
-  // Add more weeks as needed (total 14 tasks)
-];
+// Admin Dashboard Initialization
+async function initAdminDashboard() {
+  const user = JSON.parse(getCookie('user') || '{}');
+  if (!user.name) {
+    window.location.href = '/login.html';
+    return;
+  }
 
-const init = () => {
+  const userInfo = document.querySelector('#userInfo');
+  userInfo.textContent = user.name;
+
+  const leaderboard = document.querySelector('#leaderboard');
+  const notification = document.querySelector('#notification');
+
+  try {
+    const response = await fetch('/api/admin/users-progress', {
+      credentials: 'same-origin',
+    });
+    if (!response.ok) throw new Error('Failed to fetch user progress');
+    const usersProgress = await response.json();
+
+    usersProgress.sort((a, b) => b.progress - a.progress);
+    leaderboard.innerHTML = usersProgress.map((user, index) => `
+      <div class="leaderboard-item">
+        <div class="leaderboard-rank">${index + 1}</div>
+        <div class="leaderboard-avatar">
+          <img src="${user.avatar || '/assets/default-avatar.png'}" alt="${user.name}'s Avatar">
+        </div>
+        <div class="leaderboard-details">
+          <h4>${user.name}</h4>
+          <p>${user.progress}% Completed</p>
+          <div class="progress-bar leaderboard-progress" style="--progress: ${user.progress}%"></div>
+        </div>
+      </div>
+    `).join('');
+  } catch (error) {
+    console.error('Admin dashboard error:', error);
+    showNotification('Failed to load leaderboard', 'error', notification);
+  }
+}
+
+// Main Initialization
+function init() {
+  const user = JSON.parse(getCookie('user') || '{}');
   const path = window.location.pathname;
-  if (path === '/dashboard.html') {
-    initDashboard();
-  } else if (path === '/admin.html') {
-    initAdminDashboard();
-  } else if (path === '/profile.html') {
-    initProfile();
+
+  if (path === '/login.html' || path === '/register.html') {
+    if (user.name) {
+      window.location.href = '/dashboard.html';
+      return;
+    }
+  } else if (!user.name && path !== '/index.html') {
+    window.location.href = '/login.html';
+    return;
   }
 
+  // Initialize forms with CSRF token
+  initForms();
+
+  // Page-specific initialization
+  if (path === '/dashboard.html') initDashboard();
+  if (path === '/profile.html') initProfile();
+  if (path === '/admin.html') initAdminDashboard();
+
+  // Login form
+  const loginForm = document.querySelector('#loginForm');
   if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
+    loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const button = loginForm.querySelector('button');
-      const spinner = button.querySelector('.spinner');
-      button.disabled = true;
-      spinner.classList.add('active');
-
-      const formData = new FormData(loginForm);
-      try {
-        const response = await fetch('/api/login', {
-          method: 'POST',
-          body: formData,
-        });
-        if (!response.ok) throw new Error('Invalid credentials');
-        const user = await response.json();
-        setUser(user);
-        window.location.href = '/dashboard.html';
-      } catch (error) {
-        showNotification(error.message || 'Login failed', 'error');
-      } finally {
-        button.disabled = false;
-        spinner.classList.remove('active');
-      }
+      handleFormSubmission(
+        loginForm,
+        '/api/login',
+        'Login successful! Redirecting...',
+        'Login failed. Please check your credentials.',
+        document.querySelector('#notification'),
+        '/dashboard.html'
+      );
     });
   }
 
+  // Register form
+  const registerForm = document.querySelector('#registerForm');
   if (registerForm) {
-    fetch('/api/csrf')
-      .then((res) => res.json())
-      .then((data) => {
-        document.getElementById('csrf_token').value = data.token;
-      });
-
-    registerForm.addEventListener('submit', async (e) => {
+    registerForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const button = registerForm.querySelector('button');
-      const spinner = button.querySelector('.spinner');
-      button.disabled = true;
-      spinner.classList.add('active');
+      const password = registerForm.querySelector('#password').value;
+      const repeatPassword = registerForm.querySelector('#repeatPassword').value;
+      const notification = document.querySelector('#notification');
 
-      const formData = new FormData(registerForm);
-      try {
-        const response = await fetch('/api/register', {
-          method: 'POST',
-          body: formData,
-        });
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Registration failed');
-        }
-        const user = await response.json();
-        setUser(user);
-        window.location.href = '/dashboard.html';
-      } catch (error) {
-        showNotification(error.message || 'Registration failed', 'error');
-      } finally {
-        button.disabled = false;
-        spinner.classList.remove('active');
+      if (password !== repeatPassword) {
+        showNotification('Passwords do not match', 'error', notification);
+        return;
       }
+
+      handleFormSubmission(
+        registerForm,
+        '/api/register',
+        'Registration successful! Redirecting...',
+        'Registration failed. Please try again.',
+        notification,
+        '/dashboard.html'
+      );
     });
   }
 
+  // Logout
+  const logoutLink = document.querySelector('#logout');
   if (logoutLink) {
     logoutLink.addEventListener('click', async (e) => {
       e.preventDefault();
-      try {
-        await fetch('/api/logout', { method: 'POST' });
-        clearUser();
-        window.location.href = '/login.html';
-      } catch (error) {
-        console.error('Logout error:', error);
-        showNotification('Logout failed', 'error');
-      }
+      await fetch('/api/logout', {
+        method: 'POST',
+        credentials: 'same-origin',
+      });
+      document.cookie = 'session=; Max-Age=0; Path=/; SameSite=Strict';
+      document.cookie = 'user=; Max-Age=0; Path=/; SameSite=Strict';
+      window.location.href = '/login.html';
     });
   }
+}
 
-  if (modal) {
-    closeModalBtn.addEventListener('click', () => {
-      modal.style.display = 'none';
-    });
-
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) modal.style.display = 'none';
-    });
-  }
+// Task Modal Content
+const taskModalContent = {
+  week1: {
+    dc: {
+      title: 'Promote Server 2012 to Domain Controller',
+      description: `
+        <p>Promoting a Windows Server 2012 to a Domain Controller (DC) sets up Active Directory Domain Services (AD DS) and DNS for centralized management.</p>
+        <ul class="subtask-list">
+          <li>Ensure the server has a static IP address. Open Server Manager, go to Local Server, and configure the IPv4 settings.</li>
+          <li>Add the AD DS role: In Server Manager, click "Manage" > "Add Roles and Features." Select "Active Directory Domain Services" and install. (<a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-active-directory-domain-services--level-100-" target="_blank">Learn more on Microsoft Learn</a>)</li>
+          <li>Promote to Domain Controller: After installation, click the notification flag in Server Manager and select "Promote this server to a domain controller." Choose "Add a new forest," enter your domain name (e.g., velocitylab.local), and follow the wizard.</li>
+          <li>Configure DNS: During promotion, ensure DNS is installed. Post-promotion, verify DNS settings by running <code>ipconfig /all</code> to confirm the server points to itself as the primary DNS server.</li>
+          <li>Verify the setup: Open "Active Directory Users and Computers" (dsa.msc) to confirm the domain structure. For detailed steps, see <a href="https://www.alitajran.com/install-and-configure-active-directory-domain-controller/" target="_blank">ALITajran's guide</a>.</li>
+        </ul>
+      `,
+    },
+    vm: {
+      title: 'Join VM to Domain',
+      description: `
+        <p>Joining a virtual machine (VM) to the domain enables centralized authentication and management via Active Directory.</p>
+        <ul class="subtask-list">
+          <li>Configure the VM’s network: Set the DNS server to the IP address of your Domain Controller (e.g., 192.168.1.10). Open Network and Sharing Center, update the adapter settings, and restart the network service.</li>
+          <li>Join the domain: On the VM, open System Properties (sysdm.cpl), click "Change," select "Domain," and enter your domain name (e.g., velocitylab.local). Provide domain admin credentials when prompted.</li>
+          <li>Restart the VM: After joining, reboot the VM to apply changes.</li>
+          <li>Verify the join: Log in with a domain account (e.g., velocitylab\\admin). Run <code>nltest /dsgetdc:velocitylab.local</code> to confirm the VM can contact the DC. For more details, refer to <a href="https://techcommunity.microsoft.com/t5/itops-talk-blog/join-a-windows-vm-to-an-active-directory-domain/ba-p/3266388" target="_blank">TechCommunity’s guide</a>.</li>
+        </ul>
+      `,
+    },
+    share: {
+      title: 'Configure Network Share on DC',
+      description: `
+        <p>Setting up a hidden network share on the Domain Controller allows secure file sharing with multiple mapping methods.</p>
+        <ul class="subtask-list">
+          <li>Create a folder: On the DC, create a folder (e.g., C:\\HiddenShare$). The $ suffix makes the share hidden.</li>
+          <li>Share the folder: Right-click the folder, go to Properties > Sharing > Advanced Sharing. Check "Share this folder," name it "HiddenShare$," and set permissions for "Everyone" to Read/Write temporarily.</li>
+          <li>Map the share manually: On a client VM, open File Explorer, click "Map network drive," and enter <code>\\\\DC\\HiddenShare$</code>. Use domain credentials if prompted.</li>
+          <li>Map via Group Policy: On the DC, open Group Policy Management (gpedit.msc), create a GPO, and under User Configuration > Preferences > Drive Maps, create a new drive mapping to <code>\\\\DC\\HiddenShare$</code>. Link the GPO to the appropriate OU. For a step-by-step guide, see <a href="https://www.alitajran.com/create-network-share-windows-server/" target="_blank">ALITajran’s tutorial</a>.</li>
+        </ul>
+      `,
+    },
+    group: {
+      title: 'Create Security Group',
+      description: `
+        <p>Restricting network share access to a security group ensures only authorized users can access the share.</p>
+        <ul class="subtask-list">
+          <li>Create the group: On the DC, open "Active Directory Users and Computers" (dsa.msc). Right-click your domain, select New > Group, name it "ShareAccessGroup," and set it as a Security Group (Global scope).</li>
+          <li>Add users: Double-click the group, go to the Members tab, click Add, and select the users who need access (e.g., domain users).</li>
+          <li>Update share permissions: On the DC, right-click the HiddenShare$ folder, go to Properties > Security, click Edit, remove "Everyone," and add "ShareAccessGroup" with Read/Write permissions.</li>
+          <li>Verify access: Log in to a client VM as a user in the group and confirm access to the share. Deny access for a user not in the group to test. See <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups" target="_blank">Microsoft Learn on Security Groups</a> for more details.</li>
+        </ul>
+      `,
+    },
+  },
+  week2: {
+    server: {
+      title: 'Install Second Server 2012',
+      description: `
+        <p>Adding a second Windows Server 2012 provides redundancy and supports additional roles.</p>
+        <ul class="subtask-list">
+          <li>Install Server 2012: Set up a new VM in your hypervisor (e.g., Hyper-V). Boot from the Server 2012 ISO, follow the installation wizard, and select "Server with a GUI."</li>
+          <li>Configure networking: Assign a static IP and set the DNS to the primary DC’s IP (e.g., 192.168.1.10). Verify connectivity by pinging the DC.</li>
+          <li>Join the domain: Follow the same steps as joining a VM (System Properties > Change > Domain > velocitylab.local). Use domain admin credentials.</li>
+          <li>Promote to secondary DC (optional): Install the AD DS role and promote it to a Domain Controller for redundancy. Check <a href="https://www.alitajran.com/add-additional-domain-controller-to-existing-domain/" target="_blank">ALITajran’s guide on adding a secondary DC</a>.</li>
+        </ul>
+      `,
+    },
+    wsus: {
+      title: 'Setup WSUS',
+      description: `
+        <p>Windows Server Update Services (WSUS) centralizes patch management for domain-joined devices.</p>
+        <ul class="subtask-list">
+          <li>Install WSUS role: On the second server, open Server Manager, go to "Add Roles and Features," select "Windows Server Update Services," and install. Include the WSUS Services and Database components.</li>
+          <li>Configure WSUS: Run the post-installation tasks from Server Manager. Choose to store updates locally (e.g., D:\\WSUS), select products (e.g., Windows Server 2012), and classifications (e.g., Critical Updates).</li>
+          <li>Create computer groups: In the WSUS console (wsus.msc), under "Computers," create groups like "Servers" and "Workstations."</li>
+          <li>Apply Group Policy: On the DC, create a GPO to point clients to the WSUS server (e.g., http://wsus.velocitylab.local:8530). Link it to the domain OU. For detailed steps, see <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-server-update-services/deploy/deploy-windows-server-update-services" target="_blank">Microsoft Learn’s WSUS deployment guide</a>.</li>
+        </ul>
+      `,
+    },
+    time: {
+      title: 'Configure Two Time Servers',
+      description: `
+        <p>Time synchronization ensures accurate timestamps for domain operations like Kerberos authentication.</p>
+        <ul class="subtask-list">
+          <li>Configure the PDC Emulator: On the primary DC (PDC Emulator), run <code>w32tm /config /manualpeerlist:time.windows.com /syncfromflags:manual /reliable:YES /update</code>. Restart the time service: <code>net stop w32time && net start w32time</code>.</li>
+          <li>Sync the second server: On the second server, run <code>w32tm /config /syncfromflags:domhier /update</code> to sync with the PDC Emulator. Restart the time service.</li>
+          <li>Verify synchronization: On both servers, run <code>w32tm /query /status</code> to confirm the time source and sync status.</li>
+          <li>Ensure clients sync: Domain-joined devices automatically sync with the PDC Emulator. For troubleshooting, see <a href="https://techcommunity.microsoft.com/t5/itops-talk-blog/configuring-time-sync-for-windows-servers-in-a-domain/ba-p/3266400" target="_blank">TechCommunity’s time sync guide</a>.</li>
+        </ul>
+      `,
+    },
+  },
+  week3: {
+    upgrade: {
+      title: 'Upgrade Servers to 2016',
+      description: `
+        <p>Upgrading to Windows Server 2016 provides improved security and features.</p>
+        <ul class="subtask-list">
+          <li>Backup everything: Use Windows Server Backup to back up both servers, including system state and AD data. Verify backups before proceeding.</li>
+          <li>Upgrade the secondary server: Insert the Server 2016 ISO, run setup.exe, and choose "Upgrade: Install Windows and keep files, settings, and applications." Follow the wizard.</li>
+          <li>Upgrade the primary DC: After verifying the secondary server’s stability (check AD replication with <code>repadmin /replsummary</code>), upgrade the primary DC using the same process.</li>
+          <li>Verify AD health: Post-upgrade, run <code>dcdiag</code> on both DCs to ensure Active Directory is healthy. For best practices, see <a href="https://www.alitajran.com/upgrade-domain-controllers-to-windows-server-2016/" target="_blank">ALITajran’s upgrade guide</a>.</li>
+        </ul>
+      `,
+    },
+    exchange: {
+      title: 'Install Exchange Server 2019',
+      description: `
+        <p>Exchange Server 2019 provides enterprise-grade email and calendaring services.</p>
+        <ul class="subtask-list">
+          <li>Prepare the server: Install Server 2016 or 2019 (Exchange 2019 doesn’t support 2012). Join the server to the domain and install prerequisites like .NET Framework 4.8 and Visual C++ Redistributable.</li>
+          <li>Prepare Active Directory: Mount the Exchange 2019 ISO, open a PowerShell prompt, and run <code>Setup.exe /PrepareSchema /IAcceptExchangeServerLicenseTerms</code>, followed by <code>Setup.exe /PrepareAD /IAcceptExchangeServerLicenseTerms</code>.</li>
+          <li>Install Exchange: Run <code>Setup.exe /Mode:Install /Roles:Mailbox /IAcceptExchangeServerLicenseTerms</code>. This installs the Mailbox role (includes Client Access services).</li>
+          <li>Verify installation: Access the Exchange Admin Center (EAC) at <code>https://exchange.velocitylab.local/ecp</code>. For detailed steps, refer to <a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/deployment-ref/installation-procedures?view=exchserver-2019" target="_blank">Microsoft Learn’s Exchange 2019 installation guide</a>.</li>
+        </ul>
+      `,
+    },
+    mailbox: {
+      title: 'Create User Mailboxes',
+      description: `
+        <p>Mailboxes enable users to send and receive emails via Exchange Server.</p>
+        <ul class="subtask-list">
+          <li>Access EAC: Log in to the Exchange Admin Center (e.g., https://exchange.velocitylab.local/ecp) using a domain admin account.</li>
+          <li>Create a mailbox: Go to Recipients > Mailboxes, click the "+" icon, select "User mailbox," and link it to an existing AD user. Specify the mailbox alias (e.g., user@velocitylab.local).</li>
+          <li>Repeat for all users: Create mailboxes for each domain user who needs email access.</li>
+          <li>Test access: Configure Outlook on a client VM, log in with the user’s credentials, and confirm the mailbox is accessible. For more, see <a href="https://www.alitajran.com/create-user-mailbox-in-exchange-server/" target="_blank">ALITajran’s mailbox creation guide</a>.</li>
+        </ul>
+      `,
+    },
+    mail: {
+      title: 'Setup Internal Mail Flow',
+      description: `
+        <p>Internal mail flow ensures users can send emails within the domain.</p>
+        <ul class="subtask-list">
+          <li>Configure Accepted Domains: In EAC, go to Mail Flow > Accepted Domains, and ensure "velocitylab.local" is listed as Authoritative.</li>
+          <li>Verify Send Connectors: Exchange 2019 automatically creates a default Send Connector for internal mail. Confirm it exists under Mail Flow > Send Connectors.</li>
+          <li>Test mail flow: Use Outlook to send an email from one user (e.g., user1@velocitylab.local) to another (e.g., user2@velocitylab.local). Verify receipt.</li>
+          <li>Troubleshoot if needed: Check the message tracking logs in EAC (Mail Flow > Message Tracking) or use PowerShell: <code>Get-MessageTrackingLog</code>. See <a href="https://learn.microsoft.com/en-us/exchange/mail-flow/mail-routing/mail-routing?view=exchserver-2019" target="_blank">Microsoft Learn on mail flow</a>.</li>
+        </ul>
+      `,
+    },
+  },
+  week4: {
+    external: {
+      title: 'Publish Mail Externally',
+      description: `
+        <p>Publishing mail externally allows users to send and receive emails outside the domain.</p>
+        <ul class="subtask-list">
+          <li>Configure DNS records: In your DNS provider, set up an MX record (e.g., mail.velocitylab.local), an SPF record (e.g., v=spf1 ip4:192.168.1.100 -all), and DKIM/DMARC for security. Use a public IP for your Exchange server.</li>
+          <li>Update firewall: On your router/firewall, forward port 25 (SMTP) to the Exchange server’s internal IP. Enable port 443 if using Outlook on the web.</li>
+          <li>Configure Receive Connector: In EAC, go to Mail Flow > Receive Connectors, create a new connector for "Internet" (type: Frontend Transport), and allow anonymous users for external mail.</li>
+          <li>Test external mail: Send an email to an external address (e.g., Gmail) and reply back to confirm two-way mail flow. For detailed steps, see <a href="https://www.alitajran.com/configure-exchange-server-to-send-and-receive-outside-mails/" target="_blank">ALITajran’s external mail guide</a>.</li>
+        </ul>
+      `,
+    },
+    hybrid: {
+      title: 'Setup Microsoft 365 Hybrid Environment',
+      description: `
+        <p>A hybrid environment integrates on-premises Exchange with Microsoft 365 for seamless mail flow and user management.</p>
+        <ul class="subtask-list">
+          <li>Prepare Microsoft 365: Ensure you have a Microsoft 365 subscription with Exchange Online. Add your domain (velocitylab.local) in the Microsoft 365 admin center and verify ownership.</li>
+          <li>Install Azure AD Connect: On a domain-joined server, install Azure AD Connect to sync AD users to Microsoft 365. Configure it to sync passwords and enable hybrid deployment.</li>
+          <li>Run Hybrid Configuration Wizard: In EAC, go to Hybrid, click "Configure," and sign in to Microsoft 365. Follow the wizard to set up connectors for mail flow and autodiscover.</li>
+          <li>Test hybrid setup: Move a test mailbox to Exchange Online via EAC (Recipients > Migration) and verify access via Outlook. For best practices, see <a href="https://learn.microsoft.com/en-us/exchange/hybrid-deployment/hybrid-deployment-prerequisites?view=exchserver-2019" target="_blank">Microsoft Learn’s hybrid deployment guide</a>.</li>
+        </ul>
+      `,
+    },
+    hosting: {
+      title: 'Choose Hosting Environment',
+      description: `
+        <p>Selecting a hosting environment balances scalability, cost, and control for your infrastructure.</p>
+        <ul class="subtask-list">
+          <li>Evaluate Azure: Azure offers scalability, managed services, and integration with Microsoft 365. Consider costs (e.g., VM pricing) and compliance needs. See <a href="https://techcommunity.microsoft.com/t5/azure-infrastructure/choosing-between-azure-and-on-premises-for-your-infrastructure/ba-p/3266410" target="_blank">TechCommunity’s comparison</a>.</li>
+          <li>Evaluate on-premises: On-premises gives full control but requires hardware maintenance and higher upfront costs. Ensure redundancy with UPS and backups.</li>
+          <li>Document your choice: Write a pros/cons list. For Azure, consider services like Azure Virtual Machines and Azure AD; for on-premises, focus on hardware reliability.</li>
+          <li>Implement: If choosing Azure, deploy a VM via the Azure portal, migrate services, and configure networking. If on-premises, ensure proper cooling and power for servers. Refer to <a href="https://learn.microsoft.com/en-us/azure/architecture/hybrid/hybrid-deployment-options" target="_blank">Microsoft Learn on hybrid deployments</a>.</li>
+        </ul>
+      `,
+    },
+  },
 };
 
+// Run initialization
 document.addEventListener('DOMContentLoaded', init);

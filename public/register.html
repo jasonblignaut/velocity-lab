@@ -4,41 +4,54 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register | Velocity Lab</title>
-  <link rel="icon" href="/assets/favicon.ico">
   <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
 </head>
 <body>
+  <nav class="nav-glass">
+    <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="brand-logo">
+    <div class="auth">
+      <a href="/login.html">Login</a>
+    </div>
+  </nav>
   <div class="container">
     <header class="header">
-      <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="brand-logo">
-      <h1>Register</h1>
+      <h1>Create an Account</h1>
+      <h2>Join Velocity Lab</h2>
     </header>
-    <div id="notification" class="notification"></div>
-    <form id="registerForm" class="form-container">
-      <div class="form-group">
-        <label for="name">Name</label>
-        <input type="text" id="name" name="name" required autocomplete="name">
-      </div>
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required autocomplete="email">
-      </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required autocomplete="new-password">
-      </div>
-      <input type="hidden" id="csrf_token" name="csrf_token">
-      <div class="form-group">
-        <button type="submit">
-          <span>Register</span>
-          <svg class="spinner" viewBox="0 0 24 24">
-            <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z" opacity=".3"/>
-            <path d="M20 12h2A10 10 0 002 12h2a8 8 0 018 8v2a10 10 0 0010-10z"/>
-          </svg>
-        </button>
-      </div>
-    </form>
-    <p>Already have an account? <a href="/login.html">Login here</a>.</p>
+    <div class="form-container">
+      <div id="notification" class="notification"></div>
+      <form id="registerForm">
+        <input type="hidden" id="csrfToken" name="csrf_token">
+        <input type="hidden" name="role" value="user">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+          <label for="repeatPassword">Repeat Password</label>
+          <input type="password" id="repeatPassword" name="repeatPassword" required>
+        </div>
+        <div class="form-group">
+          <button type="submit">
+            Register
+            <span class="spinner">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 2a8 8 0 100 16 8 8 0 000-16z" fill="currentColor"/>
+              </svg>
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
   <script src="/js/main.js"></script>
 </body>

@@ -35,21 +35,3 @@ export function getCookie(request: Request, name: string): string | null {
   const cookie = cookies.find(c => c.startsWith(`${name}=`));
   return cookie ? cookie.split('=')[1] : null;
 }
-
-// Validate session and get user data
-export async function getUserFromSession(env: Env, request: Request): Promise<any | null> {
-  const sessionToken = getCookie(request, 'session');
-  if (!sessionToken) return null;
-
-  const userId = await env.USERS.get(`session:${sessionToken}`);
-  if (!userId) return null;
-
-  const userData = await env.USERS.get(`user:${userId}`);
-  if (!userData) {
-    // Clean up invalid session
-    await env.USERS.delete(`session:${sessionToken}`);
-    return null;
-  }
-
-  return JSON.parse(userData);
-}

@@ -1,27 +1,37 @@
-import { getUserFromSession } from '../utils';
+import { getCookie } from '../functions/utils';
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   try {
-    const user = await getUserFromSession(context.env, context.request);
-    if (!user) {
+    const sessionToken = getCookie(context.request, 'session');
+    if (!sessionToken) {
       return jsonResponse({ error: 'Unauthorized' }, 401);
     }
 
-    const progress = (await context.env.PROGRESS.get(user.id)) || '{}';
+    const userId = await context.env.USERS.get(`session:${sessionToken}`);
+    if (!userId) {
+      return jsonResponse({ error: 'Unauthorized' }, 401);
+    }
+
+    const progress = await context.env.PROGRESS.get(userId) || '{}';
     return new Response(progress, {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Get progress error:', error);
+    console.error('Progress fetch error:', error);
     return jsonResponse({ error: 'Internal server error' }, 500);
   }
 };
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
-    const user = await getUserFromSession(context.env, context.request);
-    if (!user) {
+    const sessionToken = getCookie(context.request, 'session');
+    if (!sessionToken) {
+      return jsonResponse({ error: 'Unauthorized' }, 401);
+    }
+
+    const userId = await context.env.USERS.get(`session:${sessionToken}`);
+    if (!userId) {
       return jsonResponse({ error: 'Unauthorized' }, 401);
     }
 
@@ -34,14 +44,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return jsonResponse({ error: 'Missing required fields' }, 400);
     }
 
-    let progress = JSON.parse((await context.env.PROGRESS.get(user.id)) || '{}');
+    let progress = JSON.parse((await context.env.PROGRESS.get(userId)) || '{}');
     progress[week] = progress[week] || {};
     progress[week][task] = checked;
 
-    await context.env.PROGRESS.put(user.id, JSON.stringify(progress));
+    await context.env.PROGRESS.put(userId, JSON.stringify(progress));
     return new Response(null, { status: 200 });
   } catch (error) {
-    console.error('Update progress error:', error);
+    console.error('Progress update error:', error);
     return jsonResponse({ error: 'Internal server error' }, 500);
   }
 };
