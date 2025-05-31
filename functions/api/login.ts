@@ -1,4 +1,4 @@
-import { getCookie, validateCSRFToken } from '../functions/utils';
+import { validateCSRFToken } from '../utils';
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
@@ -17,18 +17,18 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     const userData = await context.env.USERS.get(`user:${email}`);
     if (!userData) {
-      return jsonResponse({ error: 'Invalid credentials' }, 401);
+      return jsonResponse({ error: 'Email not found' }, 404);
     }
 
     const user = JSON.parse(userData);
-    if (user.password !== password) {
-      return jsonResponse({ error: 'Invalid credentials' }, 401);
+    if (user.password !== password) { // Cleartext comparison
+      return jsonResponse({ error: 'Incorrect password' }, 401);
     }
 
     const sessionToken = crypto.randomUUID();
     await context.env.USERS.put(`session:${sessionToken}`, user.id, { expirationTtl: 86400 });
 
-    return new Response(JSON.stringify({ name: user.name, role: user.role, email: user.email }), {
+    return new Response(JSON.stringify({ name: user.name, role: user.role }), {
       status: 200,
       headers: {
         'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict`,
@@ -37,7 +37,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    return jsonResponse({ error: 'Internal server error' }, 500);
+    return jsonResponse({ error: 'Server error' }, 500);
   }
 };
 

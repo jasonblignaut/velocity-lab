@@ -1,4 +1,4 @@
-import { validateCSRFToken } from '../functions/utils';
+import { validateCSRFToken } from '../utils';
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
@@ -6,10 +6,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const name = formData.get('name')?.toString().trim();
     const email = formData.get('email')?.toString().trim().toLowerCase();
     const password = formData.get('password')?.toString();
-    const role = formData.get('role')?.toString().trim() || 'user'; // Default to 'user'
+    const role = formData.get('role')?.toString().trim();
     const csrfToken = formData.get('csrf_token')?.toString();
 
-    if (!name || !email || !password || !csrfToken) {
+    if (!name || !email || !password || !role || !csrfToken) {
       return jsonResponse({ error: 'Missing required fields' }, 400);
     }
 
@@ -36,7 +36,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     await context.env.USERS.put(`user:${email}`, JSON.stringify(userData));
     await context.env.USERS.put(`session:${sessionToken}`, userId, { expirationTtl: 86400 });
 
-    return new Response(JSON.stringify({ name, role, email }), {
+    return new Response(JSON.stringify({ name, role }), {
       status: 201,
       headers: {
         'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict`,
