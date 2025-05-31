@@ -13,194 +13,134 @@
     <div class="auth">
       <span id="userInfo" class="user-info"></span>
       <a href="/profile.html">My Profile</a>
+      <a href="/admin.html" id="adminLink" style="display: none;">Admin Dashboard</a>
       <a href="#" id="logout">Logout</a>
     </div>
   </nav>
   <div class="container">
     <header class="header">
-      <h1>Velocity Lab</h1>
-      <h2>Your Progress Dashboard</h2>
+      <h1>Lab Dashboard</h1>
+      <h2>Track Your 4-Week Hybrid IT Journey</h2>
     </header>
-    <div class="progress-bar-container">
-      <div id="progressBar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-      <span id="progressText" class="progress-text">0% Completed</span>
-    </div>
+    <div id="notification" class="notification"></div>
     <div class="timeline">
-      <!-- Week 1 -->
       <div class="week" data-week="week1">
-        <div class="week-content">
-          <div class="week-badge">1</div>
-          <div class="week-card">
-            <div class="week-title">
-              <span class="week-icon">
-                <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg>
-              </span>
-              Week 1: Domain Setup
-            </div>
-            <div class="task" data-task="dc">
-              <input type="checkbox" data-week="week1" data-task="dc">
-              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
-              <div class="task-content">
-                <h4>Promote Server 2012 to Domain Controller</h4>
-                <p class="task-details">Set up Active Directory and DNS services.</p>
-              </div>
-            </div>
-            <div class="task" data-task="vm">
-              <input type="checkbox" data-week="week1" data-task="vm">
-              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
-              <div class="task-content">
-                <h4>Join VM to Domain</h4>
-                <p class="task-details">Join a virtual machine to the domain.</p>
-              </div>
-            </div>
-            <div class="task" data-task="share">
-              <input type="checkbox" data-week="week1" data-task="share">
-              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
-              <div class="task-content">
-                <h4>Configure Network Share on DC</h4>
-                <p class="task-details">Set up a hidden network share with multiple mapping methods.</p>
-              </div>
-            </div>
-            <div class="task" data-task="group">
-              <input type="checkbox" data-week="week1" data-task="group">
-              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
-              <div class="task-content">
-                <h4>Create Security Group</h4>
-                <p class="task-details">Restrict network share access to a security group.</p>
-              </div>
-            </div>
-          </div>
+        <h3>Week 1: Domain Controller & Network Shares</h3>
+        <ul class="tasks">
+          <li>
+            <input type="checkbox" data-task="promote-dc">
+            Promote 2012 Server to Domain Controller
+            <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-active-directory-domain-services--level-100-" target="_blank" rel="noopener">Guide</a>
+          </li>
+          <li>
+            <input type="checkbox" data-task="join-vm">
+            Join VM to Domain
+            <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/join-a-computer-to-a-domain" target="_blank" rel="noopener">Guide</a>
+          </li>
+          <li>
+            <input type="checkbox" data-task="create-share">
+            Create Network Share on DC
+            <a href="https://learn.microsoft.com/en-us/windows-server/storage/file-server/file-server-smb" target="_blank" rel="noopener">Guide</a>
+          </li>
+          <li>
+            <input type="checkbox" data-task="map-drive1">
+            Map Drive (Method 1: GPO)
+            <a href="https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc770902(v=ws.11)" target="_blank" rel="noopener">Guide</a>
+          </li>
+          <li>
+            <input type="checkbox" data-task="map-drive2">
+            Map Drive (Method 2: Script)
+            <a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/new-psdrive" target="_blank" rel="noopener">Guide</a>
+          </li>
+          <li>
+            <input type="checkbox" data-task="map-drive3">
+            Map Drive (Method 3: Manual)
+            <a href="https://support.microsoft.com/en-us/windows/map-a-network-drive-in-windows-29ce55d1-34e3-a7e2-b2db-cee1c125ea25" target="_blank" rel="noopener">Guide</a>
+          </li>
+          <li>
+            <input type="checkbox" data-task="create-group">
+            Create Security Group
+            <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups" target="_blank" rel="noopener">Guide</a>
+          </li>
+        </ul>
+        <div class="progress-bar">
+          <div class="progress" data-week="week1-progress"></div>
         </div>
       </div>
-      <!-- Week 2 -->
       <div class="week" data-week="week2">
-        <div class="week-content">
-          <div class="week-badge">2</div>
-          <div class="week-card">
-            <div class="week-title">
-              <span class="week-icon">
-                <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg>
-              </span>
-              Week 2: Server Expansion
-            </div>
-            <div class="task" data-task="server">
-              <input type="checkbox" data-week="week2" data-task="server">
-              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
-              <div class="task-content">
-                <h4>Install Second Server 2012</h4>
-                <p class="task-details">Add a second server for redundancy.</p>
-              </div>
-            </div>
-            <div class="task" data-task="wsus">
-              <input type="checkbox" data-week="week2" data-task="wsus">
-              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
-              <div class="task-content">
-                <h4>Setup WSUS</h4>
-                <p class="task-details">Configure Windows Server Update Services.</p>
-              </div>
-            </div>
-            <div class="task" data-task="time">
-              <input type="checkbox" data-week="week2" data-task="time">
-              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
-              <div class="task-content">
-                <h4>Configure Two Time Servers</h4>
-                <p class="task-details">Set up time synchronization.</p>
-              </div>
-            </div>
-          </div>
+        <h3>Week 2: WSUS & Time Servers</h3>
+        <ul class="tasks">
+          <li>
+            <input type="checkbox" data-task="install-server">
+            Install 2nd Server 2012
+            <a href="https://learn.microsoft.com/en-us/windows-server/get-started/installation-and-upgrade" target="_blank" rel="noopener">Guide</a>
+          </li>
+          <li>
+            <input type="checkbox" data-task="setup-wsus">
+            Setup WSUS
+            <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-server-update-services/deploy/deploy-wsus" target="_blank" rel="noopener">Guide</a>
+          </li>
+          <li>
+            <input type="checkbox" data-task="setup-time1">
+            Setup Time Server 1
+            <a href="https://learn.microsoft.com/en-us/windows-server/networking/windows-time-service/windows-time-service" target="_blank" rel="noopener">Guide</a>
+          </li>
+          <li>
+            <input type="checkbox" data-task="setup-time2">
+            Setup Time Server 2
+            <a href="https://learn.microsoft.com/en-us/windows-server/networking/windows-time-service/windows-time-service" target="_blank" rel="noopener">Guide</a>
+          </li>
+        </ul>
+        <div class="progress-bar">
+          <div class="progress" data-week="week2-progress"></div>
         </div>
       </div>
-      <!-- Week 3 -->
       <div class="week" data-week="week3">
-        <div class="week-content">
-          <div class="week-badge">3</div>
-          <div class="week-card">
-            <div class="week-title">
-              <span class="week-icon">
-                <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg>
-              </span>
-              Week 3: Upgrade & Email Setup
-            </div>
-            <div class="task" data-task="upgrade">
-              <input type="checkbox" data-week="week3" data-task="upgrade">
-              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
-              <div class="task-content">
-                <h4>Upgrade Servers to 2016</h4>
-                <p class="task-details">Modernize infrastructure.</p>
-              </div>
-            </div>
-            <div class="task" data-task="exchange">
-              <input type="checkbox" data-week="week3" data-task="exchange">
-              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
-              <div class="task-content">
-                <h4>Install Exchange Server 2019</h4>
-                <p class="task-details">Set up email services.</p>
-              </div>
-            </div>
-            <div class="task" data-task="mailbox">
-              <input type="checkbox" data-week="week3" data-task="mailbox">
-              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
-              <div class="task-content">
-                <h4>Create User Mailboxes</h4>
-                <p class="task-details">Set up mailboxes for users.</p>
-              </div>
-            </div>
-            <div class="task" data-task="mail">
-              <input type="checkbox" data-week="week3" data-task="mail">
-              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
-              <div class="task-content">
-                <h4>Setup Internal Mail Flow</h4>
-                <p class="task-details">Enable email delivery between users.</p>
-              </div>
-            </div>
-          </div>
+        <h3>Week 3: Server Upgrade & Exchange Setup</h3>
+        <ul class="tasks">
+          <li>
+            <input type="checkbox" data-task="upgrade-servers">
+            Upgrade Servers to 2016
+            <a href="https://learn.microsoft.com/en-us/windows-server/upgrade/upgrade-overview" target="_blank" rel="noopener">Guide</a>
+          </li>
+          <li>
+            <input type="checkbox" data-task="install-exchange">
+            Install 3rd Server with Exchange
+            <a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/deployment-ref/deployment-ref" target="_blank" rel="noopener">Guide</a>
+          </li>
+          <li>
+            <input type="checkbox" data-task="create-mailbox">
+            Create Mailbox for User
+            <a href="https://learn.microsoft.com/en-us/exchange/recipients/user-mailboxes/create-user-mailboxes" target="_blank" rel="noopener">Guide</a>
+          </li>
+          <li>
+            <input type="checkbox" data-task="mail-flow">
+            Get Internal Mail Flow Working
+            <a href="https://learn.microsoft.com/en-us/exchange/mail-flow/mail-flow" target="_blank" rel="noopener">Guide</a>
+          </li>
+        </ul>
+        <div class="progress-bar">
+          <div class="progress" data-week="week3-progress"></div>
         </div>
       </div>
-      <!-- Week 4 -->
       <div class="week" data-week="week4">
-        <div class="week-content">
-          <div class="week-badge">4</div>
-          <div class="week-card">
-            <div class="week-title">
-              <span class="week-icon">
-                <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg>
-              </span>
-              Week 4: External Access & Hybrid
-            </div>
-            <div class="task" data-task="external">
-              <input type="checkbox" data-week="week4" data-task="external">
-              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
-              <div class="task-content">
-                <h4>Publish Mail Externally</h4>
-                <p class="task-details">Enable external email access.</p>
-              </div>
-            </div>
-            <div class="task" data-task="hybrid">
-              <input type="checkbox" data-week="week4" data-task="hybrid">
-              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
-              <div class="task-content">
-                <h4>Setup Microsoft 365 Hybrid Environment</h4>
-                <p class="task-details">Integrate with Microsoft 365.</p>
-              </div>
-            </div>
-            <div class="task" data-task="hosting">
-              <input type="checkbox" data-week="week4" data-task="hosting">
-              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
-              <div class="task-content">
-                <h4>Choose Hosting Environment</h4>
-                <p class="task-details">Azure or on-premises deployment.</p>
-              </div>
-            </div>
-          </div>
+        <h3>Week 4: External Mail & Hybrid Setup</h3>
+        <ul class="tasks">
+          <li>
+            <input type="checkbox" data-task="publish-mail">
+            Publish Mail Externally
+            <a href="https://learn.microsoft.com/en-us/exchange/mail-flow/connectors/outbound-mail-flow" target="_blank" rel="noopener">Guide</a>
+          </li>
+          <li>
+            <input type="checkbox" data-task="hybrid-365">
+            Setup 365 Hybrid Environment
+            <a href="https://learn.microsoft.com/en-us/exchange/hybrid-deployment/hybrid-deployment" target="_blank" rel="noopener">Guide</a>
+          </li>
+        </ul>
+        <div class="progress-bar">
+          <div class="progress" data-week="week4-progress"></div>
         </div>
       </div>
-    </div>
-  </div>
-  <div id="taskModal" class="modal" tabindex="-1">
-    <div class="modal-content">
-      <button id="closeModal" class="close-btn" aria-label="Close">×</button>
-      <h2 id="modalTitle"></h2>
-      <div id="modalDescription"></div>
     </div>
   </div>
   <script src="/js/main.js"></script>
