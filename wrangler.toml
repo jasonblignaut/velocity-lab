@@ -2,9 +2,6 @@ name = "velocity-lab"
 pages_build_output_dir = "./public"
 compatibility_date = "2025-05-31"
 
-# Define the Worker script
-main = "worker.js"
-
 # KV Namespaces
 [[kv_namespaces]]
 binding = "USERS"
@@ -17,8 +14,3 @@ id = "72beb3bc668347b584984bc61aed9492"
 [[kv_namespaces]]
 binding = "AVATARS"
 id = "c70c0aa10bad4587b7c3f2272693044a"
-
-# Route to ensure the Worker handles API requests
-[[routes]]
-pattern = "*/api/*"
-zone = "labverse.co.za"

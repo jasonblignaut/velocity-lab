@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Velocity Lab</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <nav class="nav-glass">
+    <img src="/images/logo.png" alt="Velocity Lab Logo" class="brand-logo">
+    <div class="auth">
+      <span id="userInfo" class="user-info"></span>
+      <a href="/profile.html">My Profile</a>
+      <a href="#" id="logout">Logout</a>
+    </div>
+  </nav>
+  <div class="container">
+    <header class="header">
+      <h1>Velocity Lab</h1>
+      <h2>Your Progress Dashboard</h2>
+    </header>
+    <div class="progress-bar-container">
+      <div id="progressBar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+      <span id="progressText" class="progress-text">0% Completed</span>
+    </div>
+    <div class="timeline">
+      <!-- Week 1 -->
+      <div class="week" data-week="week1">
+        <div class="week-content">
+          <div class="week-badge">1</div>
+          <div class="week-card">
+            <div class="week-title">
+              <span class="week-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0 2a8 8 0 100 16 8 8 0 000-16z"/></svg>
+              </span>
+              Week 1: Domain Setup
+            </div>
+            <div class="task" data-task="dc">
+              <input type="checkbox" data-week="week1" data-task="dc">
+              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
+              <div class="task-content">
+                <h4>Promote Server 2012 to Domain Controller</h4>
+                <p class="task-details">Set up Active Directory and DNS services.</p>
+              </div>
+            </div>
+            <div class="task" data-task="vm">
+              <input type="checkbox" data-week="week1" data-task="vm">
+              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
+              <div class="task-content">
+                <h4>Join VM to Domain</h4>
+                <p class="task-details">Join a virtual machine to the domain.</p>
+              </div>
+            </div>
+            <div class="task" data-task="share">
+              <input type="checkbox" data-week="week1" data-task="share">
+              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
+              <div class="task-content">
+                <h4>Configure Network Share on DC</h4>
+                <p class="task-details">Set up a hidden network share with multiple mapping methods.</p>
+              </div>
+            </div>
+            <div class="task" data-task="group">
+              <input type="checkbox" data-week="week1" data-task="group">
+              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
+              <div class="task-content">
+                <h4>Create Security Group</h4>
+                <p class="task-details">Restrict network share access to a security group.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Week 2 -->
+      <div class="week" data-week="week2">
+        <div class="week-content">
+          <div class="week-badge">2</div>
+          <div class="week-card">
+            <div class="week-title">
+              <span class="week-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg>
+              </span>
+              Week 2: Server Expansion
+            </div>
+            <div class="task" data-task="server">
+              <input type="checkbox" data-week="week2" data-task="server">
+              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
+              <div class="task-content">
+                <h4>Install Second Server 2012</h4>
+                <p class="task-details">Add a second server for redundancy.</p>
+              </div>
+            </div>
+            <div class="task" data-task="wsus">
+              <input type="checkbox" data-week="week2" data-task="wsus">
+              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
+              <div class="task-content">
+                <h4>Setup WSUS</h4>
+                <p class="task-details">Configure Windows Server Update Services.</p>
+              </div>
+            </div>
+            <div class="task" data-task="time">
+              <input type="checkbox" data-week="week2" data-task="time">
+              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
+              <div class="task-content">
+                <h4>Configure Two Time Servers</h4>
+                <p class="task-details">Set up time synchronization.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Week 3 -->
+      <div class="week" data-week="week3">
+        <div class="week-content">
+          <div class="week-badge">3</div>
+          <div class="week-card">
+            <div class="week-title">
+              <span class="week-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg>
+              </span>
+              Week 3: Upgrade & Email Setup
+            </div>
+            <div class="task" data-task="upgrade">
+              <input type="checkbox" data-week="week3" data-task="upgrade">
+              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
+              <div class="task-content">
+                <h4>Upgrade Servers to 2016</h4>
+                <p class="task-details">Modernize infrastructure.</p>
+              </div>
+            </div>
+            <div class="task" data-task="exchange">
+              <input type="checkbox" data-week="week3" data-task="exchange">
+              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
+              <div class="task-content">
+                <h4>Install Exchange Server 2019</h4>
+                <p class="task-details">Set up email services.</p>
+              </div>
+            </div>
+            <div class="task" data-task="mailbox">
+              <input type="checkbox" data-week="week3" data-task="mailbox">
+              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
+              <div class="task-content">
+                <h4>Create User Mailboxes</h4>
+                <p class="task-details">Set up mailboxes for users.</p>
+              </div>
+            </div>
+            <div class="task" data-task="mail">
+              <input type="checkbox" data-week="week3" data-task="mail">
+              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
+              <div class="task-content">
+                <h4>Setup Internal Mail Flow</h4>
+                <p class="task-details">Enable email delivery between users.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Week 4 -->
+      <div class="week" data-week="week4">
+        <div class="week-content">
+          <div class="week-badge">4</div>
+          <div class="week-card">
+            <div class="week-title">
+              <span class="week-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg>
+              </span>
+              Week 4: External Access & Hybrid
+            </div>
+            <div class="task" data-task="external">
+              <input type="checkbox" data-week="week4" data-task="external">
+              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
+              <div class="task-content">
+                <h4>Publish Mail Externally</h4>
+                <p class="task-details">Enable external email access.</p>
+              </div>
+            </div>
+            <div class="task" data-task="hybrid">
+              <input type="checkbox" data-week="week4" data-task="hybrid">
+              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
+              <div class="task-content">
+                <h4>Setup Microsoft 365 Hybrid Environment</h4>
+                <p class="task-details">Integrate with Microsoft 365.</p>
+              </div>
+            </div>
+            <div class="task" data-task="hosting">
+              <input type="checkbox" data-week="week4" data-task="hosting">
+              <div class="task-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/></svg></div>
+              <div class="task-content">
+                <h4>Choose Hosting Environment</h4>
+                <p class="task-details">Azure or on-premises deployment.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="taskModal" class="modal" tabindex="-1">
+    <div class="modal-content">
+      <button id="closeModal" class="close-btn" aria-label="Close">&times;</button>
+      <h2 id="modalTitle"></h2>
+      <div id="modalDescription"></div>
+    </div>
+  </div>
+  <script src="/js/main.js"></script>
+</body>
+</html>
