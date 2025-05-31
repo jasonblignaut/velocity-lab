@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | Velocity Lab</title>
+  <link rel="icon" href="/assets/favicon.ico">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="brand-logo">
+      <h1>Register</h1>
+    </header>
+    <div id="notification" class="notification"></div>
+    <form id="registerForm" class="form-container">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required autocomplete="new-password">
+      </div>
+      <input type="hidden" id="csrf_token" name="csrf_token">
+      <div class="form-group">
+        <button type="submit">
+          <span>Register</span>
+          <svg class="spinner" viewBox="0 0 24 24">
+            <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z" opacity=".3"/>
+            <path d="M20 12h2A10 10 0 002 12h2a8 8 0 018 8v2a10 10 0 0010-10z"/>
+          </svg>
+        </button>
+      </div>
+    </form>
+    <p>Already have an account? <a href="/login.html">Login here</a>.</p>
+  </div>
+  <script src="/js/main.js"></script>
+</body>
+</html>
