@@ -1,7 +1,7 @@
 :root {
-  --primary: #0078d4; /* Azure blue */
-  --secondary: #ff5e62; /* Soft coral */
-  --accent: #00d4ff; /* Cyan highlight */
+  --primary: #003087; /* Deep blue from Velocity logo */
+  --secondary: #C0C0C0; /* Silver for a sleek look */
+  --accent: #00BFFF; /* Cyan for highlights */
   --success: #28a745; /* Green for success */
   --error: #dc3545; /* Red for errors */
   --dark: #1a1d1e; /* Near-black for text */
@@ -64,7 +64,7 @@ body {
 
 .auth a:hover,
 .auth a:focus {
-  color: var(--secondary);
+  color: var(--accent);
   outline: none;
 }
 
@@ -254,7 +254,7 @@ body {
 
 .task:hover,
 .task:focus {
-  background: rgba(0, 120, 212, 0.05);
+  background: rgba(0, 48, 135, 0.05); /* Adjusted to use --primary with opacity */
   transform: translateX(0.25rem);
   outline: none;
 }
@@ -350,6 +350,24 @@ body {
   outline: none;
 }
 
+.subtask-list {
+  margin-bottom: 1rem;
+}
+
+.subtask-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.subtask-checkbox {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+  accent-color: var(--success);
+}
+
 .form-container {
   max-width: 25rem;
   margin: 3rem auto;
@@ -387,7 +405,7 @@ body {
 .form-group input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+  box-shadow: 0 0 0 2px rgba(0, 48, 135, 0.2); /* Adjusted to use --primary */
 }
 
 .password-group {

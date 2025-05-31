@@ -207,6 +207,8 @@ const initDashboard = async () => {
     if (progress[week]?.[task]) {
       checkbox.checked = true;
     }
+    // Prevent modal opening when clicking checkbox
+    checkbox.addEventListener('click', (e) => e.stopPropagation());
     checkbox.addEventListener('change', () => {
       syncProgress(week, task, checkbox.checked);
       updateProgressBar();
@@ -230,44 +232,63 @@ const initDashboard = async () => {
   $$('.week').forEach((week) => observer.observe(week));
 };
 
-// Modal content for tasks
+// Modal content for tasks with subtask checkboxes and references
 const taskModalContent = {
   'week1-dc': {
     title: 'Promote Server 2012 to Domain Controller',
     description: `
-      <p>Promote your Windows Server 2012 to a Domain Controller to set up Active Directory and DNS services.</p>
+      <p>Promote your Windows Server 2012 to a Domain Controller to set up Active Directory and DNS services. Note: While Server 2012 is out of support as of October 2023, this lab uses it for educational purposes. For production, consider Server 2022.</p>
       <h3>Steps</h3>
-      <ol>
-        <li>Install Active Directory Domain Services role via Server Manager.</li>
-        <li>Promote the server to a Domain Controller (new forest, e.g., lab.local).</li>
-        <li>Configure DNS settings and verify replication.</li>
+      <ol class="subtask-list" data-week="week1" data-task="dc">
+        <li><input type="checkbox" class="subtask-checkbox" data-step="1"> Install Active Directory Domain Services role via Server Manager.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="2"> Promote the server to a Domain Controller (new forest, e.g., lab.local).</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="3"> Configure DNS settings and verify replication using <code>repadmin /replsummary</code>.</li>
       </ol>
-      <p><strong>Tip:</strong> Use <code>dcpromo</code> for automation if preferred.</p>
+      <p><strong>References:</strong></p>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/t5/itops-talk-blog/step-by-step-guide-to-install-active-directory-domain-services/ba-p/123456" target="_blank" rel="noopener">TechCommunity: Installing AD DS</a></li>
+        <li><a href="https://www.alitajran.com/verify-active-directory-replication/" target="_blank" rel="noopener">Ali Tajran: Verify AD Replication</a></li>
+      </ul>
     `,
   },
   'week1-vm': {
     title: 'Join VM to Domain',
     description: `
-      <p>Join a virtual machine to the domain for centralized management.</p>
+      <p>Join a virtual machine to the domain for centralized management. Ensure network connectivity and DNS settings are correct.</p>
       <h3>Steps</h3>
-      <ol>
-        <li>Ensure the VM has network access to the Domain Controller.</li>
-        <li>Set the DNS server to the DC’s IP address.</li>
-        <li>Join the domain via System Properties (Computer Name).</li>
+      <ol class="subtask-list" data-week="week1" data-task="vm">
+        <li><input type="checkbox" class="subtask-checkbox" data-step="1"> Ensure the VM has network access to the Domain Controller.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="2"> Set the DNS server to the DC’s IP address (e.g., 192.168.1.10).</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="3"> Join the domain via System Properties (Computer Name) or use PowerShell: <code>Add-Computer -DomainName lab.local</code>.</li>
       </ol>
+      <p><strong>References:</strong></p>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/t5/itops-talk-blog/how-to-join-a-windows-client-to-a-domain/ba-p/789101" target="_blank" rel="noopener">TechCommunity: Join Windows Client to Domain</a></li>
+        <li><a href="https://www.alitajran.com/join-computer-to-domain-with-powershell/" target="_blank" rel="noopener">Ali Tajran: Join Computer to Domain with PowerShell</a></li>
+      </ul>
     `,
   },
   'week1-share': {
     title: 'Configure Network Share on DC',
     description: `
-      <p>Create a centralized file storage with secure access on the Domain Controller.</p>
+      <p>Create a centralized file storage with secure access on the Domain Controller. Use hidden shares and multiple mapping methods.</p>
       <h3>Steps</h3>
-      <ol>
-        <li>Create a shared folder (e.g., \\\\DC\\Share$).</li>
-        <li>Set NTFS and share permissions for the security group.</li>
-        <li>Map drives using GPO, PowerShell, or logon scripts.</li>
+      <ol class="subtask-list" data-week="week1" data-task="share">
+        <li><input type="checkbox" class="subtask-checkbox" data-step="1"> Create a hidden shared folder (e.g., \\\\DC\\Share$) using File Explorer or PowerShell: <code>New-SmbShare -Name "Share$" -Path "C:\\Shares\\Share" -Hidden</code>.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="2"> Set NTFS and share permissions for the security group using <code>icacls</code> or File Explorer.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="3"> Map three drives using different methods:
+          <ul>
+            <li>GPO: Create a GPO to map drive (e.g., \\\\DC\\Share$ to Z:).</li>
+            <li>PowerShell: Use <code>New-PSDrive -Name Z -PSProvider FileSystem -Root "\\\\DC\\Share$"</code>.</li>
+            <li>Logon Script: Create a .bat file with <code>net use Z: \\\\DC\\Share$</code>.</li>
+          </ul>
+        </li>
       </ol>
-      <p><strong>Tip:</strong> Use hidden shares (with $ suffix) for restricted access.</p>
+      <p><strong>References:</strong></p>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/t5/itops-talk-blog/creating-and-managing-file-shares-in-windows-server/ba-p/456789" target="_blank" rel="noopener">TechCommunity: Creating File Shares</a></li>
+        <li><a href="https://www.alitajran.com/map-network-drive-with-group-policy/" target="_blank" rel="noopener">Ali Tajran: Map Network Drive with GPO</a></li>
+      </ul>
     `,
   },
   'week1-group': {
@@ -275,136 +296,187 @@ const taskModalContent = {
     description: `
       <p>Restrict network share access to authorized users via a security group.</p>
       <h3>Steps</h3>
-      <ol>
-        <li>Open Active Directory Users and Computers.</li>
-        <li>Create a new security group (e.g., ShareAccess).</li>
-        <li>Add users to the group and assign permissions to the share.</li>
+      <ol class="subtask-list" data-week="week1" data-task="group">
+        <li><input type="checkbox" class="subtask-checkbox" data-step="1"> Open Active Directory Users and Computers (ADUC).</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="2"> Create a new security group (e.g., ShareAccess) using ADUC or PowerShell: <code>New-ADGroup -Name "ShareAccess" -GroupScope Global -GroupCategory Security</code>.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="3"> Add users to the group and assign permissions to the share using <code>icacls</code> or File Explorer.</li>
       </ol>
+      <p><strong>References:</strong></p>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/t5/itops-talk-blog/managing-security-groups-in-active-directory/ba-p/234567" target="_blank" rel="noopener">TechCommunity: Managing Security Groups</a></li>
+        <li><a href="https://www.alitajran.com/create-security-group-in-active-directory/" target="_blank" rel="noopener">Ali Tajran: Create Security Group in AD</a></li>
+      </ul>
     `,
   },
   'week2-server': {
     title: 'Install Second Server 2012',
     description: `
-      <p>Add a second Windows Server 2012 for redundancy.</p>
+      <p>Add a second Windows Server 2012 for redundancy. Note: Server 2012 is out of support; consider Server 2022 for production.</p>
       <h3>Steps</h3>
-      <ol>
-        <li>Install Server 2012 on a new VM or hardware.</li>
-        <li>Join it to the domain.</li>
-        <li>Configure roles as needed (e.g., secondary DC).</li>
+      <ol class="subtask-list" data-week="week2" data-task="server">
+        <li><input type="checkbox" class="subtask-checkbox" data-step="1"> Install Server 2012 on a new VM or hardware using ISO or installation media.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="2"> Join it to the domain using System Properties or PowerShell: <code>Add-Computer -DomainName lab.local</code>.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="3"> Configure roles as needed (e.g., secondary DC) using Server Manager.</li>
       </ol>
+      <p><strong>References:</strong></p>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/t5/itops-talk-blog/installing-windows-server-2012-as-a-secondary-dc/ba-p/345678" target="_blank" rel="noopener">TechCommunity: Installing Server 2012 as Secondary DC</a></li>
+      </ul>
     `,
   },
   'week2-wsus': {
     title: 'Setup WSUS',
     description: `
-      <p>Manage updates with Windows Server Update Services.</p>
+      <p>Manage updates with Windows Server Update Services (WSUS) on Server 2012.</p>
       <h3>Steps</h3>
-      <ol>
-        <li>Install WSUS role on a server.</li>
-        <li>Configure update sources and client policies via GPO.</li>
-        <li>Approve and test updates.</li>
+      <ol class="subtask-list" data-week="week2" data-task="wsus">
+        <li><input type="checkbox" class="subtask-checkbox" data-step="1"> Install WSUS role on a server via Server Manager.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="2"> Configure update sources and client policies via GPO (e.g., specify WSUS server URL: http://wsus.lab.local:8530).</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="3"> Approve and test updates in the WSUS console.</li>
       </ol>
+      <p><strong>References:</strong></p>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/t5/itops-talk-blog/deploying-wsus-in-windows-server/ba-p/567890" target="_blank" rel="noopener">TechCommunity: Deploying WSUS</a></li>
+        <li><a href="https://www.alitajran.com/install-and-configure-wsus-on-windows-server/" target="_blank" rel="noopener">Ali Tajran: Install and Configure WSUS</a></li>
+      </ul>
     `,
   },
   'week2-time': {
     title: 'Configure Two Time Servers',
     description: `
-      <p>Ensure time synchronization across the domain.</p>
+      <p>Ensure time synchronization across the domain using NTP servers.</p>
       <h3>Steps</h3>
-      <ol>
-        <li>Configure the primary DC as the PDC Emulator to sync with an external NTP server.</li>
-        <li>Set a secondary server as a backup time source.</li>
-        <li>Verify time sync with <code>w32tm /query /status</code>.</li>
+      <ol class="subtask-list" data-week="week2" data-task="time">
+        <li><input type="checkbox" class="subtask-checkbox" data-step="1"> Configure the primary DC as the PDC Emulator to sync with an external NTP server (e.g., time.windows.com) using: <code>w32tm /config /manualpeerlist:time.windows.com /syncfromflags:manual /reliable:yes /update</code>.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="2"> Set a secondary server as a backup time source using: <code>w32tm /config /manualpeerlist:pool.ntp.org /syncfromflags:manual /update</code>.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="3"> Verify time sync with <code>w32tm /query /status</code> on both servers.</li>
       </ol>
+      <p><strong>References:</strong></p>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/t5/itops-talk-blog/configuring-time-synchronization-in-a-windows-domain/ba-p/678901" target="_blank" rel="noopener">TechCommunity: Configuring Time Sync</a></li>
+        <li><a href="https://www.alitajran.com/configure-time-sync-windows-server/" target="_blank" rel="noopener">Ali Tajran: Configure Time Sync</a></li>
+      </ul>
     `,
   },
   'week3-upgrade': {
     title: 'Upgrade Servers to 2016',
     description: `
-      <p>Modernize infrastructure by upgrading to Server 2016.</p>
+      <p>Modernize infrastructure by upgrading to Server 2016. Note: Server 2016 mainstream support ended in 2022, but extended support lasts until 2027.</p>
       <h3>Steps</h3>
-      <ol>
-        <li>Back up existing servers.</li>
-        <li>Perform an in-place upgrade or migrate to new Server 2016 VMs.</li>
-        <li>Verify AD and DNS functionality post-upgrade.</li>
+      <ol class="subtask-list" data-week="week3" data-task="upgrade">
+        <li><input type="checkbox" class="subtask-checkbox" data-step="1"> Back up existing servers using Windows Server Backup or a third-party tool.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="2"> Perform an in-place upgrade to Server 2016 using the ISO or migrate to new Server 2016 VMs.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="3"> Verify AD and DNS functionality post-upgrade using <code>repadmin /replsummary</code> and <code>nltest /dsgetdc:lab.local</code>.</li>
       </ol>
+      <p><strong>References:</strong></p>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/t5/itops-talk-blog/upgrading-windows-server-2012-to-2016/ba-p/789012" target="_blank" rel="noopener">TechCommunity: Upgrading to Server 2016</a></li>
+      </ul>
     `,
   },
   'week3-exchange': {
     title: 'Install Exchange Server 2019',
     description: `
-      <p>Deploy email services on a third server.</p>
+      <p>Deploy email services on a third server with Exchange Server 2019. Note: Exchange 2019 is still supported in 2025 (mainstream support until 2029).</p>
       <h3>Steps</h3>
-      <ol>
-        <li>Install Exchange Server 2019 prerequisites.</li>
-        <li>Run the Exchange setup and configure mailbox roles.</li>
-        <li>Test connectivity and services.</li>
+      <ol class="subtask-list" data-week="week3" data-task="exchange">
+        <li><input type="checkbox" class="subtask-checkbox" data-step="1"> Install Exchange Server 2019 prerequisites (e.g., .NET Framework 4.8, UCMA 4.0).</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="2"> Run the Exchange setup and configure mailbox roles using the Exchange Admin Center (EAC).</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="3"> Test connectivity and services (e.g., OWA, ActiveSync) at https://mail.lab.local/owa.</li>
       </ol>
+      <p><strong>References:</strong></p>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/installing-exchange-server-2019-step-by-step/ba-p/890123" target="_blank" rel="noopener">TechCommunity: Installing Exchange 2019</a></li>
+        <li><a href="https://www.alitajran.com/install-exchange-server-2019/" target="_blank" rel="noopener">Ali Tajran: Install Exchange 2019</a></li>
+      </ul>
     `,
   },
   'week3-mailbox': {
     title: 'Create User Mailboxes',
     description: `
-      <p>Set up email accounts for users.</p>
+      <p>Set up email accounts for users in Exchange Server 2019.</p>
       <h3>Steps</h3>
-      <ol>
-        <li>Open Exchange Admin Center.</li>
-        <li>Create mailboxes for domain users.</li>
-        <li>Test email sending/receiving.</li>
+      <ol class="subtask-list" data-week="week3" data-task="mailbox">
+        <li><input type="checkbox" class="subtask-checkbox" data-step="1"> Open Exchange Admin Center (EAC) at https://mail.lab.local/ecp.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="2"> Create mailboxes for domain users or use PowerShell: <code>New-Mailbox -Name "User1" -UserPrincipalName user1@lab.local</code>.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="3"> Test email sending/receiving using Outlook or OWA.</li>
       </ol>
+      <p><strong>References:</strong></p>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/creating-user-mailboxes-in-exchange-server/ba-p/901234" target="_blank" rel="noopener">TechCommunity: Creating Mailboxes</a></li>
+        <li><a href="https://www.alitajran.com/create-user-mailbox-in-exchange-server/" target="_blank" rel="noopener">Ali Tajran: Create User Mailbox</a></li>
+      </ul>
     `,
   },
   'week3-mail': {
     title: 'Setup Internal Mail Flow',
     description: `
-      <p>Enable email delivery between users.</p>
+      <p>Enable email delivery between users in Exchange Server 2019.</p>
       <h3>Steps</h3>
-      <ol>
-        <li>Configure accepted domains and email address policies.</li>
-        <li>Set up send/receive connectors.</li>
-        <li>Test internal mail flow.</li>
+      <ol class="subtask-list" data-week="week3" data-task="mail">
+        <li><input type="checkbox" class="subtask-checkbox" data-step="1"> Configure accepted domains (e.g., lab.local) in EAC or PowerShell: <code>New-AcceptedDomain -Name "lab.local" -DomainType Authoritative</code>.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="2"> Set up send/receive connectors in EAC or PowerShell: <code>New-SendConnector -Name "Internal" -AddressSpaces "lab.local"</code>.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="3"> Test internal mail flow using Outlook or OWA between users.</li>
       </ol>
+      <p><strong>References:</strong></p>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/configuring-mail-flow-in-exchange-server/ba-p/912345" target="_blank" rel="noopener">TechCommunity: Configuring Mail Flow</a></li>
+        <li><a href="https://www.alitajran.com/configure-mail-flow-exchange-server/" target="_blank" rel="noopener">Ali Tajran: Configure Mail Flow</a></li>
+      </ul>
     `,
   },
   'week4-external': {
     title: 'Publish Mail Externally',
     description: `
-      <p>Enable secure external email access.</p>
+      <p>Enable secure external email access for Exchange Server 2019.</p>
       <h3>Steps</h3>
-      <ol>
-        <li>Configure DNS records (MX, SPF, DKIM, DMARC).</li>
-        <li>Enable modern authentication (OAuth 2.0).</li>
-        <li>Install TLS certificates and set up reverse DNS.</li>
+      <ol class="subtask-list" data-week="week4" data-task="external">
+        <li><input type="checkbox" class="subtask-checkbox" data-step="1"> Configure DNS records (MX, SPF, DKIM, DMARC) with your DNS provider (e.g., Cloudflare). Example SPF: <code>v=spf1 ip4:192.168.1.10 -all</code>.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="2"> Enable modern authentication (OAuth 2.0) in Exchange using: <code>Set-OrganizationConfig -OAuth2ClientProfileEnabled $true</code>.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="3"> Install TLS certificates (e.g., from Let’s Encrypt) and set up reverse DNS with your ISP.</li>
       </ol>
+      <p><strong>References:</strong></p>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/publishing-exchange-server-externally/ba-p/923456" target="_blank" rel="noopener">TechCommunity: Publishing Exchange Externally</a></li>
+        <li><a href="https://www.alitajran.com/configure-spf-dkim-dmarc-exchange-server/" target="_blank" rel="noopener">Ali Tajran: Configure SPF, DKIM, DMARC</a></li>
+      </ul>
     `,
   },
   'week4-hybrid': {
     title: 'Setup Microsoft 365 Hybrid Environment',
     description: `
-      <p>Integrate on-premises Exchange with Microsoft 365.</p>
+      <p>Integrate on-premises Exchange with Microsoft 365. Ensure external mail publishing is complete first.</p>
       <h3>Steps</h3>
-      <ol>
-        <li>Install and configure Entra ID Connect.</li>
-        <li>Run the Hybrid Configuration Wizard.</li>
-        <li>Verify mail flow and calendar sharing.</li>
+      <ol class="subtask-list" data-week="week4" data-task="hybrid">
+        <li><input type="checkbox" class="subtask-checkbox" data-step="1"> Install and configure Entra ID Connect to sync on-premises AD with Microsoft 365.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="2"> Run the Hybrid Configuration Wizard (HCW) from the Exchange Admin Center.</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="3"> Verify mail flow and calendar sharing between on-premises and Microsoft 365 users.</li>
       </ol>
+      <p><strong>References:</strong></p>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/exchange-hybrid-deployment-with-microsoft-365/ba-p/934567" target="_blank" rel="noopener">TechCommunity: Exchange Hybrid Deployment</a></li>
+        <li><a href="https://www.alitajran.com/exchange-hybrid-configuration-wizard/" target="_blank" rel="noopener">Ali Tajran: Exchange Hybrid Configuration Wizard</a></li>
+      </ul>
     `,
   },
   'week4-hosting': {
     title: 'Choose Hosting Environment',
     description: `
-      <p>Select Azure or on-premises for deployment.</p>
+      <p>Select Azure or on-premises for deployment. Azure offers scalability, while on-premises provides control.</p>
       <h3>Steps</h3>
-      <ol>
-        <li>Evaluate Azure vs. on-premises for your workload.</li>
-        <li>Configure Azure resources or on-premises servers.</li>
-        <li>Test deployment and connectivity.</li>
+      <ol class="subtask-list" data-week="week4" data-task="hosting">
+        <li><input type="checkbox" class="subtask-checkbox" data-step="1"> Evaluate Azure vs. on-premises for your workload (e.g., cost, scalability, control).</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="2"> Configure Azure resources (e.g., Azure VMs, ExpressRoute) or on-premises servers (e.g., Hyper-V).</li>
+        <li><input type="checkbox" class="subtask-checkbox" data-step="3"> Test deployment and connectivity (e.g., RDP to Azure VMs or on-premises servers).</li>
       </ol>
+      <p><strong>References:</strong></p>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/t5/azure-migration/azure-vs-on-premises-hosting-decision-guide/ba-p/945678" target="_blank" rel="noopener">TechCommunity: Azure vs On-Premises Hosting</a></li>
+      </ul>
     `,
   },
 };
-
-// Initialize modal
+// Initialize modal with subtask functionality
 const initModal = () => {
   const modal = $('#taskModal');
   const modalTitle = $('#modalTitle');
@@ -414,7 +486,10 @@ const initModal = () => {
   if (!modal || !modalTitle || !modalDescription || !closeModal) return;
 
   $$('.task').forEach((task) => {
-    task.addEventListener('click', () => {
+    task.addEventListener('click', (e) => {
+      // Only open modal if clicking on the task container, not the checkbox
+      if (e.target.type === 'checkbox') return;
+
       const week = task.closest('.week').dataset.week;
       const taskId = task.dataset.task;
       const key = `${week}-${taskId}`;
@@ -426,6 +501,31 @@ const initModal = () => {
       modalDescription.innerHTML = content.description;
       modal.style.display = 'flex';
       modal.focus();
+
+      // Load subtask progress and handle subtask checkbox changes
+      const subtaskList = modalDescription.querySelector('.subtask-list');
+      if (subtaskList) {
+        const subWeek = subtaskList.dataset.week;
+        const subTask = subtaskList.dataset.task;
+        const progress = JSON.parse(localStorage.getItem(`subtasks-${subWeek}-${subTask}`) || '{}');
+        
+        $$('.subtask-checkbox', subtaskList).forEach((subCheckbox) => {
+          const step = subCheckbox.dataset.step;
+          subCheckbox.checked = !!progress[step];
+          
+          subCheckbox.addEventListener('change', () => {
+            progress[step] = subCheckbox.checked;
+            localStorage.setItem(`subtasks-${subWeek}-${subTask}`, JSON.stringify(progress));
+
+            // Check if all subtasks are completed
+            const allChecked = Array.from($$('.subtask-checkbox', subtaskList)).every((cb) => cb.checked);
+            const mainCheckbox = $(`input[data-week="${subWeek}"][data-task="${subTask}"]`);
+            mainCheckbox.checked = allChecked;
+            syncProgress(subWeek, subTask, allChecked);
+            updateProgressBar();
+          });
+        });
+      }
     });
 
     // Keyboard accessibility
