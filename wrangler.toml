@@ -28,7 +28,3 @@ bucket = "./public"
 [build]
 command = ""
 watch_paths = ["functions", "public"]
-
-# Compatibility flags for enhanced features
-[compatibility_flags]
-nodejs_compat = true
