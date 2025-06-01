@@ -9,3 +9,7 @@ id = "92065323806e46ff89949262ba803008"
 [[kv_namespaces]]
 binding = "PROGRESS"
 id = "72beb3bc668347b584984bc61aed9492"
+
+[[kv_namespaces]]
+binding = "kv_namespaces"
+id = "9270297f918d4ef6b970f1b0cec1b997"

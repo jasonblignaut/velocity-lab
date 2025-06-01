@@ -1,4 +1,4 @@
-// Enhanced Main.js for Velocity Lab
+// Complete Main.js for Velocity Lab
 // Handles client-side logic for authentication, progress tracking, modals, and animations
 
 // Utility Functions
@@ -11,11 +11,13 @@ const setCookie = (name, value, days) => {
   date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
   document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/;SameSite=Strict`;
 };
+
 const getCookie = (name) => {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
   return parts.length === 2 ? parts.pop().split(';').shift() : null;
 };
+
 const deleteCookie = (name) => {
   document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Strict`;
 };
@@ -240,7 +242,7 @@ const fetchProgress = async () => {
 
 // Enhanced progress bar with smooth animations
 const updateProgressBar = () => {
-  const tasks = $('.task input[type="checkbox"]');
+  const tasks = document.querySelectorAll('.task input[type="checkbox"]');
   const totalTasks = tasks.length;
   const completedTasks = Array.from(tasks).filter((task) => task.checked).length;
   const percentage = totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0;
@@ -290,6 +292,8 @@ const syncProgress = async (week, task, checked) => {
 const initDashboard = async () => {
   const userInfo = $('#userInfo');
   const logoutLink = $('#logout');
+  
+  // Check if we're on the dashboard page
   if (!userInfo || !logoutLink) return;
 
   const user = JSON.parse(getCookie('user') || '{}');
@@ -298,12 +302,42 @@ const initDashboard = async () => {
     return;
   }
 
-  userInfo.textContent = `${user.name} (${user.role})`;
-  
-  // Show admin link for admin users
-  const adminLink = $('#adminLink');
-  if (adminLink && user.role === 'admin') {
-    adminLink.style.display = 'inline';
+  // Get fresh user data from server to check current role
+  try {
+    const response = await fetch('/api/profile', { credentials: 'same-origin' });
+    if (response.ok) {
+      const profileData = await response.json();
+      // Update cookie with fresh data
+      setCookie('user', JSON.stringify({ 
+        name: profileData.name, 
+        role: profileData.role 
+      }), 1);
+      
+      userInfo.textContent = `${profileData.name} (${profileData.role})`;
+      
+      // Show admin link for admin users
+      const adminLink = $('#adminLink');
+      if (adminLink && profileData.role === 'admin') {
+        adminLink.style.display = 'inline';
+      }
+    } else {
+      userInfo.textContent = `${user.name} (${user.role})`;
+      
+      // Show admin link for admin users (fallback)
+      const adminLink = $('#adminLink');
+      if (adminLink && user.role === 'admin') {
+        adminLink.style.display = 'inline';
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch profile:', error);
+    userInfo.textContent = `${user.name} (${user.role})`;
+    
+    // Show admin link for admin users (fallback)
+    const adminLink = $('#adminLink');
+    if (adminLink && user.role === 'admin') {
+      adminLink.style.display = 'inline';
+    }
   }
   
   // Enhanced logout with smooth transition to home
@@ -342,49 +376,64 @@ const initDashboard = async () => {
   });
 
   // Load and display progress
-  const progress = await fetchProgress();
-  $('.task input[type="checkbox"]').forEach((checkbox) => {
-    const week = checkbox.dataset.week;
-    const task = checkbox.dataset.task;
-    if (progress[week]?.[task]) {
-      checkbox.checked = true;
+  try {
+    const progress = await fetchProgress();
+    const checkboxes = document.querySelectorAll('.task input[type="checkbox"]');
+    
+    // Safety check for dashboard elements
+    if (checkboxes.length === 0) {
+      console.log('No task checkboxes found - may not be on dashboard page');
+      return;
     }
     
-    // Enhanced checkbox interactions
-    checkbox.addEventListener('change', (e) => {
-      const taskElement = e.target.closest('.task');
-      
-      // Visual feedback
-      if (e.target.checked) {
-        taskElement.style.transform = 'scale(1.02)';
-        setTimeout(() => {
-          taskElement.style.transform = '';
-        }, 200);
+    checkboxes.forEach((checkbox) => {
+      const week = checkbox.dataset.week;
+      const task = checkbox.dataset.task;
+      if (progress[week]?.[task]) {
+        checkbox.checked = true;
       }
       
-      syncProgress(week, task, checkbox.checked);
-      updateProgressBar();
+      // Enhanced checkbox interactions
+      checkbox.addEventListener('change', (e) => {
+        const taskElement = e.target.closest('.task');
+        
+        // Visual feedback
+        if (e.target.checked) {
+          taskElement.style.transform = 'scale(1.02)';
+          setTimeout(() => {
+            taskElement.style.transform = '';
+          }, 200);
+        }
+        
+        syncProgress(week, task, checkbox.checked);
+        updateProgressBar();
+      });
     });
-  });
 
-  updateProgressBar();
+    updateProgressBar();
+  } catch (error) {
+    console.error('Dashboard progress initialization error:', error);
+  }
 
   // Enhanced timeline animation
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry, index) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => {
-            entry.target.classList.add('animate');
-          }, index * 100); // Staggered animation
-          observer.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.1 }
-  );
-  
-  $('.week').forEach((week) => observer.observe(week));
+  const weekElements = document.querySelectorAll('.week');
+  if (weekElements.length > 0) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry, index) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => {
+              entry.target.classList.add('animate');
+            }, index * 100); // Staggered animation
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    
+    weekElements.forEach((week) => observer.observe(week));
+  }
 };
 
 // Enhanced profile initialization
@@ -437,6 +486,8 @@ const initProfile = async () => {
       adminLink.style.display = 'inline';
     }
   }
+  
+  // Enhanced logout for profile page
   logoutLink.addEventListener('click', async (e) => {
     e.preventDefault();
     
@@ -504,7 +555,7 @@ const initProfile = async () => {
   initProfilePasswordForm();
 };
 
-// Modal content for tasks (unchanged but enhanced animations)
+// Modal content for tasks
 const taskModalContent = {
   'week1-dc': {
     title: 'Promote Server 2012 to Domain Controller',
@@ -687,12 +738,23 @@ const initModal = () => {
 
   if (!modal || !modalTitle || !modalDescription || !closeModal) return;
 
-  $('.task').forEach((task) => {
+  const taskElements = document.querySelectorAll('.task');
+  
+  // Safety check for task elements
+  if (taskElements.length === 0) {
+    console.log('No task elements found - may not be on dashboard page');
+    return;
+  }
+
+  taskElements.forEach((task) => {
     task.addEventListener('click', (e) => {
       // Don't open modal if clicking checkbox
       if (e.target.type === 'checkbox') return;
       
-      const week = task.closest('.week').dataset.week;
+      const weekElement = task.closest('.week');
+      if (!weekElement) return;
+      
+      const week = weekElement.dataset.week;
       const taskId = task.dataset.task;
       const key = `${week}-${taskId}`;
       const content = taskModalContent[key] || {
@@ -708,7 +770,10 @@ const initModal = () => {
       modal.style.opacity = '0';
       setTimeout(() => {
         modal.style.opacity = '1';
-        modal.querySelector('.modal-content').style.transform = 'scale(1)';
+        const modalContent = modal.querySelector('.modal-content');
+        if (modalContent) {
+          modalContent.style.transform = 'scale(1)';
+        }
       }, 10);
       
       modal.focus();
