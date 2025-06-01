@@ -102,6 +102,20 @@ export async function validateSession(env: Env, request: Request): Promise<strin
   }
 }
 
+// 🔹 Add this function (required for dashboard.ts)
+export async function getSession(env: Env, sessionToken: string): Promise<Session | null> {
+  if (!sessionToken) return null;
+
+  const sessionData = await env.USERS.get(`session:${sessionToken}`);
+  if (!sessionData) return null;
+
+  try {
+    return JSON.parse(sessionData) as Session;
+  } catch {
+    return null;
+  }
+}
+
 // Get user by ID
 export async function getUserById(env: Env, userId: string): Promise<User | null> {
   const userData = await env.USERS.list({ prefix: `user:` });
