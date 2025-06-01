@@ -56,7 +56,11 @@
               </div>
               <div class="task-content">
                 <h4>Promote Server 2012 to Domain Controller</h4>
-                <div class="task-details">Set up Active Directory and DNS services</div>
+                <div class="task-details">Set up Active Directory and DNS services for centralized domain management</div>
+                <div class="task-refs">
+                  <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-active-directory-domain-services--level-100-" target="_blank" rel="noopener">📚 MS Learn: Install AD DS</a> • 
+                  <a href="https://techcommunity.microsoft.com/t5/windows-server-for-it-pros/installing-active-directory-domain-services-on-windows-server/m-p/572305" target="_blank" rel="noopener">💡 Tech Community Guide</a>
+                </div>
               </div>
             </div>
             <div class="task" data-task="vm" role="button" tabindex="0" aria-label="Join VM to Domain">
@@ -68,7 +72,11 @@
               </div>
               <div class="task-content">
                 <h4>Join VM to Domain</h4>
-                <div class="task-details">Enable domain-based management</div>
+                <div class="task-details">Enable domain-based management and authentication for virtual machines</div>
+                <div class="task-refs">
+                  <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/join-a-computer-to-a-domain" target="_blank" rel="noopener">📚 MS Learn: Join Computer to Domain</a> • 
+                  <a href="https://alitajran.com/join-windows-server-2019-to-domain/" target="_blank" rel="noopener">🔧 Alitajran: Domain Join Guide</a>
+                </div>
               </div>
             </div>
             <div class="task" data-task="share" role="button" tabindex="0" aria-label="Configure Network Share on DC">
@@ -80,11 +88,15 @@
               </div>
               <div class="task-content">
                 <h4>Configure Network Share on DC</h4>
-                <div class="task-details">Create centralized file storage with secure access</div>
+                <div class="task-details">Create centralized file storage with secure access and automatic drive mapping</div>
                 <div class="subtasks">
-                  <div class="subtask">Map drives automatically on logon</div>
-                  <div class="subtask">Share must not be visible (hidden share)</div>
-                  <div class="subtask">Use different methods to map three drives (GPO, PowerShell, logon scripts)</div>
+                  <div class="subtask">• Map drives automatically on logon using GPO</div>
+                  <div class="subtask">• Create hidden share (Share$ format) for security</div>
+                  <div class="subtask">• Use three different mapping methods: GPO, PowerShell, and logon scripts</div>
+                </div>
+                <div class="task-refs">
+                  <a href="https://learn.microsoft.com/en-us/windows-server/storage/file-server/file-server-resource-manager/file-server-resource-manager-overview" target="_blank" rel="noopener">📚 MS Learn: File Server Resource Manager</a> • 
+                  <a href="https://alitajran.com/map-network-drives-with-group-policy/" target="_blank" rel="noopener">🔧 Alitajran: Map Drives via GPO</a>
                 </div>
               </div>
             </div>
@@ -97,7 +109,11 @@
               </div>
               <div class="task-content">
                 <h4>Create Security Group</h4>
-                <div class="task-details">Only users in group must have access to the network drive</div>
+                <div class="task-details">Implement role-based access control - only group members can access network drives</div>
+                <div class="task-refs">
+                  <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups" target="_blank" rel="noopener">📚 MS Learn: Security Groups</a> • 
+                  <a href="https://techcommunity.microsoft.com/t5/windows-server-for-it-pros/active-directory-security-groups-best-practices/m-p/1145319" target="_blank" rel="noopener">💡 Tech Community: Security Best Practices</a>
+                </div>
               </div>
             </div>
           </div>
@@ -125,7 +141,11 @@
               </div>
               <div class="task-content">
                 <h4>Install Second Server 2012</h4>
-                <div class="task-details">Add redundancy to the environment</div>
+                <div class="task-details">Add redundancy and load distribution with a secondary domain controller</div>
+                <div class="task-refs">
+                  <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-a-replica-windows-server-2016-domain-controller-in-an-existing-domain--level-200-" target="_blank" rel="noopener">📚 MS Learn: Install Replica DC</a> • 
+                  <a href="https://alitajran.com/install-additional-domain-controller/" target="_blank" rel="noopener">🔧 Alitajran: Additional DC Setup</a>
+                </div>
               </div>
             </div>
             <div class="task" data-task="wsus" role="button" tabindex="0" aria-label="Setup WSUS">
@@ -137,7 +157,11 @@
               </div>
               <div class="task-content">
                 <h4>Setup WSUS</h4>
-                <div class="task-details">Manage updates with Windows Server Update Services</div>
+                <div class="task-details">Centralize Windows updates with Windows Server Update Services for better control</div>
+                <div class="task-refs">
+                  <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-server-update-services/get-started/windows-server-update-services-wsus" target="_blank" rel="noopener">📚 MS Learn: WSUS Overview</a> • 
+                  <a href="https://techcommunity.microsoft.com/t5/windows-server-for-it-pros/windows-server-update-services-wsus-best-practices/m-p/1096945" target="_blank" rel="noopener">💡 Tech Community: WSUS Best Practices</a>
+                </div>
               </div>
             </div>
             <div class="task" data-task="time" role="button" tabindex="0" aria-label="Setup Two Time Servers">
@@ -149,7 +173,11 @@
               </div>
               <div class="task-content">
                 <h4>Setup Two Time Servers</h4>
-                <div class="task-details">Ensure time synchronization across the domain</div>
+                <div class="task-details">Ensure accurate time synchronization across the domain with redundant NTP sources</div>
+                <div class="task-refs">
+                  <a href="https://learn.microsoft.com/en-us/windows-server/networking/windows-time-service/windows-time-service-top" target="_blank" rel="noopener">📚 MS Learn: Windows Time Service</a> • 
+                  <a href="https://alitajran.com/configure-ntp-on-windows-server/" target="_blank" rel="noopener">🔧 Alitajran: Configure NTP Server</a>
+                </div>
               </div>
             </div>
           </div>
@@ -177,7 +205,11 @@
               </div>
               <div class="task-content">
                 <h4>Upgrade Servers to 2016</h4>
-                <div class="task-details">Modernize infrastructure for enhanced capabilities</div>
+                <div class="task-details">Modernize infrastructure for enhanced security, performance, and Exchange compatibility</div>
+                <div class="task-refs">
+                  <a href="https://learn.microsoft.com/en-us/windows-server/upgrade/upgrade-2012-to-2016" target="_blank" rel="noopener">📚 MS Learn: Upgrade to Server 2016</a> • 
+                  <a href="https://techcommunity.microsoft.com/t5/windows-server-for-it-pros/upgrading-from-windows-server-2012-r2-to-windows-server-2016/m-p/393194" target="_blank" rel="noopener">💡 Tech Community: Upgrade Guide</a>
+                </div>
               </div>
             </div>
             <div class="task" data-task="exchange" role="button" tabindex="0" aria-label="Install Third Server with Exchange">
@@ -189,7 +221,11 @@
               </div>
               <div class="task-content">
                 <h4>Install Third Server with Exchange</h4>
-                <div class="task-details">Deploy email services on a third server</div>
+                <div class="task-details">Deploy Exchange Server 2019 on dedicated hardware for email services</div>
+                <div class="task-refs">
+                  <a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/deploy-new-installations/install-exchange-mailbox-role?view=exchserver-2019" target="_blank" rel="noopener">📚 MS Learn: Install Exchange 2019</a> • 
+                  <a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/exchange-server-2019-setup-amp-deployment-guide/ba-p/1128616" target="_blank" rel="noopener">💡 Tech Community: Exchange Setup Guide</a>
+                </div>
               </div>
             </div>
             <div class="task" data-task="mailbox" role="button" tabindex="0" aria-label="Create Mailbox for User">
@@ -201,7 +237,11 @@
               </div>
               <div class="task-content">
                 <h4>Create Mailbox for User</h4>
-                <div class="task-details">Set up email accounts for users</div>
+                <div class="task-details">Provision email accounts and configure mailbox settings for domain users</div>
+                <div class="task-refs">
+                  <a href="https://learn.microsoft.com/en-us/exchange/recipients/create-user-mailboxes?view=exchserver-2019" target="_blank" rel="noopener">📚 MS Learn: Create User Mailboxes</a> • 
+                  <a href="https://alitajran.com/create-mailbox-exchange-server/" target="_blank" rel="noopener">🔧 Alitajran: Create Exchange Mailbox</a>
+                </div>
               </div>
             </div>
             <div class="task" data-task="mail" role="button" tabindex="0" aria-label="Get Internal Mail Flow Working">
@@ -213,7 +253,11 @@
               </div>
               <div class="task-content">
                 <h4>Get Internal Mail Flow Working</h4>
-                <div class="task-details">Enable email delivery between users</div>
+                <div class="task-details">Configure send/receive connectors and test email delivery between internal users</div>
+                <div class="task-refs">
+                  <a href="https://learn.microsoft.com/en-us/exchange/mail-flow/connectors/connectors?view=exchserver-2019" target="_blank" rel="noopener">📚 MS Learn: Mail Flow Connectors</a> • 
+                  <a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/troubleshooting-mail-flow-in-exchange-server/ba-p/1087449" target="_blank" rel="noopener">💡 Tech Community: Troubleshoot Mail Flow</a>
+                </div>
               </div>
             </div>
           </div>
@@ -241,11 +285,15 @@
               </div>
               <div class="task-content">
                 <h4>Publishing Mail Externally</h4>
-                <div class="task-details">Enable secure external email access</div>
+                <div class="task-details">Enable secure external email access with proper DNS records and security protocols</div>
                 <div class="subtasks">
-                  <div class="subtask">Configure MX, SPF, DKIM, and DMARC records</div>
-                  <div class="subtask">Enable modern authentication (OAuth 2.0)</div>
-                  <div class="subtask">Set up TLS certificates and reverse DNS</div>
+                  <div class="subtask">• Configure MX, SPF, DKIM, and DMARC records for email authentication</div>
+                  <div class="subtask">• Enable modern authentication (OAuth 2.0) for enhanced security</div>
+                  <div class="subtask">• Set up TLS certificates and configure reverse DNS for reputation</div>
+                </div>
+                <div class="task-refs">
+                  <a href="https://learn.microsoft.com/en-us/exchange/mail-flow/mail-routing/external-mail-flow?view=exchserver-2019" target="_blank" rel="noopener">📚 MS Learn: External Mail Flow</a> • 
+                  <a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/email-authentication-spf-dkim-and-dmarc/ba-p/1072258" target="_blank" rel="noopener">💡 Tech Community: Email Authentication</a>
                 </div>
               </div>
             </div>
@@ -257,13 +305,18 @@
                 </svg>
               </div>
               <div class="task-content">
-                <h4>Setup 365 Hybrid Environment</h4>
-                <div class="task-details">Integrate on-premises Exchange with Microsoft 365</div>
+                <h4>Setup Microsoft 365 Hybrid Environment</h4>
+                <div class="task-details">Integrate on-premises Exchange with Microsoft 365 for seamless hybrid operations</div>
                 <div class="subtasks">
-                  <div class="subtask">Configure Entra ID Connect for hybrid identity</div>
-                  <div class="subtask">Run Hybrid Configuration Wizard</div>
-                  <div class="subtask">Verify mail flow and calendar sharing</div>
-                  <div class="subtask">Note: Only do this once the first step of week 4 is complete</div>
+                  <div class="subtask">• Configure Entra ID Connect for hybrid identity synchronization</div>
+                  <div class="subtask">• Run Hybrid Configuration Wizard to establish trust relationship</div>
+                  <div class="subtask">• Verify bidirectional mail flow and calendar sharing functionality</div>
+                  <div class="subtask">• 📋 <strong>Important:</strong> Complete external mail publishing (Week 4 Task 1) before proceeding</div>
+                </div>
+                <div class="task-refs">
+                  <a href="https://learn.microsoft.com/en-us/exchange/hybrid-deployment/hybrid-deployment" target="_blank" rel="noopener">📚 MS Learn: Exchange Hybrid Deployment</a> • 
+                  <a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/exchange-hybrid-deployment-step-by-step-guide/ba-p/1044294" target="_blank" rel="noopener">💡 Tech Community: Hybrid Step-by-Step</a> • 
+                  <a href="https://alitajran.com/exchange-hybrid-configuration/" target="_blank" rel="noopener">🔧 Alitajran: Hybrid Configuration</a>
                 </div>
               </div>
             </div>
@@ -279,5 +332,114 @@
       <section id="modalDescription"></section>
     </div>
   </div>
+
+  <style>
+    /* Enhanced task styling for reference links */
+    .task-refs {
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-light);
+      font-size: 0.8125rem;
+      line-height: 1.4;
+    }
+    
+    .task-refs a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .task-refs a:hover {
+      text-decoration: underline;
+      color: var(--primary-dark);
+    }
+    
+    .task-refs a:focus {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    
+    /* Enhanced subtasks styling */
+    .subtasks {
+      margin-top: var(--space-3);
+      padding-left: 0;
+    }
+    
+    .subtask {
+      font-size: 0.8125rem;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-1);
+      position: relative;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+      padding-left: 8px;
+    }
+    
+    .subtask strong {
+      color: var(--warning);
+      font-weight: 600;
+    }
+    
+    /* Improved task content layout */
+    .task-content {
+      flex: 1;
+      min-width: 0;
+      padding-right: var(--space-2);
+    }
+    
+    .task-content h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+      color: var(--text-primary);
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+    }
+    
+    .task-details {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: var(--space-2);
+      letter-spacing: -0.01em;
+    }
+    
+    /* Enhanced responsive design for task references */
+    @media (max-width: 768px) {
+      .task-refs {
+        font-size: 0.75rem;
+      }
+      
+      .task-refs a {
+        display: block;
+        margin-bottom: 4px;
+      }
+      
+      .subtask {
+        font-size: 0.75rem;
+        line-height: 1.3;
+      }
+    }
+    
+    /* Accessibility improvements */
+    .task-refs a:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    
+    /* External link indicator styling */
+    .task-refs a[target="_blank"]::after {
+      content: "↗";
+      font-size: 0.75rem;
+      margin-left: 2px;
+      opacity: 0.7;
+    }
+  </style>
 </body>
 </html>
