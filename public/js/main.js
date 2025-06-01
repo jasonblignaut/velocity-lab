@@ -703,17 +703,19 @@ async function init() {
   }
 }
 
- // Initialize CSRF tokens
- await initForms();
+(async () => {
+  // Initialize CSRF tokens
+  await initForms();
 
- // Page-specific initialization
- if (path === '/dashboard.html') {
-   await initDashboard();
- } else if (path === '/profile.html') {
-   await initProfile();
- } else if (path === '/admin.html') {
-   await initAdminDashboard();
- }
+  // Page-specific initialization
+  if (path === '/dashboard.html') {
+    await initDashboard();
+  } else if (path === '/profile.html') {
+    await initProfile();
+  } else if (path === '/admin.html') {
+    await initAdminDashboard();
+  }
+})();
 
  // Setup form handlers
  setupFormHandlers();
