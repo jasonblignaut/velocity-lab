@@ -1,13 +1,12 @@
 // functions/api/[[path]].ts
-// Centralized API router for Velocity Lab
+// Centralized API router for Velocity Lab - ADMIN INITIALIZATION REMOVED
 
 import { 
   jsonResponse, 
   errorResponse, 
   validateSession,
   getUserById,
-  checkRateLimit,
-  initializeDefaultAdmin
+  checkRateLimit
 } from '../utils';
 import type { Env } from '../utils';
 
@@ -58,9 +57,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   console.log('API POST request to:', path);
 
   try {
-    // Initialize default admin
-    await initializeDefaultAdmin(env);
-
     // Rate limiting
     const ip = request.headers.get('cf-connecting-ip') || 'unknown';
     if (!(await checkRateLimit(env, ip, 30))) {

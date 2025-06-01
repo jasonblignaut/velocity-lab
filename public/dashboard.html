@@ -59,6 +59,13 @@
               <div class="task-content">
                 <h4>Install Active Directory Domain Services Role</h4>
                 <div class="task-details">Install the foundational AD DS role on Windows Server 2012</div>
+                <div class="subtasks">
+                  <div class="subtask">• Open Server Manager Dashboard</div>
+                  <div class="subtask">• Click "Add roles and features"</div>
+                  <div class="subtask">• Select "Role-based or feature-based installation"</div>
+                  <div class="subtask">• Choose server and select AD DS role</div>
+                  <div class="subtask">• Add required features and complete installation</div>
+                </div>
               </div>
             </div>
 
@@ -73,6 +80,12 @@
               <div class="task-content">
                 <h4>Promote Server to Domain Controller</h4>
                 <div class="task-details">Configure as primary DC with DNS services and create new forest</div>
+                <div class="subtasks">
+                  <div class="subtask">• Click notification flag and promote server</div>
+                  <div class="subtask">• Add new forest with domain name (lab.local)</div>
+                  <div class="subtask">• Set functional levels and enable DNS</div>
+                  <div class="subtask">• Configure DSRM password and complete promotion</div>
+                </div>
               </div>
             </div>
 
@@ -87,6 +100,12 @@
               <div class="task-content">
                 <h4>Configure VM DNS Settings</h4>
                 <div class="task-details">Point virtual machine to use domain controller as DNS server</div>
+                <div class="subtasks">
+                  <div class="subtask">• Open Network and Sharing Center</div>
+                  <div class="subtask">• Change adapter settings and properties</div>
+                  <div class="subtask">• Configure TCP/IPv4 DNS settings</div>
+                  <div class="subtask">• Test connectivity with nslookup</div>
+                </div>
               </div>
             </div>
 
@@ -101,6 +120,12 @@
               <div class="task-content">
                 <h4>Join VM to Domain</h4>
                 <div class="task-details">Add virtual machine to domain for centralized management</div>
+                <div class="subtasks">
+                  <div class="subtask">• Access computer properties</div>
+                  <div class="subtask">• Change computer name settings</div>
+                  <div class="subtask">• Join domain with credentials</div>
+                  <div class="subtask">• Restart and verify domain login</div>
+                </div>
               </div>
             </div>
 
@@ -115,6 +140,12 @@
               <div class="task-content">
                 <h4>Create Hidden Network Share</h4>
                 <div class="task-details">Set up centralized file storage with hidden share (CompanyData$)</div>
+                <div class="subtasks">
+                  <div class="subtask">• Create C:\CompanyData folder</div>
+                  <div class="subtask">• Configure advanced sharing settings</div>
+                  <div class="subtask">• Set hidden share name (CompanyData$)</div>
+                  <div class="subtask">• Configure permissions and test access</div>
+                </div>
               </div>
             </div>
 
@@ -129,6 +160,12 @@
               <div class="task-content">
                 <h4>Map Drive via Group Policy (Method 1)</h4>
                 <div class="task-details">Configure automatic drive mapping through Group Policy preferences</div>
+                <div class="subtasks">
+                  <div class="subtask">• Open Group Policy Management Console</div>
+                  <div class="subtask">• Create "Drive Mapping Policy" GPO</div>
+                  <div class="subtask">• Configure drive maps in preferences</div>
+                  <div class="subtask">• Link GPO and test deployment</div>
+                </div>
               </div>
             </div>
 
@@ -143,6 +180,12 @@
               <div class="task-content">
                 <h4>Map Drive via Logon Script (Method 2)</h4>
                 <div class="task-details">Create PowerShell logon script for automatic drive mapping</div>
+                <div class="subtasks">
+                  <div class="subtask">• Create PowerShell script in SYSVOL</div>
+                  <div class="subtask">• Add New-PSDrive command</div>
+                  <div class="subtask">• Configure logon script in GPO</div>
+                  <div class="subtask">• Test script execution</div>
+                </div>
               </div>
             </div>
 
@@ -157,6 +200,12 @@
               <div class="task-content">
                 <h4>Create Security Group for Share Access</h4>
                 <div class="task-details">Implement role-based access control using AD security groups</div>
+                <div class="subtasks">
+                  <div class="subtask">• Open AD Users and Computers</div>
+                  <div class="subtask">• Create new security group</div>
+                  <div class="subtask">• Add users to group</div>
+                  <div class="subtask">• Configure share permissions for group</div>
+                </div>
               </div>
             </div>
           </div>
@@ -188,6 +237,12 @@
               <div class="task-content">
                 <h4>Install Second Windows Server 2012</h4>
                 <div class="task-details">Deploy second server for redundancy and load distribution</div>
+                <div class="subtasks">
+                  <div class="subtask">• Create new VM with adequate resources</div>
+                  <div class="subtask">• Install Windows Server 2012</div>
+                  <div class="subtask">• Configure network and DNS settings</div>
+                  <div class="subtask">• Join server to domain</div>
+                </div>
               </div>
             </div>
 
@@ -202,6 +257,12 @@
               <div class="task-content">
                 <h4>Promote to Additional Domain Controller</h4>
                 <div class="task-details">Add redundancy with second domain controller in environment</div>
+                <div class="subtasks">
+                  <div class="subtask">• Install AD DS role on second server</div>
+                  <div class="subtask">• Promote to additional DC</div>
+                  <div class="subtask">• Configure DNS and Global Catalog</div>
+                  <div class="subtask">• Test replication and failover</div>
+                </div>
               </div>
             </div>
 
@@ -216,6 +277,12 @@
               <div class="task-content">
                 <h4>Install WSUS Role</h4>
                 <div class="task-details">Deploy Windows Server Update Services for centralized updates</div>
+                <div class="subtasks">
+                  <div class="subtask">• Add WSUS role in Server Manager</div>
+                  <div class="subtask">• Configure database and content location</div>
+                  <div class="subtask">• Run post-deployment configuration</div>
+                  <div class="subtask">• Synchronize with Microsoft Update</div>
+                </div>
               </div>
             </div>
 
@@ -230,6 +297,12 @@
               <div class="task-content">
                 <h4>Configure WSUS Client Policies</h4>
                 <div class="task-details">Set up Group Policy to direct clients to use WSUS server</div>
+                <div class="subtasks">
+                  <div class="subtask">• Create WSUS Client Configuration GPO</div>
+                  <div class="subtask">• Configure intranet update service location</div>
+                  <div class="subtask">• Set automatic update settings</div>
+                  <div class="subtask">• Test client connectivity to WSUS</div>
+                </div>
               </div>
             </div>
 
@@ -244,6 +317,12 @@
               <div class="task-content">
                 <h4>Configure Primary Time Server</h4>
                 <div class="task-details">Set PDC Emulator as authoritative time source with external NTP</div>
+                <div class="subtasks">
+                  <div class="subtask">• Identify PDC Emulator with netdom</div>
+                  <div class="subtask">• Configure external time source</div>
+                  <div class="subtask">• Set as reliable time server</div>
+                  <div class="subtask">• Restart Windows Time service and verify</div>
+                </div>
               </div>
             </div>
 
@@ -258,6 +337,12 @@
               <div class="task-content">
                 <h4>Configure Secondary Time Server</h4>
                 <div class="task-details">Set second DC as backup time source with domain hierarchy sync</div>
+                <div class="subtasks">
+                  <div class="subtask">• Configure domain hierarchy sync</div>
+                  <div class="subtask">• Set as non-reliable time source</div>
+                  <div class="subtask">• Force synchronization with PDC</div>
+                  <div class="subtask">• Test time sync across domain</div>
+                </div>
               </div>
             </div>
           </div>
@@ -289,6 +374,12 @@
               <div class="task-content">
                 <h4>Prepare for Server 2016 Upgrade</h4>
                 <div class="task-details">Create backups and verify compatibility for OS upgrade</div>
+                <div class="subtasks">
+                  <div class="subtask">• Run compatibility check</div>
+                  <div class="subtask">• Create full system backups</div>
+                  <div class="subtask">• Verify hardware compatibility</div>
+                  <div class="subtask">• Plan upgrade sequence</div>
+                </div>
               </div>
             </div>
 
@@ -303,6 +394,12 @@
               <div class="task-content">
                 <h4>Execute Server 2016 Upgrade</h4>
                 <div class="task-details">Perform in-place upgrade and raise functional levels</div>
+                <div class="subtasks">
+                  <div class="subtask">• Upgrade secondary DC first</div>
+                  <div class="subtask">• Run Server 2016 setup</div>
+                  <div class="subtask">• Verify roles and features</div>
+                  <div class="subtask">• Raise functional levels</div>
+                </div>
               </div>
             </div>
 
@@ -317,6 +414,12 @@
               <div class="task-content">
                 <h4>Prepare Exchange Server Installation</h4>
                 <div class="task-details">Install prerequisites and extend AD schema for Exchange</div>
+                <div class="subtasks">
+                  <div class="subtask">• Install Server 2016 on third server</div>
+                  <div class="subtask">• Install .NET Framework and prerequisites</div>
+                  <div class="subtask">• Extend AD schema for Exchange</div>
+                  <div class="subtask">• Verify all prerequisites</div>
+                </div>
               </div>
             </div>
 
@@ -331,6 +434,12 @@
               <div class="task-content">
                 <h4>Install Exchange Server 2019</h4>
                 <div class="task-details">Deploy Exchange with Mailbox role on third server</div>
+                <div class="subtasks">
+                  <div class="subtask">• Run Exchange setup as administrator</div>
+                  <div class="subtask">• Select Mailbox role installation</div>
+                  <div class="subtask">• Configure organization settings</div>
+                  <div class="subtask">• Install latest cumulative update</div>
+                </div>
               </div>
             </div>
 
@@ -345,6 +454,12 @@
               <div class="task-content">
                 <h4>Configure Exchange Post-Installation</h4>
                 <div class="task-details">Set up connectors, policies, and certificates</div>
+                <div class="subtasks">
+                  <div class="subtask">• Access Exchange Admin Center</div>
+                  <div class="subtask">• Configure accepted domains</div>
+                  <div class="subtask">• Set up email address policies</div>
+                  <div class="subtask">• Configure connectors and certificates</div>
+                </div>
               </div>
             </div>
 
@@ -359,6 +474,12 @@
               <div class="task-content">
                 <h4>Create User Mailboxes</h4>
                 <div class="task-details">Provision mailboxes for domain users and configure settings</div>
+                <div class="subtasks">
+                  <div class="subtask">• Navigate to Recipients > Mailboxes</div>
+                  <div class="subtask">• Create new user mailboxes</div>
+                  <div class="subtask">• Configure mailbox settings and quotas</div>
+                  <div class="subtask">• Enable mailbox features</div>
+                </div>
               </div>
             </div>
 
@@ -373,6 +494,12 @@
               <div class="task-content">
                 <h4>Test Mailbox Functionality</h4>
                 <div class="task-details">Verify OWA access, Outlook configuration, and basic features</div>
+                <div class="subtasks">
+                  <div class="subtask">• Test Outlook Web Access (OWA)</div>
+                  <div class="subtask">• Configure Outlook profiles</div>
+                  <div class="subtask">• Send test emails between mailboxes</div>
+                  <div class="subtask">• Test calendar and GAL functionality</div>
+                </div>
               </div>
             </div>
 
@@ -387,6 +514,12 @@
               <div class="task-content">
                 <h4>Configure Internal Mail Flow</h4>
                 <div class="task-details">Set up connectors and test email delivery between users</div>
+                <div class="subtasks">
+                  <div class="subtask">• Configure receive connectors</div>
+                  <div class="subtask">• Set up Hub Transport service</div>
+                  <div class="subtask">• Test mail flow between mailboxes</div>
+                  <div class="subtask">• Use Test-Mailflow cmdlet</div>
+                </div>
               </div>
             </div>
           </div>
@@ -418,6 +551,12 @@
               <div class="task-content">
                 <h4>Configure DNS Records for External Mail</h4>
                 <div class="task-details">Set up MX, SPF, DKIM, and DMARC records for email authentication</div>
+                <div class="subtasks">
+                  <div class="subtask">• Create MX and A records</div>
+                  <div class="subtask">• Configure reverse DNS (PTR)</div>
+                  <div class="subtask">• Set up SPF record</div>
+                  <div class="subtask">• Create DKIM and DMARC records</div>
+                </div>
               </div>
             </div>
 
@@ -432,6 +571,12 @@
               <div class="task-content">
                 <h4>Configure Firewall and Network Security</h4>
                 <div class="task-details">Set up port forwarding and security rules for external access</div>
+                <div class="subtasks">
+                  <div class="subtask">• Configure SMTP port forwarding (25, 587)</div>
+                  <div class="subtask">• Set up HTTPS (443) and secure ports</div>
+                  <div class="subtask">• Configure Windows Firewall rules</div>
+                  <div class="subtask">• Test external connectivity</div>
+                </div>
               </div>
             </div>
 
@@ -446,6 +591,12 @@
               <div class="task-content">
                 <h4>Install and Configure SSL Certificates</h4>
                 <div class="task-details">Secure external communications with proper TLS certificates</div>
+                <div class="subtasks">
+                  <div class="subtask">• Generate Certificate Signing Request</div>
+                  <div class="subtask">• Purchase SSL certificate from CA</div>
+                  <div class="subtask">• Install certificate on Exchange</div>
+                  <div class="subtask">• Assign to services and test</div>
+                </div>
               </div>
             </div>
 
@@ -460,6 +611,12 @@
               <div class="task-content">
                 <h4>Configure Modern Authentication</h4>
                 <div class="task-details">Implement OAuth 2.0 and modern authentication protocols</div>
+                <div class="subtasks">
+                  <div class="subtask">• Enable modern auth in Exchange Online</div>
+                  <div class="subtask">• Configure Azure AD app registration</div>
+                  <div class="subtask">• Set up OAuth endpoints</div>
+                  <div class="subtask">• Test with Outlook clients</div>
+                </div>
               </div>
             </div>
 
@@ -474,6 +631,12 @@
               <div class="task-content">
                 <h4>Prepare for Hybrid Configuration</h4>
                 <div class="task-details">Set up Microsoft 365 tenant and Azure AD Connect</div>
+                <div class="subtasks">
+                  <div class="subtask">• Create Microsoft 365 tenant</div>
+                  <div class="subtask">• Purchase Exchange Online licenses</div>
+                  <div class="subtask">• Install Azure AD Connect</div>
+                  <div class="subtask">• Synchronize users to Azure AD</div>
+                </div>
               </div>
             </div>
 
@@ -488,6 +651,12 @@
               <div class="task-content">
                 <h4>Run Hybrid Configuration Wizard</h4>
                 <div class="task-details">Execute wizard to establish trust and mail routing</div>
+                <div class="subtasks">
+                  <div class="subtask">• Launch Hybrid Configuration Wizard</div>
+                  <div class="subtask">• Sign in with Global Admin credentials</div>
+                  <div class="subtask">• Configure hybrid features</div>
+                  <div class="subtask">• Monitor progress and resolve errors</div>
+                </div>
               </div>
             </div>
 
@@ -502,6 +671,12 @@
               <div class="task-content">
                 <h4>Configure Hybrid Mail Flow</h4>
                 <div class="task-details">Set up bidirectional mail flow between on-premises and cloud</div>
+                <div class="subtasks">
+                  <div class="subtask">• Configure inbound connector in Exchange Online</div>
+                  <div class="subtask">• Set up outbound connector for on-premises</div>
+                  <div class="subtask">• Test mail flow both directions</div>
+                  <div class="subtask">• Set up monitoring and alerts</div>
+                </div>
               </div>
             </div>
 
@@ -516,6 +691,12 @@
               <div class="task-content">
                 <h4>Verify Hybrid Functionality</h4>
                 <div class="task-details">Test and validate all hybrid features and functionality</div>
+                <div class="subtasks">
+                  <div class="subtask">• Test cross-premises free/busy sharing</div>
+                  <div class="subtask">• Verify mail tips between environments</div>
+                  <div class="subtask">• Test mailbox moves</div>
+                  <div class="subtask">• Document configuration and train users</div>
+                </div>
               </div>
             </div>
           </div>
@@ -533,7 +714,7 @@
   </div>
 
   <style>
-    /* Enhanced task styling for comprehensive layout */
+    /* Enhanced task styling for comprehensive layout with subtasks */
     .task {
       display: flex;
       align-items: flex-start;
@@ -631,6 +812,35 @@
       color: var(--text-secondary);
       line-height: 1.4;
       letter-spacing: -0.01em;
+      margin-bottom: var(--space-3);
+    }
+
+    .subtasks {
+      margin-top: var(--space-3);
+      padding-left: var(--space-4);
+      border-left: 2px solid var(--border-light);
+    }
+
+    .subtask {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-1);
+      position: relative;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+      padding: var(--space-1) 0;
+    }
+
+    .subtask::before {
+      content: '';
+      position: absolute;
+      left: -var(--space-4);
+      top: 50%;
+      width: 4px;
+      height: 4px;
+      background: var(--primary);
+      border-radius: 50%;
+      transform: translateY(-50%);
     }
 
     /* Enhanced week card styling for comprehensive tasks */
@@ -710,6 +920,15 @@
         line-height: 1.3;
       }
 
+      .subtasks {
+        padding-left: var(--space-3);
+        margin-top: var(--space-2);
+      }
+
+      .subtask {
+        font-size: 0.7rem;
+      }
+
       .week-card {
         padding: var(--space-5);
       }
@@ -737,6 +956,14 @@
 
       .task-details {
         font-size: 0.7rem;
+      }
+
+      .subtasks {
+        padding-left: var(--space-2);
+      }
+
+      .subtask {
+        font-size: 0.65rem;
       }
     }
   </style>

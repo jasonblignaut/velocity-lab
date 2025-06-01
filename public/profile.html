@@ -63,64 +63,288 @@
         </div>
       </div>
 
-      <!-- Progress Statistics Section -->
+      <!-- FIXED: Progress Statistics Section with 30-Task System -->
       <div class="profile-section">
         <h3>Your Progress Statistics</h3>
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-value" id="totalProgress">0%</div>
             <div class="stat-label">Overall Progress</div>
+            <div class="stat-description">Completion across all 30 tasks</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value" id="completedTasks">0/14</div>
+            <div class="stat-value" id="completedTasks">0/30</div>
             <div class="stat-label">Tasks Completed</div>
+            <div class="stat-description">Your current task completion</div>
           </div>
           <div class="stat-card">
             <div class="stat-value" id="currentWeek">Week 1</div>
             <div class="stat-label">Current Focus</div>
+            <div class="stat-description">Your recommended next week</div>
           </div>
           <div class="stat-card">
             <div class="stat-value" id="userRank">#-</div>
             <div class="stat-label">Leaderboard Rank</div>
+            <div class="stat-description">Your position among all users</div>
           </div>
         </div>
       </div>
 
-      <!-- Weekly Progress Breakdown -->
+      <!-- FIXED: Enhanced Weekly Progress Breakdown - All 4 Weeks with Proper Task Counts -->
       <div class="profile-section">
         <h3>Weekly Progress Breakdown</h3>
+        <p class="section-description">Track your completion across the comprehensive 30-task training program</p>
+        
         <div class="week-progress-grid">
-          <div class="week-progress-item">
-            <div class="week-number">Week 1</div>
+          <!-- Week 1: Foundation Setup (8 tasks) -->
+          <div class="week-progress-item" data-week="week1">
+            <div class="week-header">
+              <div class="week-number">Week 1</div>
+              <div class="week-badge">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 6h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2"/>
+                </svg>
+              </div>
+            </div>
             <div class="week-title">Foundation Setup</div>
+            <div class="week-description">Active Directory, DNS, Domain joining, and file sharing setup</div>
             <div class="week-progress-bar">
               <div class="week-progress-fill" id="week1Progress" style="width: 0%"></div>
             </div>
-            <div class="week-progress-text" id="week1Text">0/4 tasks</div>
+            <div class="week-progress-stats">
+              <div class="week-progress-text" id="week1Text">0/8 tasks</div>
+              <div class="week-progress-percentage" id="week1Percentage">0%</div>
+            </div>
+            <div class="week-task-list">
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Install Active Directory Domain Services Role</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Promote Server to Domain Controller</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Configure VM DNS Settings</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Join VM to Domain</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Create Hidden Network Share</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Map Drive via Group Policy</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Map Drive via Logon Script</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Create Security Group for Share Access</span>
+              </div>
+            </div>
           </div>
-          <div class="week-progress-item">
-            <div class="week-number">Week 2</div>
+
+          <!-- Week 2: Infrastructure Expansion (6 tasks) -->
+          <div class="week-progress-item" data-week="week2">
+            <div class="week-header">
+              <div class="week-number">Week 2</div>
+              <div class="week-badge">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m1 5v4h4v2h-4v4h-2v-4H7v-2h4V9h2"/>
+                </svg>
+              </div>
+            </div>
             <div class="week-title">Infrastructure Expansion</div>
+            <div class="week-description">Additional domain controllers, WSUS deployment, and time synchronization</div>
             <div class="week-progress-bar">
               <div class="week-progress-fill" id="week2Progress" style="width: 0%"></div>
             </div>
-            <div class="week-progress-text" id="week2Text">0/3 tasks</div>
+            <div class="week-progress-stats">
+              <div class="week-progress-text" id="week2Text">0/6 tasks</div>
+              <div class="week-progress-percentage" id="week2Percentage">0%</div>
+            </div>
+            <div class="week-task-list">
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Install Second Windows Server 2012</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Promote to Additional Domain Controller</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Install WSUS Role</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Configure WSUS Client Policies</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Configure Primary Time Server</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Configure Secondary Time Server</span>
+              </div>
+            </div>
           </div>
-          <div class="week-progress-item">
-            <div class="week-number">Week 3</div>
-            <div class="week-title">Email & Messaging</div>
+
+          <!-- Week 3: Email & Messaging (8 tasks) -->
+          <div class="week-progress-item" data-week="week3">
+            <div class="week-header">
+              <div class="week-number">Week 3</div>
+              <div class="week-badge">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2"/>
+                </svg>
+              </div>
+            </div>
+            <div class="week-title">Email &amp; Messaging</div>
+            <div class="week-description">Server 2016 upgrade, Exchange 2019 installation, and mailbox configuration</div>
             <div class="week-progress-bar">
               <div class="week-progress-fill" id="week3Progress" style="width: 0%"></div>
             </div>
-            <div class="week-progress-text" id="week3Text">0/4 tasks</div>
+            <div class="week-progress-stats">
+              <div class="week-progress-text" id="week3Text">0/8 tasks</div>
+              <div class="week-progress-percentage" id="week3Percentage">0%</div>
+            </div>
+            <div class="week-task-list">
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Prepare for Server 2016 Upgrade</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Execute Server 2016 Upgrade</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Prepare Exchange Server Installation</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Install Exchange Server 2019</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Configure Exchange Post-Installation</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Create User Mailboxes</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Test Mailbox Functionality</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Configure Internal Mail Flow</span>
+              </div>
+            </div>
           </div>
-          <div class="week-progress-item">
-            <div class="week-number">Week 4</div>
+
+          <!-- Week 4: Cloud Integration (8 tasks) -->
+          <div class="week-progress-item" data-week="week4">
+            <div class="week-header">
+              <div class="week-number">Week 4</div>
+              <div class="week-badge">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 18H6a4 4 0 0 1-4-4 4 4 0 0 1 4-4h.71a5.5 5.5 0 0 1 0-1A5.37 5.37 0 0 1 12 3.59a5.26 5.26 0 0 1 5.33 4.71A4.33 4.33 0 0 1 22 13a4.5 4.5 0 0 1-3 4.2"/>
+                </svg>
+              </div>
+            </div>
             <div class="week-title">Cloud Integration</div>
+            <div class="week-description">External mail configuration, SSL certificates, and Microsoft 365 hybrid setup</div>
             <div class="week-progress-bar">
               <div class="week-progress-fill" id="week4Progress" style="width: 0%"></div>
             </div>
-            <div class="week-progress-text" id="week4Text">0/2 tasks</div>
+            <div class="week-progress-stats">
+              <div class="week-progress-text" id="week4Text">0/8 tasks</div>
+              <div class="week-progress-percentage" id="week4Percentage">0%</div>
+            </div>
+            <div class="week-task-list">
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Configure DNS Records for External Mail</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Configure Firewall and Network Security</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Install and Configure SSL Certificates</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Configure Modern Authentication</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Prepare for Hybrid Configuration</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Run Hybrid Configuration Wizard</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Configure Hybrid Mail Flow</span>
+              </div>
+              <div class="task-preview">
+                <span class="task-bullet">•</span>
+                <span>Verify Hybrid Functionality</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENHANCED: Overall Progress Summary -->
+        <div class="progress-summary">
+          <h4>Training Progress Overview</h4>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <div class="summary-icon">📊</div>
+              <div class="summary-content">
+                <div class="summary-title">Total Progress</div>
+                <div class="summary-value" id="summaryProgress">0%</div>
+                <div class="summary-description">Overall completion rate</div>
+              </div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">✅</div>
+              <div class="summary-content">
+                <div class="summary-title">Tasks Completed</div>
+                <div class="summary-value" id="summaryTasks">0/30</div>
+                <div class="summary-description">Individual tasks finished</div>
+              </div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">🏆</div>
+              <div class="summary-content">
+                <div class="summary-title">Weeks Completed</div>
+                <div class="summary-value" id="summaryWeeks">0/4</div>
+                <div class="summary-description">Full weeks finished</div>
+              </div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-icon">🎯</div>
+              <div class="summary-content">
+                <div class="summary-title">Next Milestone</div>
+                <div class="summary-value" id="summaryNext">Week 1</div>
+                <div class="summary-description">Recommended focus area</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -225,7 +449,7 @@
   </main>
 
   <script>
-    // Profile-specific functionality
+    // Profile-specific functionality with enhanced 30-task system
     async function exportMyData() {
       try {
         const response = await fetch('/api/profile/export-data', {
@@ -265,17 +489,23 @@
       showNotification('Complete the 4-week timeline in your dashboard to master Microsoft hybrid IT setup.', 'info', 8000);
     }
 
-    // Load and display weekly progress
+    // FIXED: Load and display weekly progress with proper 30-task system
     async function loadWeeklyProgress() {
       try {
         const response = await fetch('/api/progress', { credentials: 'same-origin' });
         if (response.ok) {
           const progress = await response.json();
           
-          // Week task counts
+          // FIXED: Week task counts for 30-task system
           const weekTasks = {
-            week1: 4, week2: 3, week3: 4, week4: 2
+            week1: 8, // Foundation Setup
+            week2: 6, // Infrastructure Expansion  
+            week3: 8, // Email & Messaging
+            week4: 8  // Cloud Integration
           };
+          
+          let totalCompleted = 0;
+          let completedWeeks = 0;
           
           Object.keys(weekTasks).forEach(week => {
             const weekNum = week.replace('week', '');
@@ -284,9 +514,13 @@
             const total = weekTasks[week];
             const percentage = (completed / total) * 100;
             
+            totalCompleted += completed;
+            if (percentage === 100) completedWeeks++;
+            
             // Update progress bar
             const progressBar = document.getElementById(`${week}Progress`);
             const progressText = document.getElementById(`${week}Text`);
+            const progressPercentage = document.getElementById(`${week}Percentage`);
             
             if (progressBar) {
               progressBar.style.width = `${percentage}%`;
@@ -297,11 +531,69 @@
             if (progressText) {
               progressText.textContent = `${completed}/${total} tasks`;
             }
+            
+            if (progressPercentage) {
+              progressPercentage.textContent = `${Math.round(percentage)}%`;
+            }
+            
+            // Add completion animations
+            const weekItem = document.querySelector(`[data-week="${week}"]`);
+            if (weekItem) {
+              if (percentage === 100) {
+                weekItem.classList.add('week-completed');
+              } else if (percentage > 0) {
+                weekItem.classList.add('week-in-progress');
+              }
+            }
+          });
+          
+          // Update summary statistics
+          const totalTasks = 30;
+          const overallProgress = Math.round((totalCompleted / totalTasks) * 100);
+          
+          updateSummaryStats({
+            progress: overallProgress,
+            tasks: `${totalCompleted}/${totalTasks}`,
+            weeks: `${completedWeeks}/4`,
+            next: getNextMilestone(totalCompleted, completedWeeks)
           });
         }
       } catch (error) {
         console.error('Failed to load weekly progress:', error);
       }
+    }
+
+    function updateSummaryStats(stats) {
+      const elements = {
+        summaryProgress: stats.progress + '%',
+        summaryTasks: stats.tasks,
+        summaryWeeks: stats.weeks,
+        summaryNext: stats.next
+      };
+      
+      Object.keys(elements).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          // Add animation
+          element.style.transition = 'all 0.3s ease';
+          element.style.transform = 'scale(0.9)';
+          element.style.opacity = '0.7';
+          
+          setTimeout(() => {
+            element.textContent = elements[id];
+            element.style.transform = 'scale(1)';
+            element.style.opacity = '1';
+          }, 150);
+        }
+      });
+    }
+
+    function getNextMilestone(completedTasks, completedWeeks) {
+      if (completedTasks === 30) return 'Complete! 🎉';
+      if (completedTasks >= 22) return 'Week 4';
+      if (completedTasks >= 14) return 'Week 3';
+      if (completedTasks >= 8) return 'Week 2';
+      return 'Week 1';
     }
 
     // Initialize profile page
@@ -500,7 +792,7 @@
           if (totalProgress) totalProgress.textContent = `${profileData.progress}%`;
           if (completedTasks) completedTasks.textContent = `${profileData.completedTasks}/${profileData.totalTasks}`;
           if (currentWeek) {
-            const weekNumber = Math.min(Math.floor(profileData.completedTasks / 3.5) + 1, 4);
+            const weekNumber = Math.min(Math.floor(profileData.completedTasks / 7.5) + 1, 4);
             currentWeek.textContent = `Week ${weekNumber}`;
           }
           if (userRank) {
@@ -515,141 +807,198 @@
   </script>
 
   <style>
-    /* Profile-specific styles */
-    .detail-group {
-      margin-bottom: var(--space-md);
-      padding: var(--space-md);
-      background: var(--surface-light);
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border-light);
-    }
-    
-    .detail-group p {
-      margin: 0;
+    /* Enhanced profile-specific styles for 30-task system */
+    .section-description {
       color: var(--text-secondary);
+      font-size: 0.9375rem;
+      margin-bottom: var(--space-6);
+      text-align: center;
+      letter-spacing: -0.01em;
     }
-    
-    .detail-group strong {
-      color: var(--text-primary);
-      font-weight: 600;
+
+    .week-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-3);
     }
-    
-    .week-progress-grid {
-      display: grid;
-      gap: var(--space-lg);
-    }
-    
-    .week-progress-item {
-      padding: var(--space-lg);
-      background: var(--surface);
+
+    .week-badge {
+      width: 2rem;
+      height: 2rem;
+      background: var(--gradient-primary);
       border-radius: var(--radius-md);
-      border: 1px solid var(--border-light);
-      transition: var(--transition);
-    }
-    
-    .week-progress-item:hover {
-      border-color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       box-shadow: var(--shadow-sm);
     }
-    
-    .week-number {
+
+    .week-badge svg {
+      stroke: var(--text-inverse);
+    }
+
+    .week-description {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-4);
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+    }
+
+    .week-progress-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: var(--space-3);
+    }
+
+    .week-progress-percentage {
       font-size: 0.875rem;
       font-weight: 600;
       color: var(--primary);
-      margin-bottom: var(--space-xs);
+      letter-spacing: -0.01em;
     }
-    
-    .week-title {
-      font-size: 1rem;
-      font-weight: 500;
-      color: var(--text-primary);
-      margin-bottom: var(--space-md);
+
+    .week-task-list {
+      margin-top: var(--space-5);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--border-light);
     }
-    
-    .week-progress-bar {
-      width: 100%;
-      height: 8px;
-      background: var(--border-light);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      margin-bottom: var(--space-sm);
-    }
-    
-    .week-progress-fill {
-      height: 100%;
-      background: var(--gradient-primary);
-      border-radius: var(--radius-sm);
-      transition: var(--transition-slow);
-    }
-    
-    .week-progress-text {
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-    
-    .action-buttons {
+
+    .task-preview {
       display: flex;
-      gap: var(--space-md);
-      flex-wrap: wrap;
-    }
-    
-    .help-links {
-      display: flex;
-      gap: var(--space-sm);
       align-items: center;
-      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-bottom: var(--space-2);
+      font-size: 0.8125rem;
+      color: var(--text-tertiary);
+      line-height: 1.4;
+      letter-spacing: -0.01em;
     }
-    
-    .help-links a {
-      text-decoration: none;
-      font-weight: 500;
+
+    .task-bullet {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .week-completed {
+      background: linear-gradient(135deg, rgba(52, 199, 89, 0.05), rgba(52, 199, 89, 0.1));
+      border-color: var(--success);
+    }
+
+    .week-completed .week-badge {
+      background: var(--gradient-accent);
+    }
+
+    .week-in-progress {
+      background: linear-gradient(135deg, rgba(0, 122, 255, 0.03), rgba(0, 122, 255, 0.08));
+      border-color: var(--primary);
+    }
+
+    .progress-summary {
+      margin-top: var(--space-12);
+      padding: var(--space-8);
+      background: var(--gradient-surface);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-light);
+    }
+
+    .progress-summary h4 {
+      text-align: center;
+      margin-bottom: var(--space-8);
+      color: var(--text-primary);
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-6);
+    }
+
+    .summary-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-5);
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light);
       transition: var(--transition);
     }
-    
-    .help-links a:hover {
-      text-decoration: underline;
+
+    .summary-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+      border-color: var(--primary);
     }
-    
-    .error-text {
-      display: none;
-      color: var(--error);
+
+    .summary-icon {
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+
+    .summary-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .summary-title {
       font-size: 0.875rem;
-      margin-top: var(--space-xs);
+      color: var(--text-secondary);
+      margin-bottom: var(--space-1);
+      letter-spacing: -0.01em;
     }
-    
-    .field-hint {
-      margin-top: var(--space-sm);
+
+    .summary-value {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--space-1);
+      letter-spacing: -0.01em;
     }
-    
-    .field-hint small {
+
+    .summary-description {
+      font-size: 0.75rem;
       color: var(--text-tertiary);
-      font-size: 0.8125rem;
-      line-height: 1.4;
+      letter-spacing: -0.01em;
     }
-    
-    .password-requirements {
-      margin-top: var(--space-sm);
-    }
-    
-    .password-requirements small {
+
+    .stat-description {
+      font-size: 0.75rem;
       color: var(--text-tertiary);
-      font-size: 0.8125rem;
+      margin-top: var(--space-1);
+      text-align: center;
+      letter-spacing: -0.01em;
     }
-    
-    /* Responsive adjustments */
+
+    /* Mobile responsiveness */
     @media (max-width: 768px) {
-      .action-buttons {
-        flex-direction: column;
-      }
-      
-      .help-links {
+      .week-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: var(--space-2);
       }
-      
-      .help-links span {
-        display: none;
+
+      .week-badge {
+        width: 1.75rem;
+        height: 1.75rem;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+      }
+
+      .summary-item {
+        padding: var(--space-4);
+      }
+
+      .task-preview {
+        font-size: 0.75rem;
       }
     }
   </style>

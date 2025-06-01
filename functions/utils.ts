@@ -1,5 +1,5 @@
 // functions/utils.ts
-// Enhanced utilities for Velocity Lab
+// Enhanced utilities for Velocity Lab - ADMIN CREDENTIALS REMOVED
 
 export interface Env {
   USERS: KVNamespace;
@@ -199,10 +199,10 @@ export const sanitizeInput = (input: string): string => {
   return input.trim().replace(/[<>]/g, '');
 };
 
-// Calculate user progress percentage
+// Calculate user progress percentage (30-task system)
 export const calculateProgress = (progress: Progress): number => {
   let completedTasks = 0;
-  const totalTasks = 14;
+  const totalTasks = 30; // Updated to 30-task system
   
   Object.values(progress).forEach(week => {
     completedTasks += Object.values(week).filter(Boolean).length;
@@ -211,34 +211,9 @@ export const calculateProgress = (progress: Progress): number => {
   return Math.round((completedTasks / totalTasks) * 100);
 };
 
-// Initialize default admin user
-export const initializeDefaultAdmin = async (env: Env): Promise<void> => {
-  try {
-    const adminEmail = 'asusautomation@gmail.com';
-    const existingAdmin = await getUserByEmail(env, adminEmail);
-    
-    if (!existingAdmin) {
-      const adminUser: User = {
-        id: crypto.randomUUID(),
-        name: 'System Administrator',
-        email: adminEmail,
-        password: 'Superadmin@123',
-        role: 'admin',
-        createdAt: new Date().toISOString()
-      };
-      
-      await env.USERS.put(`user:${adminEmail}`, JSON.stringify(adminUser));
-      console.log('Default admin user created with role: admin');
-    } else if (existingAdmin.role !== 'admin') {
-      // Ensure the default admin has admin role
-      existingAdmin.role = 'admin';
-      await env.USERS.put(`user:${adminEmail}`, JSON.stringify(existingAdmin));
-      console.log('Default admin user role updated to: admin');
-    }
-  } catch (error) {
-    console.error('Initialize default admin error:', error);
-  }
-};
+// NO DEFAULT ADMIN - Removed initializeDefaultAdmin function
+// Admins must be created manually through the registration process
+// and then promoted via database direct access or other secure means
 
 // Format date for display
 export const formatDate = (dateString: string): string => {

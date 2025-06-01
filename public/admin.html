@@ -35,27 +35,31 @@
 
     <div id="notification" class="notification" role="alert" aria-live="polite"></div>
 
-    <!-- FIXED: Admin Statistics with Working Click Handlers -->
+    <!-- FIXED: Admin Statistics with Working Click Handlers and Correct Task Counts -->
     <div class="stats-grid">
       <div class="stat-card" onclick="showAllUsers()" style="cursor: pointer;" title="Click to see all users">
         <div class="stat-value" id="totalUsers">0</div>
         <div class="stat-label">Total Users</div>
+        <div class="stat-description">All registered users in the system</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" id="averageProgress">0%</div>
         <div class="stat-label">Average Progress</div>
+        <div class="stat-description">Mean completion across all users</div>
       </div>
       <div class="stat-card" onclick="showCompletedUsers()" style="cursor: pointer;" title="Click to see completed users">
         <div class="stat-value" id="completedUsers">0</div>
         <div class="stat-label">Completed Training</div>
+        <div class="stat-description">Users who finished all 30 tasks</div>
       </div>
       <div class="stat-card" onclick="showActiveToday()" style="cursor: pointer;" title="Click to see active users">
         <div class="stat-value" id="activeToday">0</div>
         <div class="stat-label">Active Today</div>
+        <div class="stat-description">Users who logged in today</div>
       </div>
     </div>
 
-    <!-- Admin Controls -->
+    <!-- Enhanced Admin Controls -->
     <div class="admin-controls">
       <h3>Admin Actions</h3>
       <div class="admin-actions">
@@ -77,6 +81,12 @@
           </svg>
           <span>Sort: Desc</span>
         </button>
+        <button class="btn btn-secondary" onclick="showTaskBreakdown()" title="View 30-task breakdown">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2h-4M9 11V9a3 3 0 116 0v2M9 11h6"/>
+          </svg>
+          <span>Task Breakdown</span>
+        </button>
       </div>
     </div>
 
@@ -92,11 +102,11 @@
                 class="filter-select"
                 onchange="filterUsers()">
           <option value="">All Progress</option>
-          <option value="0-25">0-25%</option>
-          <option value="26-50">26-50%</option>
-          <option value="51-75">51-75%</option>
-          <option value="76-99">76-99%</option>
-          <option value="100">Completed</option>
+          <option value="0-25">0-25% (1-7 tasks)</option>
+          <option value="26-50">26-50% (8-15 tasks)</option>
+          <option value="51-75">51-75% (16-22 tasks)</option>
+          <option value="76-99">76-99% (23-29 tasks)</option>
+          <option value="100">Completed (30/30 tasks)</option>
         </select>
         <select id="sortBy" 
                 class="filter-select"
@@ -104,13 +114,32 @@
           <option value="progress">Sort by Progress</option>
           <option value="name">Sort by Name</option>
           <option value="recent">Sort by Activity</option>
+          <option value="tasks">Sort by Task Count</option>
         </select>
       </div>
     </div>
 
-    <!-- User Progress Leaderboard -->
+    <!-- ENHANCED: User Progress Leaderboard with 30-Task System -->
     <div class="profile-container">
-      <h3 class="section-title">User Progress Leaderboard</h3>
+      <h3 class="section-title">User Progress Leaderboard - 30 Task System</h3>
+      <div class="leaderboard-summary">
+        <div class="summary-item">
+          <span class="summary-label">Week 1:</span>
+          <span class="summary-value">8 tasks (Foundation Setup)</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Week 2:</span>
+          <span class="summary-value">6 tasks (Infrastructure Expansion)</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Week 3:</span>
+          <span class="summary-value">8 tasks (Email & Messaging)</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Week 4:</span>
+          <span class="summary-value">8 tasks (Cloud Integration)</span>
+        </div>
+      </div>
       <div id="leaderboard" class="leaderboard">
         <!-- Loading skeleton -->
         <div class="leaderboard-item skeleton"></div>
@@ -119,11 +148,16 @@
       </div>
     </div>
 
-    <!-- Pagination -->
+    <!-- Enhanced Pagination -->
     <div class="pagination-controls">
       <button class="btn btn-secondary" onclick="previousPage()" id="prevBtn" disabled>Previous</button>
       <span id="pageInfo" class="page-info">Page 1 of 1</span>
       <button class="btn btn-secondary" onclick="nextPage()" id="nextBtn">Next</button>
+      <select id="itemsPerPageSelect" class="filter-select" onchange="changeItemsPerPage()">
+        <option value="10">10 per page</option>
+        <option value="25">25 per page</option>
+        <option value="50">50 per page</option>
+      </select>
     </div>
   </main>
 
@@ -137,6 +171,17 @@
         <h3 id="modalUserName"></h3>
         <p id="modalUserEmail"></p>
         <p id="modalUserRole"></p>
+        <div class="user-progress-detail">
+          <div class="progress-circle-large" id="modalUserProgress">
+            <span class="progress-text-large">0%</span>
+          </div>
+          <div class="progress-breakdown">
+            <div class="week-progress" id="modalWeek1">Week 1: <span>0/8</span></div>
+            <div class="week-progress" id="modalWeek2">Week 2: <span>0/6</span></div>
+            <div class="week-progress" id="modalWeek3">Week 3: <span>0/8</span></div>
+            <div class="week-progress" id="modalWeek4">Week 4: <span>0/8</span></div>
+          </div>
+        </div>
       </div>
 
       <div class="modal-section">
@@ -164,6 +209,14 @@
         </form>
       </div>
 
+      <div class="modal-section">
+        <h4>Reset Progress</h4>
+        <p style="color: var(--text-secondary); margin-bottom: var(--space-4);">
+          Reset user's progress back to 0/30 tasks completed.
+        </p>
+        <button class="btn btn-secondary" onclick="resetUserProgress()">Reset All Progress</button>
+      </div>
+
       <div class="modal-section danger-section">
         <h4>Danger Zone</h4>
         <button class="btn btn-danger" onclick="deleteUser()">Delete User</button>
@@ -171,7 +224,7 @@
     </div>
   </div>
 
-  <!-- FIXED: Stats Detail Modal -->
+  <!-- FIXED: Stats Detail Modal with Accurate Data -->
   <div class="modal" id="statsModal" role="dialog" aria-labelledby="statsModalTitle" aria-modal="true">
     <div class="modal-content">
       <button class="close-btn" id="closeStatsModal" aria-label="Close modal">×</button>
@@ -180,10 +233,91 @@
     </div>
   </div>
 
+  <!-- NEW: Task Breakdown Modal -->
+  <div class="modal" id="taskBreakdownModal" role="dialog" aria-labelledby="taskBreakdownTitle" aria-modal="true">
+    <div class="modal-content">
+      <button class="close-btn" id="closeTaskBreakdownModal" aria-label="Close modal">×</button>
+      <h2 id="taskBreakdownTitle">30-Task System Breakdown</h2>
+      <div id="taskBreakdownContent">
+        <div class="task-week-breakdown">
+          <h3>📅 Week 1: Foundation Setup (8 tasks)</h3>
+          <ul>
+            <li>Install Active Directory Domain Services Role</li>
+            <li>Promote Server to Domain Controller</li>
+            <li>Configure VM DNS Settings</li>
+            <li>Join VM to Domain</li>
+            <li>Create Hidden Network Share</li>
+            <li>Map Drive via Group Policy (Method 1)</li>
+            <li>Map Drive via Logon Script (Method 2)</li>
+            <li>Create Security Group for Share Access</li>
+          </ul>
+        </div>
+        
+        <div class="task-week-breakdown">
+          <h3>🏗️ Week 2: Infrastructure Expansion (6 tasks)</h3>
+          <ul>
+            <li>Install Second Windows Server 2012</li>
+            <li>Promote to Additional Domain Controller</li>
+            <li>Install WSUS Role</li>
+            <li>Configure WSUS Client Policies</li>
+            <li>Configure Primary Time Server</li>
+            <li>Configure Secondary Time Server</li>
+          </ul>
+        </div>
+        
+        <div class="task-week-breakdown">
+          <h3>📧 Week 3: Email & Messaging (8 tasks)</h3>
+          <ul>
+            <li>Prepare for Server 2016 Upgrade</li>
+            <li>Execute Server 2016 Upgrade</li>
+            <li>Prepare Exchange Server Installation</li>
+            <li>Install Exchange Server 2019</li>
+            <li>Configure Exchange Post-Installation</li>
+            <li>Create User Mailboxes</li>
+            <li>Test Mailbox Functionality</li>
+            <li>Configure Internal Mail Flow</li>
+          </ul>
+        </div>
+        
+        <div class="task-week-breakdown">
+          <h3>☁️ Week 4: Cloud Integration (8 tasks)</h3>
+          <ul>
+            <li>Configure DNS Records for External Mail</li>
+            <li>Configure Firewall and Network Security</li>
+            <li>Install and Configure SSL Certificates</li>
+            <li>Configure Modern Authentication</li>
+            <li>Prepare for Hybrid Configuration</li>
+            <li>Run Hybrid Configuration Wizard</li>
+            <li>Configure Hybrid Mail Flow</li>
+            <li>Verify Hybrid Functionality</li>
+          </ul>
+        </div>
+        
+        <div class="task-summary">
+          <h3>📊 Summary</h3>
+          <div class="summary-stats">
+            <div class="summary-stat">
+              <span class="stat-number">30</span>
+              <span class="stat-label">Total Tasks</span>
+            </div>
+            <div class="summary-stat">
+              <span class="stat-number">4</span>
+              <span class="stat-label">Weeks</span>
+            </div>
+            <div class="summary-stat">
+              <span class="stat-number">100%</span>
+              <span class="stat-label">Hybrid Ready</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // FIXED: Admin-specific functionality with working stat cards
+    // FIXED: Admin-specific functionality with working stat cards and 30-task system
     let currentPage = 1;
-    const itemsPerPage = 10;
+    let itemsPerPage = 10;
     let allUsers = [];
     let filteredUsers = [];
     let currentUserEmail = '';
@@ -195,6 +329,7 @@
       loadUsersProgress();
       setupUserModal();
       setupStatsModal();
+      setupTaskBreakdownModal();
     });
 
     async function loadAdminStats() {
@@ -205,14 +340,30 @@
         
         if (response.ok) {
           const stats = await response.json();
-          document.getElementById('totalUsers').textContent = stats.totalUsers;
-          document.getElementById('averageProgress').textContent = stats.averageProgress + '%';
-          document.getElementById('completedUsers').textContent = stats.completedUsers;
-          document.getElementById('activeToday').textContent = stats.activeToday;
+          // FIXED: Display stats with proper animations
+          animateStatUpdate('totalUsers', stats.totalUsers);
+          animateStatUpdate('averageProgress', stats.averageProgress + '%');
+          animateStatUpdate('completedUsers', stats.completedUsers);
+          animateStatUpdate('activeToday', stats.activeToday);
         }
       } catch (error) {
         console.error('Failed to load admin stats:', error);
         showNotification('Failed to load statistics', 'error');
+      }
+    }
+
+    function animateStatUpdate(elementId, value) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.style.transition = 'all 0.3s ease';
+        element.style.transform = 'scale(0.9)';
+        element.style.opacity = '0.7';
+        
+        setTimeout(() => {
+          element.textContent = value;
+          element.style.transform = 'scale(1)';
+          element.style.opacity = '1';
+        }, 150);
       }
     }
 
@@ -255,6 +406,9 @@
           rankIcon = '🥉';
         }
         
+        // FIXED: Show proper task count (x/30 instead of x/14)
+        const totalTasks = 30;
+        
         return `
           <div class="leaderboard-item" onclick="openUserModal('${user.email}')">
             <div class="user-rank ${rankClass}">${rankIcon}#${globalRank}</div>
@@ -267,7 +421,7 @@
               <div class="progress-circle" style="--progress: ${user.progress}%">
                 <span class="progress-text">${user.progress}%</span>
               </div>
-              <div class="task-count">${user.completedTasks}/${user.totalTasks} tasks</div>
+              <div class="task-count">${user.completedTasks}/${totalTasks} tasks</div>
             </div>
             <div class="user-activity">
               <div class="activity-label">Last Activity</div>
@@ -280,7 +434,7 @@
       updatePagination();
     }
 
-    // FIXED: Working stat card functions
+    // FIXED: Working stat card functions with accurate counts
     function showAllUsers() {
       const modal = document.getElementById('statsModal');
       const title = document.getElementById('statsModalTitle');
@@ -298,13 +452,13 @@
               </div>
               <div style="text-align: right;">
                 <div style="font-weight: 600; color: var(--primary); font-size: 1.125rem;">${user.progress}%</div>
-                <div style="font-size: 0.75rem; color: var(--text-tertiary);">${user.completedTasks}/${user.totalTasks} tasks</div>
+                <div style="font-size: 0.75rem; color: var(--text-tertiary);">${user.completedTasks}/30 tasks</div>
               </div>
             </div>
           `).join('')}
         </div>
         <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-light); text-align: center; color: var(--text-secondary);">
-          Total: ${allUsers.length} users
+          Total: ${allUsers.length} users in the 30-task training system
         </div>
       `;
       
@@ -318,7 +472,7 @@
       const title = document.getElementById('statsModalTitle');
       const content = document.getElementById('statsModalContent');
       
-      title.textContent = 'Completed Training Users';
+      title.textContent = 'Completed Training Users (30/30 Tasks)';
       content.innerHTML = completedUsers.length > 0 ? `
         <div style="max-height: 400px; overflow-y: auto;">
           ${completedUsers.map(user => `
@@ -330,19 +484,19 @@
               </div>
               <div style="color: var(--success); font-weight: 600; display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 1.5rem;">✓</span>
-                <span>Complete</span>
+                <span>30/30 Complete</span>
               </div>
             </div>
           `).join('')}
         </div>
         <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-light); text-align: center; color: var(--text-secondary);">
-          ${completedUsers.length} of ${allUsers.length} users completed (${Math.round((completedUsers.length / allUsers.length) * 100)}%)
+          ${completedUsers.length} of ${allUsers.length} users completed all 30 tasks (${Math.round((completedUsers.length / allUsers.length) * 100)}%)
         </div>
       ` : `
         <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
           <div style="font-size: 3rem; margin-bottom: 16px;">📚</div>
-          <p>No users have completed the training yet.</p>
-          <p style="font-size: 0.875rem; margin-top: 8px;">Users need to complete all 14 tasks to finish the training.</p>
+          <p>No users have completed all 30 training tasks yet.</p>
+          <p style="font-size: 0.875rem; margin-top: 8px;">Users need to complete all 30 tasks across 4 weeks to finish the training.</p>
         </div>
       `;
       
@@ -373,7 +527,7 @@
               </div>
               <div style="text-align: right;">
                 <div style="font-weight: 600; color: var(--primary); font-size: 1.125rem;">${user.progress}%</div>
-                <div style="font-size: 0.75rem; color: var(--success);">🟢 Active Today</div>
+                <div style="font-size: 0.75rem; color: var(--success);">🟢 ${user.completedTasks}/30 tasks</div>
               </div>
             </div>
           `).join('')}
@@ -389,6 +543,13 @@
         </div>
       `;
       
+      modal.style.display = 'flex';
+      modal.style.opacity = '1';
+    }
+
+    // NEW: Show task breakdown modal
+    function showTaskBreakdown() {
+      const modal = document.getElementById('taskBreakdownModal');
       modal.style.display = 'flex';
       modal.style.opacity = '1';
     }
@@ -436,7 +597,7 @@
       displayUsers();
     }
 
-    // FIXED: Sort by activity function
+    // FIXED: Sort by activity function with task count option
     function sortUsers() {
       const sortBy = document.getElementById('sortBy').value;
       
@@ -446,6 +607,9 @@
         switch (sortBy) {
           case 'name':
             comparison = a.name.localeCompare(b.name);
+            break;
+          case 'tasks':
+            comparison = b.completedTasks - a.completedTasks;
             break;
           case 'recent':
             // FIXED: Proper sort by activity - most recent first, "Never" last
@@ -474,6 +638,35 @@
       document.getElementById('modalUserEmail').textContent = user.email;
       document.getElementById('modalUserRole').textContent = `Role: ${user.role}`;
       document.getElementById('userRole').value = user.role;
+      
+      // FIXED: Update progress circle and breakdown for 30-task system
+      const progressCircle = document.getElementById('modalUserProgress');
+      const progressText = progressCircle.querySelector('.progress-text-large');
+      
+      progressCircle.style.setProperty('--progress', `${user.progress}%`);
+      progressText.textContent = `${user.progress}%`;
+      
+      // Update week breakdown (assuming week progress is available)
+      const weekTasks = { week1: 8, week2: 6, week3: 8, week4: 8 };
+      Object.keys(weekTasks).forEach((week, index) => {
+        const weekElement = document.getElementById(`modalWeek${index + 1}`);
+        if (weekElement && user.weekProgress) {
+          const completed = user.weekProgress[week] || 0;
+          const total = weekTasks[week];
+          weekElement.innerHTML = `Week ${index + 1}: <span>${completed}/${total}</span>`;
+          
+          // Add color coding
+          const percentage = (completed / total) * 100;
+          if (percentage === 100) {
+            weekElement.style.color = 'var(--success)';
+          } else if (percentage > 50) {
+            weekElement.style.color = 'var(--warning)';
+          } else {
+            weekElement.style.color = 'var(--text-secondary)';
+          }
+        }
+      });
+      
       document.getElementById('userModal').style.display = 'flex';
       document.getElementById('userModal').style.opacity = '1';
     }
@@ -569,6 +762,65 @@
       });
     }
 
+    // NEW: Setup task breakdown modal
+    function setupTaskBreakdownModal() {
+      const modal = document.getElementById('taskBreakdownModal');
+      const closeBtn = document.getElementById('closeTaskBreakdownModal');
+      
+      closeBtn.addEventListener('click', () => {
+        modal.style.opacity = '0';
+        setTimeout(() => modal.style.display = 'none', 200);
+      });
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.style.opacity = '0';
+          setTimeout(() => modal.style.display = 'none', 200);
+        }
+      });
+    }
+
+    // NEW: Reset user progress function
+    async function resetUserProgress() {
+      if (!confirm(`Are you sure you want to reset ${currentUserEmail}'s progress? This will set their progress back to 0/30 tasks.`)) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/progress?userId=${encodeURIComponent(currentUserEmail)}`, {
+          method: 'DELETE',
+          credentials: 'same-origin'
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          showNotification('User progress reset successfully', 'success');
+          loadUsersProgress(); // Refresh the list
+          loadAdminStats(); // Refresh stats
+          
+          // Update modal display
+          const progressCircle = document.getElementById('modalUserProgress');
+          const progressText = progressCircle.querySelector('.progress-text-large');
+          progressCircle.style.setProperty('--progress', '0%');
+          progressText.textContent = '0%';
+          
+          // Reset week breakdown
+          for (let i = 1; i <= 4; i++) {
+            const weekElement = document.getElementById(`modalWeek${i}`);
+            if (weekElement) {
+              const weekTasks = [8, 6, 8, 8];
+              weekElement.innerHTML = `Week ${i}: <span>0/${weekTasks[i-1]}</span>`;
+              weekElement.style.color = 'var(--text-secondary)';
+            }
+          }
+        } else {
+          showNotification(data.error || 'Failed to reset progress', 'error');
+        }
+      } catch (error) {
+        showNotification('Failed to reset progress', 'error');
+      }
+    }
+
     async function deleteUser() {
       if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
         return;
@@ -609,9 +861,9 @@
 
     function exportData() {
       const csvContent = "data:text/csv;charset=utf-8," + 
-        "Name,Email,Role,Progress,Completed Tasks,Last Activity\n" +
+        "Name,Email,Role,Progress,Completed Tasks,Total Tasks,Last Activity\n" +
         allUsers.map(user => 
-          `"${user.name}","${user.email}","${user.role}",${user.progress}%,${user.completedTasks}/${user.totalTasks},"${user.lastActivity}"`
+          `"${user.name}","${user.email}","${user.role}",${user.progress}%,${user.completedTasks},30,"${user.lastActivity}"`
         ).join('\n');
 
       const encodedUri = encodeURI(csvContent);
@@ -623,6 +875,13 @@
       document.body.removeChild(link);
       
       showNotification('Data exported successfully', 'success');
+    }
+
+    function changeItemsPerPage() {
+      const select = document.getElementById('itemsPerPageSelect');
+      itemsPerPage = parseInt(select.value);
+      currentPage = 1;
+      displayUsers();
     }
 
     function previousPage() {
@@ -670,7 +929,207 @@
       }
     }
 
-    // REMOVED: Duplicate getCookie function - will use the one from main.js
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      return parts.length === 2 ? parts.pop().split(';').shift() : null;
+    }
   </script>
+
+  <style>
+    /* Enhanced admin styling for 30-task system */
+    .leaderboard-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+      padding: var(--space-6);
+      background: var(--surface-light);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light);
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-3);
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+    }
+
+    .summary-label {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.875rem;
+    }
+
+    .summary-value {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+    }
+
+    .stat-description {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      margin-top: var(--space-1);
+      text-align: center;
+    }
+
+    .user-progress-detail {
+      display: flex;
+      gap: var(--space-6);
+      align-items: center;
+      margin: var(--space-6) 0;
+      padding: var(--space-6);
+      background: var(--surface-light);
+      border-radius: var(--radius-lg);
+    }
+
+    .progress-circle-large {
+      width: 6rem;
+      height: 6rem;
+      border-radius: 50%;
+      background: conic-gradient(var(--primary) calc(var(--progress) * 3.6deg), var(--border-light) 0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .progress-circle-large::before {
+      content: '';
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+      background: var(--surface);
+    }
+
+    .progress-text-large {
+      position: relative;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .progress-breakdown {
+      flex: 1;
+    }
+
+    .week-progress {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-2);
+      margin-bottom: var(--space-2);
+      background: var(--surface);
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      transition: var(--transition);
+    }
+
+    .week-progress:hover {
+      background: var(--surface-dark);
+    }
+
+    .task-week-breakdown {
+      margin-bottom: var(--space-8);
+      padding: var(--space-6);
+      background: var(--surface-light);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light);
+    }
+
+    .task-week-breakdown h3 {
+      color: var(--primary);
+      margin-bottom: var(--space-4);
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+
+    .task-week-breakdown ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .task-week-breakdown li {
+      padding: var(--space-2);
+      margin-bottom: var(--space-2);
+      background: var(--surface);
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--primary);
+      font-size: 0.875rem;
+      transition: var(--transition);
+    }
+
+    .task-week-breakdown li:hover {
+      background: var(--surface-dark);
+      transform: translateX(2px);
+    }
+
+    .task-summary {
+      background: var(--gradient-primary);
+      padding: var(--space-8);
+      border-radius: var(--radius-xl);
+      text-align: center;
+      color: white;
+    }
+
+    .task-summary h3 {
+      color: white;
+      margin-bottom: var(--space-6);
+    }
+
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: var(--space-6);
+    }
+
+    .summary-stat {
+      text-align: center;
+    }
+
+    .stat-number {
+      display: block;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      opacity: 0.9;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .leaderboard-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .user-progress-detail {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .progress-circle-large {
+        width: 5rem;
+        height: 5rem;
+      }
+
+      .summary-stats {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: var(--space-4);
+      }
+
+      .admin-actions {
+        flex-direction: column;
+        gap: var(--space-3);
+      }
+    }
+  </style>
 </body>
 </html>
