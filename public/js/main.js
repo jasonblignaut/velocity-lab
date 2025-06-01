@@ -122,7 +122,8 @@ const handleFormSubmit = async (form, endpoint, isRegister = false) => {
 
 // Enhanced password toggle with smooth animations
 const setupPasswordToggle = () => {
-  $$('.toggle-password').forEach((button) => {
+  const toggleButtons = document.querySelectorAll('.toggle-password');
+  toggleButtons.forEach((button) => {
     button.addEventListener('click', () => {
       const input = button.previousElementSibling;
       const isPassword = input.type === 'password';
@@ -299,6 +300,12 @@ const initDashboard = async () => {
 
   userInfo.textContent = `${user.name} (${user.role})`;
   
+  // Show admin link for admin users
+  const adminLink = $('#adminLink');
+  if (adminLink && user.role === 'admin') {
+    adminLink.style.display = 'inline';
+  }
+  
   // Enhanced logout with smooth transition to home
   logoutLink.addEventListener('click', async (e) => {
     e.preventDefault();
@@ -394,6 +401,12 @@ const initProfile = async () => {
   }
 
   userInfo.textContent = `${user.name} (${user.role})`;
+  
+  // Show admin link for admin users
+  const adminLink = $('#adminLink');
+  if (adminLink && user.role === 'admin') {
+    adminLink.style.display = 'inline';
+  }
   
   // Enhanced logout for profile page
   logoutLink.addEventListener('click', async (e) => {

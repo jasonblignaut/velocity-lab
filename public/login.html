@@ -92,18 +92,6 @@
           <p>Don't have an account? <a href="/register.html">Create one here</a></p>
         </div>
       </form>
-      
-      <!-- Demo Account Info -->
-      <div class="demo-info" style="margin-top: var(--space-xl); padding: var(--space-lg); background: rgba(0, 120, 212, 0.05); border-radius: var(--radius-md); border: 1px solid rgba(0, 120, 212, 0.2);">
-        <h4 style="color: var(--primary); margin-bottom: var(--space-sm); font-size: 1rem;">Demo Account</h4>
-        <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: var(--space-sm);">
-          Try the admin features with the demo account:
-        </p>
-        <div style="font-family: monospace; font-size: 0.8125rem; background: var(--surface); padding: var(--space-sm); border-radius: var(--radius-xs); border: 1px solid var(--border-light);">
-          <div><strong>Email:</strong> asusautomation@gmail.com</div>
-          <div><strong>Password:</strong> Superadmin@123</div>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -178,19 +166,7 @@
       });
 
       // Auto-fill demo account when clicking demo info
-      const demoInfo = document.querySelector('.demo-info');
-      if (demoInfo) {
-        demoInfo.addEventListener('click', function() {
-          emailInput.value = 'asusautomation@gmail.com';
-          passwordInput.value = 'Superadmin@123';
-          clearFieldError('email-error');
-          clearFieldError('password-error');
-        });
-        
-        // Add cursor pointer style
-        demoInfo.style.cursor = 'pointer';
-        demoInfo.title = 'Click to auto-fill demo credentials';
-      }
+      // Removed for security
     });
 
     // Show forgot password info
