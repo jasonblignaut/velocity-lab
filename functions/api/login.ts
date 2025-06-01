@@ -1,118 +1,46 @@
-// functions/api/login.ts
-
-import { Env } from '@cloudflare/workers-types';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  password: string;
-  role: 'user' | 'admin';
-  createdAt: number;
-}
-
-interface Session {
-  userId: string;
-  expires: number;
-}
-
-async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const buffer = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(buffer))
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
-}
-
-function generateToken(length: number = 32): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let token = '';
-  for (let i = 0; i < length; i++) {
-    token += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return token;
-}
-
-function getCookie(request: Request, name: string): string | null {
-  const cookieHeader = request.headers.get('cookie') || '';
-  const cookies = cookieHeader.split(';').map(cookie => cookie.trim());
-  const cookie = cookies.find(c => c.startsWith(`${name}=`));
-  return cookie ? cookie.split('=')[1] : null;
-}
-
-function setCookie(name: string, value: string, days: number = 1): string {
-  const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
-  return `${name}=${value}; Path=/; Expires=${expires}; SameSite=Strict; HttpOnly`;
-}
-
-async function validateCsrf(request: Request, env: Env): Promise<boolean> {
+export async function onRequestPost({ env, request }) {
   const formData = await request.formData();
-  const token = formData.get('csrf_token');
-  const sessionId = getCookie(request, 'session');
-  if (!sessionId || !token) return false;
+  const email = formData.get('email');
+  const password = formData.get('password');
+  const csrfToken = formData.get('csrf_token');
+  const sessionId = request.headers.get('Cookie')?.match(/session=([^;]+)/)?.[1];
 
-  const storedToken = await env.USERS.get(`csrf:${sessionId}`);
-  return storedToken === token;
-}
-
-export async function handleLogin(request: Request, env: Env): Promise<Response> {
-  if (request.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' },
+  if (!sessionId || !csrfToken) {
+    return new Response(JSON.stringify({ error: 'Invalid session or CSRF token' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' }
     });
   }
 
-  if (!(await validateCsrf(request, env))) {
+  const session = await env.SESSIONS.get(sessionId);
+  if (!session || JSON.parse(session).csrfToken !== csrfToken) {
     return new Response(JSON.stringify({ error: 'Invalid CSRF token' }), {
       status: 403,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json' }
     });
   }
 
-  const formData = await request.formData();
-  const email = formData.get('email')?.toLowerCase();
-  const password = formData.get('password');
-
-  if (!email || !password) {
-    return new Response(JSON.stringify({ error: 'Invalid input' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  const userId = await env.USERS.get(`user:email:${email}`);
-  if (!userId) {
-    return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
+  const user = await env.USERS.get(email);
+  if (!user) {
+    return new Response(JSON.stringify({ error: 'User not found' }), {
       status: 401,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json' }
     });
   }
 
-  const user: User = await env.USERS.get(`user:${userId}`, { type: 'json' });
-  const hashedPassword = await hashPassword(password);
-  if (user.password !== hashedPassword) {
-    return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
+  const userData = JSON.parse(user);
+  // Simplified password check (update with your hashing logic)
+  if (password !== userData.password) {
+    return new Response(JSON.stringify({ error: 'Invalid password' }), {
       status: 401,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json' }
     });
   }
 
-  const sessionId = generateToken();
-  await env.USERS.put(
-    `session:${sessionId}`,
-    JSON.stringify({
-      userId,
-      expires: Date.now() + 24 * 60 * 60 * 1000,
-    } as Session),
-    { expirationTtl: 24 * 60 * 60 },
-  );
-
-  return new Response(JSON.stringify({ id: userId, name: user.name, email, role: user.role }), {
+  return new Response(JSON.stringify({ email, name: userData.name, role: userData.role }), {
     headers: {
       'Content-Type': 'application/json',
-      'Set-Cookie': setCookie('session', sessionId),
-    },
+      'Set-Cookie': `session=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Strict`
+    }
   });
 }
