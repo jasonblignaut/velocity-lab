@@ -31,10 +31,10 @@
     </header>
     <div class="progress-bar-container">
       <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-      <span class="progress-text" id="progressText">0% Completed</span>
+      <span class="progress-text" id="progressText">0% Completed (0/30 tasks)</span>
     </div>
     <div class="timeline">
-      <!-- Week 1 - LEFT (Foundation Setup) -->
+      <!-- Week 1 - Foundation Setup (8 tasks) -->
       <div class="week" data-week="week1">
         <div class="week-content">
           <div class="week-badge">1</div>
@@ -47,79 +47,123 @@
               </div>
               <span>Foundation Setup</span>
             </div>
-            <div class="task" data-task="dc" role="button" tabindex="0" aria-label="Promote Server 2012 to Domain Controller">
-              <input type="checkbox" data-week="week1" data-task="dc" id="dc-week1">
+            
+            <!-- Task 1: Install AD DS Role -->
+            <div class="task" data-task="dc-install" role="button" tabindex="0">
+              <input type="checkbox" data-week="week1" data-task="dc-install" id="dc-install-week1">
               <div class="task-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 6h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2m0 2v4h16V8H4m8 1a1 1 0 1 1-1 1 1 1 0 0 1 1-1m-8 6h4v2H4v-2m6 0h4v2h-4v-2m6 0h4v2h-4v-2"/>
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
                 </svg>
               </div>
               <div class="task-content">
-                <h4>Promote Server 2012 to Domain Controller</h4>
-                <div class="task-details">Set up Active Directory and DNS services for centralized domain management</div>
-                <div class="task-refs">
-                  <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-active-directory-domain-services--level-100-" target="_blank" rel="noopener">📚 MS Learn: Install AD DS</a> • 
-                  <a href="https://techcommunity.microsoft.com/t5/windows-server-for-it-pros/installing-active-directory-domain-services-on-windows-server/m-p/572305" target="_blank" rel="noopener">💡 Tech Community Guide</a>
-                </div>
+                <h4>Install Active Directory Domain Services Role</h4>
+                <div class="task-details">Install the foundational AD DS role on Windows Server 2012</div>
               </div>
             </div>
-            <div class="task" data-task="vm" role="button" tabindex="0" aria-label="Join VM to Domain">
-              <input type="checkbox" data-week="week1" data-task="vm" id="vm-week1">
+
+            <!-- Task 2: Promote to DC -->
+            <div class="task" data-task="dc-promote" role="button" tabindex="0">
+              <input type="checkbox" data-week="week1" data-task="dc-promote" id="dc-promote-week1">
               <div class="task-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 4h16v12H4V4m2 2v8h12V6H6m2 8h8v2H8v-2"/>
+                  <path d="M4 6h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2m0 2v4h16V8H4m8 1a1 1 0 1 1-1 1 1 1 0 0 1 1-1"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Promote Server to Domain Controller</h4>
+                <div class="task-details">Configure as primary DC with DNS services and create new forest</div>
+              </div>
+            </div>
+
+            <!-- Task 3: Configure VM DNS -->
+            <div class="task" data-task="vm-dns" role="button" tabindex="0">
+              <input type="checkbox" data-week="week1" data-task="vm-dns" id="vm-dns-week1">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Configure VM DNS Settings</h4>
+                <div class="task-details">Point virtual machine to use domain controller as DNS server</div>
+              </div>
+            </div>
+
+            <!-- Task 4: Join VM to Domain -->
+            <div class="task" data-task="vm-join" role="button" tabindex="0">
+              <input type="checkbox" data-week="week1" data-task="vm-join" id="vm-join-week1">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 4h16v12H4V4m2 2v8h12V6H6"/>
                 </svg>
               </div>
               <div class="task-content">
                 <h4>Join VM to Domain</h4>
-                <div class="task-details">Enable domain-based management and authentication for virtual machines</div>
-                <div class="task-refs">
-                  <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/join-a-computer-to-a-domain" target="_blank" rel="noopener">📚 MS Learn: Join Computer to Domain</a> • 
-                  <a href="https://alitajran.com/join-windows-server-2019-to-domain/" target="_blank" rel="noopener">🔧 Alitajran: Domain Join Guide</a>
-                </div>
+                <div class="task-details">Add virtual machine to domain for centralized management</div>
               </div>
             </div>
-            <div class="task" data-task="share" role="button" tabindex="0" aria-label="Configure Network Share on DC">
-              <input type="checkbox" data-week="week1" data-task="share" id="share-week1">
+
+            <!-- Task 5: Create Hidden Share -->
+            <div class="task" data-task="share-create" role="button" tabindex="0">
+              <input type="checkbox" data-week="week1" data-task="share-create" id="share-create-week1">
               <div class="task-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6m2 10h8v2H8v-2m0 4h5v2H8v-2"/>
+                  <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6"/>
                 </svg>
               </div>
               <div class="task-content">
-                <h4>Configure Network Share on DC</h4>
-                <div class="task-details">Create centralized file storage with secure access and automatic drive mapping</div>
-                <div class="subtasks">
-                  <div class="subtask">• Map drives automatically on logon using GPO</div>
-                  <div class="subtask">• Create hidden share (Share$ format) for security</div>
-                  <div class="subtask">• Use three different mapping methods: GPO, PowerShell, and logon scripts</div>
-                </div>
-                <div class="task-refs">
-                  <a href="https://learn.microsoft.com/en-us/windows-server/storage/file-server/file-server-resource-manager/file-server-resource-manager-overview" target="_blank" rel="noopener">📚 MS Learn: File Server Resource Manager</a> • 
-                  <a href="https://alitajran.com/map-network-drives-with-group-policy/" target="_blank" rel="noopener">🔧 Alitajran: Map Drives via GPO</a>
-                </div>
+                <h4>Create Hidden Network Share</h4>
+                <div class="task-details">Set up centralized file storage with hidden share (CompanyData$)</div>
               </div>
             </div>
-            <div class="task" data-task="group" role="button" tabindex="0" aria-label="Create Security Group">
-              <input type="checkbox" data-week="week1" data-task="group" id="group-week1">
+
+            <!-- Task 6: Map Drive via GPO -->
+            <div class="task" data-task="share-gpo" role="button" tabindex="0">
+              <input type="checkbox" data-week="week1" data-task="share-gpo" id="share-gpo-week1">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Map Drive via Group Policy (Method 1)</h4>
+                <div class="task-details">Configure automatic drive mapping through Group Policy preferences</div>
+              </div>
+            </div>
+
+            <!-- Task 7: Map Drive via Script -->
+            <div class="task" data-task="share-script" role="button" tabindex="0">
+              <input type="checkbox" data-week="week1" data-task="share-script" id="share-script-week1">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Map Drive via Logon Script (Method 2)</h4>
+                <div class="task-details">Create PowerShell logon script for automatic drive mapping</div>
+              </div>
+            </div>
+
+            <!-- Task 8: Create Security Group -->
+            <div class="task" data-task="group-create" role="button" tabindex="0">
+              <input type="checkbox" data-week="week1" data-task="group-create" id="group-create-week1">
               <div class="task-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"/>
                 </svg>
               </div>
               <div class="task-content">
-                <h4>Create Security Group</h4>
-                <div class="task-details">Implement role-based access control - only group members can access network drives</div>
-                <div class="task-refs">
-                  <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups" target="_blank" rel="noopener">📚 MS Learn: Security Groups</a> • 
-                  <a href="https://techcommunity.microsoft.com/t5/windows-server-for-it-pros/active-directory-security-groups-best-practices/m-p/1145319" target="_blank" rel="noopener">💡 Tech Community: Security Best Practices</a>
-                </div>
+                <h4>Create Security Group for Share Access</h4>
+                <div class="task-details">Implement role-based access control using AD security groups</div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <!-- Week 2 - RIGHT (Infrastructure Expansion) -->
+
+      <!-- Week 2 - Infrastructure Expansion (6 tasks) -->
       <div class="week" data-week="week2">
         <div class="week-content">
           <div class="week-badge">2</div>
@@ -132,58 +176,95 @@
               </div>
               <span>Infrastructure Expansion</span>
             </div>
-            <div class="task" data-task="server" role="button" tabindex="0" aria-label="Install Second Server 2012">
-              <input type="checkbox" data-week="week2" data-task="server" id="server-week2">
+
+            <!-- Task 9: Install Second Server -->
+            <div class="task" data-task="server-install" role="button" tabindex="0">
+              <input type="checkbox" data-week="week2" data-task="server-install" id="server-install-week2">
               <div class="task-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 6h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2m0 2v4h16V8H4m8 1a1 1 0 1 1-1 1 1 1 0 0 1 1-1m-8 6h4v2H4v-2m6 0h4v2h-4v-2m6 0h4v2h-4v-2"/>
+                  <path d="M4 6h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2m0 2v4h16V8H4"/>
                 </svg>
               </div>
               <div class="task-content">
-                <h4>Install Second Server 2012</h4>
-                <div class="task-details">Add redundancy and load distribution with a secondary domain controller</div>
-                <div class="task-refs">
-                  <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-a-replica-windows-server-2016-domain-controller-in-an-existing-domain--level-200-" target="_blank" rel="noopener">📚 MS Learn: Install Replica DC</a> • 
-                  <a href="https://alitajran.com/install-additional-domain-controller/" target="_blank" rel="noopener">🔧 Alitajran: Additional DC Setup</a>
-                </div>
+                <h4>Install Second Windows Server 2012</h4>
+                <div class="task-details">Deploy second server for redundancy and load distribution</div>
               </div>
             </div>
-            <div class="task" data-task="wsus" role="button" tabindex="0" aria-label="Setup WSUS">
-              <input type="checkbox" data-week="week2" data-task="wsus" id="wsus-week2">
+
+            <!-- Task 10: Promote to Additional DC -->
+            <div class="task" data-task="server-promote" role="button" tabindex="0">
+              <input type="checkbox" data-week="week2" data-task="server-promote" id="server-promote-week2">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Promote to Additional Domain Controller</h4>
+                <div class="task-details">Add redundancy with second domain controller in environment</div>
+              </div>
+            </div>
+
+            <!-- Task 11: Install WSUS -->
+            <div class="task" data-task="wsus-install" role="button" tabindex="0">
+              <input type="checkbox" data-week="week2" data-task="wsus-install" id="wsus-install-week2">
               <div class="task-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m1 5v4h4v2h-4v4h-2v-4H7v-2h4V9h2"/>
                 </svg>
               </div>
               <div class="task-content">
-                <h4>Setup WSUS</h4>
-                <div class="task-details">Centralize Windows updates with Windows Server Update Services for better control</div>
-                <div class="task-refs">
-                  <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-server-update-services/get-started/windows-server-update-services-wsus" target="_blank" rel="noopener">📚 MS Learn: WSUS Overview</a> • 
-                  <a href="https://techcommunity.microsoft.com/t5/windows-server-for-it-pros/windows-server-update-services-wsus-best-practices/m-p/1096945" target="_blank" rel="noopener">💡 Tech Community: WSUS Best Practices</a>
-                </div>
+                <h4>Install WSUS Role</h4>
+                <div class="task-details">Deploy Windows Server Update Services for centralized updates</div>
               </div>
             </div>
-            <div class="task" data-task="time" role="button" tabindex="0" aria-label="Setup Two Time Servers">
-              <input type="checkbox" data-week="week2" data-task="time" id="time-week2">
+
+            <!-- Task 12: Configure WSUS -->
+            <div class="task" data-task="wsus-configure" role="button" tabindex="0">
+              <input type="checkbox" data-week="week2" data-task="wsus-configure" id="wsus-configure-week2">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97s-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1s.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Configure WSUS Client Policies</h4>
+                <div class="task-details">Set up Group Policy to direct clients to use WSUS server</div>
+              </div>
+            </div>
+
+            <!-- Task 13: Primary Time Server -->
+            <div class="task" data-task="time-primary" role="button" tabindex="0">
+              <input type="checkbox" data-week="week2" data-task="time-primary" id="time-primary-week2">
               <div class="task-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m0 2a8 8 0 0 0 0 16 8 8 0 0 0 0-16m0 2v6h4v2h-6V6h2"/>
                 </svg>
               </div>
               <div class="task-content">
-                <h4>Setup Two Time Servers</h4>
-                <div class="task-details">Ensure accurate time synchronization across the domain with redundant NTP sources</div>
-                <div class="task-refs">
-                  <a href="https://learn.microsoft.com/en-us/windows-server/networking/windows-time-service/windows-time-service-top" target="_blank" rel="noopener">📚 MS Learn: Windows Time Service</a> • 
-                  <a href="https://alitajran.com/configure-ntp-on-windows-server/" target="_blank" rel="noopener">🔧 Alitajran: Configure NTP Server</a>
-                </div>
+                <h4>Configure Primary Time Server</h4>
+                <div class="task-details">Set PDC Emulator as authoritative time source with external NTP</div>
+              </div>
+            </div>
+
+            <!-- Task 14: Secondary Time Server -->
+            <div class="task" data-task="time-secondary" role="button" tabindex="0">
+              <input type="checkbox" data-week="week2" data-task="time-secondary" id="time-secondary-week2">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m0 2a8 8 0 0 0 0 16 8 8 0 0 0 0-16m1 5v4l3 2-1 1.5-4-2.5V7h2"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Configure Secondary Time Server</h4>
+                <div class="task-details">Set second DC as backup time source with domain hierarchy sync</div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <!-- Week 3 - LEFT (Email & Messaging) -->
+
+      <!-- Week 3 - Email & Messaging (8 tasks) -->
       <div class="week" data-week="week3">
         <div class="week-content">
           <div class="week-badge">3</div>
@@ -196,74 +277,123 @@
               </div>
               <span>Email &amp; Messaging</span>
             </div>
-            <div class="task" data-task="upgrade" role="button" tabindex="0" aria-label="Upgrade Servers to 2016">
-              <input type="checkbox" data-week="week3" data-task="upgrade" id="upgrade-week3">
+
+            <!-- Task 15: Prepare Server 2016 Upgrade -->
+            <div class="task" data-task="upgrade-prep" role="button" tabindex="0">
+              <input type="checkbox" data-week="week3" data-task="upgrade-prep" id="upgrade-prep-week3">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M9 7h6v2H9zm0 4h6v2H9zm0 4h6v2H9zM4 3h16c1.1 0 2 .9 2 2v14c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2z"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Prepare for Server 2016 Upgrade</h4>
+                <div class="task-details">Create backups and verify compatibility for OS upgrade</div>
+              </div>
+            </div>
+
+            <!-- Task 16: Execute Upgrade -->
+            <div class="task" data-task="upgrade-execute" role="button" tabindex="0">
+              <input type="checkbox" data-week="week3" data-task="upgrade-execute" id="upgrade-execute-week3">
               <div class="task-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m-1 3h2v4l4 4-1.41 1.41-3.59-3.59V11h-2V7"/>
                 </svg>
               </div>
               <div class="task-content">
-                <h4>Upgrade Servers to 2016</h4>
-                <div class="task-details">Modernize infrastructure for enhanced security, performance, and Exchange compatibility</div>
-                <div class="task-refs">
-                  <a href="https://learn.microsoft.com/en-us/windows-server/upgrade/upgrade-2012-to-2016" target="_blank" rel="noopener">📚 MS Learn: Upgrade to Server 2016</a> • 
-                  <a href="https://techcommunity.microsoft.com/t5/windows-server-for-it-pros/upgrading-from-windows-server-2012-r2-to-windows-server-2016/m-p/393194" target="_blank" rel="noopener">💡 Tech Community: Upgrade Guide</a>
-                </div>
+                <h4>Execute Server 2016 Upgrade</h4>
+                <div class="task-details">Perform in-place upgrade and raise functional levels</div>
               </div>
             </div>
-            <div class="task" data-task="exchange" role="button" tabindex="0" aria-label="Install Third Server with Exchange">
-              <input type="checkbox" data-week="week3" data-task="exchange" id="exchange-week3">
+
+            <!-- Task 17: Prepare Exchange -->
+            <div class="task" data-task="exchange-prep" role="button" tabindex="0">
+              <input type="checkbox" data-week="week3" data-task="exchange-prep" id="exchange-prep-week3">
               <div class="task-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2"/>
                 </svg>
               </div>
               <div class="task-content">
-                <h4>Install Third Server with Exchange</h4>
-                <div class="task-details">Deploy Exchange Server 2019 on dedicated hardware for email services</div>
-                <div class="task-refs">
-                  <a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/deploy-new-installations/install-exchange-mailbox-role?view=exchserver-2019" target="_blank" rel="noopener">📚 MS Learn: Install Exchange 2019</a> • 
-                  <a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/exchange-server-2019-setup-amp-deployment-guide/ba-p/1128616" target="_blank" rel="noopener">💡 Tech Community: Exchange Setup Guide</a>
-                </div>
+                <h4>Prepare Exchange Server Installation</h4>
+                <div class="task-details">Install prerequisites and extend AD schema for Exchange</div>
               </div>
             </div>
-            <div class="task" data-task="mailbox" role="button" tabindex="0" aria-label="Create Mailbox for User">
-              <input type="checkbox" data-week="week3" data-task="mailbox" id="mailbox-week3">
+
+            <!-- Task 18: Install Exchange -->
+            <div class="task" data-task="exchange-install" role="button" tabindex="0">
+              <input type="checkbox" data-week="week3" data-task="exchange-install" id="exchange-install-week3">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 6h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2m0 2v4h16V8H4"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Install Exchange Server 2019</h4>
+                <div class="task-details">Deploy Exchange with Mailbox role on third server</div>
+              </div>
+            </div>
+
+            <!-- Task 19: Configure Exchange -->
+            <div class="task" data-task="exchange-config" role="button" tabindex="0">
+              <input type="checkbox" data-week="week3" data-task="exchange-config" id="exchange-config-week3">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97s-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1s.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Configure Exchange Post-Installation</h4>
+                <div class="task-details">Set up connectors, policies, and certificates</div>
+              </div>
+            </div>
+
+            <!-- Task 20: Create Mailboxes -->
+            <div class="task" data-task="mailbox-create" role="button" tabindex="0">
+              <input type="checkbox" data-week="week3" data-task="mailbox-create" id="mailbox-create-week3">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Create User Mailboxes</h4>
+                <div class="task-details">Provision mailboxes for domain users and configure settings</div>
+              </div>
+            </div>
+
+            <!-- Task 21: Test Mailboxes -->
+            <div class="task" data-task="mailbox-test" role="button" tabindex="0">
+              <input type="checkbox" data-week="week3" data-task="mailbox-test" id="mailbox-test-week3">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Test Mailbox Functionality</h4>
+                <div class="task-details">Verify OWA access, Outlook configuration, and basic features</div>
+              </div>
+            </div>
+
+            <!-- Task 22: Internal Mail Flow -->
+            <div class="task" data-task="mail-internal" role="button" tabindex="0">
+              <input type="checkbox" data-week="week3" data-task="mail-internal" id="mail-internal-week3">
               <div class="task-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2"/>
                 </svg>
               </div>
               <div class="task-content">
-                <h4>Create Mailbox for User</h4>
-                <div class="task-details">Provision email accounts and configure mailbox settings for domain users</div>
-                <div class="task-refs">
-                  <a href="https://learn.microsoft.com/en-us/exchange/recipients/create-user-mailboxes?view=exchserver-2019" target="_blank" rel="noopener">📚 MS Learn: Create User Mailboxes</a> • 
-                  <a href="https://alitajran.com/create-mailbox-exchange-server/" target="_blank" rel="noopener">🔧 Alitajran: Create Exchange Mailbox</a>
-                </div>
-              </div>
-            </div>
-            <div class="task" data-task="mail" role="button" tabindex="0" aria-label="Get Internal Mail Flow Working">
-              <input type="checkbox" data-week="week3" data-task="mail" id="mail-week3">
-              <div class="task-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2"/>
-                </svg>
-              </div>
-              <div class="task-content">
-                <h4>Get Internal Mail Flow Working</h4>
-                <div class="task-details">Configure send/receive connectors and test email delivery between internal users</div>
-                <div class="task-refs">
-                  <a href="https://learn.microsoft.com/en-us/exchange/mail-flow/connectors/connectors?view=exchserver-2019" target="_blank" rel="noopener">📚 MS Learn: Mail Flow Connectors</a> • 
-                  <a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/troubleshooting-mail-flow-in-exchange-server/ba-p/1087449" target="_blank" rel="noopener">💡 Tech Community: Troubleshoot Mail Flow</a>
-                </div>
+                <h4>Configure Internal Mail Flow</h4>
+                <div class="task-details">Set up connectors and test email delivery between users</div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <!-- Week 4 - RIGHT (Cloud Integration) -->
+
+      <!-- Week 4 - Cloud Integration (8 tasks) -->
       <div class="week" data-week="week4">
         <div class="week-content">
           <div class="week-badge">4</div>
@@ -276,48 +406,116 @@
               </div>
               <span>Cloud Integration</span>
             </div>
-            <div class="task" data-task="external" role="button" tabindex="0" aria-label="Publishing Mail Externally">
-              <input type="checkbox" data-week="week4" data-task="external" id="external-week4">
+
+            <!-- Task 23: Configure DNS Records -->
+            <div class="task" data-task="external-dns" role="button" tabindex="0">
+              <input type="checkbox" data-week="week4" data-task="external-dns" id="external-dns-week4">
               <div class="task-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2"/>
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>
               </div>
               <div class="task-content">
-                <h4>Publishing Mail Externally</h4>
-                <div class="task-details">Enable secure external email access with proper DNS records and security protocols</div>
-                <div class="subtasks">
-                  <div class="subtask">• Configure MX, SPF, DKIM, and DMARC records for email authentication</div>
-                  <div class="subtask">• Enable modern authentication (OAuth 2.0) for enhanced security</div>
-                  <div class="subtask">• Set up TLS certificates and configure reverse DNS for reputation</div>
-                </div>
-                <div class="task-refs">
-                  <a href="https://learn.microsoft.com/en-us/exchange/mail-flow/mail-routing/external-mail-flow?view=exchserver-2019" target="_blank" rel="noopener">📚 MS Learn: External Mail Flow</a> • 
-                  <a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/email-authentication-spf-dkim-and-dmarc/ba-p/1072258" target="_blank" rel="noopener">💡 Tech Community: Email Authentication</a>
-                </div>
+                <h4>Configure DNS Records for External Mail</h4>
+                <div class="task-details">Set up MX, SPF, DKIM, and DMARC records for email authentication</div>
               </div>
             </div>
-            <div class="task" data-task="hybrid" role="button" tabindex="0" aria-label="Setup 365 Hybrid Environment">
-              <input type="checkbox" data-week="week4" data-task="hybrid" id="hybrid-week4">
+
+            <!-- Task 24: Configure Firewall -->
+            <div class="task" data-task="external-firewall" role="button" tabindex="0">
+              <input type="checkbox" data-week="week4" data-task="external-firewall" id="external-firewall-week4">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11.5C15.4,11.5 16,12.4 16,13V16C16,17.4 15.4,18 14.8,18H9.2C8.6,18 8,17.4 8,16V13C8,12.4 8.6,11.5 9.2,11.5V10C9.2,8.6 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,10V11.5H13.5V10C13.5,8.7 12.8,8.2 12,8.2Z"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Configure Firewall and Network Security</h4>
+                <div class="task-details">Set up port forwarding and security rules for external access</div>
+              </div>
+            </div>
+
+            <!-- Task 25: Install SSL Certificates -->
+            <div class="task" data-task="external-certificates" role="button" tabindex="0">
+              <input type="checkbox" data-week="week4" data-task="external-certificates" id="external-certificates-week4">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M9,22A1,1 0 0,1 8,21V18H4A2,2 0 0,1 2,16V4C2,2.89 2.9,2 4,2H20A2,2 0 0,1 22,4V16A2,2 0 0,1 20,18H13.9L10.2,21.71C10,21.9 9.75,22 9.5,22H9M10,16V19.08L13.08,16H20V4H4V16H10Z"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Install and Configure SSL Certificates</h4>
+                <div class="task-details">Secure external communications with proper TLS certificates</div>
+              </div>
+            </div>
+
+            <!-- Task 26: Configure Modern Auth -->
+            <div class="task" data-task="external-auth" role="button" tabindex="0">
+              <input type="checkbox" data-week="week4" data-task="external-auth" id="external-auth-week4">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Configure Modern Authentication</h4>
+                <div class="task-details">Implement OAuth 2.0 and modern authentication protocols</div>
+              </div>
+            </div>
+
+            <!-- Task 27: Prepare Hybrid -->
+            <div class="task" data-task="hybrid-prepare" role="button" tabindex="0">
+              <input type="checkbox" data-week="week4" data-task="hybrid-prepare" id="hybrid-prepare-week4">
               <div class="task-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M19 18H6a4 4 0 0 1-4-4 4 4 0 0 1 4-4h.71a5.5 5.5 0 0 1 0-1A5.37 5.37 0 0 1 12 3.59a5.26 5.26 0 0 1 5.33 4.71A4.33 4.33 0 0 1 22 13a4.5 4.5 0 0 1-3 4.2"/>
                 </svg>
               </div>
               <div class="task-content">
-                <h4>Setup Microsoft 365 Hybrid Environment</h4>
-                <div class="task-details">Integrate on-premises Exchange with Microsoft 365 for seamless hybrid operations</div>
-                <div class="subtasks">
-                  <div class="subtask">• Configure Entra ID Connect for hybrid identity synchronization</div>
-                  <div class="subtask">• Run Hybrid Configuration Wizard to establish trust relationship</div>
-                  <div class="subtask">• Verify bidirectional mail flow and calendar sharing functionality</div>
-                  <div class="subtask">• 📋 <strong>Important:</strong> Complete external mail publishing (Week 4 Task 1) before proceeding</div>
-                </div>
-                <div class="task-refs">
-                  <a href="https://learn.microsoft.com/en-us/exchange/hybrid-deployment/hybrid-deployment" target="_blank" rel="noopener">📚 MS Learn: Exchange Hybrid Deployment</a> • 
-                  <a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/exchange-hybrid-deployment-step-by-step-guide/ba-p/1044294" target="_blank" rel="noopener">💡 Tech Community: Hybrid Step-by-Step</a> • 
-                  <a href="https://alitajran.com/exchange-hybrid-configuration/" target="_blank" rel="noopener">🔧 Alitajran: Hybrid Configuration</a>
-                </div>
+                <h4>Prepare for Hybrid Configuration</h4>
+                <div class="task-details">Set up Microsoft 365 tenant and Azure AD Connect</div>
+              </div>
+            </div>
+
+            <!-- Task 28: Run Hybrid Wizard -->
+            <div class="task" data-task="hybrid-wizard" role="button" tabindex="0">
+              <input type="checkbox" data-week="week4" data-task="hybrid-wizard" id="hybrid-wizard-week4">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M7,2V4H8V18A4,4 0 0,0 12,22A4,4 0 0,0 16,18V4H17V2H7M11,16C10.4,16 10,15.6 10,15C10,14.4 10.4,14 11,14C11.6,14 12,14.4 12,15C12,15.6 11.6,16 11,16M13,12C12.4,12 12,11.6 12,11C12,10.4 12.4,10 13,10C13.6,10 14,10.4 14,11C14,11.6 13.6,12 13,12M14,7H10V9H14V7Z"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Run Hybrid Configuration Wizard</h4>
+                <div class="task-details">Execute wizard to establish trust and mail routing</div>
+              </div>
+            </div>
+
+            <!-- Task 29: Configure Hybrid Mail Flow -->
+            <div class="task" data-task="hybrid-mailflow" role="button" tabindex="0">
+              <input type="checkbox" data-week="week4" data-task="hybrid-mailflow" id="hybrid-mailflow-week4">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Configure Hybrid Mail Flow</h4>
+                <div class="task-details">Set up bidirectional mail flow between on-premises and cloud</div>
+              </div>
+            </div>
+
+            <!-- Task 30: Verify Hybrid Functionality -->
+            <div class="task" data-task="hybrid-verify" role="button" tabindex="0">
+              <input type="checkbox" data-week="week4" data-task="hybrid-verify" id="hybrid-verify-week4">
+              <div class="task-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              </div>
+              <div class="task-content">
+                <h4>Verify Hybrid Functionality</h4>
+                <div class="task-details">Test and validate all hybrid features and functionality</div>
               </div>
             </div>
           </div>
@@ -325,6 +523,7 @@
       </div>
     </div>
   </div>
+
   <div class="modal" id="taskModal" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
     <div class="modal-content">
       <button class="close-btn" id="closeModal" aria-label="Close modal">×</button>
@@ -334,111 +533,211 @@
   </div>
 
   <style>
-    /* Enhanced task styling for reference links */
-    .task-refs {
-      margin-top: 12px;
-      padding-top: 8px;
-      border-top: 1px solid var(--border-light);
-      font-size: 0.8125rem;
-      line-height: 1.4;
-    }
-    
-    .task-refs a {
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: 500;
+    /* Enhanced task styling for comprehensive layout */
+    .task {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
       transition: var(--transition);
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-    
-    .task-refs a:hover {
-      text-decoration: underline;
-      color: var(--primary-dark);
-    }
-    
-    .task-refs a:focus {
-      outline: 2px solid var(--primary);
-      outline-offset: 2px;
-      border-radius: 4px;
-    }
-    
-    /* Enhanced subtasks styling */
-    .subtasks {
-      margin-top: var(--space-3);
-      padding-left: 0;
-    }
-    
-    .subtask {
-      font-size: 0.8125rem;
-      color: var(--text-tertiary);
-      margin-bottom: var(--space-1);
+      cursor: pointer;
+      border: 1px solid transparent;
       position: relative;
-      line-height: 1.4;
-      letter-spacing: -0.01em;
-      padding-left: 8px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.4);
     }
-    
-    .subtask strong {
-      color: var(--warning);
-      font-weight: 600;
+
+    .task::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 122, 255, 0.04), transparent);
+      transition: var(--transition);
     }
-    
-    /* Improved task content layout */
+
+    .task:hover::before {
+      left: 100%;
+    }
+
+    .task:hover,
+    .task:focus {
+      background: rgba(0, 122, 255, 0.02);
+      border-color: var(--border-light);
+      transform: translateX(3px);
+      outline: none;
+      box-shadow: var(--shadow-xs);
+    }
+
+    .task input[type="checkbox"] {
+      width: 1.125rem;
+      height: 1.125rem;
+      cursor: pointer;
+      accent-color: var(--success);
+      margin-top: var(--space-1);
+      border-radius: var(--radius-xs);
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .task input[type="checkbox"]:checked {
+      transform: scale(1.05);
+    }
+
+    .task-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: var(--radius-lg);
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition-bounce);
+      box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
+    }
+
+    .task:hover .task-icon {
+      transform: scale(1.02) rotate(2deg);
+      box-shadow: var(--shadow);
+    }
+
+    .task-icon svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      fill: var(--text-inverse);
+    }
+
     .task-content {
       flex: 1;
       min-width: 0;
-      padding-right: var(--space-2);
     }
-    
+
     .task-content h4 {
-      font-size: 1rem;
+      font-size: 0.9375rem;
       font-weight: 600;
-      margin-bottom: var(--space-2);
+      margin-bottom: var(--space-1);
       color: var(--text-primary);
       line-height: 1.3;
       letter-spacing: -0.01em;
     }
-    
+
     .task-details {
-      font-size: 0.875rem;
+      font-size: 0.8125rem;
       color: var(--text-secondary);
-      line-height: 1.5;
-      margin-bottom: var(--space-2);
+      line-height: 1.4;
       letter-spacing: -0.01em;
     }
-    
-    /* Enhanced responsive design for task references */
+
+    /* Enhanced week card styling for comprehensive tasks */
+    .week-card {
+      background: var(--gradient-card);
+      backdrop-filter: var(--backdrop-blur);
+      -webkit-backdrop-filter: var(--backdrop-blur);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--glass-border);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .week-title {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: var(--space-6);
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .week-icon {
+      width: 2.25rem;
+      height: 2.25rem;
+      padding: var(--space-2);
+      background: var(--gradient-primary);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .week-icon svg {
+      width: 1.125rem;
+      height: 1.125rem;
+      fill: var(--text-inverse);
+    }
+
+    /* Progress text enhancement */
+    .progress-text {
+      display: block;
+      margin-top: var(--space-4);
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    /* Responsive adjustments for comprehensive tasks */
     @media (max-width: 768px) {
-      .task-refs {
-        font-size: 0.75rem;
+      .task {
+        padding: var(--space-3);
+        gap: var(--space-2);
+        flex-direction: row;
+        align-items: flex-start;
       }
-      
-      .task-refs a {
-        display: block;
-        margin-bottom: 4px;
+
+      .task-icon {
+        width: 2rem;
+        height: 2rem;
       }
-      
-      .subtask {
+
+      .task-content h4 {
+        font-size: 0.875rem;
+        line-height: 1.3;
+      }
+
+      .task-details {
         font-size: 0.75rem;
         line-height: 1.3;
       }
+
+      .week-card {
+        padding: var(--space-5);
+      }
+
+      .week-title {
+        font-size: 1rem;
+        gap: var(--space-2);
+      }
     }
-    
-    /* Accessibility improvements */
-    .task-refs a:focus-visible {
-      outline: 2px solid var(--primary);
-      outline-offset: 2px;
-      border-radius: 4px;
-    }
-    
-    /* External link indicator styling */
-    .task-refs a[target="_blank"]::after {
-      content: "↗";
-      font-size: 0.75rem;
-      margin-left: 2px;
-      opacity: 0.7;
+
+    @media (max-width: 480px) {
+      .task {
+        padding: var(--space-2);
+        margin-bottom: var(--space-3);
+      }
+
+      .task-icon {
+        width: 1.75rem;
+        height: 1.75rem;
+      }
+
+      .task-content h4 {
+        font-size: 0.8125rem;
+      }
+
+      .task-details {
+        font-size: 0.7rem;
+      }
     }
   </style>
 </body>

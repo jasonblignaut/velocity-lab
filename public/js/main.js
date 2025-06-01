@@ -1,5 +1,5 @@
 // Enhanced Main.js for Velocity Lab
-// Fixed password confirmation, admin portal stats, and mobile improvements
+// Comprehensive task system with detailed sub-steps and reference links
 
 // Utility Functions with Performance Optimizations
 const $ = (selector, context = document) => context.querySelector(selector);
@@ -21,6 +21,717 @@ const getCookie = (name) => {
 const deleteCookie = (name) => {
   document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Strict;Secure`;
 };
+
+// COMPREHENSIVE TASK DEFINITIONS WITH REFERENCE LINKS
+const TASK_DEFINITIONS = {
+  // WEEK 1: Foundation Setup (8 tasks)
+  'week1-dc-install': {
+    title: 'Install Active Directory Domain Services Role',
+    description: `
+      <p><strong>Install the foundational role for domain services on Windows Server 2012.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Open Server Manager Dashboard</li>
+        <li>Click "Add roles and features"</li>
+        <li>Select "Role-based or feature-based installation"</li>
+        <li>Choose your server from the server pool</li>
+        <li>Select "Active Directory Domain Services" role</li>
+        <li>Add required features when prompted</li>
+        <li>Complete the installation wizard</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-active-directory-domain-services--level-100-" target="_blank">📖 MS Learn: Install Active Directory Domain Services</a></li>
+        <li><a href="https://techcommunity.microsoft.com/t5/windows-server-for-it-pros/installing-active-directory-domain-services-on-windows-server/m-p/572305" target="_blank">💡 Tech Community: AD DS Installation Guide</a></li>
+        <li><a href="https://alitajran.com/install-active-directory-windows-server-2019/" target="_blank">🔧 Alitajran: Step-by-Step AD Installation</a></li>
+      </ul>
+    `
+  },
+
+  'week1-dc-promote': {
+    title: 'Promote Server to Domain Controller',
+    description: `
+      <p><strong>Configure the server as the primary domain controller with DNS services.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Click the notification flag in Server Manager</li>
+        <li>Select "Promote this server to a domain controller"</li>
+        <li>Choose "Add a new forest" and specify domain name (e.g., lab.local)</li>
+        <li>Set Forest and Domain functional levels to Windows Server 2012</li>
+        <li>Ensure "Domain Name System (DNS) server" is checked</li>
+        <li>Set Directory Services Restore Mode (DSRM) password</li>
+        <li>Review DNS options and NetBIOS domain name</li>
+        <li>Specify database, log files, and SYSVOL paths</li>
+        <li>Complete the promotion and restart when prompted</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-a-new-windows-server-2016-active-directory-forest--level-200-" target="_blank">📖 MS Learn: Install New AD Forest</a></li>
+        <li><a href="https://alitajran.com/promote-windows-server-2019-to-domain-controller/" target="_blank">🔧 Alitajran: Promote to Domain Controller</a></li>
+      </ul>
+    `
+  },
+
+  'week1-vm-dns': {
+    title: 'Configure VM DNS Settings',
+    description: `
+      <p><strong>Point the virtual machine to use the domain controller as its DNS server.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Open Network and Sharing Center on the VM</li>
+        <li>Click "Change adapter settings"</li>
+        <li>Right-click network adapter and select "Properties"</li>
+        <li>Select "Internet Protocol Version 4 (TCP/IPv4)" and click "Properties"</li>
+        <li>Select "Use the following DNS server addresses"</li>
+        <li>Enter the Domain Controller's IP address as Preferred DNS</li>
+        <li>Click "OK" to save settings</li>
+        <li>Test connectivity with <code>nslookup lab.local</code></li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/networking/dns/troubleshoot/troubleshoot-dns-clients" target="_blank">📖 MS Learn: Configure DNS Clients</a></li>
+        <li><a href="https://alitajran.com/configure-dns-client-windows/" target="_blank">🔧 Alitajran: Configure DNS Client</a></li>
+      </ul>
+    `
+  },
+
+  'week1-vm-join': {
+    title: 'Join VM to Domain',
+    description: `
+      <p><strong>Add the virtual machine to the newly created domain for centralized management.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Right-click "This PC" and select "Properties"</li>
+        <li>Click "Change settings" next to Computer name</li>
+        <li>Click "Change..." button</li>
+        <li>Select "Domain" and enter your domain name (e.g., lab.local)</li>
+        <li>Provide domain administrator credentials when prompted</li>
+        <li>Welcome message confirms successful domain join</li>
+        <li>Restart the computer when prompted</li>
+        <li>Log in with domain account to verify</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/join-a-computer-to-a-domain" target="_blank">📖 MS Learn: Join Computer to Domain</a></li>
+        <li><a href="https://alitajran.com/join-windows-server-2019-to-domain/" target="_blank">🔧 Alitajran: Join Computer to Domain</a></li>
+      </ul>
+    `
+  },
+
+  'week1-share-create': {
+    title: 'Create Hidden Network Share',
+    description: `
+      <p><strong>Create a centralized file share with security and automatic mapping capabilities.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Create folder "C:\\CompanyData" on Domain Controller</li>
+        <li>Right-click folder and select "Properties"</li>
+        <li>Go to "Sharing" tab and click "Advanced Sharing"</li>
+        <li>Check "Share this folder"</li>
+        <li>Change share name to "CompanyData$" ($ makes it hidden)</li>
+        <li>Click "Permissions" and set appropriate access</li>
+        <li>Go to "Security" tab and configure NTFS permissions</li>
+        <li>Test access from another machine using \\\\servername\\CompanyData$</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/storage/file-server/file-server-resource-manager/file-server-resource-manager-overview" target="_blank">📖 MS Learn: File Server Management</a></li>
+        <li><a href="https://alitajran.com/create-shared-folder-windows-server/" target="_blank">🔧 Alitajran: Create Shared Folders</a></li>
+      </ul>
+    `
+  },
+
+  'week1-share-gpo': {
+    title: 'Map Drive via Group Policy',
+    description: `
+      <p><strong>Configure automatic drive mapping through Group Policy for Method 1.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Open Group Policy Management Console (gpmc.msc)</li>
+        <li>Create new GPO named "Drive Mapping Policy"</li>
+        <li>Right-click and "Edit" the GPO</li>
+        <li>Navigate to User Configuration > Preferences > Windows Settings > Drive Maps</li>
+        <li>Right-click and select "New > Mapped Drive"</li>
+        <li>Set Action to "Create", Location to \\\\servername\\CompanyData$</li>
+        <li>Set Drive Letter to "H:" and configure options</li>
+        <li>Link GPO to appropriate OU and test</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/dn581922(v=ws.11)" target="_blank">📖 MS Learn: Group Policy Preferences</a></li>
+        <li><a href="https://alitajran.com/map-network-drives-with-group-policy/" target="_blank">🔧 Alitajran: Map Drives with GPO</a></li>
+      </ul>
+    `
+  },
+
+  'week1-share-script': {
+    title: 'Map Drive via Logon Script',
+    description: `
+      <p><strong>Create PowerShell logon script for automatic drive mapping - Method 2.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Create PowerShell script file "MapDrives.ps1" in SYSVOL</li>
+        <li>Add command: <code>New-PSDrive -Name "S" -PSProvider FileSystem -Root "\\\\servername\\CompanyData$" -Persist</code></li>
+        <li>Set execution policy if needed</li>
+        <li>Open Group Policy Management Console</li>
+        <li>Navigate to User Configuration > Policies > Windows Settings > Scripts</li>
+        <li>Double-click "Logon" and add PowerShell script</li>
+        <li>Configure script parameters and test deployment</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/new-psdrive" target="_blank">📖 MS Learn: New-PSDrive Cmdlet</a></li>
+        <li><a href="https://alitajran.com/powershell-logon-script-group-policy/" target="_blank">🔧 Alitajran: PowerShell Logon Scripts</a></li>
+      </ul>
+    `
+  },
+
+  'week1-group-create': {
+    title: 'Create Security Group for Share Access',
+    description: `
+      <p><strong>Implement role-based access control using Active Directory security groups.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Open Active Directory Users and Computers (dsa.msc)</li>
+        <li>Navigate to appropriate OU or create new OU "Groups"</li>
+        <li>Right-click and select "New > Group"</li>
+        <li>Name the group "CompanyData_Access"</li>
+        <li>Set Group scope to "Global" and type to "Security"</li>
+        <li>Add users to the group who need share access</li>
+        <li>Modify share and NTFS permissions to grant access only to this group</li>
+        <li>Test access with group member and non-member accounts</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups" target="_blank">📖 MS Learn: Security Groups Overview</a></li>
+        <li><a href="https://techcommunity.microsoft.com/t5/windows-server-for-it-pros/active-directory-security-groups-best-practices/m-p/1145319" target="_blank">💡 Tech Community: Security Groups Best Practices</a></li>
+        <li><a href="https://alitajran.com/create-active-directory-security-groups/" target="_blank">🔧 Alitajran: Create Security Groups</a></li>
+      </ul>
+    `
+  },
+
+  // WEEK 2: Infrastructure Expansion (6 tasks)
+  'week2-server-install': {
+    title: 'Install Second Windows Server 2012',
+    description: `
+      <p><strong>Deploy a second server to provide redundancy and load distribution.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Create new virtual machine with adequate resources</li>
+        <li>Install Windows Server 2012 using installation media</li>
+        <li>Configure basic network settings with static IP</li>
+        <li>Set DNS server to point to first domain controller</li>
+        <li>Install latest updates and configure Windows Firewall</li>
+        <li>Join the new server to the existing domain</li>
+        <li>Verify successful domain join and network connectivity</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/get-started/installation-and-upgrade" target="_blank">📖 MS Learn: Server Installation</a></li>
+        <li><a href="https://alitajran.com/install-windows-server-2019/" target="_blank">🔧 Alitajran: Install Windows Server</a></li>
+      </ul>
+    `
+  },
+
+  'week2-server-promote': {
+    title: 'Promote Second Server to Additional Domain Controller',
+    description: `
+      <p><strong>Add redundancy by creating a second domain controller in the environment.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Install Active Directory Domain Services role on second server</li>
+        <li>Run "Promote this server to a domain controller"</li>
+        <li>Select "Add a domain controller to an existing domain"</li>
+        <li>Provide domain administrator credentials</li>
+        <li>Ensure DNS server and Global Catalog options are selected</li>
+        <li>Set Directory Services Restore Mode password</li>
+        <li>Complete promotion and verify replication</li>
+        <li>Test failover scenarios between domain controllers</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-a-replica-windows-server-2016-domain-controller-in-an-existing-domain--level-200-" target="_blank">📖 MS Learn: Install Replica Domain Controller</a></li>
+        <li><a href="https://alitajran.com/install-additional-domain-controller/" target="_blank">🔧 Alitajran: Additional Domain Controller</a></li>
+      </ul>
+    `
+  },
+
+  'week2-wsus-install': {
+    title: 'Install WSUS Role',
+    description: `
+      <p><strong>Deploy Windows Server Update Services for centralized update management.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Open Server Manager and click "Add roles and features"</li>
+        <li>Select "Windows Server Update Services" role</li>
+        <li>Choose WID (Windows Internal Database) for database</li>
+        <li>Specify content location (recommend separate drive)</li>
+        <li>Complete installation and run Post-Deployment Configuration</li>
+        <li>Connect to Microsoft Update and synchronize</li>
+        <li>Configure update classifications and products</li>
+        <li>Create computer groups for different update schedules</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-server-update-services/get-started/windows-server-update-services-wsus" target="_blank">📖 MS Learn: WSUS Overview</a></li>
+        <li><a href="https://techcommunity.microsoft.com/t5/windows-server-for-it-pros/windows-server-update-services-wsus-best-practices/m-p/1096945" target="_blank">💡 Tech Community: WSUS Best Practices</a></li>
+        <li><a href="https://alitajran.com/install-wsus-windows-server/" target="_blank">🔧 Alitajran: Install WSUS</a></li>
+      </ul>
+    `
+  },
+
+  'week2-wsus-configure': {
+    title: 'Configure WSUS Client Policies',
+    description: `
+      <p><strong>Set up Group Policy to direct clients to use WSUS for updates.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Open Group Policy Management Console</li>
+        <li>Create new GPO named "WSUS Client Configuration"</li>
+        <li>Navigate to Computer Configuration > Policies > Administrative Templates</li>
+        <li>Go to Windows Components > Windows Update</li>
+        <li>Configure "Specify intranet Microsoft update service location"</li>
+        <li>Set both URLs to http://WSUSServerName:8530</li>
+        <li>Configure automatic update settings and schedule</li>
+        <li>Link GPO to appropriate OUs and test client connectivity</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-server-update-services/deploy/4-configure-group-policy-settings-for-automatic-updates" target="_blank">📖 MS Learn: Configure WSUS Group Policy</a></li>
+        <li><a href="https://alitajran.com/configure-wsus-group-policy/" target="_blank">🔧 Alitajran: WSUS Group Policy Settings</a></li>
+      </ul>
+    `
+  },
+
+  'week2-time-primary': {
+    title: 'Configure Primary Time Server',
+    description: `
+      <p><strong>Set up the PDC Emulator as the authoritative time source for the domain.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Identify PDC Emulator role holder with: <code>netdom query fsmo</code></li>
+        <li>On PDC Emulator, configure external time source:</li>
+        <li>Run: <code>w32tm /config /manualpeerlist:"time.nist.gov,pool.ntp.org" /syncfromflags:manual</code></li>
+        <li>Run: <code>w32tm /config /reliable:yes</code></li>
+        <li>Restart Windows Time service: <code>net stop w32time && net start w32time</code></li>
+        <li>Force immediate sync: <code>w32tm /resync /rediscover</code></li>
+        <li>Verify configuration: <code>w32tm /query /status</code></li>
+        <li>Check time source: <code>w32tm /query /source</code></li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/networking/windows-time-service/windows-time-service-top" target="_blank">📖 MS Learn: Windows Time Service</a></li>
+        <li><a href="https://alitajran.com/configure-ntp-on-windows-server/" target="_blank">🔧 Alitajran: Configure NTP Server</a></li>
+      </ul>
+    `
+  },
+
+  'week2-time-secondary': {
+    title: 'Configure Secondary Time Server',
+    description: `
+      <p><strong>Set up the second domain controller as backup time source.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>On second domain controller, configure time sync with PDC:</li>
+        <li>Run: <code>w32tm /config /syncfromflags:domhier</code></li>
+        <li>Run: <code>w32tm /config /reliable:no</code></li>
+        <li>Restart Windows Time service</li>
+        <li>Force sync with domain hierarchy: <code>w32tm /resync</code></li>
+        <li>Verify sync status: <code>w32tm /query /status</code></li>
+        <li>Test time synchronization across all domain members</li>
+        <li>Configure monitoring for time drift issues</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/troubleshoot/windows-server/identity/config-authoritative-time-server" target="_blank">📖 MS Learn: Configure Authoritative Time Server</a></li>
+        <li><a href="https://techcommunity.microsoft.com/t5/windows-server-for-it-pros/time-synchronization-in-active-directory/m-p/395402" target="_blank">💡 Tech Community: Time Sync in AD</a></li>
+      </ul>
+    `
+  },
+
+  // WEEK 3: Email & Messaging (8 tasks)
+  'week3-upgrade-prep': {
+    title: 'Prepare for Server 2016 Upgrade',
+    description: `
+      <p><strong>Prepare the environment for upgrading from Windows Server 2012 to 2016.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Run Windows Server 2016 compatibility check</li>
+        <li>Create full system backups of all servers</li>
+        <li>Document current server configurations and roles</li>
+        <li>Verify hardware compatibility with Server 2016</li>
+        <li>Check application compatibility requirements</li>
+        <li>Plan upgrade sequence (secondary DC first, then primary)</li>
+        <li>Download Windows Server 2016 installation media</li>
+        <li>Schedule maintenance window for upgrades</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/upgrade/upgrade-2012-to-2016" target="_blank">📖 MS Learn: Upgrade to Server 2016</a></li>
+        <li><a href="https://techcommunity.microsoft.com/t5/windows-server-for-it-pros/upgrading-from-windows-server-2012-r2-to-windows-server-2016/m-p/393194" target="_blank">💡 Tech Community: Server 2016 Upgrade</a></li>
+      </ul>
+    `
+  },
+
+  'week3-upgrade-execute': {
+    title: 'Execute Server 2016 Upgrade',
+    description: `
+      <p><strong>Perform in-place upgrade of domain controllers to Windows Server 2016.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Start with secondary domain controller upgrade</li>
+        <li>Run Windows Server 2016 setup from installation media</li>
+        <li>Choose "Keep personal files and apps" option</li>
+        <li>Follow upgrade wizard and wait for completion</li>
+        <li>Verify all roles and features are functioning</li>
+        <li>Test Active Directory replication between DCs</li>
+        <li>Upgrade primary domain controller using same process</li>
+        <li>Raise domain and forest functional levels to 2016</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/upgrade/upgrade-2012-to-2016" target="_blank">📖 MS Learn: In-Place Upgrade Process</a></li>
+        <li><a href="https://alitajran.com/upgrade-windows-server-2012-to-2016/" target="_blank">🔧 Alitajran: Server Upgrade Guide</a></li>
+      </ul>
+    `
+  },
+
+  'week3-exchange-prep': {
+    title: 'Prepare Exchange Server Installation',
+    description: `
+      <p><strong>Prepare the third server for Exchange Server 2019 deployment.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Install Windows Server 2016 on third server with minimum 16GB RAM</li>
+        <li>Join server to domain and install latest updates</li>
+        <li>Install required Windows features and .NET Framework</li>
+        <li>Install Visual C++ Redistributable packages</li>
+        <li>Download Exchange Server 2019 installation files</li>
+        <li>Extend Active Directory schema for Exchange</li>
+        <li>Prepare Active Directory domain for Exchange</li>
+        <li>Verify all prerequisites are met before installation</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/prerequisites?view=exchserver-2019" target="_blank">📖 MS Learn: Exchange 2019 Prerequisites</a></li>
+        <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/exchange-server-2019-setup-amp-deployment-guide/ba-p/1128616" target="_blank">💡 Tech Community: Exchange 2019 Setup</a></li>
+      </ul>
+    `
+  },
+
+  'week3-exchange-install': {
+    title: 'Install Exchange Server 2019',
+    description: `
+      <p><strong>Deploy Exchange Server 2019 with Mailbox role on the prepared server.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Run Exchange setup.exe as administrator</li>
+        <li>Accept license agreement and choose update options</li>
+        <li>Select "Mailbox role" for installation</li>
+        <li>Specify installation path and organization name</li>
+        <li>Configure malware protection settings</li>
+        <li>Review readiness checks and resolve any issues</li>
+        <li>Complete installation (may take 60+ minutes)</li>
+        <li>Install latest Exchange cumulative update</li>
+        <li>Verify Exchange services are running properly</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/deploy-new-installations/install-exchange-mailbox-role?view=exchserver-2019" target="_blank">📖 MS Learn: Install Exchange Mailbox Role</a></li>
+        <li><a href="https://alitajran.com/install-exchange-server-2019/" target="_blank">🔧 Alitajran: Install Exchange 2019</a></li>
+      </ul>
+    `
+  },
+
+  'week3-exchange-config': {
+    title: 'Configure Exchange Post-Installation',
+    description: `
+      <p><strong>Complete initial Exchange configuration and security settings.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Access Exchange Admin Center (EAC) via https://servername/ecp</li>
+        <li>Configure accepted domains for your organization</li>
+        <li>Set up email address policies for automatic address generation</li>
+        <li>Configure receive connectors for SMTP traffic</li>
+        <li>Set up send connectors for outbound mail routing</li>
+        <li>Configure transport rules and message hygiene</li>
+        <li>Set up certificates for secure communication</li>
+        <li>Test basic Exchange functionality and services</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/architecture/mailbox-servers/manage-mailbox-servers?view=exchserver-2019" target="_blank">📖 MS Learn: Manage Mailbox Servers</a></li>
+        <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/exchange-server-post-installation-tasks/ba-p/1098432" target="_blank">💡 Tech Community: Post-Installation Tasks</a></li>
+      </ul>
+    `
+  },
+
+  'week3-mailbox-create': {
+    title: 'Create User Mailboxes',
+    description: `
+      <p><strong>Provision mailboxes for domain users and configure mailbox settings.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Open Exchange Admin Center (EAC)</li>
+        <li>Navigate to Recipients > Mailboxes</li>
+        <li>Click "+" to create new user mailbox</li>
+        <li>Choose "User mailbox" and select existing domain user</li>
+        <li>Configure mailbox database and alias settings</li>
+        <li>Set mailbox quota and message size limits</li>
+        <li>Enable mailbox features (ActiveSync, OWA, etc.)</li>
+        <li>Create additional test mailboxes for different scenarios</li>
+        <li>Verify mailboxes appear in Exchange Management Shell</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/recipients/create-user-mailboxes?view=exchserver-2019" target="_blank">📖 MS Learn: Create User Mailboxes</a></li>
+        <li><a href="https://alitajran.com/create-mailbox-exchange-server/" target="_blank">🔧 Alitajran: Create Exchange Mailboxes</a></li>
+      </ul>
+    `
+  },
+
+  'week3-mailbox-test': {
+    title: 'Test Mailbox Functionality',
+    description: `
+      <p><strong>Verify mailbox creation and basic email functionality.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Test mailbox access via Outlook Web Access (OWA)</li>
+        <li>Configure Outlook profile for test user</li>
+        <li>Send test emails between created mailboxes</li>
+        <li>Verify mail delivery and folder synchronization</li>
+        <li>Test calendar functionality and meeting requests</li>
+        <li>Check global address list (GAL) visibility</li>
+        <li>Verify distribution group creation and membership</li>
+        <li>Test mailbox permissions and delegation</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/clients/outlook-on-the-web/outlook-on-the-web?view=exchserver-2019" target="_blank">📖 MS Learn: Outlook on the Web</a></li>
+        <li><a href="https://alitajran.com/test-exchange-mail-flow/" target="_blank">🔧 Alitajran: Test Mail Flow</a></li>
+      </ul>
+    `
+  },
+
+  'week3-mail-internal': {
+    title: 'Configure Internal Mail Flow',
+    description: `
+      <p><strong>Set up and verify internal mail routing and delivery within the organization.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Configure default receive connector for internal SMTP traffic</li>
+        <li>Set up Hub Transport service for message routing</li>
+        <li>Configure message routing within the Exchange organization</li>
+        <li>Test mail flow between different mailboxes</li>
+        <li>Set up message tracking and logging</li>
+        <li>Configure mailbox delivery options and restrictions</li>
+        <li>Test large attachment handling and size limits</li>
+        <li>Verify mail flow using Exchange Management Shell cmdlets</li>
+        <li>Use Test-Mailflow cmdlet to verify routing</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/mail-flow/connectors/connectors?view=exchserver-2019" target="_blank">📖 MS Learn: Mail Flow Connectors</a></li>
+        <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/troubleshooting-mail-flow-in-exchange-server/ba-p/1087449" target="_blank">💡 Tech Community: Troubleshoot Mail Flow</a></li>
+        <li><a href="https://alitajran.com/exchange-mail-flow-troubleshooting/" target="_blank">🔧 Alitajran: Mail Flow Troubleshooting</a></li>
+      </ul>
+    `
+  },
+
+  // WEEK 4: Cloud Integration (8 tasks)
+  'week4-external-dns': {
+    title: 'Configure DNS Records for External Mail',
+    description: `
+      <p><strong>Set up essential DNS records for external email delivery and authentication.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Create MX record pointing to your Exchange server's public IP</li>
+        <li>Set up A record for mail server (mail.yourdomain.com)</li>
+        <li>Configure reverse DNS (PTR) record with your ISP</li>
+        <li>Create SPF record: "v=spf1 ip4:your.public.ip -all"</li>
+        <li>Generate DKIM key pair using Exchange or third-party tool</li>
+        <li>Publish DKIM public key in DNS as TXT record</li>
+        <li>Create DMARC policy record for email authentication</li>
+        <li>Test DNS propagation and validate records</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/mail-flow/mail-routing/external-mail-flow?view=exchserver-2019" target="_blank">📖 MS Learn: External Mail Flow</a></li>
+        <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/email-authentication-spf-dkim-and-dmarc/ba-p/1072258" target="_blank">💡 Tech Community: Email Authentication</a></li>
+        <li><a href="https://alitajran.com/configure-spf-dkim-dmarc-records/" target="_blank">🔧 Alitajran: Configure Email Authentication</a></li>
+      </ul>
+    `
+  },
+
+  'week4-external-firewall': {
+    title: 'Configure Firewall and Network Security',
+    description: `
+      <p><strong>Set up network security and firewall rules for external email access.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Configure router/firewall to forward SMTP port 25 to Exchange server</li>
+        <li>Set up port forwarding for SMTPS (587) and HTTPS (443)</li>
+        <li>Configure IMAPS (993) and POP3S (995) if required</li>
+        <li>Set up Windows Firewall rules on Exchange server</li>
+        <li>Configure network load balancing if using multiple servers</li>
+        <li>Set up VPN access for remote administration</li>
+        <li>Implement intrusion detection and prevention</li>
+        <li>Test external connectivity from outside network</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/deployment-ref/network-ports?view=exchserver-2019" target="_blank">📖 MS Learn: Exchange Network Ports</a></li>
+        <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/exchange-server-network-security-best-practices/ba-p/1095832" target="_blank">💡 Tech Community: Network Security</a></li>
+      </ul>
+    `
+  },
+
+  'week4-external-certificates': {
+    title: 'Install and Configure SSL Certificates',
+    description: `
+      <p><strong>Secure external communications with proper SSL/TLS certificates.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Generate Certificate Signing Request (CSR) from Exchange</li>
+        <li>Purchase SSL certificate from trusted Certificate Authority</li>
+        <li>Install certificate on Exchange server</li>
+        <li>Assign certificate to SMTP, IIS, and other services</li>
+        <li>Configure virtual directories to use HTTPS</li>
+        <li>Test certificate validation and trust chain</li>
+        <li>Set up automatic certificate renewal process</li>
+        <li>Verify secure connections for all external services</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/architecture/client-access/certificates?view=exchserver-2019" target="_blank">📖 MS Learn: Exchange Certificates</a></li>
+        <li><a href="https://alitajran.com/install-ssl-certificate-exchange-server/" target="_blank">🔧 Alitajran: Install SSL Certificates</a></li>
+      </ul>
+    `
+  },
+
+  'week4-external-auth': {
+    title: 'Configure Modern Authentication',
+    description: `
+      <p><strong>Implement OAuth 2.0 and modern authentication protocols for enhanced security.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Enable modern authentication in Exchange Online</li>
+        <li>Configure Azure AD application registration</li>
+        <li>Set up OAuth authentication endpoints</li>
+        <li>Configure Exchange virtual directories for modern auth</li>
+        <li>Disable legacy authentication protocols where possible</li>
+        <li>Test modern authentication with Outlook clients</li>
+        <li>Configure conditional access policies</li>
+        <li>Verify multi-factor authentication integration</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/enable-or-disable-modern-authentication-in-exchange-online" target="_blank">📖 MS Learn: Modern Authentication</a></li>
+        <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/modern-authentication-in-exchange-server/ba-p/1087774" target="_blank">💡 Tech Community: Modern Auth in Exchange</a></li>
+      </ul>
+    `
+  },
+
+  'week4-hybrid-prepare': {
+    title: 'Prepare for Hybrid Configuration',
+    description: `
+      <p><strong>Set up prerequisites for Microsoft 365 hybrid deployment.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Create Microsoft 365 tenant and verify domain ownership</li>
+        <li>Purchase appropriate Exchange Online licenses</li>
+        <li>Install and configure Azure AD Connect</li>
+        <li>Synchronize on-premises users to Azure AD</li>
+        <li>Verify directory synchronization is working</li>
+        <li>Configure UPN suffixes to match verified domains</li>
+        <li>Set up service accounts for hybrid configuration</li>
+        <li>Download and install Hybrid Configuration Wizard</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/hybrid-deployment/hybrid-deployment-prerequisites" target="_blank">📖 MS Learn: Hybrid Prerequisites</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/azure/active-directory/hybrid/how-to-connect-install-roadmap" target="_blank">📖 MS Learn: Azure AD Connect</a></li>
+        <li><a href="https://alitajran.com/install-azure-ad-connect/" target="_blank">🔧 Alitajran: Install Azure AD Connect</a></li>
+      </ul>
+    `
+  },
+
+  'week4-hybrid-wizard': {
+    title: 'Run Hybrid Configuration Wizard',
+    description: `
+      <p><strong>Execute the Hybrid Configuration Wizard to establish trust and mail routing.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Launch Hybrid Configuration Wizard from Exchange server</li>
+        <li>Sign in with Global Administrator credentials</li>
+        <li>Select Exchange organization and Office 365 tenant</li>
+        <li>Choose hybrid features to enable (Free/Busy, Mail Tips, etc.)</li>
+        <li>Configure mail routing and transport settings</li>
+        <li>Set up organization relationship and sharing policies</li>
+        <li>Review and apply configuration changes</li>
+        <li>Monitor wizard progress and resolve any errors</li>
+        <li>Verify hybrid configuration completion</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/hybrid-deployment/deploy-hybrid" target="_blank">📖 MS Learn: Deploy Hybrid</a></li>
+        <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/exchange-hybrid-deployment-step-by-step-guide/ba-p/1044294" target="_blank">💡 Tech Community: Hybrid Step-by-Step</a></li>
+        <li><a href="https://alitajran.com/exchange-hybrid-configuration/" target="_blank">🔧 Alitajran: Hybrid Configuration</a></li>
+      </ul>
+    `
+  },
+
+  'week4-hybrid-mailflow': {
+    title: 'Configure Hybrid Mail Flow',
+    description: `
+      <p><strong>Set up bidirectional mail flow between on-premises and Exchange Online.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Configure inbound connector in Exchange Online</li>
+        <li>Set up outbound connector for on-premises routing</li>
+        <li>Configure mail routing rules and policies</li>
+        <li>Test mail flow from on-premises to cloud</li>
+        <li>Test mail flow from cloud to on-premises</li>
+        <li>Verify external mail routing through correct path</li>
+        <li>Set up mail flow monitoring and alerts</li>
+        <li>Configure centralized mail transport if required</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/mail-flow-best-practices/mail-flow-best-practices" target="_blank">📖 MS Learn: Mail Flow Best Practices</a></li>
+        <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/troubleshooting-hybrid-mail-flow/ba-p/1098753" target="_blank">💡 Tech Community: Troubleshoot Hybrid Mail Flow</a></li>
+      </ul>
+    `
+  },
+
+  'week4-hybrid-verify': {
+    title: 'Verify Hybrid Functionality',
+    description: `
+      <p><strong>Test and validate all hybrid features and functionality.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <ol>
+        <li>Test cross-premises free/busy calendar sharing</li>
+        <li>Verify mail tips between on-premises and cloud users</li>
+        <li>Test cross-premises message tracking</li>
+        <li>Validate secure mail transport between environments</li>
+        <li>Test mailbox moves between on-premises and cloud</li>
+        <li>Verify single sign-on functionality</li>
+        <li>Test mobile device management across environments</li>
+        <li>Document hybrid configuration and create maintenance procedures</li>
+        <li>Train users on hybrid functionality and features</li>
+      </ol>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/hybrid-deployment/hybrid-deployment" target="_blank">📖 MS Learn: Hybrid Deployment Overview</a></li>
+        <li><a href="https://techcommunity.microsoft.com/t5/exchange-team-blog/exchange-hybrid-free-busy-troubleshooting/ba-p/1087623" target="_blank">💡 Tech Community: Hybrid Free/Busy</a></li>
+        <li><a href="https://alitajran.com/test-exchange-hybrid-configuration/" target="_blank">🔧 Alitajran: Test Hybrid Configuration</a></li>
+      </ul>
+    `
+  }
+};
+
+// TOTAL TASK COUNT: 30 tasks (8 + 6 + 8 + 8 = 30)
+const TOTAL_TASKS = 30;
 
 // Enhanced Notification System with Rich Animations
 let notificationQueue = [];
@@ -406,8 +1117,7 @@ const initProfilePasswordForm = () => {
         setTimeout(() => {
           submitButton.style.background = '';
           buttonText.textContent = originalText;
-          submitButton.style.transform = '';
-        }, 3000);
+          }, 3000);
         
       } else {
         throw new Error(data.error || 'Failed to update password');
@@ -451,10 +1161,10 @@ const fetchProgress = async () => {
   }
 };
 
-// Sophisticated Progress Bar with Celebration Effects
+// FIXED: Progress Bar with Correct Task Count (30 tasks)
 const updateProgressBar = () => {
   const tasks = document.querySelectorAll('.task input[type="checkbox"]');
-  const totalTasks = tasks.length;
+  const totalTasks = TOTAL_TASKS; // Use constant instead of DOM count
   const completedTasks = Array.from(tasks).filter((task) => task.checked).length;
   const percentage = totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0;
   
@@ -842,7 +1552,7 @@ const initProfile = async () => {
         { id: 'profileRole', value: profileData.role },
         { id: 'profileJoined', value: new Date(profileData.createdAt).toLocaleDateString() },
         { id: 'totalProgress', value: `${profileData.progress}%` },
-        { id: 'completedTasks', value: `${profileData.completedTasks}/${profileData.totalTasks}` }
+        { id: 'completedTasks', value: `${profileData.completedTasks}/${TOTAL_TASKS}` }
       ];
       
       profileElements.forEach((element, index) => {
@@ -862,7 +1572,7 @@ const initProfile = async () => {
       // Animate current week calculation
       const currentWeek = $('#currentWeek');
       if (currentWeek) {
-        const weekNumber = Math.min(Math.floor(profileData.completedTasks / 3.5) + 1, 4);
+        const weekNumber = Math.min(Math.floor(profileData.completedTasks / 7.5) + 1, 4);
         setTimeout(() => {
           currentWeek.style.transition = 'all 0.3s ease';
           currentWeek.style.opacity = '0';
@@ -882,7 +1592,7 @@ const initProfile = async () => {
   initProfilePasswordForm();
 };
 
-// Enhanced Modal with Sophisticated Animations
+// Enhanced Modal with Comprehensive Task Details
 const initModal = () => {
   const modal = $('#taskModal');
   const modalTitle = $('#modalTitle');
@@ -898,168 +1608,6 @@ const initModal = () => {
     return;
   }
 
-  // Enhanced task modal content
-  const taskModalContent = {
-    'week1-dc': {
-      title: 'Promote Server 2012 to Domain Controller',
-      description: `
-        <p>Promote your Windows Server 2012 to a Domain Controller to set up Active Directory and DNS services.</p>
-        <h3>Steps</h3>
-        <ol>
-          <li>Install Active Directory Domain Services role via Server Manager.</li>
-          <li>Promote the server to a Domain Controller (new forest, e.g., lab.local).</li>
-          <li>Configure DNS settings and verify replication.</li>
-        </ol>
-        <p><strong>Tip:</strong> Use <code>dcpromo</code> for automation if preferred.</p>
-      `,
-    },
-    'week1-vm': {
-      title: 'Join VM to Domain',
-      description: `
-        <p>Join a virtual machine to the domain for centralized management.</p>
-        <h3>Steps</h3>
-        <ol>
-          <li>Ensure the VM has network access to the Domain Controller.</li>
-          <li>Set the DNS server to the DC's IP address.</li>
-          <li>Join the domain via System Properties (Computer Name).</li>
-        </ol>
-      `,
-    },
-    'week1-share': {
-      title: 'Configure Network Share on DC',
-      description: `
-        <p>Create a centralized file storage with secure access on the Domain Controller.</p>
-        <h3>Steps</h3>
-        <ol>
-          <li>Create a shared folder (e.g., \\\\DC\\Share$).</li>
-          <li>Set NTFS and share permissions for the security group.</li>
-          <li>Map drives using GPO, PowerShell, or logon scripts.</li>
-        </ol>
-        <p><strong>Tip:</strong> Use hidden shares (with $ suffix) for restricted access.</p>
-      `,
-    },
-    'week1-group': {
-      title: 'Create Security Group',
-      description: `
-        <p>Restrict network share access to authorized users via a security group.</p>
-        <h3>Steps</h3>
-        <ol>
-          <li>Open Active Directory Users and Computers.</li>
-          <li>Create a new security group (e.g., ShareAccess).</li>
-          <li>Add users to the group and assign permissions to the share.</li>
-        </ol>
-      `,
-    },
-    'week2-server': {
-      title: 'Install Second Server 2012',
-      description: `
-        <p>Add a second Windows Server 2012 for redundancy.</p>
-        <h3>Steps</h3>
-        <ol>
-          <li>Install Server 2012 on a new VM or hardware.</li>
-          <li>Join it to the domain.</li>
-          <li>Configure roles as needed (e.g., secondary DC).</li>
-        </ol>
-      `,
-    },
-    'week2-wsus': {
-      title: 'Setup WSUS',
-      description: `
-        <p>Manage updates with Windows Server Update Services.</p>
-        <h3>Steps</h3>
-        <ol>
-          <li>Install WSUS role on a server.</li>
-          <li>Configure update sources and client policies via GPO.</li>
-          <li>Approve and test updates.</li>
-        </ol>
-      `,
-    },
-    'week2-time': {
-      title: 'Configure Two Time Servers',
-      description: `
-        <p>Ensure time synchronization across the domain.</p>
-        <h3>Steps</h3>
-        <ol>
-          <li>Configure the primary DC as the PDC Emulator to sync with an external NTP server.</li>
-          <li>Set a secondary server as a backup time source.</li>
-          <li>Verify time sync with <code>w32tm /query /status</code>.</li>
-        </ol>
-      `,
-    },
-    'week3-upgrade': {
-      title: 'Upgrade Servers to 2016',
-      description: `
-        <p>Modernize infrastructure by upgrading to Server 2016.</p>
-        <h3>Steps</h3>
-        <ol>
-          <li>Back up existing servers.</li>
-          <li>Perform an in-place upgrade or migrate to new Server 2016 VMs.</li>
-          <li>Verify AD and DNS functionality post-upgrade.</li>
-        </ol>
-      `,
-    },
-    'week3-exchange': {
-      title: 'Install Exchange Server 2019',
-      description: `
-        <p>Deploy email services on a third server.</p>
-        <h3>Steps</h3>
-        <ol>
-          <li>Install Exchange Server 2019 prerequisites.</li>
-          <li>Run the Exchange setup and configure mailbox roles.</li>
-          <li>Test connectivity and services.</li>
-        </ol>
-      `,
-    },
-    'week3-mailbox': {
-      title: 'Create User Mailboxes',
-      description: `
-        <p>Set up email accounts for users.</p>
-        <h3>Steps</h3>
-        <ol>
-          <li>Open Exchange Admin Center.</li>
-          <li>Create mailboxes for domain users.</li>
-          <li>Test email sending/receiving.</li>
-        </ol>
-      `,
-    },
-    'week3-mail': {
-      title: 'Setup Internal Mail Flow',
-      description: `
-        <p>Enable email delivery between users.</p>
-        <h3>Steps</h3>
-        <ol>
-          <li>Configure accepted domains and email address policies.</li>
-          <li>Set up send/receive connectors.</li>
-          <li>Test internal mail flow.</li>
-        </ol>
-      `,
-    },
-    'week4-external': {
-      title: 'Publish Mail Externally',
-      description: `
-        <p>Enable secure external email access.</p>
-        <h3>Steps</h3>
-        <ol>
-          <li>Configure DNS records (MX, SPF, DKIM, DMARC).</li>
-          <li>Enable modern authentication (OAuth 2.0).</li>
-          <li>Install TLS certificates and set up reverse DNS.</li>
-        </ol>
-      `,
-    },
-    'week4-hybrid': {
-      title: 'Setup Microsoft 365 Hybrid Environment',
-      description: `
-        <p>Integrate on-premises Exchange with Microsoft 365.</p>
-        <h3>Steps</h3>
-        <ol>
-          <li>Install and configure Entra ID Connect.</li>
-          <li>Run the Hybrid Configuration Wizard.</li>
-          <li>Verify mail flow and calendar sharing.</li>
-        </ol>
-      `,
-    },
-  };
-
   taskElements.forEach((task) => {
     task.addEventListener('click', (e) => {
       if (e.target.type === 'checkbox') return;
@@ -1070,9 +1618,9 @@ const initModal = () => {
       const week = weekElement.dataset.week;
       const taskId = task.dataset.task;
       const key = `${week}-${taskId}`;
-      const content = taskModalContent[key] || {
+      const content = TASK_DEFINITIONS[key] || {
         title: 'Task Details',
-        description: '<p>No details available.</p>',
+        description: '<p>No details available for this task.</p>',
       };
       
       modalTitle.textContent = content.title;
@@ -1213,7 +1761,9 @@ window.VelocityLab = {
     }
   },
   triggerCelebration: () => triggerCelebration(),
-  triggerMilestone: (percentage) => triggerMilestone(percentage)
+  triggerMilestone: (percentage) => triggerMilestone(percentage),
+  TOTAL_TASKS: TOTAL_TASKS,
+  TASK_DEFINITIONS: TASK_DEFINITIONS
 };
 
 // FIXED: Make showNotification globally available
@@ -1222,6 +1772,7 @@ window.showNotification = showNotification;
 // Enhanced Initialization with Performance Optimization
 const init = () => {
   console.log('🚀 Initializing Velocity Lab with enhanced UX...');
+  console.log(`📊 Total Tasks Configured: ${TOTAL_TASKS}`);
   
   // Add custom animations
   addCustomAnimations();
