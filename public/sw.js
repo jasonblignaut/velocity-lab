@@ -1,4 +1,5 @@
 // sw.js - Service Worker for Velocity Lab
+
 const CACHE_NAME = 'velocity-lab-v5';
 const urlsToCache = [
   '/',
@@ -60,20 +61,33 @@ self.addEventListener('fetch', event => {
   const method = event.request.method;
   console.log(`Service Worker: Fetching ${url.href} Method: ${method}`);
 
-  // Bypass cache for login and register pages to handle redirects properly
+  // Bypass cache for API calls to always fetch fresh data
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store', redirect: 'follow' }).catch(() => {
+        return new Response(JSON.stringify({ error: 'API unavailable' }), {
+          status: 503,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      })
+    );
+    return;
+  }
+
+  // Bypass caching for login and register pages to handle redirects and fresh content
   if (['/login.html', '/register.html'].includes(url.pathname)) {
     console.log('Service Worker: Bypassing cache for', url.pathname);
     event.respondWith(
-      fetch(event.request, { redirect: 'follow', cache: 'no-store' })
-        .then(response => {
-          console.log(`Service Worker: Fetch response for ${url.pathname} - Status: ${response.status}, Redirected: ${response.redirected}, URL: ${response.url}`);
-          // Just return the response; no manual redirect fetching to avoid errors
-          return response;
-        })
-        .catch(error => {
-          console.error(`Service Worker: Fetch failed for ${url.pathname}`, error);
-          return caches.match('/offline.html');
-        })
+      fetch(event.request, { redirect: 'follow', cache: 'no-store' }).then(response => {
+        if (response.redirected) {
+          console.log(`Service Worker: Following redirect to ${response.url}`);
+          return fetch(response.url, { redirect: 'follow', cache: 'no-store' });
+        }
+        return response;
+      }).catch(error => {
+        console.error(`Service Worker: Fetch failed for ${url.pathname}`, error);
+        return caches.match('/offline.html');
+      })
     );
     return;
   }
@@ -86,15 +100,12 @@ self.addEventListener('fetch', event => {
           console.log('Service Worker: Serving from cache:', url.href);
           return cachedResponse;
         }
-        return fetch(event.request, { redirect: 'follow' })
-          .then(response => {
-            console.log(`Service Worker: Fetch response for ${url.pathname} - Status: ${response.status}, Redirected: ${response.redirected}`);
-            return response;
-          })
-          .catch(() => {
-            console.log('Service Worker: Network fetch failed, serving offline page');
-            return caches.match('/offline.html');
-          });
+        return fetch(event.request, { redirect: 'follow' }).then(response => {
+          return response;
+        }).catch(() => {
+          console.log('Service Worker: Network fetch failed, serving offline page');
+          return caches.match('/offline.html');
+        });
       })
     );
     return;
