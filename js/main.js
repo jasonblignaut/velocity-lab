@@ -69,25 +69,25 @@ function calculateProgress(progressData) {
 }
 
 // ===== API Functions =====
-async function apiCall(url, options = {}) {
+async function apiCall(path, options = {}) {
+  const baseUrl = location.origin; // dynamically gets https://your-current-subdomain.pages.dev
+  const url = `${baseUrl}${path}`;
+
   try {
     const response = await fetch(url, {
+      credentials: 'include',
+      redirect: 'follow',
       ...options,
-      credentials: 'same-origin',
-      headers: {
-        ...options.headers
-      }
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Request failed');
+      throw new Error(`API error: ${response.status}`);
     }
 
-    return response;
-  } catch (error) {
-    console.error(`API call failed: ${url}`, error);
-    throw error;
+    return await response.json();
+  } catch (err) {
+    console.error(`API call failed: ${path}`, err);
+    throw err;
   }
 }
 
