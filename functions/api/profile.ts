@@ -1,5 +1,5 @@
 // functions/api/profile.ts
-// Enhanced user profile endpoints (no avatar functionality)
+// Enhanced user profile endpoints (no avatar functionality) - FIXED IMPORTS
 
 import { 
   jsonResponse, 
@@ -9,9 +9,9 @@ import {
   calculateProgress,
   validatePassword,
   sanitizeInput,
-  logActivity
+  logActivity,
+  validateCSRFToken  // Import from utils.ts instead of csrf.ts
 } from './utils';
-import { validateCSRFToken } from './csrf';
 import type { Env, User, Progress } from './utils';
 
 // GET user profile
