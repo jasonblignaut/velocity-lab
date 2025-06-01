@@ -71,17 +71,22 @@ function calculateProgress(progressData) {
 // ===== API Functions =====
 async function apiCall(url, options = {}) {
   try {
-    const response = await fetch(url, {
+    // Use absolute URL to ensure correct endpoint
+    const baseUrl = 'https://velocity-lab-23f.pages.dev';
+    const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
+    
+    const response = await fetch(fullUrl, {
       ...options,
       credentials: 'same-origin',
       headers: {
+        'Content-Type': options.body instanceof FormData ? undefined : 'application/json',
         ...options.headers
       }
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Request failed');
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error || `HTTP ${response.status}`);
     }
 
     return response;
@@ -98,6 +103,7 @@ async function fetchCsrfToken() {
     return data.token;
   } catch (error) {
     console.error('Failed to fetch CSRF token:', error);
+    showNotification('Unable to fetch security token. Please try again.', 'error');
     return null;
   }
 }
@@ -138,7 +144,10 @@ async function handleFormSubmission(form, url, successCallback) {
 // Initialize forms with CSRF token
 async function initForms() {
   const token = await fetchCsrfToken();
-  if (!token) return;
+  if (!token) {
+    console.error('CSRF token initialization failed');
+    return;
+  }
 
   document.querySelectorAll('input[name="csrf_token"]').forEach(input => {
     input.value = token;
@@ -1053,6 +1062,17 @@ async function addAdmin() {
 
 // ===== Authentication Functions =====
 async function handleLogin(form) {
+  // Ensure CSRF token is set before submission
+  const csrfInput = form.querySelector('input[name="csrf_token"]');
+  if (!csrfInput.value) {
+    const token = await fetchCsrfToken();
+    if (!token) {
+      showNotification('Failed to initialize login. Please refresh the page.', 'error');
+      return;
+    }
+    csrfInput.value = token;
+  }
+
   await handleFormSubmission(
     form,
     '/api/login',
@@ -1079,6 +1099,17 @@ async function handleRegister(form) {
   if (password.length < 8) {
     showNotification('Password must be at least 8 characters', 'error');
     return;
+  }
+
+  // Ensure CSRF token is set
+  const csrfInput = form.querySelector('input[name="csrf_token"]');
+  if (!csrfInput.value) {
+    const token = await fetchCsrfToken();
+    if (!token) {
+      showNotification('Failed to initialize registration. Please refresh the page.', 'error');
+      return;
+    }
+    csrfInput.value = token;
   }
 
   await handleFormSubmission(
