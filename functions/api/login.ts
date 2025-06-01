@@ -12,8 +12,8 @@ import {
   logActivity,
   checkRateLimit,
   initializeDefaultAdmin
-} from './utils';
-import type { Env } from './utils';
+} from '../utils';
+import type { Env } from '../utils';
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {

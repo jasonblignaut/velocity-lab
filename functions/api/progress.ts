@@ -8,8 +8,8 @@ import {
   getUserById,
   logActivity,
   calculateProgress
-} from './utils';
-import type { Env, Progress } from './utils';
+} from '../utils';
+import type { Env, Progress } from '../utils';
 
 // GET user progress
 export const onRequestGet: PagesFunction<Env> = async (context) => {

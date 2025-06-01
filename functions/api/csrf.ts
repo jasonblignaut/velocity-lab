@@ -4,8 +4,8 @@
 import { 
   generateCSRFToken,
   validateCSRFToken as utilsValidateCSRFToken
-} from './utils';
-import type { Env } from './utils';
+} from '../utils';
+import type { Env } from '../utils';
 
 // Export the validateCSRFToken function for use in other modules
 export const validateCSRFToken = utilsValidateCSRFToken;

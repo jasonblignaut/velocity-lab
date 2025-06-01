@@ -6,8 +6,8 @@ import {
   errorResponse, 
   validateSession,
   getUserById
-} from './utils';
-import type { Env, User, Progress } from './utils';
+} from '../utils';
+import type { Env, User, Progress } from '../utils';
 
 // GET admin endpoints
 export const onRequestGet: PagesFunction<Env> = async (context) => {

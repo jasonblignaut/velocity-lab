@@ -12,8 +12,8 @@ import {
   sanitizeInput,
   logActivity,
   checkRateLimit
-} from './utils';
-import type { Env, User } from './utils';
+} from '../utils';
+import type { Env, User } from '../utils';
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {

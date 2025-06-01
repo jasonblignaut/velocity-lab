@@ -11,8 +11,8 @@ import {
   sanitizeInput,
   logActivity,
   validateCSRFToken  // Import from utils.ts instead of csrf.ts
-} from './utils';
-import type { Env, User, Progress } from './utils';
+} from '../utils';
+import type { Env, User, Progress } from '../utils';
 
 // GET user profile
 export const onRequestGet: PagesFunction<Env> = async (context) => {
