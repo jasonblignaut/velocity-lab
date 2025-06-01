@@ -1,54 +1,57 @@
-export async function onRequestPost({ env, request }) {
-  const formData = await request.formData();
-  const email = formData.get('email');
-  const password = formData.get('password');
-  const repeatPassword = formData.get('repeatPassword');
-  const name = formData.get('name');
-  const csrfToken = formData.get('csrf_token');
-  const sessionId = request.headers.get('Cookie')?.match(/session=([^;]+)/)?.[1];
+import { validateCSRFToken } from '../utils';
 
-  if (!sessionId || !csrfToken) {
-    return new Response(JSON.stringify({ error: 'Invalid session or CSRF token' }), {
-      status: 403,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
+export const onRequestPost: PagesFunction<Env> = async (context) => {
+  try {
+    const formData = await context.request.formData();
+    const name = formData.get('name')?.toString().trim();
+    const email = formData.get('email')?.toString().trim().toLowerCase();
+    const password = formData.get('password')?.toString();
+    const role = formData.get('role')?.toString().trim();
+    const csrfToken = formData.get('csrf_token')?.toString();
 
-  const session = await env.SESSIONS.get(sessionId);
-  if (!session || JSON.parse(session).csrfToken !== csrfToken) {
-    return new Response(JSON.stringify({ error: 'Invalid CSRF token' }), {
-      status: 403,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-
-  if (password !== repeatPassword) {
-    return new Response(JSON.stringify({ error: 'Passwords do not match' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-
-  if (await env.USERS.get(email)) {
-    return new Response(JSON.stringify({ error: 'User already exists' }), {
-      status: 409,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-
-  const userData = {
-    email,
-    name,
-    password, // Replace with hashed password in production
-    role: 'user',
-    createdAt: new Date().toISOString()
-  };
-
-  await env.USERS.put(email, JSON.stringify(userData));
-  return new Response(JSON.stringify({ email, name, role: 'user' }), {
-    headers: {
-      'Content-Type': 'application/json',
-      'Set-Cookie': `session=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Strict`
+    if (!name || !email || !password || !role || !csrfToken) {
+      return jsonResponse({ error: 'Missing required fields' }, 400);
     }
+
+    if (!(await validateCSRFToken(context.env, csrfToken))) {
+      return jsonResponse({ error: 'Invalid CSRF token' }, 403);
+    }
+
+    const existingUser = await context.env.USERS.get(`user:${email}`);
+    if (existingUser) {
+      return jsonResponse({ error: 'Email already registered' }, 409);
+    }
+
+    const userId = crypto.randomUUID();
+    const sessionToken = crypto.randomUUID();
+
+    const userData = {
+      id: userId,
+      name,
+      email,
+      password, // Cleartext as requested
+      role,
+    };
+
+    await context.env.USERS.put(`user:${email}`, JSON.stringify(userData));
+    await context.env.USERS.put(`session:${sessionToken}`, userId, { expirationTtl: 86400 });
+
+    return new Response(JSON.stringify({ name, role }), {
+      status: 201,
+      headers: {
+        'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict`,
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (error) {
+    console.error('Register error:', error);
+    return jsonResponse({ error: 'Internal server error' }, 500);
+  }
+};
+
+function jsonResponse(data: Record<string, any>, status: number = 200): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
   });
 }

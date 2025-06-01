@@ -1,46 +1,49 @@
-export async function onRequestPost({ env, request }) {
-  const formData = await request.formData();
-  const email = formData.get('email');
-  const password = formData.get('password');
-  const csrfToken = formData.get('csrf_token');
-  const sessionId = request.headers.get('Cookie')?.match(/session=([^;]+)/)?.[1];
+import { validateCSRFToken } from '../utils';
 
-  if (!sessionId || !csrfToken) {
-    return new Response(JSON.stringify({ error: 'Invalid session or CSRF token' }), {
-      status: 403,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
+export const onRequestPost: PagesFunction<Env> = async (context) => {
+  try {
+    const formData = await context.request.formData();
+    const email = formData.get('email')?.toString().trim().toLowerCase();
+    const password = formData.get('password')?.toString();
+    const csrfToken = formData.get('csrf_token')?.toString();
 
-  const session = await env.SESSIONS.get(sessionId);
-  if (!session || JSON.parse(session).csrfToken !== csrfToken) {
-    return new Response(JSON.stringify({ error: 'Invalid CSRF token' }), {
-      status: 403,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-
-  const user = await env.USERS.get(email);
-  if (!user) {
-    return new Response(JSON.stringify({ error: 'User not found' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-
-  const userData = JSON.parse(user);
-  // Simplified password check (update with your hashing logic)
-  if (password !== userData.password) {
-    return new Response(JSON.stringify({ error: 'Invalid password' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
-
-  return new Response(JSON.stringify({ email, name: userData.name, role: userData.role }), {
-    headers: {
-      'Content-Type': 'application/json',
-      'Set-Cookie': `session=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Strict`
+    if (!email || !password || !csrfToken) {
+      return jsonResponse({ error: 'Missing required fields' }, 400);
     }
+
+    if (!(await validateCSRFToken(context.env, csrfToken))) {
+      return jsonResponse({ error: 'Invalid CSRF token' }, 403);
+    }
+
+    const userData = await context.env.USERS.get(`user:${email}`);
+    if (!userData) {
+      return jsonResponse({ error: 'Email not found' }, 404);
+    }
+
+    const user = JSON.parse(userData);
+    if (user.password !== password) { // Cleartext comparison
+      return jsonResponse({ error: 'Incorrect password' }, 401);
+    }
+
+    const sessionToken = crypto.randomUUID();
+    await context.env.USERS.put(`session:${sessionToken}`, user.id, { expirationTtl: 86400 });
+
+    return new Response(JSON.stringify({ name: user.name, role: user.role }), {
+      status: 200,
+      headers: {
+        'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict`,
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    return jsonResponse({ error: 'Server error' }, 500);
+  }
+};
+
+function jsonResponse(data: Record<string, any>, status: number = 200): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
   });
 }
