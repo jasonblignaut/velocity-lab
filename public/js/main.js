@@ -51,6 +51,9 @@ const showNotification = (message, type = 'info', duration = 5000) => {
   }, duration);
 };
 
+// Make showNotification globally available
+window.showNotification = showNotification;
+
 // Fetch CSRF token from server
 const fetchCSRFToken = async () => {
   try {
@@ -192,13 +195,9 @@ const initProfilePasswordForm = () => {
     spinner?.classList.add('active');
     
     try {
-      const token = await fetchCSRFToken();
-      if (!token) return;
-      
       const formData = new FormData();
       formData.append('currentPassword', currentPassword);
       formData.append('newPassword', newPassword);
-      formData.append('csrf_token', token);
       
       const response = await fetch('/api/profile/change-password', {
         method: 'POST',
@@ -399,10 +398,12 @@ const initDashboard = async () => {
         
         syncProgress(week, task, checkbox.checked);
         updateProgressBar();
+        updateSubTaskProgress();
       });
     });
 
     updateProgressBar();
+    updateSubTaskProgress();
   } catch (error) {
     console.error('Dashboard progress initialization error:', error);
   }
@@ -528,18 +529,33 @@ const initProfile = async () => {
       if (profileEmail) profileEmail.textContent = profileData.email;
       if (profileRole) profileRole.textContent = profileData.role;
       if (profileJoined) {
-        const joinedDate = new Date(profileData.createdAt);
-        if (!isNaN(joinedDate.getTime())) {
-          profileJoined.textContent = joinedDate.toLocaleDateString();
+        if (profileData.createdAt) {
+          const joinedDate = new Date(profileData.createdAt);
+          if (!isNaN(joinedDate.getTime())) {
+            profileJoined.textContent = joinedDate.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            });
+          } else {
+            profileJoined.textContent = 'Registration date unavailable';
+          }
         } else {
-          profileJoined.textContent = 'Unknown';
+          profileJoined.textContent = 'Registration date unavailable';
         }
       }
       if (profileLastLogin) {
         if (profileData.lastLogin) {
           const lastLoginDate = new Date(profileData.lastLogin);
           if (!isNaN(lastLoginDate.getTime())) {
-            profileLastLogin.textContent = lastLoginDate.toLocaleDateString() + ' ' + lastLoginDate.toLocaleTimeString();
+            profileLastLogin.textContent = lastLoginDate.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            }) + ' at ' + lastLoginDate.toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit'
+            });
           } else {
             profileLastLogin.textContent = 'Unknown';
           }
@@ -563,6 +579,107 @@ const initProfile = async () => {
   initProfilePasswordForm();
 };
 
+// Store subtask states in memory
+let subTaskStates = {};
+
+// Function to update sub-task progress counter
+const updateSubTaskProgress = () => {
+  document.querySelectorAll('.task').forEach(task => {
+    const weekElement = task.closest('.week');
+    if (!weekElement) return;
+    
+    const week = weekElement.dataset.week;
+    const taskId = task.dataset.task;
+    const key = `${week}-${taskId}`;
+    
+    // Find existing counter or create one
+    let counter = task.querySelector('.subtask-counter');
+    if (!counter) {
+      counter = document.createElement('div');
+      counter.className = 'subtask-counter';
+      counter.style.cssText = `
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+        margin-top: 0.25rem;
+        font-weight: 500;
+      `;
+      task.querySelector('.task-content').appendChild(counter);
+    }
+    
+    // Count subtasks based on task content
+    const subtaskCounts = {
+      'week1-share': 6, // Map drives automatically, Share not visible, Use different methods (GPO, PowerShell, logon), auto map, set permissions, create share
+      'week4-external': 7, // MX, SPF, DKIM, DMARC, OAuth, TLS, reverse DNS
+      'week4-hybrid': 5, // Install Connect, sync identities, wizard, verify flow, test sharing
+      'week1-dc': 3,
+      'week1-vm': 3,
+      'week1-group': 4,
+      'week2-server': 3,
+      'week2-wsus': 3,
+      'week2-time': 3,
+      'week3-upgrade': 3,
+      'week3-exchange': 3,
+      'week3-mailbox': 3,
+      'week3-mail': 3,
+      'week4-hosting': 3
+    };
+    
+    const totalSubtasks = subtaskCounts[key] || 0;
+    if (totalSubtasks > 0) {
+      const completed = subTaskStates[key] || 0;
+      counter.textContent = `${completed}/${totalSubtasks} steps`;
+      
+      if (completed === totalSubtasks) {
+        counter.style.color = 'var(--success)';
+        counter.textContent += ' ✓';
+      } else {
+        counter.style.color = 'var(--text-tertiary)';
+      }
+    } else {
+      counter.style.display = 'none';
+    }
+  });
+};
+
+// Function to handle sub-task checkbox changes
+const updateSubTaskState = (week, task, subtask, checked) => {
+  const key = `${week}-${task}`;
+  if (!subTaskStates[key]) subTaskStates[key] = 0;
+  
+  const currentState = localStorage.getItem(`subtask-${key}-${subtask}`) === 'true';
+  
+  if (checked && !currentState) {
+    subTaskStates[key]++;
+    localStorage.setItem(`subtask-${key}-${subtask}`, 'true');
+  } else if (!checked && currentState) {
+    subTaskStates[key]--;
+    localStorage.removeItem(`subtask-${key}-${subtask}`);
+  }
+  
+  updateSubTaskProgress();
+};
+
+// Load subtask states from localStorage
+const loadSubTaskStates = () => {
+  subTaskStates = {};
+  
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('subtask-')) {
+      const value = localStorage.getItem(key);
+      if (value === 'true') {
+        // Extract week-task from key
+        const match = key.match(/subtask-(week\d+-\w+)-/);
+        if (match) {
+          const taskKey = match[1];
+          if (!subTaskStates[taskKey]) subTaskStates[taskKey] = 0;
+          subTaskStates[taskKey]++;
+        }
+      }
+    }
+  }
+};
+
 // Modal content for tasks with updated content and reference links
 const taskModalContent = {
   'week1-dc': {
@@ -575,9 +692,9 @@ const taskModalContent = {
       
       <h3>Steps</h3>
       <ol>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'dc', 'install-adds')"> Install Active Directory Domain Services role via Server Manager.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'dc', 'promote-dc')"> Promote the server to a Domain Controller (new forest, e.g., lab.local).</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'dc', 'configure-dns')"> Configure DNS settings and verify replication.</li>
+        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'dc', 'install-adds', this.checked)"> Install Active Directory Domain Services role via Server Manager.</li>
+        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'dc', 'promote-dc', this.checked)"> Promote the server to a Domain Controller (new forest, e.g., lab.local).</li>
+        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'dc', 'configure-dns', this.checked)"> Configure DNS settings and verify replication.</li>
       </ol>
       
       <h3>Reference Links</h3>
@@ -596,9 +713,9 @@ const taskModalContent = {
       
       <h3>Steps</h3>
       <ol>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'vm', 'network-access')"> Ensure the VM has network access to the Domain Controller.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'vm', 'dns-config')"> Set the DNS server to the DC's IP address.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'vm', 'join-domain')"> Join the domain via System Properties (Computer Name).</li>
+        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'vm', 'network-access', this.checked)"> Ensure the VM has network access to the Domain Controller.</li>
+        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'vm', 'dns-config', this.checked)"> Set the DNS server to the DC's IP address.</li>
+        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'vm', 'join-domain', this.checked)"> Join the domain via System Properties (Computer Name).</li>
       </ol>
       
       <h3>Reference Links</h3>
@@ -615,12 +732,12 @@ const taskModalContent = {
       
       <h3>Steps</h3>
       <ol>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'share', 'create-share')"> Create a shared folder (e.g., \\\\DC\\Share$) - Share must not be visible (hidden share).</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'share', 'set-permissions')"> Set NTFS and share permissions for the security group.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'share', 'map-gpo')"> Map drive using Group Policy Object (GPO).</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'share', 'map-powershell')"> Map drive using PowerShell script.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'share', 'map-logon')"> Map drive using logon script.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'share', 'auto-map')"> Ensure drives automatically map to machine on logon.</li>
+        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'share', 'create-share', this.checked)"> Create a shared folder (e.g., \\\\DC\\Share$) - Share must not be visible (hidden share).</li>
+        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'share', 'set-permissions', this.checked)"> Set NTFS and share permissions for the security group.</li>
+        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'share', 'map-gpo', this.checked)"> Map drive using Group Policy Object (GPO).</li>
+        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'share', 'map-powershell', this.checked)"> Map drive using PowerShell script.</li>
+        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'share', 'map-logon', this.checked)"> Map drive using logon script.</li>
+        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'share', 'auto-map', this.checked)"> Ensure drives automatically map to machine on logon.</li>
       </ol>
       
       <h3>Reference Links</h3>
@@ -639,382 +756,3 @@ const taskModalContent = {
       
       <h3>Steps</h3>
       <ol>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'group', 'open-aduc')"> Open Active Directory Users and Computers.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'group', 'create-group')"> Create a new security group (e.g., ShareAccess).</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'group', 'add-users')"> Add users to the group.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'group', 'assign-permissions')"> Assign permissions to the share for this group only.</li>
-      </ol>
-      
-      <h3>Reference Links</h3>
-      <ul>
-        <li><a href="https://techcommunity.microsoft.com/blog/itopstalk/how-to-create-and-manage-security-groups-in-active-directory/259090" target="_blank">Security Groups Management - Microsoft Tech Community</a></li>
-        <li><a href="https://alitajran.com/create-security-groups-active-directory/" target="_blank">Create Security Groups - Ali Tajran</a></li>
-      </ul>
-    `,
-  },
-  'week2-server': {
-    title: 'Install Second Server 2012',
-    description: `
-      <p>Add a second Windows Server 2012 for redundancy.</p>
-      
-      <h3>Steps</h3>
-      <ol>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'server', 'install-server')"> Install Server 2012 on a new VM or hardware.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'server', 'join-domain')"> Join it to the domain.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'server', 'configure-roles')"> Configure roles as needed (e.g., secondary DC).</li>
-      </ol>
-      
-      <h3>Reference Links</h3>
-      <ul>
-        <li><a href="https://techcommunity.microsoft.com/blog/itopstalk/how-to-install-windows-server-2012-r2/259070" target="_blank">Install Windows Server 2012 - Microsoft Tech Community</a></li>
-        <li><a href="https://alitajran.com/install-windows-server-2019/" target="_blank">Server Installation Guide - Ali Tajran</a></li>
-      </ul>
-    `,
-  },
-  'week2-wsus': {
-    title: 'Setup WSUS',
-    description: `
-      <p>Manage updates with Windows Server Update Services.</p>
-      
-      <h3>Steps</h3>
-      <ol>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'wsus', 'install-role')"> Install WSUS role on a server.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'wsus', 'configure-sources')"> Configure update sources and client policies via GPO.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'wsus', 'approve-updates')"> Approve and test updates.</li>
-      </ol>
-      
-      <h3>Reference Links</h3>
-      <ul>
-        <li><a href="https://techcommunity.microsoft.com/blog/itopstalk/how-to-install-and-configure-wsus-on-windows-server/259095" target="_blank">WSUS Configuration - Microsoft Tech Community</a></li>
-        <li><a href="https://alitajran.com/install-configure-wsus-windows-server/" target="_blank">WSUS Setup Guide - Ali Tajran</a></li>
-      </ul>
-    `,
-  },
-  'week2-time': {
-    title: 'Configure Two Time Servers',
-    description: `
-      <p>Ensure time synchronization across the domain.</p>
-      
-      <h3>Steps</h3>
-      <ol>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'time', 'configure-pdc')"> Configure the primary DC as the PDC Emulator to sync with an external NTP server.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'time', 'setup-secondary')"> Set a secondary server as a backup time source.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'time', 'verify-sync')"> Verify time sync with <code>w32tm /query /status</code>.</li>
-      </ol>
-      
-      <h3>Reference Links</h3>
-      <ul>
-        <li><a href="https://techcommunity.microsoft.com/blog/itopstalk/how-to-configure-time-synchronization-in-active-directory/259100" target="_blank">Time Sync Configuration - Microsoft Tech Community</a></li>
-        <li><a href="https://alitajran.com/configure-time-server-windows-server/" target="_blank">Time Server Setup - Ali Tajran</a></li>
-      </ul>
-    `,
-  },
-  'week3-upgrade': {
-    title: 'Upgrade Servers to 2016',
-    description: `
-      <p>Modernize infrastructure by upgrading to Server 2016.</p>
-      
-      <h3>Steps</h3>
-      <ol>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'upgrade', 'backup-servers')"> Back up existing servers.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'upgrade', 'perform-upgrade')"> Perform an in-place upgrade or migrate to new Server 2016 VMs.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'upgrade', 'verify-functionality')"> Verify AD and DNS functionality post-upgrade.</li>
-      </ol>
-      
-      <h3>Reference Links</h3>
-      <ul>
-        <li><a href="https://techcommunity.microsoft.com/blog/itopstalk/how-to-upgrade-from-windows-server-2012-r2-to-windows-server-2016/259110" target="_blank">Server Upgrade Guide - Microsoft Tech Community</a></li>
-        <li><a href="https://alitajran.com/upgrade-windows-server-2016-to-2019/" target="_blank">Server Upgrade Process - Ali Tajran</a></li>
-      </ul>
-    `,
-  },
-  'week3-exchange': {
-    title: 'Install Exchange Server 2019',
-    description: `
-      <p>Deploy email services on a third server.</p>
-      
-      <h3>Steps</h3>
-      <ol>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'exchange', 'install-prerequisites')"> Install Exchange Server 2019 prerequisites.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'exchange', 'run-setup')"> Run the Exchange setup and configure mailbox roles.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'exchange', 'test-connectivity')"> Test connectivity and services.</li>
-      </ol>
-      
-      <h3>Reference Links</h3>
-      <ul>
-        <li><a href="https://techcommunity.microsoft.com/blog/exchange/how-to-install-exchange-server-2019/259115" target="_blank">Exchange 2019 Installation - Microsoft Tech Community</a></li>
-        <li><a href="https://alitajran.com/install-exchange-server-2019/" target="_blank">Exchange Server Installation - Ali Tajran</a></li>
-      </ul>
-    `,
-  },
-  'week3-mailbox': {
-    title: 'Create User Mailboxes',
-    description: `
-      <p>Set up email accounts for users.</p>
-      
-      <h3>Steps</h3>
-      <ol>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'mailbox', 'open-eac')"> Open Exchange Admin Center.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'mailbox', 'create-mailboxes')"> Create mailboxes for domain users.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'mailbox', 'test-email')"> Test email sending/receiving.</li>
-      </ol>
-      
-      <h3>Reference Links</h3>
-      <ul>
-        <li><a href="https://techcommunity.microsoft.com/blog/exchange/how-to-create-user-mailboxes-in-exchange/259120" target="_blank">Create User Mailboxes - Microsoft Tech Community</a></li>
-        <li><a href="https://alitajran.com/create-mailboxes-exchange-server/" target="_blank">Mailbox Creation Guide - Ali Tajran</a></li>
-      </ul>
-    `,
-  },
-  'week3-mail': {
-    title: 'Setup Internal Mail Flow',
-    description: `
-      <p>Enable email delivery between users.</p>
-      
-      <h3>Steps</h3>
-      <ol>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'mail', 'configure-domains')"> Configure accepted domains and email address policies.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'mail', 'setup-connectors')"> Set up send/receive connectors.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'mail', 'test-flow')"> Test internal mail flow between users.</li>
-      </ol>
-      
-      <h3>Reference Links</h3>
-      <ul>
-        <li><a href="https://techcommunity.microsoft.com/blog/exchange/how-to-configure-mail-flow-in-exchange/259125" target="_blank">Mail Flow Configuration - Microsoft Tech Community</a></li>
-        <li><a href="https://alitajran.com/configure-mail-flow-exchange-server/" target="_blank">Internal Mail Flow - Ali Tajran</a></li>
-      </ul>
-    `,
-  },
-  'week4-external': {
-    title: 'Publish Mail Externally',
-    description: `
-      <p>Enable secure external email access.</p>
-      
-      <h3>Steps</h3>
-      <ol>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'external', 'configure-mx')"> Configure MX records.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'external', 'setup-spf')"> Set up SPF records.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'external', 'configure-dkim')"> Configure DKIM records.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'external', 'setup-dmarc')"> Set up DMARC records.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'external', 'enable-oauth')"> Enable modern authentication (OAuth 2.0).</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'external', 'install-certs')"> Install TLS certificates.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'external', 'setup-rdns')"> Set up reverse DNS.</li>
-      </ol>
-      
-      <h3>Reference Links</h3>
-      <ul>
-        <li><a href="https://techcommunity.microsoft.com/blog/exchange/how-to-publish-exchange-externally/259130" target="_blank">External Email Publishing - Microsoft Tech Community</a></li>
-        <li><a href="https://alitajran.com/publish-exchange-server-externally/" target="_blank">External Exchange Setup - Ali Tajran</a></li>
-      </ul>
-    `,
-  },
-  'week4-hybrid': {
-    title: 'Setup Microsoft 365 Hybrid Environment',
-    description: `
-      <p>Integrate on-premises Exchange with Microsoft 365. <strong>Note:</strong> This should only be done once the first step of week 4 is complete.</p>
-      
-      <h3>Steps</h3>
-      <ol>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'hybrid', 'install-connect')"> Install and configure Entra ID Connect.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'hybrid', 'sync-identities')"> Configure hybrid identity synchronization.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'hybrid', 'run-wizard')"> Run the Hybrid Configuration Wizard.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'hybrid', 'verify-flow')"> Verify mail flow between on-premises and cloud.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'hybrid', 'test-sharing')"> Test calendar sharing functionality.</li>
-      </ol>
-      
-      <h3>Reference Links</h3>
-      <ul>
-        <li><a href="https://techcommunity.microsoft.com/blog/exchange/how-to-configure-exchange-hybrid/259135" target="_blank">Exchange Hybrid Setup - Microsoft Tech Community</a></li>
-        <li><a href="https://alitajran.com/exchange-hybrid-configuration/" target="_blank">Hybrid Configuration Guide - Ali Tajran</a></li>
-      </ul>
-    `,
-  },
-  'week4-hosting': {
-    title: 'Choose Hosting Environment',
-    description: `
-      <p>Select Azure or on-premises for deployment.</p>
-      
-      <h3>Steps</h3>
-      <ol>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'hosting', 'evaluate-options')"> Evaluate Azure vs. on-premises for your workload.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'hosting', 'configure-resources')"> Configure Azure resources or on-premises servers.</li>
-        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'hosting', 'test-deployment')"> Test deployment and connectivity.</li>
-      </ol>
-      
-      <h3>Reference Links</h3>
-      <ul>
-        <li><a href="https://techcommunity.microsoft.com/blog/azure/choosing-between-azure-and-on-premises/259140" target="_blank">Azure vs On-Premises - Microsoft Tech Community</a></li>
-        <li><a href="https://alitajran.com/azure-vs-on-premises-comparison/" target="_blank">Hosting Comparison - Ali Tajran</a></li>
-      </ul>
-    `,
-  },
-};
-
-// Function to update sub-task progress
-const updateSubTaskProgress = async (checkbox, week, task, subtask) => {
-  // This would sync with server if needed
-  console.log(`Sub-task ${subtask} in ${week}-${task} updated:`, checkbox.checked);
-};
-
-// Enhanced modal with better animations
-const initModal = () => {
-  const modal = $('#taskModal');
-  const modalTitle = $('#modalTitle');
-  const modalDescription = $('#modalDescription');
-  const closeModal = $('#closeModal');
-
-  if (!modal || !modalTitle || !modalDescription || !closeModal) return;
-
-  const taskElements = document.querySelectorAll('.task');
-  
-  // Safety check for task elements
-  if (taskElements.length === 0) {
-    console.log('No task elements found - may not be on dashboard page');
-    return;
-  }
-
-  taskElements.forEach((task) => {
-    task.addEventListener('click', (e) => {
-      // Don't open modal if clicking checkbox
-      if (e.target.type === 'checkbox') return;
-      
-      const weekElement = task.closest('.week');
-      if (!weekElement) return;
-      
-      const week = weekElement.dataset.week;
-      const taskId = task.dataset.task;
-      const key = `${week}-${taskId}`;
-      const content = taskModalContent[key] || {
-        title: 'Task Details',
-        description: '<p>No details available.</p>',
-      };
-      
-      modalTitle.textContent = content.title;
-      modalDescription.innerHTML = content.description;
-      
-      // Enhanced modal opening animation
-      modal.style.display = 'flex';
-      modal.style.opacity = '0';
-      setTimeout(() => {
-        modal.style.opacity = '1';
-        const modalContent = modal.querySelector('.modal-content');
-        if (modalContent) {
-          modalContent.style.transform = 'scale(1)';
-        }
-      }, 10);
-      
-      modal.focus();
-    });
-
-    // Enhanced keyboard accessibility
-    task.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        task.click();
-      }
-    });
-  });
-
-  // Enhanced modal closing
-  const closeModalFunction = () => {
-    modal.style.opacity = '0';
-    const modalContent = modal.querySelector('.modal-content');
-    if (modalContent) {
-      modalContent.style.transform = 'scale(0.95)';
-    }
-    setTimeout(() => {
-      modal.style.display = 'none';
-      if (modalContent) {
-        modalContent.style.transform = '';
-      }
-    }, 200);
-  };
-
-  closeModal.addEventListener('click', closeModalFunction);
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) closeModalFunction();
-  });
-
-  // Close modal with Escape key
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.style.display === 'flex') {
-      closeModalFunction();
-    }
-  });
-};
-
-// Global VelocityLab object for admin functions
-window.VelocityLab = {
-  showNotification,
-  refreshLeaderboard: () => {
-    if (typeof loadUsersProgress === 'function') loadUsersProgress();
-  },
-  exportData: () => {
-    if (typeof exportData === 'function') exportData();
-  },
-  addAdmin: () => {
-    const email = prompt('Enter email address to grant admin access:');
-    if (email) {
-      showNotification('Admin access management available in user modal', 'info');
-    }
-  }
-};
-
-// Enhanced initialization
-const init = () => {
-  console.log('Initializing Velocity Lab...');
-  
-  try {
-    setupPasswordToggle();
-    console.log('Password toggle initialized');
-  } catch (error) {
-    console.error('Password toggle error:', error);
-  }
-  
-  try {
-    initLoginForm();
-    console.log('Login form initialized');
-  } catch (error) {
-    console.error('Login form error:', error);
-  }
-  
-  try {
-    initRegisterForm();
-    console.log('Register form initialized');
-  } catch (error) {
-    console.error('Register form error:', error);
-  }
-  
-  try {
-    initDashboard();
-    console.log('Dashboard initialized');
-  } catch (error) {
-    console.error('Dashboard error:', error);
-  }
-  
-  try {
-    initProfile();
-    console.log('Profile initialized');
-  } catch (error) {
-    console.error('Profile error:', error);
-  }
-  
-  try {
-    initModal();
-    console.log('Modal initialized');
-  } catch (error) {
-    console.error('Modal error:', error);
-  }
-  
-  // Add smooth page transitions
-  document.body.style.opacity = '0';
-  setTimeout(() => {
-    document.body.style.transition = 'opacity 0.3s ease';
-    document.body.style.opacity = '1';
-  }, 50);
-  
-  console.log('Velocity Lab initialization complete');
-};
-
-// Run initialization when DOM is loaded
-document.addEventListener('DOMContentLoaded', init);
