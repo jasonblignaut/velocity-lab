@@ -103,14 +103,10 @@ const handleFormSubmit = async (form, endpoint, isRegister = false) => {
     showNotification(`Welcome, ${data.name}!`, 'success');
     setCookie('user', JSON.stringify({ name: data.name, role: data.role }), 1);
     
-    // Smooth transition to dashboard
+    // Faster transition to dashboard
     setTimeout(() => {
-      document.body.style.transition = 'opacity 0.3s ease';
-      document.body.style.opacity = '0';
-      setTimeout(() => {
-        window.location.href = '/dashboard.html';
-      }, 300);
-    }, 1000);
+      window.location.href = '/dashboard.html';
+    }, 300);
   } catch (error) {
     console.error(`${endpoint} error:`, error);
     showNotification(error.message || 'An error occurred.', 'error');
@@ -313,7 +309,7 @@ const initDashboard = async () => {
         role: profileData.role 
       }), 1);
       
-      userInfo.textContent = `${profileData.name} (${profileData.role})`;
+      userInfo.textContent = `${profileData.name}`;
       
       // Show admin link for admin users
       const adminLink = $('#adminLink');
@@ -321,7 +317,7 @@ const initDashboard = async () => {
         adminLink.style.display = 'inline';
       }
     } else {
-      userInfo.textContent = `${user.name} (${user.role})`;
+      userInfo.textContent = `${user.name}`;
       
       // Show admin link for admin users (fallback)
       const adminLink = $('#adminLink');
@@ -331,7 +327,7 @@ const initDashboard = async () => {
     }
   } catch (error) {
     console.error('Failed to fetch profile:', error);
-    userInfo.textContent = `${user.name} (${user.role})`;
+    userInfo.textContent = `${user.name}`;
     
     // Show admin link for admin users (fallback)
     const adminLink = $('#adminLink');
@@ -360,12 +356,8 @@ const initDashboard = async () => {
         
         // Smooth transition to home
         setTimeout(() => {
-          document.body.style.transition = 'opacity 0.5s ease';
-          document.body.style.opacity = '0';
-          setTimeout(() => {
-            window.location.href = '/index.html';
-          }, 500);
-        }, 1000);
+          window.location.href = '/index.html';
+        }, 500);
       }
     } catch (error) {
       console.error('Logout error:', error);
@@ -460,7 +452,7 @@ const initProfile = async () => {
         role: profileData.role 
       }), 1);
       
-      userInfo.textContent = `${profileData.name} (${profileData.role})`;
+      userInfo.textContent = `${profileData.name}`;
       
       // Show admin link for admin users
       const adminLink = $('#adminLink');
@@ -468,7 +460,7 @@ const initProfile = async () => {
         adminLink.style.display = 'inline';
       }
     } else {
-      userInfo.textContent = `${user.name} (${user.role})`;
+      userInfo.textContent = `${user.name}`;
       
       // Show admin link for admin users (fallback)
       const adminLink = $('#adminLink');
@@ -478,7 +470,7 @@ const initProfile = async () => {
     }
   } catch (error) {
     console.error('Failed to fetch profile:', error);
-    userInfo.textContent = `${user.name} (${user.role})`;
+    userInfo.textContent = `${user.name}`;
     
     // Show admin link for admin users (fallback)
     const adminLink = $('#adminLink');
@@ -505,12 +497,8 @@ const initProfile = async () => {
         showNotification('Logged out successfully', 'success', 2000);
         
         setTimeout(() => {
-          document.body.style.transition = 'opacity 0.5s ease';
-          document.body.style.opacity = '0';
-          setTimeout(() => {
-            window.location.href = '/index.html';
-          }, 500);
-        }, 1000);
+          window.location.href = '/index.html';
+        }, 500);
       }
     } catch (error) {
       console.error('Logout error:', error);
@@ -520,17 +508,18 @@ const initProfile = async () => {
     }
   });
 
-  // Load profile data
+  // Load profile data faster
   try {
     const response = await fetch('/api/profile', { credentials: 'same-origin' });
     if (response.ok) {
       const profileData = await response.json();
       
-      // Update profile information (no avatar)
+      // Update profile information
       const profileName = $('#profileName');
       const profileEmail = $('#profileEmail');
       const profileRole = $('#profileRole');
       const profileJoined = $('#profileJoined');
+      const profileLastLogin = $('#profileLastLogin');
       const totalProgress = $('#totalProgress');
       const completedTasks = $('#completedTasks');
       const currentWeek = $('#currentWeek');
@@ -538,7 +527,26 @@ const initProfile = async () => {
       if (profileName) profileName.textContent = profileData.name;
       if (profileEmail) profileEmail.textContent = profileData.email;
       if (profileRole) profileRole.textContent = profileData.role;
-      if (profileJoined) profileJoined.textContent = new Date(profileData.createdAt).toLocaleDateString();
+      if (profileJoined) {
+        const joinedDate = new Date(profileData.createdAt);
+        if (!isNaN(joinedDate.getTime())) {
+          profileJoined.textContent = joinedDate.toLocaleDateString();
+        } else {
+          profileJoined.textContent = 'Unknown';
+        }
+      }
+      if (profileLastLogin) {
+        if (profileData.lastLogin) {
+          const lastLoginDate = new Date(profileData.lastLogin);
+          if (!isNaN(lastLoginDate.getTime())) {
+            profileLastLogin.textContent = lastLoginDate.toLocaleDateString() + ' ' + lastLoginDate.toLocaleTimeString();
+          } else {
+            profileLastLogin.textContent = 'Unknown';
+          }
+        } else {
+          profileLastLogin.textContent = 'Never';
+        }
+      }
       if (totalProgress) totalProgress.textContent = `${profileData.progress}%`;
       if (completedTasks) completedTasks.textContent = `${profileData.completedTasks}/${profileData.totalTasks}`;
       if (currentWeek) {
@@ -555,18 +563,29 @@ const initProfile = async () => {
   initProfilePasswordForm();
 };
 
-// Modal content for tasks
+// Modal content for tasks with updated content and reference links
 const taskModalContent = {
   'week1-dc': {
     title: 'Promote Server 2012 to Domain Controller',
     description: `
       <p>Promote your Windows Server 2012 to a Domain Controller to set up Active Directory and DNS services.</p>
+      
+      <h3>Prerequisites</h3>
+      <p><strong>TIP:</strong> For first-time users - Where you decide to host this is up to you. Azure has some benefits, whereas an on-prem virtual lab has others. We suggest going through this lab at least once a year, especially the Exchange Hybrid portion.</p>
+      
       <h3>Steps</h3>
       <ol>
-        <li>Install Active Directory Domain Services role via Server Manager.</li>
-        <li>Promote the server to a Domain Controller (new forest, e.g., lab.local).</li>
-        <li>Configure DNS settings and verify replication.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'dc', 'install-adds')"> Install Active Directory Domain Services role via Server Manager.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'dc', 'promote-dc')"> Promote the server to a Domain Controller (new forest, e.g., lab.local).</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'dc', 'configure-dns')"> Configure DNS settings and verify replication.</li>
       </ol>
+      
+      <h3>Reference Links</h3>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/blog/itopstalk/how-to-install-and-configure-active-directory-domain-services-on-windows-server-2012-r2/259064" target="_blank">Install and Configure Active Directory - Microsoft Tech Community</a></li>
+        <li><a href="https://alitajran.com/install-active-directory-windows-server-2019/" target="_blank">Active Directory Installation Guide - Ali Tajran</a></li>
+      </ul>
+      
       <p><strong>Tip:</strong> Use <code>dcpromo</code> for automation if preferred.</p>
     `,
   },
@@ -574,159 +593,267 @@ const taskModalContent = {
     title: 'Join VM to Domain',
     description: `
       <p>Join a virtual machine to the domain for centralized management.</p>
+      
       <h3>Steps</h3>
       <ol>
-        <li>Ensure the VM has network access to the Domain Controller.</li>
-        <li>Set the DNS server to the DC's IP address.</li>
-        <li>Join the domain via System Properties (Computer Name).</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'vm', 'network-access')"> Ensure the VM has network access to the Domain Controller.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'vm', 'dns-config')"> Set the DNS server to the DC's IP address.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'vm', 'join-domain')"> Join the domain via System Properties (Computer Name).</li>
       </ol>
+      
+      <h3>Reference Links</h3>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/blog/itopstalk/how-to-join-a-computer-to-a-domain/341911" target="_blank">Join Computer to Domain - Microsoft Tech Community</a></li>
+        <li><a href="https://alitajran.com/join-computer-to-active-directory-domain/" target="_blank">Join Computer to Domain - Ali Tajran</a></li>
+      </ul>
     `,
   },
   'week1-share': {
     title: 'Configure Network Share on DC',
     description: `
       <p>Create a centralized file storage with secure access on the Domain Controller.</p>
+      
       <h3>Steps</h3>
       <ol>
-        <li>Create a shared folder (e.g., \\\\DC\\Share$).</li>
-        <li>Set NTFS and share permissions for the security group.</li>
-        <li>Map drives using GPO, PowerShell, or logon scripts.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'share', 'create-share')"> Create a shared folder (e.g., \\\\DC\\Share$) - Share must not be visible (hidden share).</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'share', 'set-permissions')"> Set NTFS and share permissions for the security group.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'share', 'map-gpo')"> Map drive using Group Policy Object (GPO).</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'share', 'map-powershell')"> Map drive using PowerShell script.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'share', 'map-logon')"> Map drive using logon script.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'share', 'auto-map')"> Ensure drives automatically map to machine on logon.</li>
       </ol>
-      <p><strong>Tip:</strong> Use hidden shares (with $ suffix) for restricted access.</p>
+      
+      <h3>Reference Links</h3>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/blog/itopstalk/how-to-create-and-share-a-folder-in-windows-server/259088" target="_blank">Create Network Shares - Microsoft Tech Community</a></li>
+        <li><a href="https://alitajran.com/how-to-create-shared-folder-windows-server/" target="_blank">Network Share Configuration - Ali Tajran</a></li>
+      </ul>
+      
+      <p><strong>Tip:</strong> Use hidden shares (with $ suffix) for restricted access. Create three drives using different methods.</p>
     `,
   },
   'week1-group': {
     title: 'Create Security Group',
     description: `
       <p>Restrict network share access to authorized users via a security group.</p>
+      
       <h3>Steps</h3>
       <ol>
-        <li>Open Active Directory Users and Computers.</li>
-        <li>Create a new security group (e.g., ShareAccess).</li>
-        <li>Add users to the group and assign permissions to the share.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'group', 'open-aduc')"> Open Active Directory Users and Computers.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'group', 'create-group')"> Create a new security group (e.g., ShareAccess).</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'group', 'add-users')"> Add users to the group.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week1', 'group', 'assign-permissions')"> Assign permissions to the share for this group only.</li>
       </ol>
+      
+      <h3>Reference Links</h3>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/blog/itopstalk/how-to-create-and-manage-security-groups-in-active-directory/259090" target="_blank">Security Groups Management - Microsoft Tech Community</a></li>
+        <li><a href="https://alitajran.com/create-security-groups-active-directory/" target="_blank">Create Security Groups - Ali Tajran</a></li>
+      </ul>
     `,
   },
   'week2-server': {
     title: 'Install Second Server 2012',
     description: `
       <p>Add a second Windows Server 2012 for redundancy.</p>
+      
       <h3>Steps</h3>
       <ol>
-        <li>Install Server 2012 on a new VM or hardware.</li>
-        <li>Join it to the domain.</li>
-        <li>Configure roles as needed (e.g., secondary DC).</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'server', 'install-server')"> Install Server 2012 on a new VM or hardware.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'server', 'join-domain')"> Join it to the domain.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'server', 'configure-roles')"> Configure roles as needed (e.g., secondary DC).</li>
       </ol>
+      
+      <h3>Reference Links</h3>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/blog/itopstalk/how-to-install-windows-server-2012-r2/259070" target="_blank">Install Windows Server 2012 - Microsoft Tech Community</a></li>
+        <li><a href="https://alitajran.com/install-windows-server-2019/" target="_blank">Server Installation Guide - Ali Tajran</a></li>
+      </ul>
     `,
   },
   'week2-wsus': {
     title: 'Setup WSUS',
     description: `
       <p>Manage updates with Windows Server Update Services.</p>
+      
       <h3>Steps</h3>
       <ol>
-        <li>Install WSUS role on a server.</li>
-        <li>Configure update sources and client policies via GPO.</li>
-        <li>Approve and test updates.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'wsus', 'install-role')"> Install WSUS role on a server.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'wsus', 'configure-sources')"> Configure update sources and client policies via GPO.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'wsus', 'approve-updates')"> Approve and test updates.</li>
       </ol>
+      
+      <h3>Reference Links</h3>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/blog/itopstalk/how-to-install-and-configure-wsus-on-windows-server/259095" target="_blank">WSUS Configuration - Microsoft Tech Community</a></li>
+        <li><a href="https://alitajran.com/install-configure-wsus-windows-server/" target="_blank">WSUS Setup Guide - Ali Tajran</a></li>
+      </ul>
     `,
   },
   'week2-time': {
     title: 'Configure Two Time Servers',
     description: `
       <p>Ensure time synchronization across the domain.</p>
+      
       <h3>Steps</h3>
       <ol>
-        <li>Configure the primary DC as the PDC Emulator to sync with an external NTP server.</li>
-        <li>Set a secondary server as a backup time source.</li>
-        <li>Verify time sync with <code>w32tm /query /status</code>.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'time', 'configure-pdc')"> Configure the primary DC as the PDC Emulator to sync with an external NTP server.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'time', 'setup-secondary')"> Set a secondary server as a backup time source.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week2', 'time', 'verify-sync')"> Verify time sync with <code>w32tm /query /status</code>.</li>
       </ol>
+      
+      <h3>Reference Links</h3>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/blog/itopstalk/how-to-configure-time-synchronization-in-active-directory/259100" target="_blank">Time Sync Configuration - Microsoft Tech Community</a></li>
+        <li><a href="https://alitajran.com/configure-time-server-windows-server/" target="_blank">Time Server Setup - Ali Tajran</a></li>
+      </ul>
     `,
   },
   'week3-upgrade': {
     title: 'Upgrade Servers to 2016',
     description: `
       <p>Modernize infrastructure by upgrading to Server 2016.</p>
+      
       <h3>Steps</h3>
       <ol>
-        <li>Back up existing servers.</li>
-        <li>Perform an in-place upgrade or migrate to new Server 2016 VMs.</li>
-        <li>Verify AD and DNS functionality post-upgrade.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'upgrade', 'backup-servers')"> Back up existing servers.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'upgrade', 'perform-upgrade')"> Perform an in-place upgrade or migrate to new Server 2016 VMs.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'upgrade', 'verify-functionality')"> Verify AD and DNS functionality post-upgrade.</li>
       </ol>
+      
+      <h3>Reference Links</h3>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/blog/itopstalk/how-to-upgrade-from-windows-server-2012-r2-to-windows-server-2016/259110" target="_blank">Server Upgrade Guide - Microsoft Tech Community</a></li>
+        <li><a href="https://alitajran.com/upgrade-windows-server-2016-to-2019/" target="_blank">Server Upgrade Process - Ali Tajran</a></li>
+      </ul>
     `,
   },
   'week3-exchange': {
     title: 'Install Exchange Server 2019',
     description: `
       <p>Deploy email services on a third server.</p>
+      
       <h3>Steps</h3>
       <ol>
-        <li>Install Exchange Server 2019 prerequisites.</li>
-        <li>Run the Exchange setup and configure mailbox roles.</li>
-        <li>Test connectivity and services.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'exchange', 'install-prerequisites')"> Install Exchange Server 2019 prerequisites.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'exchange', 'run-setup')"> Run the Exchange setup and configure mailbox roles.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'exchange', 'test-connectivity')"> Test connectivity and services.</li>
       </ol>
+      
+      <h3>Reference Links</h3>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/blog/exchange/how-to-install-exchange-server-2019/259115" target="_blank">Exchange 2019 Installation - Microsoft Tech Community</a></li>
+        <li><a href="https://alitajran.com/install-exchange-server-2019/" target="_blank">Exchange Server Installation - Ali Tajran</a></li>
+      </ul>
     `,
   },
   'week3-mailbox': {
     title: 'Create User Mailboxes',
     description: `
       <p>Set up email accounts for users.</p>
+      
       <h3>Steps</h3>
       <ol>
-        <li>Open Exchange Admin Center.</li>
-        <li>Create mailboxes for domain users.</li>
-        <li>Test email sending/receiving.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'mailbox', 'open-eac')"> Open Exchange Admin Center.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'mailbox', 'create-mailboxes')"> Create mailboxes for domain users.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'mailbox', 'test-email')"> Test email sending/receiving.</li>
       </ol>
+      
+      <h3>Reference Links</h3>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/blog/exchange/how-to-create-user-mailboxes-in-exchange/259120" target="_blank">Create User Mailboxes - Microsoft Tech Community</a></li>
+        <li><a href="https://alitajran.com/create-mailboxes-exchange-server/" target="_blank">Mailbox Creation Guide - Ali Tajran</a></li>
+      </ul>
     `,
   },
   'week3-mail': {
     title: 'Setup Internal Mail Flow',
     description: `
       <p>Enable email delivery between users.</p>
+      
       <h3>Steps</h3>
       <ol>
-        <li>Configure accepted domains and email address policies.</li>
-        <li>Set up send/receive connectors.</li>
-        <li>Test internal mail flow.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'mail', 'configure-domains')"> Configure accepted domains and email address policies.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'mail', 'setup-connectors')"> Set up send/receive connectors.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week3', 'mail', 'test-flow')"> Test internal mail flow between users.</li>
       </ol>
+      
+      <h3>Reference Links</h3>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/blog/exchange/how-to-configure-mail-flow-in-exchange/259125" target="_blank">Mail Flow Configuration - Microsoft Tech Community</a></li>
+        <li><a href="https://alitajran.com/configure-mail-flow-exchange-server/" target="_blank">Internal Mail Flow - Ali Tajran</a></li>
+      </ul>
     `,
   },
   'week4-external': {
     title: 'Publish Mail Externally',
     description: `
       <p>Enable secure external email access.</p>
+      
       <h3>Steps</h3>
       <ol>
-        <li>Configure DNS records (MX, SPF, DKIM, DMARC).</li>
-        <li>Enable modern authentication (OAuth 2.0).</li>
-        <li>Install TLS certificates and set up reverse DNS.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'external', 'configure-mx')"> Configure MX records.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'external', 'setup-spf')"> Set up SPF records.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'external', 'configure-dkim')"> Configure DKIM records.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'external', 'setup-dmarc')"> Set up DMARC records.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'external', 'enable-oauth')"> Enable modern authentication (OAuth 2.0).</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'external', 'install-certs')"> Install TLS certificates.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'external', 'setup-rdns')"> Set up reverse DNS.</li>
       </ol>
+      
+      <h3>Reference Links</h3>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/blog/exchange/how-to-publish-exchange-externally/259130" target="_blank">External Email Publishing - Microsoft Tech Community</a></li>
+        <li><a href="https://alitajran.com/publish-exchange-server-externally/" target="_blank">External Exchange Setup - Ali Tajran</a></li>
+      </ul>
     `,
   },
   'week4-hybrid': {
     title: 'Setup Microsoft 365 Hybrid Environment',
     description: `
-      <p>Integrate on-premises Exchange with Microsoft 365.</p>
+      <p>Integrate on-premises Exchange with Microsoft 365. <strong>Note:</strong> This should only be done once the first step of week 4 is complete.</p>
+      
       <h3>Steps</h3>
       <ol>
-        <li>Install and configure Entra ID Connect.</li>
-        <li>Run the Hybrid Configuration Wizard.</li>
-        <li>Verify mail flow and calendar sharing.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'hybrid', 'install-connect')"> Install and configure Entra ID Connect.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'hybrid', 'sync-identities')"> Configure hybrid identity synchronization.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'hybrid', 'run-wizard')"> Run the Hybrid Configuration Wizard.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'hybrid', 'verify-flow')"> Verify mail flow between on-premises and cloud.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'hybrid', 'test-sharing')"> Test calendar sharing functionality.</li>
       </ol>
+      
+      <h3>Reference Links</h3>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/blog/exchange/how-to-configure-exchange-hybrid/259135" target="_blank">Exchange Hybrid Setup - Microsoft Tech Community</a></li>
+        <li><a href="https://alitajran.com/exchange-hybrid-configuration/" target="_blank">Hybrid Configuration Guide - Ali Tajran</a></li>
+      </ul>
     `,
   },
   'week4-hosting': {
     title: 'Choose Hosting Environment',
     description: `
       <p>Select Azure or on-premises for deployment.</p>
+      
       <h3>Steps</h3>
       <ol>
-        <li>Evaluate Azure vs. on-premises for your workload.</li>
-        <li>Configure Azure resources or on-premises servers.</li>
-        <li>Test deployment and connectivity.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'hosting', 'evaluate-options')"> Evaluate Azure vs. on-premises for your workload.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'hosting', 'configure-resources')"> Configure Azure resources or on-premises servers.</li>
+        <li><input type="checkbox" onchange="updateSubTaskProgress(this, 'week4', 'hosting', 'test-deployment')"> Test deployment and connectivity.</li>
       </ol>
+      
+      <h3>Reference Links</h3>
+      <ul>
+        <li><a href="https://techcommunity.microsoft.com/blog/azure/choosing-between-azure-and-on-premises/259140" target="_blank">Azure vs On-Premises - Microsoft Tech Community</a></li>
+        <li><a href="https://alitajran.com/azure-vs-on-premises-comparison/" target="_blank">Hosting Comparison - Ali Tajran</a></li>
+      </ul>
     `,
   },
+};
+
+// Function to update sub-task progress
+const updateSubTaskProgress = async (checkbox, week, task, subtask) => {
+  // This would sync with server if needed
+  console.log(`Sub-task ${subtask} in ${week}-${task} updated:`, checkbox.checked);
 };
 
 // Enhanced modal with better animations
@@ -882,7 +1009,7 @@ const init = () => {
   // Add smooth page transitions
   document.body.style.opacity = '0';
   setTimeout(() => {
-    document.body.style.transition = 'opacity 0.5s ease';
+    document.body.style.transition = 'opacity 0.3s ease';
     document.body.style.opacity = '1';
   }, 50);
   
