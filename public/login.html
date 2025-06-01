@@ -1,78 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login | Velocity Lab</title>
-  <link rel="stylesheet" href="/css/styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Log in to Velocity Lab to track your progress in the 4-week Microsoft hybrid IT guide.">
+  <title>Login - Velocity Lab</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/main.js" defer></script>
 </head>
 <body>
-  <main class="container">
-    <h1>Login to Velocity Lab</h1>
-
-    <div id="notification" role="alert" aria-live="polite"></div>
-
-    <form id="loginForm" novalidate>
-      <!-- Hidden CSRF token input, filled dynamically -->
-      <input type="hidden" id="csrfToken" name="csrf_token" />
-
-      <label for="email">Email Address</label>
-      <input type="email" id="email" name="email" required autocomplete="email" placeholder="your@email.com" />
-
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="Enter your password" />
-
-      <button type="submit">Login</button>
-    </form>
-  </main>
-
-  <script>
-    async function fetchCSRFToken() {
-      try {
-        const res = await fetch('/api/csrf');
-        if (!res.ok) throw new Error('Failed to fetch CSRF token');
-        const data = await res.json();
-        document.querySelector('#csrfToken').value = data.token;
-      } catch (e) {
-        console.error(e);
-        document.querySelector('#notification').textContent = 'Error fetching security token. Please try again.';
-      }
-    }
-
-    async function login(event) {
-      event.preventDefault();
-      const form = event.target;
-      const formData = new FormData(form);
-      const payload = Object.fromEntries(formData.entries());
-
-      try {
-        const res = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-
-        const result = await res.json();
-        if (!res.ok) {
-          document.querySelector('#notification').textContent = result.error || 'Login failed';
-          await fetchCSRFToken(); // Refresh token on failure
-          return;
-        }
-
-        // Success: redirect or show message
-        window.location.href = '/dashboard.html';
-      } catch (err) {
-        console.error(err);
-        document.querySelector('#notification').textContent = 'Network error. Please try again.';
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      fetchCSRFToken();
-
-      const loginForm = document.querySelector('#loginForm');
-      if (loginForm) loginForm.addEventListener('submit', login);
-    });
-  </script>
+  <nav class="nav-glass">
+    <div class="brand">
+      <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="brand-logo">
+    </div>
+    <div class="auth">
+      <a href="/register.html" aria-label="Register for Velocity Lab">Register</a>
+      <a href="/login.html" aria-label="Login to Velocity Lab">Login</a>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="form-container">
+      <h2>Login</h2>
+      <div class="notification" id="notification"></div>
+      <form id="loginForm" aria-label="Login form">
+        <input type="hidden" name="csrf_token" id="csrfToken">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required aria-required="true" placeholder="Enter your email">
+        </div>
+        <div class="form-group password-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required aria-required="true" placeholder="Enter your password">
+          <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        <div class="form-group">
+          <button type="submit" id="loginButton">
+            Login
+            <span class="spinner">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10 10 10 0 0 1-10-10A10 10 0 0 1 12 2z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-dasharray="15 45"/>
+              </svg>
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </body>
 </html>
