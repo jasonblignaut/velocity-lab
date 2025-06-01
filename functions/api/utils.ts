@@ -31,6 +31,16 @@ export function generateToken(length: number = 32): string {
   return token;
 }
 
+// Generate a CSRF token (uses secure UUID)
+export function generateCSRFToken(): string {
+  return crypto.randomUUID();
+}
+
+// Standard JSON error response
+export function errorResponse(message: string, status: number = 400): Response {
+  return jsonResponse({ error: message }, status);
+}
+
 // Hash password using SHA-256 (note: use bcrypt in production)
 export async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
