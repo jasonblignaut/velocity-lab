@@ -1,4 +1,3 @@
-// sw.js - Service Worker for Velocity Lab
 const CACHE_NAME = 'velocity-lab-v1';
 const STATIC_ASSETS = [
   '/',
@@ -12,7 +11,8 @@ const STATIC_ASSETS = [
   '/js/main.js',
   '/assets/Velocity-Logo.png',
   '/assets/default-avatar.png',
-  '/assets/favicon.ico'
+  '/assets/favicon.ico',
+  '/offline.html'
 ];
 
 // Install event - cache static assets
@@ -44,10 +44,10 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests
+  // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
-  // Skip API requests
+  // Skip API calls
   if (event.request.url.includes('/api/')) return;
 
   event.respondWith(
@@ -57,26 +57,29 @@ self.addEventListener('fetch', (event) => {
           return cachedResponse;
         }
 
-        return fetch(event.request)
+        // Force redirect: follow (to avoid opaque redirects)
+        return fetch(event.request, { redirect: 'follow' })
           .then((response) => {
             // Don't cache non-successful responses
-            if (!response || response.status !== 200 || response.type !== 'basic') {
+            if (
+              !response ||
+              response.status !== 200 ||
+              response.type !== 'basic'
+            ) {
               return response;
             }
 
-            // Clone the response
+            // Clone and cache
             const responseToCache = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
 
             return response;
           });
       })
       .catch(() => {
-        // Offline fallback
+        // Offline fallback for HTML pages
         if (event.request.destination === 'document') {
           return caches.match('/offline.html');
         }
