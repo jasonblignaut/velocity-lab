@@ -400,15 +400,43 @@ const initProfile = async () => {
     return;
   }
 
-  userInfo.textContent = `${user.name} (${user.role})`;
-  
-  // Show admin link for admin users
-  const adminLink = $('#adminLink');
-  if (adminLink && user.role === 'admin') {
-    adminLink.style.display = 'inline';
+  // Get fresh user data from server to check current role
+  try {
+    const response = await fetch('/api/profile', { credentials: 'same-origin' });
+    if (response.ok) {
+      const profileData = await response.json();
+      // Update cookie with fresh data
+      setCookie('user', JSON.stringify({ 
+        name: profileData.name, 
+        role: profileData.role 
+      }), 1);
+      
+      userInfo.textContent = `${profileData.name} (${profileData.role})`;
+      
+      // Show admin link for admin users
+      const adminLink = $('#adminLink');
+      if (adminLink && profileData.role === 'admin') {
+        adminLink.style.display = 'inline';
+      }
+    } else {
+      userInfo.textContent = `${user.name} (${user.role})`;
+      
+      // Show admin link for admin users (fallback)
+      const adminLink = $('#adminLink');
+      if (adminLink && user.role === 'admin') {
+        adminLink.style.display = 'inline';
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch profile:', error);
+    userInfo.textContent = `${user.name} (${user.role})`;
+    
+    // Show admin link for admin users (fallback)
+    const adminLink = $('#adminLink');
+    if (adminLink && user.role === 'admin') {
+      adminLink.style.display = 'inline';
+    }
   }
-  
-  // Enhanced logout for profile page
   logoutLink.addEventListener('click', async (e) => {
     e.preventDefault();
     

@@ -220,7 +220,7 @@ export const initializeDefaultAdmin = async (env: Env): Promise<void> => {
     if (!existingAdmin) {
       const adminUser: User = {
         id: crypto.randomUUID(),
-        name: 'Admin User',
+        name: 'System Administrator',
         email: adminEmail,
         password: 'Superadmin@123',
         role: 'admin',
@@ -228,7 +228,12 @@ export const initializeDefaultAdmin = async (env: Env): Promise<void> => {
       };
       
       await env.USERS.put(`user:${adminEmail}`, JSON.stringify(adminUser));
-      console.log('Default admin user created');
+      console.log('Default admin user created with role: admin');
+    } else if (existingAdmin.role !== 'admin') {
+      // Ensure the default admin has admin role
+      existingAdmin.role = 'admin';
+      await env.USERS.put(`user:${adminEmail}`, JSON.stringify(existingAdmin));
+      console.log('Default admin user role updated to: admin');
     }
   } catch (error) {
     console.error('Initialize default admin error:', error);
