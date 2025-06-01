@@ -85,17 +85,17 @@ async function handleFormSubmission(form, url, successCallback) {
   }
 }
 
-// Fetch CSRF Token
-async function fetchCsrfToken() {
+async function fetchCSRFToken() {
   try {
-    const response = await fetch('/api/csrf', {
-      credentials: 'same-origin'
-    });
+    const response = await fetch('/api/csrf');  // Adjust to your actual endpoint
+    if (!response.ok) throw new Error('Failed to fetch CSRF token');
     const data = await response.json();
-    return data.token;
+    const csrfInput = document.querySelector('#csrfToken');
+    if (csrfInput) {
+      csrfInput.value = data.token;
+    }
   } catch (error) {
-    console.error('Failed to fetch CSRF token:', error);
-    return null;
+    console.error('CSRF token fetch error:', error);
   }
 }
 
@@ -704,6 +704,8 @@ async function init() {
 }
 
 (async () => {
+  const path = window.location.pathname;
+
   // Initialize CSRF tokens
   await initForms();
 
@@ -716,6 +718,7 @@ async function init() {
     await initAdminDashboard();
   }
 })();
+
 
  // Setup form handlers
  setupFormHandlers();

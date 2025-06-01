@@ -1,152 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Register for Velocity Lab - Start your Microsoft Hybrid IT training journey">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Register | Velocity Lab</title>
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
-  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
-  <a href="#main" class="skip-link">Skip to content</a>
-  
-  <nav class="nav-glass" role="navigation" aria-label="Main navigation">
-    <div class="brand">
-      <a href="/">
-        <img src="/assets/Velocity-Logo.png" alt="Velocity Lab" class="brand-logo" width="180" height="45">
-      </a>
-    </div>
-    <div class="auth">
-      <a href="/">Home</a>
-      <a href="/login.html">Login</a>
-    </div>
-  </nav>
+  <main class="container">
+    <h1>Create Your Account</h1>
 
-  <main id="main" class="container">
-    <header class="header">
-      <h1>Create an Account</h1>
-      <h2>Join Velocity Lab Today</h2>
-    </header>
+    <div id="notification" role="alert" aria-live="polite"></div>
 
-    <div class="form-container">
-      <div id="notification" class="notification" role="alert" aria-live="polite"></div>
-      
-      <form id="registerForm" novalidate>
-        <input type="hidden" id="csrfToken" name="csrf_token">
-        <input type="hidden" name="role" value="user">
-        
-        <div class="form-group">
-          <label for="name">Full Name</label>
-          <input 
-            type="text" 
-            id="name" 
-            name="name" 
-            required 
-            autocomplete="name"
-            placeholder="John Doe"
-            aria-describedby="name-error"
-            minlength="2"
-            maxlength="100"
-          >
-          <span id="name-error" class="error-text" role="alert"></span>
-        </div>
-        
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input 
-            type="email" 
-            id="email" 
-            name="email" 
-            required 
-            autocomplete="email"
-            placeholder="your@email.com"
-            aria-describedby="email-error"
-          >
-          <span id="email-error" class="error-text" role="alert"></span>
-        </div>
-        
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input 
-            type="password" 
-            id="password" 
-            name="password" 
-            required 
-            autocomplete="new-password"
-            placeholder="Minimum 8 characters"
-            aria-describedby="password-error password-requirements"
-            minlength="8"
-          >
-          <span id="password-error" class="error-text" role="alert"></span>
-          <div id="password-requirements" style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--primary-gray);">
-            Password must contain:
-            <ul style="margin: 0.25rem 0 0 1.5rem; font-size: 0.875rem;">
-              <li>At least 8 characters</li>
-              <li>One uppercase letter</li>
-              <li>One lowercase letter</li>
-              <li>One number</li>
-            </ul>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="repeatPassword">Confirm Password</label>
-          <input 
-            type="password" 
-            id="repeatPassword" 
-            name="repeatPassword" 
-            required 
-            autocomplete="new-password"
-            placeholder="Repeat your password"
-            aria-describedby="repeat-password-error"
-          >
-          <span id="repeat-password-error" class="error-text" role="alert"></span>
-        </div>
-        
-        <div class="form-group" style="margin-top: 1.5rem;">
-          <label style="display: flex; align-items: flex-start; cursor: pointer; font-weight: normal;">
-            <input 
-              type="checkbox" 
-              id="terms" 
-              name="terms" 
-              required
-              style="width: auto; margin-right: 0.5rem; margin-top: 0.2rem;"
-            >
-            <span style="font-size: 0.9rem; line-height: 1.4;">
-              I agree to the 
-              <a href="/terms" target="_blank" style="color: var(--primary-orange);">Terms of Service</a> 
-              and 
-              <a href="/privacy" target="_blank" style="color: var(--primary-orange);">Privacy Policy</a>
-            </span>
-          </label>
-        </div>
-        
-        <div class="form-group">
-          <button type="submit" class="btn btn-primary">
-            <span>Create Account</span>
-            <span class="spinner" aria-hidden="true"></span>
-          </button>
-        </div>
-        
-        <div style="text-align: center; margin-top: 1.5rem;">
-          <p style="color: var(--primary-gray);">
-            Already have an account? 
-            <a href="/login.html" style="color: var(--primary-orange); font-weight: 500;">
-              Login here
-            </a>
-          </p>
-        </div>
-      </form>
-    </div>
+    <form id="registerForm" novalidate>
+      <!-- Hidden CSRF token input, filled dynamically -->
+      <input type="hidden" id="csrfToken" name="csrf_token" />
 
-    <div style="text-align: center; margin-top: 3rem;">
-      <p style="color: var(--primary-gray); font-size: 0.9rem;">
-        <strong>Note:</strong> After registration, you'll have immediate access to all training materials and progress tracking features.
-      </p>
-    </div>
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" required autocomplete="email" placeholder="your@email.com" />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required autocomplete="new-password" placeholder="Choose a password" />
+
+      <label for="confirmPassword">Confirm Password</label>
+      <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password" placeholder="Confirm your password" />
+
+      <button type="submit">Register</button>
+    </form>
   </main>
 
-  <script src="/js/main.js" defer></script>
+  <script>
+    async function fetchCSRFToken() {
+      try {
+        const res = await fetch('/api/csrf');
+        if (!res.ok) throw new Error('Failed to fetch CSRF token');
+        const data = await res.json();
+        document.querySelector('#csrfToken').value = data.token;
+      } catch (e) {
+        console.error(e);
+        document.querySelector('#notification').textContent = 'Error fetching security token. Please try again.';
+      }
+    }
+
+    async function register(event) {
+      event.preventDefault();
+      const form = event.target;
+      const formData = new FormData(form);
+      const payload = Object.fromEntries(formData.entries());
+
+      if (payload.password !== payload.confirmPassword) {
+        document.querySelector('#notification').textContent = 'Passwords do not match.';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await res.json();
+        if (!res.ok) {
+          document.querySelector('#notification').textContent = result.error || 'Registration failed';
+          await fetchCSRFToken(); // Refresh token on failure
+          return;
+        }
+
+        // Success: redirect or show message
+        window.location.href = '/login.html';
+      } catch (err) {
+        console.error(err);
+        document.querySelector('#notification').textContent = 'Network error. Please try again.';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchCSRFToken();
+
+      const registerForm = document.querySelector('#registerForm');
+      if (registerForm) registerForm.addEventListener('submit', register);
+    });
+  </script>
 </body>
 </html>
