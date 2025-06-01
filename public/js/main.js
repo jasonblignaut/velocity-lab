@@ -685,10 +685,15 @@ const initModal = () => {
   // Enhanced modal closing
   const closeModalFunction = () => {
     modal.style.opacity = '0';
-    modal.querySelector('.modal-content').style.transform = 'scale(0.95)';
+    const modalContent = modal.querySelector('.modal-content');
+    if (modalContent) {
+      modalContent.style.transform = 'scale(0.95)';
+    }
     setTimeout(() => {
       modal.style.display = 'none';
-      modal.querySelector('.modal-content').style.transform = '';
+      if (modalContent) {
+        modalContent.style.transform = '';
+      }
     }, 200);
   };
 
@@ -724,12 +729,49 @@ window.VelocityLab = {
 
 // Enhanced initialization
 const init = () => {
-  setupPasswordToggle();
-  initLoginForm();
-  initRegisterForm();
-  initDashboard();
-  initProfile();
-  initModal();
+  console.log('Initializing Velocity Lab...');
+  
+  try {
+    setupPasswordToggle();
+    console.log('Password toggle initialized');
+  } catch (error) {
+    console.error('Password toggle error:', error);
+  }
+  
+  try {
+    initLoginForm();
+    console.log('Login form initialized');
+  } catch (error) {
+    console.error('Login form error:', error);
+  }
+  
+  try {
+    initRegisterForm();
+    console.log('Register form initialized');
+  } catch (error) {
+    console.error('Register form error:', error);
+  }
+  
+  try {
+    initDashboard();
+    console.log('Dashboard initialized');
+  } catch (error) {
+    console.error('Dashboard error:', error);
+  }
+  
+  try {
+    initProfile();
+    console.log('Profile initialized');
+  } catch (error) {
+    console.error('Profile error:', error);
+  }
+  
+  try {
+    initModal();
+    console.log('Modal initialized');
+  } catch (error) {
+    console.error('Modal error:', error);
+  }
   
   // Add smooth page transitions
   document.body.style.opacity = '0';
@@ -737,6 +779,8 @@ const init = () => {
     document.body.style.transition = 'opacity 0.5s ease';
     document.body.style.opacity = '1';
   }, 50);
+  
+  console.log('Velocity Lab initialization complete');
 };
 
 // Run initialization when DOM is loaded
