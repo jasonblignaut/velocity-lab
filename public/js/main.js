@@ -601,7 +601,7 @@ const initDashboard = async () => {
     return;
   }
 
-  // Enhanced user info display with fresh data
+  // FIXED: Enhanced user info display without role in brackets
   try {
     const response = await fetch('/api/profile', { credentials: 'same-origin' });
     if (response.ok) {
@@ -611,11 +611,11 @@ const initDashboard = async () => {
         role: profileData.role 
       }), 1);
       
-      // Animate user info update
+      // Animate user info update - REMOVED role display
       userInfo.style.transition = 'all 0.3s ease';
       userInfo.style.opacity = '0';
       setTimeout(() => {
-        userInfo.textContent = `${profileData.name} (${profileData.role})`;
+        userInfo.textContent = profileData.name; // FIXED: No role in brackets
         userInfo.style.opacity = '1';
       }, 150);
       
@@ -627,7 +627,7 @@ const initDashboard = async () => {
     }
   } catch (error) {
     console.error('Failed to fetch profile:', error);
-    userInfo.textContent = `${user.name} (${user.role})`;
+    userInfo.textContent = user.name; // FIXED: No role in brackets
   }
   
   // Enhanced logout with smooth transitions
@@ -771,7 +771,7 @@ const initProfile = async () => {
     return;
   }
 
-  // Similar enhanced user info logic as dashboard
+  // FIXED: Similar enhanced user info logic as dashboard - no role in brackets
   try {
     const response = await fetch('/api/profile', { credentials: 'same-origin' });
     if (response.ok) {
@@ -781,7 +781,7 @@ const initProfile = async () => {
         role: profileData.role 
       }), 1);
       
-      userInfo.textContent = `${profileData.name} (${profileData.role})`;
+      userInfo.textContent = profileData.name; // FIXED: No role in brackets
       
       const adminLink = $('#adminLink');
       if (adminLink && profileData.role === 'admin') {
@@ -790,7 +790,7 @@ const initProfile = async () => {
     }
   } catch (error) {
     console.error('Failed to fetch profile:', error);
-    userInfo.textContent = `${user.name} (${user.role})`;
+    userInfo.textContent = user.name; // FIXED: No role in brackets
   }
   
   // Enhanced logout for profile page (same as dashboard)
@@ -1216,7 +1216,7 @@ window.VelocityLab = {
   triggerMilestone: (percentage) => triggerMilestone(percentage)
 };
 
-// Make showNotification globally available
+// FIXED: Make showNotification globally available
 window.showNotification = showNotification;
 
 // Enhanced Initialization with Performance Optimization

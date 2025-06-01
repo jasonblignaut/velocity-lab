@@ -436,6 +436,7 @@
       displayUsers();
     }
 
+    // FIXED: Sort by activity function
     function sortUsers() {
       const sortBy = document.getElementById('sortBy').value;
       
@@ -447,7 +448,10 @@
             comparison = a.name.localeCompare(b.name);
             break;
           case 'recent':
-            comparison = new Date(b.lastActivity) - new Date(a.lastActivity);
+            // FIXED: Proper sort by activity - most recent first, "Never" last
+            const dateA = new Date(a.lastActivity || '1970-01-01');
+            const dateB = new Date(b.lastActivity || '1970-01-01');
+            comparison = dateB.getTime() - dateA.getTime(); // Most recent first
             break;
           case 'progress':
           default:
@@ -666,11 +670,7 @@
       }
     }
 
-    function getCookie(name) {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      return parts.length === 2 ? parts.pop().split(';').shift() : null;
-    }
+    // REMOVED: Duplicate getCookie function - will use the one from main.js
   </script>
 </body>
 </html>

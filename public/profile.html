@@ -435,19 +435,49 @@
           if (profileName) profileName.textContent = profileData.name;
           if (profileEmail) profileEmail.textContent = profileData.email;
           if (profileRole) profileRole.textContent = profileData.role;
+          
+          // FIXED: Better date parsing for member since
           if (profileJoined) {
-            // FIXED: Better date parsing for member since
-            const joinDate = new Date(profileData.createdAt);
-            if (!isNaN(joinDate.getTime())) {
-              profileJoined.textContent = joinDate.toLocaleDateString();
+            if (profileData.createdAt) {
+              const joinDate = new Date(profileData.createdAt);
+              if (!isNaN(joinDate.getTime())) {
+                profileJoined.textContent = joinDate.toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                });
+              } else {
+                // Try alternative parsing if ISO format fails
+                const altDate = new Date(profileData.createdAt.replace(/[-T:]/g, match => {
+                  return match === 'T' ? ' ' : match;
+                }));
+                if (!isNaN(altDate.getTime())) {
+                  profileJoined.textContent = altDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  });
+                } else {
+                  profileJoined.textContent = 'Unknown';
+                }
+              }
             } else {
               profileJoined.textContent = 'Unknown';
             }
           }
+          
           if (profileLastLogin) {
-            const lastLoginDate = profileData.lastLogin ? new Date(profileData.lastLogin) : null;
-            if (lastLoginDate && !isNaN(lastLoginDate.getTime())) {
-              profileLastLogin.textContent = lastLoginDate.toLocaleDateString();
+            if (profileData.lastLogin) {
+              const lastLoginDate = new Date(profileData.lastLogin);
+              if (!isNaN(lastLoginDate.getTime())) {
+                profileLastLogin.textContent = lastLoginDate.toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                });
+              } else {
+                profileLastLogin.textContent = 'Never';
+              }
             } else {
               profileLastLogin.textContent = 'Never';
             }
@@ -457,7 +487,11 @@
             if (profileData.passwordChangedAt) {
               const passwordDate = new Date(profileData.passwordChangedAt);
               if (!isNaN(passwordDate.getTime())) {
-                profilePasswordChanged.textContent = passwordDate.toLocaleDateString();
+                profilePasswordChanged.textContent = passwordDate.toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                });
                 passwordChangedGroup.style.display = 'block';
               }
             }
