@@ -6,7 +6,6 @@ import {
   createCookie,
   checkRateLimit
 } from './utils';
-import { validateCSRFToken } from './csrf';
 import type { Env, User } from './utils';
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
@@ -16,9 +15,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     const email = formData.get('email')?.toString().trim().toLowerCase();
     const password = formData.get('password')?.toString();
-    const csrfToken = formData.get('csrf_token')?.toString();
 
-    if (!email || !password || !csrfToken) {
+    if (!email || !password) {
       return errorResponse('Missing required fields', 400);
     }
 
@@ -27,11 +25,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     if (!canProceed) {
       return errorResponse('Too many login attempts. Please try again later.', 429);
-    }
-
-    const isValidCSRF = await validateCSRFToken(env, csrfToken);
-    if (!isValidCSRF) {
-      return errorResponse('Invalid CSRF token', 403);
     }
 
     const userData = await env.USERS.get(`user:${email}`);

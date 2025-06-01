@@ -1,198 +1,105 @@
 // functions/api/utils.ts
-// Core utility functions and interfaces for the API
+import type { Env, User } from './utils';
 
-export interface Env {
-  USERS: KVNamespace;
-  PROGRESS: KVNamespace;
-  AVATARS: KVNamespace;
-}
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-  role: 'user' | 'admin';
-  createdAt: string;
-  lastLogin?: string;
-  passwordChangedAt?: string;
-}
-
-export interface Session {
-  userId: string;
-  createdAt: string;
-  expiresAt: string;
-}
-
-export interface Progress {
-  [week: string]: {
-    [task: string]: boolean;
-  };
-}
-
-// Generate secure random string
-export function generateSecureToken(): string {
-  const array = new Uint8Array(32);
+// Generate a secure random token (e.g., CSRF or session token)
+export function generateSecureToken(length = 48): string {
+  const array = new Uint8Array(length);
   crypto.getRandomValues(array);
-  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
-}
-
-// Get cookie value
-export function getCookie(request: Request, name: string): string | null {
-  const cookieHeader = request.headers.get('cookie') || '';
-  const cookies = cookieHeader.split(';').map(cookie => cookie.trim());
-  const cookie = cookies.find(c => c.startsWith(`${name}=`));
-  
-  if (!cookie) return null;
-  return decodeURIComponent(cookie.split('=')[1]);
-}
-
-// Create cookie string
-export function createCookie(
-  name: string, 
-  value: string, 
-  maxAge: number = 86400
-): string {
-  return `${name}=${encodeURIComponent(value)}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${maxAge}`;
+  return [...array].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 // JSON response helper
-export function jsonResponse(
-  data: any, 
-  status: number = 200,
-  headers: Record<string, string> = {}
-): Response {
+export function jsonResponse(data: any, status = 200, headers: Record<string, string> = {}) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: {
-      'Content-Type': 'application/json',
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      ...headers
-    }
+    headers: { 'Content-Type': 'application/json', ...headers },
   });
 }
 
 // Error response helper
-export function errorResponse(message: string, status: number = 400): Response {
+export function errorResponse(message: string, status = 400) {
   return jsonResponse({ error: message }, status);
 }
 
-// Validate session and get user ID
-export async function validateSession(env: Env, request: Request): Promise<string | null> {
-  const sessionToken = getCookie(request, 'session');
-  if (!sessionToken) return null;
-  
-  const sessionData = await env.USERS.get(`session:${sessionToken}`);
-  if (!sessionData) return null;
-  
-  try {
-    const session: Session = JSON.parse(sessionData);
-    const now = new Date();
-    const expiresAt = new Date(session.expiresAt);
-    
-    if (now < expiresAt) {
-      return session.userId;
-    } else {
-      await env.USERS.delete(`session:${sessionToken}`);
-      return null;
-    }
-  } catch (e) {
-    console.error('Session validation error:', e);
-    return null;
-  }
-}
-
-// 🔹 Add this function (required for dashboard.ts)
-export async function getSession(env: Env, sessionToken: string): Promise<Session | null> {
-  if (!sessionToken) return null;
-
-  const sessionData = await env.USERS.get(`session:${sessionToken}`);
-  if (!sessionData) return null;
-
-  try {
-    return JSON.parse(sessionData) as Session;
-  } catch {
-    return null;
-  }
-}
-
-// Get user by ID
-export async function getUserById(env: Env, userId: string): Promise<User | null> {
-  const userData = await env.USERS.list({ prefix: `user:` });
-  
-  for (const { name } of userData.keys) {
-    const userJson = await env.USERS.get(name);
-    if (!userJson) continue;
-    
-    try {
-      const user = JSON.parse(userJson) as User;
-      if (user.id === userId) {
-        return user;
-      }
-    } catch (e) {
-      console.error('User parse error:', e);
-    }
-  }
-  
-  return null;
-}
-
-// Create session
-export async function createSession(
-  env: Env, 
-  userId: string, 
-  ttl: number = 86400
-): Promise<string> {
-  const sessionToken = generateSecureToken();
-  const session: Session = {
-    userId,
-    createdAt: new Date().toISOString(),
-    expiresAt: new Date(Date.now() + ttl * 1000).toISOString()
+// Create HTTP cookie header string
+export function createCookie(name: string, value: string, options: Record<string, any> = {}) {
+  const opts = {
+    path: '/',
+    httpOnly: true,
+    secure: true,
+    sameSite: 'Lax',
+    maxAge: 3600 * 24 * 7, // 7 days default
+    ...options,
   };
-  
-  await env.USERS.put(
-    `session:${sessionToken}`, 
-    JSON.stringify(session), 
-    { expirationTtl: ttl }
-  );
-  
-  return sessionToken;
+
+  let cookie = `${name}=${value}`;
+
+  if (opts.maxAge) cookie += `; Max-Age=${opts.maxAge}`;
+  if (opts.path) cookie += `; Path=${opts.path}`;
+  if (opts.httpOnly) cookie += `; HttpOnly`;
+  if (opts.secure) cookie += `; Secure`;
+  if (opts.sameSite) cookie += `; SameSite=${opts.sameSite}`;
+
+  return cookie;
 }
 
-// Rate limiting
-export async function checkRateLimit(
-  env: Env, 
-  identifier: string, 
-  limit: number = 10, 
-  window: number = 60
-): Promise<boolean> {
-  const key = `ratelimit:${identifier}`;
-  const current = await env.USERS.get(key);
-  
-  if (!current) {
-    await env.USERS.put(key, '1', { expirationTtl: window });
-    return true;
+// Rate limit check (simple counter in KV)
+export async function checkRateLimit(env: Env, key: string, limit: number, windowSeconds: number): Promise<boolean> {
+  const now = Date.now();
+  const windowStart = now - windowSeconds * 1000;
+
+  let attemptsRaw = await env.USERS.get(key, { type: 'json' }) as { timestamps: number[] } | null;
+
+  if (!attemptsRaw) {
+    attemptsRaw = { timestamps: [] };
   }
-  
-  const count = parseInt(current);
-  if (count >= limit) {
+
+  // Filter timestamps inside window
+  attemptsRaw.timestamps = attemptsRaw.timestamps.filter(ts => ts > windowStart);
+
+  if (attemptsRaw.timestamps.length >= limit) {
+    // Rate limit exceeded
     return false;
   }
-  
-  await env.USERS.put(key, (count + 1).toString(), { expirationTtl: window });
+
+  // Add current timestamp and store back
+  attemptsRaw.timestamps.push(now);
+  await env.USERS.put(key, JSON.stringify(attemptsRaw), { expirationTtl: windowSeconds });
+
   return true;
 }
 
-// Validate email format
-export function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+// Create a new session: store session token linked to user ID
+export async function createSession(env: Env, userId: string): Promise<string> {
+  const sessionToken = generateSecureToken();
+  // Store session with TTL 7 days
+  await env.USERS.put(`session:${sessionToken}`, userId, { expirationTtl: 60 * 60 * 24 * 7 });
+  return sessionToken;
 }
 
-// Validate password strength
-export function isValidPassword(password: string): boolean {
-  return password.length >= 8 && 
-         /[A-Z]/.test(password) && 
-         /[a-z]/.test(password) && 
-         /[0-9]/.test(password);
+// Get session user ID from request cookies
+export async function getSession(env: Env, request: Request): Promise<{ userId: string } | null> {
+  const cookie = request.headers.get('cookie') || '';
+  const match = cookie.match(/session=([^;]+)/);
+  if (!match) return null;
+
+  const sessionToken = match[1];
+  const userId = await env.USERS.get(`session:${sessionToken}`);
+  if (!userId) return null;
+
+  return { userId };
+}
+
+// Generate & store CSRF token for session (overwrite old)
+export async function generateCsrfToken(env: Env, userId: string): Promise<string> {
+  const token = generateSecureToken(24);
+  await env.USERS.put(`csrf:${userId}`, token, { expirationTtl: 60 * 60 }); // 1 hour
+  return token;
+}
+
+// Validate CSRF token for session user ID
+export async function validateCSRFToken(env: Env, userId: string, token: string | null): Promise<boolean> {
+  if (!token) return false;
+  const stored = await env.USERS.get(`csrf:${userId}`);
+  return stored === token;
 }

@@ -1,14 +1,5 @@
 // functions/api/register.ts
-import { 
-  jsonResponse, 
-  errorResponse, 
-  createSession, 
-  createCookie,
-  isValidEmail,
-  isValidPassword,
-  generateSecureToken
-} from './utils';
-import { validateCSRFToken } from './csrf';
+import { jsonResponse, errorResponse, checkRateLimit } from './utils';
 import type { Env, User } from './utils';
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
@@ -16,63 +7,40 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const { env, request } = context;
     const formData = await request.formData();
 
-    const name = formData.get('name')?.toString().trim();
     const email = formData.get('email')?.toString().trim().toLowerCase();
     const password = formData.get('password')?.toString();
-    const role = formData.get('role')?.toString() || 'user';
-    const csrfToken = formData.get('csrf_token')?.toString();
+    const name = formData.get('name')?.toString();
 
-    if (!name || !email || !password || !csrfToken) {
+    if (!email || !password || !name) {
       return errorResponse('Missing required fields', 400);
     }
 
-    const isValidCSRF = await validateCSRFToken(env, csrfToken);
-    if (!isValidCSRF) {
-      return errorResponse('Invalid CSRF token', 403);
+    // Rate limit per IP
+    const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
+    const canProceed = await checkRateLimit(env, `register:${clientIP}`, 5, 3600); // max 5 per hour
+    if (!canProceed) {
+      return errorResponse('Too many registration attempts. Please try later.', 429);
     }
 
-    if (!isValidEmail(email)) {
-      return errorResponse('Invalid email format', 400);
-    }
-
-    if (!isValidPassword(password)) {
-      return errorResponse('Password must be at least 8 characters with uppercase, lowercase, and numbers', 400);
-    }
-
-    if (name.length < 2 || name.length > 100) {
-      return errorResponse('Name must be between 2 and 100 characters', 400);
-    }
-
-    const existingUser = await env.USERS.get(`user:${email}`);
-    if (existingUser) {
+    // Check if user exists
+    const existing = await env.USERS.get(`user:${email}`);
+    if (existing) {
       return errorResponse('Email already registered', 409);
     }
 
-    const userId = generateSecureToken();
-    const user: User = {
-      id: userId,
-      name,
+    const newUser: User = {
+      id: crypto.randomUUID(),
       email,
-      password, // NOTE: use hashing in production
-      role: role === 'admin' ? 'admin' : 'user',
-      createdAt: new Date().toISOString()
+      name,
+      password, // WARNING: store hashed password in production
+      role: 'user',
+      createdAt: new Date().toISOString(),
+      lastLogin: null,
     };
 
-    await env.USERS.put(`user:${email}`, JSON.stringify(user));
+    await env.USERS.put(`user:${email}`, JSON.stringify(newUser));
 
-    const sessionToken = await createSession(env, userId);
-
-    await env.USERS.put(
-      `log:register:${new Date().toISOString()}:${userId}`,
-      JSON.stringify({ action: 'user_registered', email }),
-      { expirationTtl: 86400 * 30 }
-    );
-
-    return jsonResponse(
-      { name: user.name, role: user.role },
-      201,
-      { 'Set-Cookie': createCookie('session', sessionToken) }
-    );
+    return jsonResponse({ message: 'User registered successfully' }, 201);
   } catch (error) {
     console.error('Registration error:', error);
     return errorResponse('Internal server error', 500);
