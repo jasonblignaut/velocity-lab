@@ -1,6 +1,6 @@
-// sw.js - Service Worker for Velocity Lab
+// sw.js - Velocity Lab Service Worker
 
-const CACHE_NAME = 'velocity-lab-v5';
+const CACHE_NAME = 'velocity-lab-v6';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -17,133 +17,109 @@ const urlsToCache = [
   '/assets/default-avatar.png'
 ];
 
-// Install: cache static files
+// Install: Pre-cache static resources
 self.addEventListener('install', (event) => {
   console.log('Service Worker: Installing');
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Service Worker: Caching files');
-        return cache.addAll(urlsToCache);
-      })
-      .then(() => {
-        console.log('Service Worker: Installed');
-        return self.skipWaiting();
-      })
-      .catch((err) => {
-        console.error('Service Worker: Installation failed', err);
-      })
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('Service Worker: Caching static assets');
+      return cache.addAll(urlsToCache);
+    }).then(() => self.skipWaiting())
   );
 });
 
-// Activate: remove old caches
+// Activate: Clean up old caches
 self.addEventListener('activate', (event) => {
   console.log('Service Worker: Activating');
   event.waitUntil(
-    caches.keys()
-      .then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cache) => {
-            if (cache !== CACHE_NAME) {
-              console.log('Service Worker: Deleting old cache', cache);
-              return caches.delete(cache);
-            }
-          })
-        );
-      })
-      .then(() => {
-        console.log('Service Worker: Activated');
-        return self.clients.claim();
-      })
-      .catch((err) => {
-        console.error('Service Worker: Activation failed', err);
-      })
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            console.log('Service Worker: Removing old cache', cache);
+            return caches.delete(cache);
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
   );
 });
 
-// Fetch: decide how to respond
+// Fetch handler
 self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
-  const method = event.request.method;
-  console.log(`Service Worker: Fetching ${url.href} Method: ${method}`);
+  const { request } = event;
+  const url = new URL(request.url);
 
-  // 1) Bypass cache entirely for all API calls (always go to network)
+  console.log(`Service Worker: Fetching ${url.href} [${request.method}]`);
+
+  // 1. Always bypass cache for API requests
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
-      fetch(event.request, { cache: 'no-store', redirect: 'follow' })
-        .then((response) => {
-          // If API is down, return a 503‐style JSON
-          return response;
-        })
-        .catch(() => {
-          return new Response(
-            JSON.stringify({ error: 'API unavailable' }),
-            {
-              status: 503,
-              headers: { 'Content-Type': 'application/json' },
-            }
-          );
-        })
+      fetch(request, { cache: 'no-store', redirect: 'follow' })
+        .then((res) => res)
+        .catch(() =>
+          new Response(JSON.stringify({ error: 'API unreachable' }), {
+            status: 503,
+            headers: { 'Content-Type': 'application/json' }
+          })
+        )
     );
     return;
   }
 
-  // 2) Bypass cache for login.html & register.html (so redirects always come fresh)
+  // 2. Login & register: no-cache + follow redirect safely
   if (['/login.html', '/register.html'].includes(url.pathname)) {
-    console.log('Service Worker: Bypassing cache for', url.pathname);
     event.respondWith(
-      fetch(event.request, { redirect: 'follow', cache: 'no-store' })
-        .then((response) => {
-          // If the server responds with a redirect, the browser will follow it
-          return response;
+      fetch(request, { redirect: 'manual', cache: 'no-store' })
+        .then((res) => {
+          if (res.type === 'opaqueredirect' || res.status === 302 || res.status === 301) {
+            console.log('Service Worker: Following manual redirect to', res.headers.get('Location'));
+            return fetch(res.url); // Safely follow
+          }
+          return res;
         })
         .catch((err) => {
-          console.error(`Service Worker: Fetch failed for ${url.pathname}`, err);
+          console.error('Service Worker: Login/Register fetch failed', err);
           return caches.match('/offline.html');
         })
     );
     return;
   }
 
-  // 3) For navigations (HTML pages), serve cache first, then network
-  if (event.request.mode === 'navigate') {
+  // 3. Navigation requests: HTML pages
+  if (request.mode === 'navigate') {
     event.respondWith(
-      caches.match(event.request)
-        .then((cached) => {
-          if (cached) {
-            console.log('Service Worker: Serving from cache:', url.href);
-            return cached;
+      fetch(request, { redirect: 'manual' })
+        .then((res) => {
+          if (res.type === 'opaqueredirect' || res.status === 301 || res.status === 302) {
+            return fetch(res.url);
           }
-          return fetch(event.request, { redirect: 'follow' })
-            .then((response) => {
-              return response;
-            })
-            .catch(() => {
-              console.log('Service Worker: Network fetch failed, serving offline page');
-              return caches.match('/offline.html');
-            });
+          return res;
+        })
+        .catch(() => {
+          console.warn('Service Worker: Offline, serving cached navigation page');
+          return caches.match(request).then((cached) => cached || caches.match('/offline.html'));
         })
     );
     return;
   }
 
-  // 4) For everything else (CSS, JS, images, etc.), try cache first, fallback to network
+  // 4. Other assets: try cache first, then network
   event.respondWith(
-    caches.match(event.request)
-      .then((cached) => {
-        if (cached) {
-          console.log('Service Worker: Serving from cache:', url.href);
-          return cached;
-        }
-        return fetch(event.request, { redirect: 'follow' })
-          .catch((err) => {
-            console.error('Service Worker: Fetch failed for', url.href, err);
-            if (event.request.destination === 'image') {
-              // Deafult avatar when images fail
-              return caches.match('/assets/default-avatar.png');
-            }
-            return new Response('Resource not available offline', { status: 503 });
-          });
-      })
+    caches.match(request).then((cached) => {
+      if (cached) {
+        console.log('Service Worker: Cache hit for', url.href);
+        return cached;
+      }
+      return fetch(request, { redirect: 'follow' })
+        .then((res) => res)
+        .catch((err) => {
+          console.error('Service Worker: Asset fetch failed', url.href, err);
+          if (request.destination === 'image') {
+            return caches.match('/assets/default-avatar.png');
+          }
+          return new Response('Offline - asset not cached', { status: 503 });
+        });
+    })
   );
 });
