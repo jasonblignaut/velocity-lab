@@ -3,55 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Log in to Velocity Lab to track your progress in the 4-week Microsoft hybrid IT guide.">
-  <title>Login - Velocity Lab</title>
+  <meta name="description" content="Login to Velocity Lab - Microsoft Hybrid IT Training Platform">
+  <title>Login | Velocity Lab</title>
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
-  <script src="/js/main.js" defer></script>
 </head>
 <body>
-  <nav class="nav-glass">
+  <a href="#main" class="skip-link">Skip to content</a>
+  
+  <nav class="nav-glass" role="navigation" aria-label="Main navigation">
     <div class="brand">
-      <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="brand-logo">
+      <a href="/">
+        <img src="/assets/Velocity-Logo.png" alt="Velocity Lab" class="brand-logo" width="180" height="45">
+      </a>
     </div>
     <div class="auth">
-      <a href="/register.html" aria-label="Register for Velocity Lab">Register</a>
-      <a href="/login.html" aria-label="Login to Velocity Lab">Login</a>
+      <a href="/">Home</a>
+      <a href="/register.html">Register</a>
     </div>
   </nav>
-  <div class="container">
+
+  <main id="main" class="container">
+    <header class="header">
+      <h1>Welcome Back</h1>
+      <h2>Login to Velocity Lab</h2>
+    </header>
+
     <div class="form-container">
-      <h2>Login</h2>
-      <div class="notification" id="notification"></div>
-      <form id="loginForm" aria-label="Login form">
-        <input type="hidden" name="csrf_token" id="csrfToken">
+      <div id="notification" class="notification" role="alert" aria-live="polite"></div>
+      
+      <form id="loginForm" novalidate>
+        <input type="hidden" id="csrfToken" name="csrf_token">
+        
         <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" required aria-required="true" placeholder="Enter your email">
+          <label for="email">Email Address</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            required 
+            autocomplete="email"
+            placeholder="your@email.com"
+            aria-describedby="email-error"
+          >
+          <span id="email-error" class="error-text" role="alert"></span>
         </div>
-        <div class="form-group password-group">
+        
+        <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" id="password" name="password" required aria-required="true" placeholder="Enter your password">
-          <button type="button" class="toggle-password" aria-label="Toggle password visibility">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-              <circle cx="12" cy="12" r="3"/>
-            </svg>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            required 
+            autocomplete="current-password"
+            placeholder="Enter your password"
+            aria-describedby="password-error"
+          >
+          <span id="password-error" class="error-text" role="alert"></span>
+        </div>
+        
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary">
+            <span>Login</span>
+            <span class="spinner" aria-hidden="true"></span>
           </button>
         </div>
-        <div class="form-group">
-          <button type="submit" id="loginButton">
-            Login
-            <span class="spinner">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10 10 10 0 0 1-10-10A10 10 0 0 1 12 2z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-dasharray="15 45"/>
-              </svg>
-            </span>
-          </button>
+        
+        <div style="text-align: center; margin-top: 1.5rem;">
+          <p style="color: var(--primary-gray);">
+            Don't have an account? 
+            <a href="/register.html" style="color: var(--primary-orange); font-weight: 500;">
+              Register here
+            </a>
+          </p>
+          <p style="margin-top: 1rem;">
+            <a href="/forgot-password" style="color: var(--primary-blue); font-size: 0.9rem;">
+              Forgot your password?
+            </a>
+          </p>
         </div>
       </form>
     </div>
-  </div>
+
+    <div style="text-align: center; margin-top: 3rem;">
+      <p style="color: var(--primary-gray); font-size: 0.9rem;">
+        By logging in, you agree to our 
+        <a href="/terms" style="color: var(--primary-gray);">Terms of Service</a> and 
+        <a href="/privacy" style="color: var(--primary-gray);">Privacy Policy</a>
+      </p>
+    </div>
+  </main>
+
+  <script src="/js/main.js" defer></script>
 </body>
 </html>
