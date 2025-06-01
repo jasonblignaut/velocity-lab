@@ -1,11 +1,13 @@
 // sw.js - Service Worker for Velocity Lab
-const CACHE_NAME = 'velocity-lab-v3';
+const CACHE_NAME = 'velocity-lab-v5';
 const urlsToCache = [
   '/',
   '/index.html',
   '/dashboard.html',
   '/profile.html',
   '/admin.html',
+  '/login.html',
+  '/register.html',
   '/offline.html',
   '/css/styles.css',
   '/js/main.js',
@@ -55,14 +57,23 @@ self.addEventListener('activate', event => {
 // Fetch event: Serve cached assets or fetch from network
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
-  console.log('Service Worker: Fetching', url.href);
+  const method = event.request.method;
+  console.log(`Service Worker: Fetching ${url.href} Method: ${method}`);
 
   // Bypass caching for login and register pages to handle redirects
   if (['/login.html', '/register.html'].includes(url.pathname)) {
     console.log('Service Worker: Bypassing cache for', url.pathname);
     event.respondWith(
-      fetch(event.request, { redirect: 'follow' }).catch(() => {
-        console.log('Service Worker: Network fetch failed for', url.pathname);
+      fetch(event.request, { redirect: 'follow', cache: 'no-store' }).then(response => {
+        console.log(`Service Worker: Fetch response for ${url.pathname} - Status: ${response.status}, Redirected: ${response.redirected}, URL: ${response.url}`);
+        if (response.redirected) {
+          console.log(`Service Worker: Following redirect to ${response.url}`);
+          // Manually follow redirect to ensure compatibility
+          return fetch(response.url, { redirect: 'follow', cache: 'no-store' });
+        }
+        return response;
+      }).catch(error => {
+        console.error(`Service Worker: Fetch failed for ${url.pathname}`, error);
         return caches.match('/offline.html');
       })
     );
@@ -77,7 +88,10 @@ self.addEventListener('fetch', event => {
           console.log('Service Worker: Serving from cache:', url.href);
           return cachedResponse;
         }
-        return fetch(event.request, { redirect: 'follow' }).catch(() => {
+        return fetch(event.request, { redirect: 'follow' }).then(response => {
+          console.log(`Service Worker: Fetch response for ${url.pathname} - Status: ${response.status}, Redirected: ${response.redirected}`);
+          return response;
+        }).catch(() => {
           console.log('Service Worker: Network fetch failed, serving offline page');
           return caches.match('/offline.html');
         });
