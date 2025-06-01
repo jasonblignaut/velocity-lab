@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Velocity Lab Register - Create an account for Microsoft Hybrid IT training">
+  <title>Register | Velocity Lab</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <nav class="nav-glass" role="navigation" aria-label="Main navigation">
+    <div class="brand">
+      <a href="/">
+        <img src="/assets/Velocity-Logo.png" alt="Velocity Lab" class="brand-logo" width="180" height="45">
+      </a>
+    </div>
+    <div class="auth">
+      <a href="/register.html">Register</a>
+      <a href="/login.html">Login</a>
+    </div>
+  </nav>
+
+  <main id="main" class="container">
+    <header class="header">
+      <h1>Velocity Lab</h1>
+      <h2>Create Your Account</h2>
+    </header>
+
+    <div class="form-container">
+      <form id="registerForm">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+        <div class="form-group">
+          <button type="submit" id="registerButton">Register <span class="spinner"></span></button>
+        </div>
+      </form>
+      <p>Already have an account? <a href="/login.html">Login here</a>.</p>
+    </div>
+  </main>
+
+  <script src="/js/main.js" defer></script>
+</body>
+</html>
