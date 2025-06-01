@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Velocity Lab: A 4-week guide to implement a hybrid IT environment with Microsoft technologies. Master Exchange Online hybrid migration step by step.">
+  <meta name="keywords" content="Microsoft Exchange, hybrid migration, IT training, Exchange Online, Microsoft 365, hybrid setup">
+  <title>Velocity Lab - Master Microsoft Hybrid IT in 4 Weeks</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/main.js" defer></script>
+</head>
+<body>
+  <nav class="nav-glass">
+    <div class="brand">
+      <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="brand-logo">
+    </div>
+    <div class="auth">
+      <a href="/register.html" aria-label="Register for Velocity Lab">Get Started</a>
+      <a href="/login.html" aria-label="Login to Velocity Lab">Login</a>
+    </div>
+  </nav>
+  
+  <div class="container">
+    <header class="header">
+      <h1>Velocity Lab</h1>
+      <h2>Master Microsoft Hybrid IT in 4 Weeks</h2>
+      <p class="hero-description">
+        Complete hands-on training program designed for MSPs and IT professionals. 
+        Build a hybrid IT environment with Microsoft technologies and successfully execute Exchange Online hybrid migrations.
+      </p>
+      <div class="hero-actions">
+        <a href="/register.html" class="btn btn-primary hero-btn">
+          <span>Start Your Journey</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m9 18 6-6-6-6"/>
+          </svg>
+        </a>
+        <a href="/login.html" class="btn btn-secondary hero-btn">
+          <span>Continue Training</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Course Overview -->
+    <section class="course-overview">
+      <h3>What You'll Master</h3>
+      <div class="overview-grid">
+        <div class="overview-card">
+          <div class="overview-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 6h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2"/>
+            </svg>
+          </div>
+          <h4>Foundation Setup</h4>
+          <p>Establish Active Directory, DNS services, and domain management. Create secure network shares and security groups.</p>
+        </div>
+        <div class="overview-card">
+          <div class="overview-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m1 5v4h4v2h-4v4h-2v-4H7v-2h4V9h2"/>
+            </svg>
+          </div>
+          <h4>Infrastructure Expansion</h4>
+          <p>Deploy redundant servers, implement WSUS for update management, and configure time synchronization across your domain.</p>
+        </div>
+        <div class="overview-card">
+          <div class="overview-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2"/>
+            </svg>
+          </div>
+          <h4>Email & Messaging</h4>
+          <p>Install Exchange Server 2019, create user mailboxes, and establish internal mail flow for seamless communication.</p>
+        </div>
+        <div class="overview-card">
+          <div class="overview-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 18H6a4 4 0 0 1-4-4 4 4 0 0 1 4-4h.71a5.5 5.5 0 0 1 0-1A5.37 5.37 0 0 1 12 3.59a5.26 5.26 0 0 1 5.33 4.71A4.33 4.33 0 0 1 22 13a4.5 4.5 0 0 1-3 4.2"/>
+            </svg>
+          </div>
+          <h4>Cloud Integration</h4>
+          <p>Complete Microsoft 365 hybrid setup with Entra ID Connect and execute successful Exchange Online hybrid migrations.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Prerequisites -->
+    <section class="prerequisites">
+      <h3>Lab Prerequisites</h3>
+      <p class="prerequisites-intro">
+        Before starting your 4-week journey, ensure you have the following requirements in place:
+      </p>
+      <div class="prerequisites-grid">
+        <div class="prerequisite-category">
+          <h4>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 18H6a4 4 0 0 1-4-4 4 4 0 0 1 4-4h.71a5.5 5.5 0 0 1 0-1A5.37 5.37 0 0 1 12 3.59a5.26 5.26 0 0 1 5.33 4.71A4.33 4.33 0 0 1 22 13a4.5 4.5 0 0 1-3 4.2"/>
+            </svg>
+            Cloud Services
+          </h4>
+          <ul>
+            <li>Microsoft 365 free trial from <a href="https://www.microsoft.com/en-us/microsoft-365/try" target="_blank" rel="noopener">microsoft.com</a></li>
+            <li>Access to Entra ID and Exchange Online (included in trial)</li>
+          </ul>
+        </div>
+        
+        <div class="prerequisite-category">
+          <h4>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16v12H4V4m2 2v8h12V6H6m2 8h8v2H8v-2"/>
+            </svg>
+            Hardware Requirements
+          </h4>
+          <ul>
+            <li>Old laptop with minimum 8GB RAM and 100GB disk space</li>
+            <li>VirtualBox installed from <a href="https://www.virtualbox.org" target="_blank" rel="noopener">virtualbox.org</a></li>
+            <li>Bridged networking configured (e.g., 192.168.1.x subnet)</li>
+          </ul>
+        </div>
+        
+        <div class="prerequisite-category">
+          <h4>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            Network Setup
+          </h4>
+          <ul>
+            <li>Static IP from your ISP (~R25/month via Afrihost or Telkom)</li>
+            <li>Firewall ports opened: 25 (SMTP), 587 (SMTPS), 443 (HTTPS), 993 (IMAPS)</li>
+            <li>Port forwarding configured to laptop's IP address</li>
+            <li>Stable internet connection (minimum 10 Mbps)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Training Features -->
+    <section class="features">
+      <h3>Why Choose Velocity Lab?</h3>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2h-4M9 11V9a3 3 0 116 0v2M9 11h6"/>
+            </svg>
+          </div>
+          <h4>Hands-On Learning</h4>
+          <p>Real-world lab environment with actual Microsoft servers and services. No simulations - build the real thing.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+          </div>
+          <h4>Accelerated Timeline</h4>
+          <p>Complete your hybrid IT mastery in just 4 weeks with our structured, progressive curriculum.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M8.5 11a4 4 0 100-8 4 4 0 000 8zM20 8v6M23 11h-6"/>
+            </svg>
+          </div>
+          <h4>MSP Focused</h4>
+          <p>Designed specifically for Managed Service Providers and IT professionals managing multiple client environments.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+            </svg>
+          </div>
+          <h4>Progress Tracking</h4>
+          <p>Monitor your advancement through detailed progress tracking and compete on the leaderboard.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </div>
+          <h4>Expert Guidance</h4>
+          <p>Detailed step-by-step instructions with troubleshooting tips and best practices from industry experts.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+              <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+              <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+          </div>
+          <h4>Real-World Skills</h4>
+          <p>Learn production-ready configurations and deployment strategies you'll use in actual client environments.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta">
+      <div class="cta-content">
+        <h3>Ready to Master Microsoft Hybrid IT?</h3>
+        <p>Join hundreds of IT professionals who have successfully completed their hybrid Exchange migrations using Velocity Lab.</p>
+        <div class="cta-actions">
+          <a href="/register.html" class="btn btn-primary">
+            <span>Start Training Now</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m9 18 6-6-6-6"/>
+            </svg>
+          </a>
+          <div class="cta-note">
+            <small>✓ Free registration • ✓ Immediate access • ✓ Self-paced learning</small>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <img src="/assets/Velocity-Logo.png" alt="Velocity Lab" class="footer-logo">
+          <p>Accelerating IT mastery through hands-on hybrid infrastructure training.</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-column">
+            <h4>Training</h4>
+            <ul>
+              <li><a href="/register.html">Get Started</a></li>
+              <li><a href="/login.html">Login</a></li>
+              <li><a href="#" onclick="showInfo('Training covers 4 weeks of progressive hybrid IT setup')">Course Overview</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h4>Support</h4>
+            <ul>
+              <li><a href="#" onclick="showInfo('Contact your system administrator for technical support')">Help Center</a></li>
+              <li><a href="#" onclick="showInfo('Lab requirements: 8GB RAM, VirtualBox, static IP')">Prerequisites</a></li>
+              <li><a href="#" onclick="showInfo('Complete Exchange Online hybrid migration training')">Documentation</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 Velocity Lab. All rights reserved. • Designed for MSP professionals.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function showInfo(message) {
+      if (typeof showNotification === 'function') {
+        showNotification(message, 'info', 6000);
+      } else {
+        alert(message);
+      }
+    }
+  </script>
+</body>
+</html>

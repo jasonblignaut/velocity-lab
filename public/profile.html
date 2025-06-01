@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="My Profile - Velocity Lab">
+  <title>My Profile | Velocity Lab</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/main.js" defer></script>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  
+  <nav class="nav-glass" role="navigation" aria-label="Main navigation">
+    <div class="brand">
+      <a href="/">
+        <img src="/assets/Velocity-Lab.png" alt="Velocity Lab" class="brand-logo">
+      </a>
+    </div>
+    <div class="auth">
+      <span id="userInfo" class="user-info"></span>
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="#" id="logout">Logout</a>
+    </div>
+  </nav>
+
+  <main id="main" class="container">
+    <header class="header">
+      <h1>My Profile</h1>
+      <h2>Manage your account settings and track your progress</h2>
+    </header>
+
+    <div id="notification" class="notification" role="alert" aria-live="polite"></div>
+
+    <div class="profile-container">
+      <!-- Profile Information Section -->
+      <div class="profile-section">
+        <h3>Profile Information</h3>
+        <div class="profile-info">
+          <div class="profile-details">
+            <div class="detail-group">
+              <p><strong>Name:</strong> <span id="profileName">Loading...</span></p>
+            </div>
+            <div class="detail-group">
+              <p><strong>Email:</strong> <span id="profileEmail">Loading...</span></p>
+            </div>
+            <div class="detail-group">
+              <p><strong>Role:</strong> <span id="profileRole" style="text-transform: capitalize;">Loading...</span></p>
+            </div>
+            <div class="detail-group">
+              <p><strong>Member Since:</strong> <span id="profileJoined">Loading...</span></p>
+            </div>
+            <div class="detail-group">
+              <p><strong>Last Login:</strong> <span id="profileLastLogin">Loading...</span></p>
+            </div>
+            <div class="detail-group" id="passwordChangedGroup" style="display: none;">
+              <p><strong>Password Last Changed:</strong> <span id="profilePasswordChanged">Never</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Statistics Section -->
+      <div class="profile-section">
+        <h3>Your Progress Statistics</h3>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="totalProgress">0%</div>
+            <div class="stat-label">Overall Progress</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="completedTasks">0/14</div>
+            <div class="stat-label">Tasks Completed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="currentWeek">Week 1</div>
+            <div class="stat-label">Current Focus</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="userRank">#-</div>
+            <div class="stat-label">Leaderboard Rank</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekly Progress Breakdown -->
+      <div class="profile-section">
+        <h3>Weekly Progress Breakdown</h3>
+        <div class="week-progress-grid">
+          <div class="week-progress-item">
+            <div class="week-number">Week 1</div>
+            <div class="week-title">Foundation Setup</div>
+            <div class="week-progress-bar">
+              <div class="week-progress-fill" id="week1Progress" style="width: 0%"></div>
+            </div>
+            <div class="week-progress-text" id="week1Text">0/4 tasks</div>
+          </div>
+          <div class="week-progress-item">
+            <div class="week-number">Week 2</div>
+            <div class="week-title">Infrastructure Expansion</div>
+            <div class="week-progress-bar">
+              <div class="week-progress-fill" id="week2Progress" style="width: 0%"></div>
+            </div>
+            <div class="week-progress-text" id="week2Text">0/3 tasks</div>
+          </div>
+          <div class="week-progress-item">
+            <div class="week-number">Week 3</div>
+            <div class="week-title">Email & Messaging</div>
+            <div class="week-progress-bar">
+              <div class="week-progress-fill" id="week3Progress" style="width: 0%"></div>
+            </div>
+            <div class="week-progress-text" id="week3Text">0/4 tasks</div>
+          </div>
+          <div class="week-progress-item">
+            <div class="week-number">Week 4</div>
+            <div class="week-title">Cloud Integration</div>
+            <div class="week-progress-bar">
+              <div class="week-progress-fill" id="week4Progress" style="width: 0%"></div>
+            </div>
+            <div class="week-progress-text" id="week4Text">0/3 tasks</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Change Password Section -->
+      <div class="profile-section">
+        <h3>Change Password</h3>
+        <p style="color: var(--text-secondary); margin-bottom: var(--space-lg);">
+          Ensure your account stays secure by using a strong, unique password.
+        </p>
+        
+        <form id="passwordForm" novalidate>
+          <input type="hidden" id="csrfToken" name="csrf_token">
+          
+          <div class="form-group">
+            <label for="currentPassword">Current Password</label>
+            <input type="password" 
+                   id="currentPassword" 
+                   name="currentPassword" 
+                   required
+                   autocomplete="current-password"
+                   placeholder="Enter your current password"
+                   aria-describedby="current-password-error">
+            <span id="current-password-error" class="error-text" role="alert"></span>
+          </div>
+          
+          <div class="form-group">
+            <label for="newPassword">New Password</label>
+            <input type="password" 
+                   id="newPassword" 
+                   name="newPassword" 
+                   required
+                   autocomplete="new-password"
+                   minlength="8"
+                   maxlength="128"
+                   placeholder="Enter your new password"
+                   aria-describedby="new-password-error new-password-requirements">
+            <span id="new-password-error" class="error-text" role="alert"></span>
+            <div id="new-password-requirements" class="field-hint">
+              <small>Password must be at least 8 characters long and different from your current password</small>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="confirmPassword">Confirm New Password</label>
+            <input type="password" 
+                   id="confirmPassword" 
+                   name="confirmPassword" 
+                   required
+                   autocomplete="new-password"
+                   placeholder="Confirm your new password"
+                   aria-describedby="confirm-password-error">
+            <span id="confirm-password-error" class="error-text" role="alert"></span>
+          </div>
+          
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary">
+              <span>Update Password</span>
+              <span class="spinner" aria-hidden="true"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Account Actions Section -->
+      <div class="profile-section">
+        <h3>Account Actions</h3>
+        <div class="action-buttons">
+          <button class="btn btn-secondary" onclick="exportMyData()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+              <polyline points="7,10 12,15 17,10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export My Data
+          </button>
+          <button class="btn btn-secondary" onclick="goToDashboard()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+              <polyline points="9,22 9,12 15,12 15,22"/>
+            </svg>
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
+
+      <!-- Help Section -->
+      <div class="profile-section" style="background: var(--surface-light); border: 1px solid var(--border-light);">
+        <h3 style="color: var(--text-secondary); font-size: 1.125rem;">Need Help?</h3>
+        <p style="color: var(--text-secondary); margin-bottom: var(--space-md);">
+          If you're experiencing issues or need assistance with your account, here are some helpful resources:
+        </p>
+        <div class="help-links">
+          <a href="/dashboard.html" style="color: var(--primary);">Return to Training Dashboard</a>
+          <span style="color: var(--text-tertiary);">•</span>
+          <a href="#" onclick="showContactInfo()" style="color: var(--primary);">Contact Support</a>
+          <span style="color: var(--text-tertiary);">•</span>
+          <a href="#" onclick="showHelpInfo()" style="color: var(--primary);">Training Guide</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Profile-specific functionality
+    async function exportMyData() {
+      try {
+        const response = await fetch('/api/profile/export-data', {
+          method: 'POST',
+          credentials: 'same-origin'
+        });
+        
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `velocity-lab-data-${new Date().toISOString().split('T')[0]}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+          
+          showNotification('Your data has been exported successfully', 'success');
+        } else {
+          const data = await response.json();
+          showNotification(data.error || 'Failed to export data', 'error');
+        }
+      } catch (error) {
+        console.error('Export error:', error);
+        showNotification('Failed to export data', 'error');
+      }
+    }
+
+    function goToDashboard() {
+      window.location.href = '/dashboard.html';
+    }
+
+    function showContactInfo() {
+      showNotification('For support, please contact your system administrator or IT department.', 'info', 8000);
+    }
+
+    function showHelpInfo() {
+      showNotification('Complete the 4-week timeline in your dashboard to master Microsoft hybrid IT setup.', 'info', 8000);
+    }
+
+    // Load and display weekly progress
+    async function loadWeeklyProgress() {
+      try {
+        const response = await fetch('/api/progress', { credentials: 'same-origin' });
+        if (response.ok) {
+          const progress = await response.json();
+          
+          // Week task counts
+          const weekTasks = {
+            week1: 4, week2: 3, week3: 4, week4: 3
+          };
+          
+          Object.keys(weekTasks).forEach(week => {
+            const weekNum = week.replace('week', '');
+            const weekProgress = progress[week] || {};
+            const completed = Object.values(weekProgress).filter(Boolean).length;
+            const total = weekTasks[week];
+            const percentage = (completed / total) * 100;
+            
+            // Update progress bar
+            const progressBar = document.getElementById(`${week}Progress`);
+            const progressText = document.getElementById(`${week}Text`);
+            
+            if (progressBar) {
+              progressBar.style.width = `${percentage}%`;
+              progressBar.style.background = percentage === 100 ? 
+                'var(--success)' : 'var(--gradient-primary)';
+            }
+            
+            if (progressText) {
+              progressText.textContent = `${completed}/${total} tasks`;
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Failed to load weekly progress:', error);
+      }
+    }
+
+    // Initialize profile page
+    document.addEventListener('DOMContentLoaded', function() {
+      loadWeeklyProgress();
+      
+      // Enhanced password form validation
+      const passwordForm = document.getElementById('passwordForm');
+      const currentPasswordInput = document.getElementById('currentPassword');
+      const newPasswordInput = document.getElementById('newPassword');
+      const confirmPasswordInput = document.getElementById('confirmPassword');
+
+      // Real-time validation
+      currentPasswordInput.addEventListener('blur', validateCurrentPassword);
+      newPasswordInput.addEventListener('input', validateNewPassword);
+      confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+
+      function validateCurrentPassword() {
+        const password = currentPasswordInput.value;
+        
+        if (!password) {
+          showFieldError('current-password-error', 'Current password is required');
+          return false;
+        }
+        
+        clearFieldError('current-password-error');
+        return true;
+      }
+
+      function validateNewPassword() {
+        const newPassword = newPasswordInput.value;
+        const currentPassword = currentPasswordInput.value;
+        
+        if (!newPassword) {
+          showFieldError('new-password-error', 'New password is required');
+          return false;
+        } else if (newPassword.length < 8) {
+          showFieldError('new-password-error', 'Password must be at least 8 characters');
+          return false;
+        } else if (newPassword.length > 128) {
+          showFieldError('new-password-error', 'Password must be less than 128 characters');
+          return false;
+        } else if (currentPassword && newPassword === currentPassword) {
+          showFieldError('new-password-error', 'New password must be different from current password');
+          return false;
+        }
+        
+        clearFieldError('new-password-error');
+        
+        // Also validate confirm password if it has content
+        if (confirmPasswordInput.value) {
+          validateConfirmPassword();
+        }
+        
+        return true;
+      }
+
+      function validateConfirmPassword() {
+        const newPassword = newPasswordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        
+        if (!confirmPassword) {
+          showFieldError('confirm-password-error', 'Please confirm your new password');
+          return false;
+        } else if (newPassword !== confirmPassword) {
+          showFieldError('confirm-password-error', 'Passwords do not match');
+          return false;
+        }
+        
+        clearFieldError('confirm-password-error');
+        return true;
+      }
+
+      function showFieldError(elementId, message) {
+        const errorElement = document.getElementById(elementId);
+        if (errorElement) {
+          errorElement.textContent = message;
+          errorElement.style.display = 'block';
+        }
+      }
+
+      function clearFieldError(elementId) {
+        const errorElement = document.getElementById(elementId);
+        if (errorElement) {
+          errorElement.textContent = '';
+          errorElement.style.display = 'none';
+        }
+      }
+
+      // Enhanced form submission
+      passwordForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const isCurrentValid = validateCurrentPassword();
+        const isNewValid = validateNewPassword();
+        const isConfirmValid = validateConfirmPassword();
+        
+        if (isCurrentValid && isNewValid && isConfirmValid) {
+          // All validation passed, proceed with form submission
+          // The main.js initProfilePasswordForm will handle the actual submission
+        } else {
+          showNotification('Please fix the errors above before submitting', 'error');
+        }
+      });
+
+      // Load profile data and update display
+      loadProfileData();
+    });
+
+    async function loadProfileData() {
+      try {
+        const response = await fetch('/api/profile', { credentials: 'same-origin' });
+        if (response.ok) {
+          const profileData = await response.json();
+          
+          // Update profile information
+          const profileName = document.getElementById('profileName');
+          const profileEmail = document.getElementById('profileEmail');
+          const profileRole = document.getElementById('profileRole');
+          const profileJoined = document.getElementById('profileJoined');
+          const profileLastLogin = document.getElementById('profileLastLogin');
+          const profilePasswordChanged = document.getElementById('profilePasswordChanged');
+          const passwordChangedGroup = document.getElementById('passwordChangedGroup');
+          
+          // Update progress statistics
+          const totalProgress = document.getElementById('totalProgress');
+          const completedTasks = document.getElementById('completedTasks');
+          const currentWeek = document.getElementById('currentWeek');
+          const userRank = document.getElementById('userRank');
+          
+          if (profileName) profileName.textContent = profileData.name;
+          if (profileEmail) profileEmail.textContent = profileData.email;
+          if (profileRole) profileRole.textContent = profileData.role;
+          if (profileJoined) profileJoined.textContent = new Date(profileData.createdAt).toLocaleDateString();
+          if (profileLastLogin) {
+            profileLastLogin.textContent = profileData.lastLogin ? 
+              new Date(profileData.lastLogin).toLocaleDateString() : 'Never';
+          }
+          
+          if (profilePasswordChanged && passwordChangedGroup) {
+            if (profileData.passwordChangedAt) {
+              profilePasswordChanged.textContent = new Date(profileData.passwordChangedAt).toLocaleDateString();
+              passwordChangedGroup.style.display = 'block';
+            }
+          }
+          
+          if (totalProgress) totalProgress.textContent = `${profileData.progress}%`;
+          if (completedTasks) completedTasks.textContent = `${profileData.completedTasks}/${profileData.totalTasks}`;
+          if (currentWeek) {
+            const weekNumber = Math.min(Math.floor(profileData.completedTasks / 3.5) + 1, 4);
+            currentWeek.textContent = `Week ${weekNumber}`;
+          }
+          if (userRank) {
+            userRank.textContent = profileData.rank ? `#${profileData.rank}` : '#-';
+          }
+        }
+      } catch (error) {
+        console.error('Profile load error:', error);
+        showNotification('Failed to load profile data', 'error');
+      }
+    }
+  </script>
+
+  <style>
+    /* Profile-specific styles */
+    .detail-group {
+      margin-bottom: var(--space-md);
+      padding: var(--space-md);
+      background: var(--surface-light);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+    }
+    
+    .detail-group p {
+      margin: 0;
+      color: var(--text-secondary);
+    }
+    
+    .detail-group strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    
+    .week-progress-grid {
+      display: grid;
+      gap: var(--space-lg);
+    }
+    
+    .week-progress-item {
+      padding: var(--space-lg);
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      transition: var(--transition);
+    }
+    
+    .week-progress-item:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .week-number {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: var(--space-xs);
+    }
+    
+    .week-title {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: var(--space-md);
+    }
+    
+    .week-progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--border-light);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .week-progress-fill {
+      height: 100%;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-sm);
+      transition: var(--transition-slow);
+    }
+    
+    .week-progress-text {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+    }
+    
+    .help-links {
+      display: flex;
+      gap: var(--space-sm);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .help-links a {
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    
+    .help-links a:hover {
+      text-decoration: underline;
+    }
+    
+    .error-text {
+      display: none;
+      color: var(--error);
+      font-size: 0.875rem;
+      margin-top: var(--space-xs);
+    }
+    
+    .field-hint {
+      margin-top: var(--space-sm);
+    }
+    
+    .field-hint small {
+      color: var(--text-tertiary);
+      font-size: 0.8125rem;
+      line-height: 1.4;
+    }
+    
+    .password-requirements {
+      margin-top: var(--space-sm);
+    }
+    
+    .password-requirements small {
+      color: var(--text-tertiary);
+      font-size: 0.8125rem;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .help-links {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .help-links span {
+        display: none;
+      }
+    }
+  </style>
+</body>
+</html>

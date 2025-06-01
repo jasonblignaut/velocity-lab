@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Register for Velocity Lab to start your 4-week Microsoft hybrid IT journey.">
+  <title>Register - Velocity Lab</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/main.js" defer></script>
+</head>
+<body>
+  <nav class="nav-glass">
+    <div class="brand">
+      <a href="/">
+        <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="brand-logo">
+      </a>
+    </div>
+    <div class="auth">
+      <a href="/register.html" aria-label="Register for Velocity Lab">Register</a>
+      <a href="/login.html" aria-label="Login to Velocity Lab">Login</a>
+    </div>
+  </nav>
+  
+  <div class="container">
+    <div class="form-container">
+      <h2>Create Your Account</h2>
+      <p style="text-align: center; color: var(--text-secondary); margin-bottom: var(--space-xl);">
+        Join Velocity Lab and start your Microsoft hybrid IT mastery journey
+      </p>
+      
+      <div class="notification" id="notification"></div>
+      
+      <form id="registerForm" aria-label="Registration form" novalidate>
+        <input type="hidden" name="csrf_token" id="csrfToken">
+        
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" 
+                 id="name" 
+                 name="name" 
+                 required 
+                 aria-required="true" 
+                 placeholder="Enter your full name"
+                 autocomplete="name"
+                 minlength="2"
+                 maxlength="50">
+          <span class="error-text" id="name-error"></span>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" 
+                 id="email" 
+                 name="email" 
+                 required 
+                 aria-required="true" 
+                 placeholder="Enter your email address"
+                 autocomplete="email"
+                 maxlength="100">
+          <span class="error-text" id="email-error"></span>
+        </div>
+        
+        <div class="form-group password-group">
+          <label for="password">Password</label>
+          <input type="password" 
+                 id="password" 
+                 name="password" 
+                 required 
+                 aria-required="true" 
+                 placeholder="Create a secure password"
+                 autocomplete="new-password"
+                 minlength="8"
+                 maxlength="128">
+          <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+          <span class="error-text" id="repeat-password-error"></span>
+        </div>
+        
+        <div class="form-group">
+          <label for="role">Job Role</label>
+          <input type="text" 
+                 id="role" 
+                 name="role" 
+                 required 
+                 aria-required="true" 
+                 placeholder="e.g., IT Administrator, System Engineer"
+                 autocomplete="organization-title"
+                 maxlength="100">
+          <span class="error-text" id="role-error"></span>
+          <div class="field-hint">
+            <small>This helps us understand your background and experience level</small>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="checkbox-container">
+            <input type="checkbox" id="terms" name="terms" required aria-required="true">
+            <span class="checkmark"></span>
+            <span class="checkbox-text">
+              I agree to the <a href="#" target="_blank" rel="noopener">Terms of Service</a> 
+              and <a href="#" target="_blank" rel="noopener">Privacy Policy</a>
+            </span>
+          </label>
+          <span class="error-text" id="terms-error"></span>
+        </div>
+        
+        <div class="form-group">
+          <button type="submit" id="registerButton" class="btn btn-primary">
+            <span>Create Account</span>
+            <span class="spinner">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 12 2z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-dasharray="15 45"/>
+              </svg>
+            </span>
+          </button>
+        </div>
+        
+        <div class="form-footer">
+          <p>Already have an account? <a href="/login.html">Sign in here</a></p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Enhanced client-side validation
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('registerForm');
+      const nameInput = document.getElementById('name');
+      const emailInput = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
+      const repeatPasswordInput = document.getElementById('repeatPassword');
+      const roleInput = document.getElementById('role');
+      const termsInput = document.getElementById('terms');
+
+      // Real-time validation
+      nameInput.addEventListener('blur', validateName);
+      emailInput.addEventListener('blur', validateEmail);
+      passwordInput.addEventListener('input', validatePassword);
+      repeatPasswordInput.addEventListener('input', validateRepeatPassword);
+      roleInput.addEventListener('blur', validateRole);
+      termsInput.addEventListener('change', validateTerms);
+
+      function validateName() {
+        const name = nameInput.value.trim();
+        const errorElement = document.getElementById('name-error');
+        
+        if (!name) {
+          showFieldError('name-error', 'Name is required');
+          return false;
+        } else if (name.length < 2) {
+          showFieldError('name-error', 'Name must be at least 2 characters');
+          return false;
+        } else if (name.length > 50) {
+          showFieldError('name-error', 'Name must be less than 50 characters');
+          return false;
+        }
+        
+        clearFieldError('name-error');
+        return true;
+      }
+
+      function validateEmail() {
+        const email = emailInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const errorElement = document.getElementById('email-error');
+        
+        if (!email) {
+          showFieldError('email-error', 'Email is required');
+          return false;
+        } else if (!emailRegex.test(email)) {
+          showFieldError('email-error', 'Please enter a valid email address');
+          return false;
+        } else if (email.length > 100) {
+          showFieldError('email-error', 'Email must be less than 100 characters');
+          return false;
+        }
+        
+        clearFieldError('email-error');
+        return true;
+      }
+
+      function validatePassword() {
+        const password = passwordInput.value;
+        const errorElement = document.getElementById('password-error');
+        
+        if (!password) {
+          showFieldError('password-error', 'Password is required');
+          return false;
+        } else if (password.length < 8) {
+          showFieldError('password-error', 'Password must be at least 8 characters');
+          return false;
+        } else if (password.length > 128) {
+          showFieldError('password-error', 'Password must be less than 128 characters');
+          return false;
+        }
+        
+        clearFieldError('password-error');
+        
+        // Also validate repeat password if it has content
+        if (repeatPasswordInput.value) {
+          validateRepeatPassword();
+        }
+        
+        return true;
+      }
+
+      function validateRepeatPassword() {
+        const password = passwordInput.value;
+        const repeatPassword = repeatPasswordInput.value;
+        const errorElement = document.getElementById('repeat-password-error');
+        
+        if (!repeatPassword) {
+          showFieldError('repeat-password-error', 'Please confirm your password');
+          return false;
+        } else if (password !== repeatPassword) {
+          showFieldError('repeat-password-error', 'Passwords do not match');
+          return false;
+        }
+        
+        clearFieldError('repeat-password-error');
+        return true;
+      }
+
+      function validateRole() {
+        const role = roleInput.value.trim();
+        const errorElement = document.getElementById('role-error');
+        
+        if (!role) {
+          showFieldError('role-error', 'Job role is required');
+          return false;
+        } else if (role.length > 100) {
+          showFieldError('role-error', 'Job role must be less than 100 characters');
+          return false;
+        }
+        
+        clearFieldError('role-error');
+        return true;
+      }
+
+      function validateTerms() {
+        const errorElement = document.getElementById('terms-error');
+        
+        if (!termsInput.checked) {
+          showFieldError('terms-error', 'You must agree to the terms and privacy policy');
+          return false;
+        }
+        
+        clearFieldError('terms-error');
+        return true;
+      }
+
+      function showFieldError(elementId, message) {
+        const errorElement = document.getElementById(elementId);
+        if (errorElement) {
+          errorElement.textContent = message;
+          errorElement.style.display = 'block';
+        }
+      }
+
+      function clearFieldError(elementId) {
+        const errorElement = document.getElementById(elementId);
+        if (errorElement) {
+          errorElement.textContent = '';
+          errorElement.style.display = 'none';
+        }
+      }
+
+      // Enhanced form submission with validation
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validate all fields
+        const isNameValid = validateName();
+        const isEmailValid = validateEmail();
+        const isPasswordValid = validatePassword();
+        const isRepeatPasswordValid = validateRepeatPassword();
+        const isRoleValid = validateRole();
+        const isTermsValid = validateTerms();
+        
+        if (isNameValid && isEmailValid && isPasswordValid && isRepeatPasswordValid && isRoleValid && isTermsValid) {
+          // All validation passed, proceed with form submission
+          // The main.js handleFormSubmit will take over from here
+        } else {
+          showNotification('Please fix the errors above before submitting', 'error');
+        }
+      });
+    });
+  </script>
+</body>
+</html> 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+          <span class="error-text" id="password-error"></span>
+          <div class="password-requirements">
+            <small>Password must be at least 8 characters long</small>
+          </div>
+        </div>
+        
+        <div class="form-group password-group">
+          <label for="repeatPassword">Confirm Password</label>
+          <input type="password" 
+                 id="repeatPassword" 
+                 name="repeatPassword" 
+                 required 
+                 aria-required="true" 
+                 placeholder="Confirm your password"
+                 autocomplete="new-password"
+                 minlength="8"
+                 maxlength="128">
+          <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1
