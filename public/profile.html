@@ -120,12 +120,12 @@
             <div class="week-progress-bar">
               <div class="week-progress-fill" id="week4Progress" style="width: 0%"></div>
             </div>
-            <div class="week-progress-text" id="week4Text">0/3 tasks</div>
+            <div class="week-progress-text" id="week4Text">0/2 tasks</div>
           </div>
         </div>
       </div>
 
-      <!-- Change Password Section -->
+      <!-- ENHANCED: Change Password Section with Better Success Feedback -->
       <div class="profile-section">
         <h3>Change Password</h3>
         <p style="color: var(--text-secondary); margin-bottom: var(--space-lg);">
@@ -274,7 +274,7 @@
           
           // Week task counts
           const weekTasks = {
-            week1: 4, week2: 3, week3: 4, week4: 3
+            week1: 4, week2: 3, week3: 4, week4: 2
           };
           
           Object.keys(weekTasks).forEach(week => {
@@ -435,16 +435,31 @@
           if (profileName) profileName.textContent = profileData.name;
           if (profileEmail) profileEmail.textContent = profileData.email;
           if (profileRole) profileRole.textContent = profileData.role;
-          if (profileJoined) profileJoined.textContent = new Date(profileData.createdAt).toLocaleDateString();
+          if (profileJoined) {
+            // FIXED: Better date parsing for member since
+            const joinDate = new Date(profileData.createdAt);
+            if (!isNaN(joinDate.getTime())) {
+              profileJoined.textContent = joinDate.toLocaleDateString();
+            } else {
+              profileJoined.textContent = 'Unknown';
+            }
+          }
           if (profileLastLogin) {
-            profileLastLogin.textContent = profileData.lastLogin ? 
-              new Date(profileData.lastLogin).toLocaleDateString() : 'Never';
+            const lastLoginDate = profileData.lastLogin ? new Date(profileData.lastLogin) : null;
+            if (lastLoginDate && !isNaN(lastLoginDate.getTime())) {
+              profileLastLogin.textContent = lastLoginDate.toLocaleDateString();
+            } else {
+              profileLastLogin.textContent = 'Never';
+            }
           }
           
           if (profilePasswordChanged && passwordChangedGroup) {
             if (profileData.passwordChangedAt) {
-              profilePasswordChanged.textContent = new Date(profileData.passwordChangedAt).toLocaleDateString();
-              passwordChangedGroup.style.display = 'block';
+              const passwordDate = new Date(profileData.passwordChangedAt);
+              if (!isNaN(passwordDate.getTime())) {
+                profilePasswordChanged.textContent = passwordDate.toLocaleDateString();
+                passwordChangedGroup.style.display = 'block';
+              }
             }
           }
           
