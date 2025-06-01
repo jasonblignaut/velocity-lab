@@ -734,7 +734,6 @@ async function init() {
 
  // Setup scroll effects
  setupScrollEffects();
-}
 
 // Setup Form Handlers
 function setupFormHandlers() {
