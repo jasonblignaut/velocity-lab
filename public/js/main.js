@@ -20,15 +20,15 @@ function deleteCookie(name) {
 function showNotification(message, type = 'info', elementId = 'notification') {
   const notification = document.getElementById(elementId);
   if (!notification) return;
-  
+
   notification.textContent = message;
   notification.className = `notification ${type}`;
-  
+
   // Force reflow for animation
   void notification.offsetWidth;
-  
+
   notification.classList.add('show');
-  
+
   setTimeout(() => {
     notification.classList.remove('show');
     notification.classList.add('hide');
@@ -49,9 +49,9 @@ function formatDate(dateString) {
 function updateProgressBar(progress) {
   const progressBar = document.querySelector('#progressBar');
   const progressText = document.querySelector('#progressText');
-  
+
   if (!progressBar || !progressText) return;
-  
+
   progressBar.style.setProperty('--progress', `${progress}%`);
   progressBar.setAttribute('aria-valuenow', progress);
   progressText.textContent = `${progress}% Completed`;
@@ -71,17 +71,22 @@ function calculateProgress(progressData) {
 // ===== API Functions =====
 async function apiCall(url, options = {}) {
   try {
-    const response = await fetch(url, {
+    // Use absolute URL to ensure correct endpoint
+    const baseUrl = 'https://velocity-lab-23f.pages.dev';
+    const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
+    
+    const response = await fetch(fullUrl, {
       ...options,
       credentials: 'same-origin',
       headers: {
+        'Content-Type': options.body instanceof FormData ? undefined : 'application/json',
         ...options.headers
       }
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Request failed');
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error || `HTTP ${response.status}`);
     }
 
     return response;
@@ -98,6 +103,7 @@ async function fetchCsrfToken() {
     return data.token;
   } catch (error) {
     console.error('Failed to fetch CSRF token:', error);
+    showNotification('Unable to fetch security token. Please try again.', 'error');
     return null;
   }
 }
@@ -107,9 +113,9 @@ async function handleFormSubmission(form, url, successCallback) {
   const formData = new FormData(form);
   const spinner = form.querySelector('.spinner');
   const button = form.querySelector('button[type="submit"]');
-  const notification = form.closest('.form-container')?.querySelector('.notification') || 
-                       document.querySelector('#notification');
-  
+  const notification = form.closest('.form-container')?.querySelector('.notification') ||
+                      document.querySelector('#notification');
+
   button.disabled = true;
   if (spinner) spinner.classList.add('active');
 
@@ -120,11 +126,11 @@ async function handleFormSubmission(form, url, successCallback) {
     });
 
     const data = await response.json();
-    
+
     if (successCallback) {
       successCallback(data);
     }
-    
+
     return { success: true, data };
   } catch (error) {
     showNotification(error.message || 'An error occurred', 'error', notification?.id);
@@ -138,8 +144,11 @@ async function handleFormSubmission(form, url, successCallback) {
 // Initialize forms with CSRF token
 async function initForms() {
   const token = await fetchCsrfToken();
-  if (!token) return;
-  
+  if (!token) {
+    console.error('CSRF token initialization failed');
+    return;
+  }
+
   document.querySelectorAll('input[name="csrf_token"]').forEach(input => {
     input.value = token;
   });
@@ -172,7 +181,7 @@ async function updateTaskProgress(week, task, checked) {
     const progressData = await loadDashboardData();
     const progress = calculateProgress(progressData);
     updateProgressBar(progress);
-    
+
     // Animate checkbox
     animateTaskCheck(week, task);
   } catch (error) {
@@ -186,7 +195,7 @@ async function updateTaskProgress(week, task, checked) {
 function animateTaskCheck(week, task) {
   const checkbox = document.querySelector(`input[data-week="${week}"][data-task="${task}"]`);
   if (!checkbox) return;
-  
+
   const taskElement = checkbox.closest('.task');
   taskElement.style.animation = 'none';
   void taskElement.offsetWidth; // Force reflow
@@ -693,7 +702,7 @@ function showTaskModal(week, taskId) {
 
   modalTitle.textContent = content.title;
   modalDescription.innerHTML = content.description;
-  
+
   modal.style.display = 'flex';
   void modal.offsetWidth; // Force reflow
   modal.classList.add('show');
@@ -702,7 +711,7 @@ function showTaskModal(week, taskId) {
 function closeModal() {
   const modal = document.querySelector('#taskModal');
   if (!modal) return;
-  
+
   modal.classList.remove('show');
   setTimeout(() => {
     modal.style.display = 'none';
@@ -713,6 +722,7 @@ function closeModal() {
 async function initDashboard() {
   const user = JSON.parse(getCookie('user') || '{}');
   if (!user.name) {
+    console.log('No user logged in, redirecting to /login.html');
     window.location.href = '/login.html';
     return;
   }
@@ -756,7 +766,7 @@ function setupTaskCheckboxes(progressData) {
   document.querySelectorAll('.task input[type="checkbox"]').forEach(checkbox => {
     const week = checkbox.dataset.week;
     const task = checkbox.dataset.task;
-    
+
     // Set initial state
     if (progressData[week] && progressData[week][task]) {
       checkbox.checked = true;
@@ -773,7 +783,7 @@ function setupTaskClickHandlers() {
   document.querySelectorAll('.task').forEach(task => {
     task.addEventListener('click', (e) => {
       if (e.target.type === 'checkbox') return;
-      
+
       const week = task.closest('.week').dataset.week;
       const taskId = task.dataset.task;
       showTaskModal(week, taskId);
@@ -789,7 +799,7 @@ function animateTimeline() {
         observer.unobserve(entry.target);
       }
     });
-  }, { 
+  }, {
     threshold: 0.1,
     rootMargin: '0px 0px -50px 0px'
   });
@@ -803,18 +813,19 @@ function animateTimeline() {
 async function initProfile() {
   const user = JSON.parse(getCookie('user') || '{}');
   if (!user.name) {
+    console.log('No user logged in, redirecting to /login.html');
     window.location.href = '/login.html';
     return;
   }
 
   updateUserInfo(user);
-  
+
   // Load profile data
   await loadProfileData();
-  
+
   // Setup avatar upload
   setupAvatarUpload();
-  
+
   // Setup password form
   setupPasswordForm();
 }
@@ -823,23 +834,23 @@ async function loadProfileData() {
   try {
     const response = await apiCall('/api/user/profile');
     const data = await response.json();
-    
+
     // Update profile display
     document.querySelector('#profileName').textContent = data.name;
     document.querySelector('#profileEmail').textContent = data.email;
     document.querySelector('#profileRole').textContent = data.role;
     document.querySelector('#profileJoined').textContent = formatDate(data.createdAt);
-    
+
     // Update progress stats
     document.querySelector('#totalProgress').textContent = data.progress + '%';
     document.querySelector('#completedTasks').textContent = `${data.completedTasks}/${data.totalTasks}`;
-    
+
     // Calculate current week
     const currentWeek = data.completedTasks <= 4 ? 'Week 1' :
                        data.completedTasks <= 7 ? 'Week 2' :
                        data.completedTasks <= 11 ? 'Week 3' : 'Week 4';
     document.querySelector('#currentWeek').textContent = currentWeek;
-    
+
     // Load avatar
     await loadAvatar();
   } catch (error) {
@@ -852,496 +863,543 @@ async function loadAvatar() {
   try {
     const response = await apiCall('/api/avatar');
     if (response.ok) {
-const blob = await response.blob();
-     document.querySelector('#avatarPreview').src = URL.createObjectURL(blob);
-   }
- } catch (error) {
-   console.error('Avatar load error:', error);
- }
+      const blob = await response.blob();
+      document.querySelector('#avatarPreview').src = URL.createObjectURL(blob);
+    }
+  } catch (error) {
+    console.error('Avatar load error:', error);
+  }
 }
 
 function setupAvatarUpload() {
- const avatarInput = document.querySelector('#avatarInput');
- const uploadBtn = document.querySelector('#uploadAvatarBtn');
- 
- uploadBtn.addEventListener('click', () => avatarInput.click());
- 
- avatarInput.addEventListener('change', async (e) => {
-   const file = e.target.files[0];
-   if (!file) return;
+  const avatarInput = document.querySelector('#avatarInput');
+  const uploadBtn = document.querySelector('#uploadAvatarBtn');
 
-   // Validate file
-   if (!file.type.startsWith('image/')) {
-     showNotification('Please select an image file', 'error');
-     return;
-   }
+  uploadBtn.addEventListener('click', () => avatarInput.click());
 
-   if (file.size > 5 * 1024 * 1024) {
-     showNotification('File size must be less than 5MB', 'error');
-     return;
-   }
+  avatarInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-   // Show preview
-   const preview = document.querySelector('#avatarPreview');
-   preview.src = URL.createObjectURL(file);
+    // Validate file
+    if (!file.type.startsWith('image/')) {
+      showNotification('Please select an image file', 'error');
+      return;
+    }
 
-   // Upload
-   const formData = new FormData();
-   formData.append('avatar', file);
+    if (file.size > 5 * 1024 * 1024) {
+      showNotification('File size must be less than 5MB', 'error');
+      return;
+    }
 
-   try {
-     await apiCall('/api/avatar', {
-       method: 'POST',
-       body: formData
-     });
-     showNotification('Avatar uploaded successfully', 'success');
-   } catch (error) {
-     showNotification('Failed to upload avatar', 'error');
-     // Revert preview
-     loadAvatar();
-   }
- });
+    // Show preview
+    const preview = document.querySelector('#avatarPreview');
+    preview.src = URL.createObjectURL(file);
+
+    // Upload
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    try {
+      await apiCall('/api/avatar', {
+        method: 'POST',
+        body: formData
+      });
+      showNotification('Avatar uploaded successfully', 'success');
+    } catch (error) {
+      showNotification('Failed to upload avatar', 'error');
+      // Revert preview
+      loadAvatar();
+    }
+  });
 }
 
 function setupPasswordForm() {
- const passwordForm = document.querySelector('#passwordForm');
- 
- passwordForm.addEventListener('submit', async (e) => {
-   e.preventDefault();
-   
-   const newPassword = passwordForm.querySelector('#newPassword').value;
-   const confirmPassword = passwordForm.querySelector('#confirmPassword').value;
+  const passwordForm = document.querySelector('#passwordForm');
 
-   if (newPassword !== confirmPassword) {
-     showNotification('Passwords do not match', 'error');
-     return;
-   }
+  passwordForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-   if (newPassword.length < 8) {
-     showNotification('Password must be at least 8 characters', 'error');
-     return;
-   }
+    const newPassword = passwordForm.querySelector('#newPassword').value;
+    const confirmPassword = passwordForm.querySelector('#confirmPassword').value;
 
-   await handleFormSubmission(
-     passwordForm,
-     '/api/profile/change-password',
-     () => {
-       showNotification('Password updated successfully', 'success');
-       passwordForm.reset();
-     }
-   );
- });
+    if (newPassword !== confirmPassword) {
+      showNotification('Passwords do not match', 'error');
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      showNotification('Password must be at least 8 characters', 'error');
+      return;
+    }
+
+    await handleFormSubmission(
+      passwordForm,
+      '/api/profile/change-password',
+      () => {
+        showNotification('Password updated successfully', 'success');
+        passwordForm.reset();
+      }
+    );
+  });
 }
 
 // ===== Admin Functions =====
 async function initAdminDashboard() {
- const user = JSON.parse(getCookie('user') || '{}');
- if (!user.name || user.role !== 'admin') {
-   window.location.href = '/dashboard.html';
-   return;
- }
+  const user = JSON.parse(getCookie('user') || '{}');
+  if (!user.name || user.role !== 'admin') {
+    console.log('Non-admin user or no user, redirecting to /dashboard.html');
+    window.location.href = '/dashboard.html';
+    return;
+  }
 
- updateUserInfo(user);
- 
- // Load statistics
- await loadAdminStats();
- 
- // Load leaderboard
- await loadLeaderboard();
+  updateUserInfo(user);
+
+  // Load statistics
+  await loadAdminStats();
+
+  // Load leaderboard
+  await loadLeaderboard();
 }
 
 async function loadAdminStats() {
- try {
-   const response = await apiCall('/api/admin/stats');
-   const stats = await response.json();
-   
-   document.querySelector('#totalUsers').textContent = stats.totalUsers;
-   document.querySelector('#averageProgress').textContent = stats.averageProgress + '%';
-   document.querySelector('#completedUsers').textContent = stats.completedUsers;
-   document.querySelector('#activeToday').textContent = stats.activeToday;
- } catch (error) {
-   console.error('Admin stats error:', error);
- }
+  try {
+    const response = await apiCall('/api/admin/stats');
+    const stats = await response.json();
+
+    document.querySelector('#totalUsers').textContent = stats.totalUsers;
+    document.querySelector('#averageProgress').textContent = stats.averageProgress + '%';
+    document.querySelector('#completedUsers').textContent = stats.completedUsers;
+    document.querySelector('#activeToday').textContent = stats.activeToday;
+  } catch (error) {
+    console.error('Admin stats error:', error);
+  }
 }
 
 async function loadLeaderboard() {
- const leaderboard = document.querySelector('#leaderboard');
- 
- try {
-   // Show loading
-   leaderboard.innerHTML = `
-     <div class="leaderboard-item skeleton" style="height: 100px;"></div>
-     <div class="leaderboard-item skeleton" style="height: 100px;"></div>
-     <div class="leaderboard-item skeleton" style="height: 100px;"></div>
-   `;
-   
-   const response = await apiCall('/api/admin/users-progress');
-   const usersProgress = await response.json();
-   
-   // Sort by progress
-   usersProgress.sort((a, b) => b.progress - a.progress);
-   
-   // Render leaderboard
-   leaderboard.innerHTML = usersProgress.map((user, index) => `
-     <div class="leaderboard-item" style="animation-delay: ${index * 0.1}s">
-       <div class="leaderboard-rank">${index + 1}</div>
-       <div class="leaderboard-avatar">
-         <img src="${user.avatar || '/assets/default-avatar.png'}" 
-              alt="${user.name}'s Avatar"
-              onerror="this.src='/assets/default-avatar.png'">
-       </div>
-       <div class="leaderboard-details">
-         <h4>${user.name}</h4>
-         <p>${user.progress}% Completed</p>
-         <div class="leaderboard-progress" style="--progress: ${user.progress}%"></div>
-       </div>
-     </div>
-   `).join('');
- } catch (error) {
-   console.error('Leaderboard error:', error);
-   showNotification('Failed to load leaderboard', 'error');
- }
+  const leaderboard = document.querySelector('#leaderboard');
+
+  try {
+    // Show loading
+    leaderboard.innerHTML = `
+      <div class="leaderboard-item skeleton" style="height: 100px;"></div>
+      <div class="leaderboard-item skeleton" style="height: 100px;"></div>
+      <div class="leaderboard-item skeleton" style="height: 100px;"></div>
+    `;
+
+    const response = await apiCall('/api/admin/users-progress');
+    const usersProgress = await response.json();
+
+    // Sort by progress
+    usersProgress.sort((a, b) => b.progress - a.progress);
+
+    // Render leaderboard
+    leaderboard.innerHTML = usersProgress.map((user, index) => `
+      <div class="leaderboard-item" style="animation-delay: ${index * 0.1}s">
+        <div class="leaderboard-rank">${index + 1}</div>
+        <div class="leaderboard-avatar">
+          <img src="${user.avatar || '/assets/default-avatar.png'}" 
+               alt="${user.name}'s Avatar"
+               onerror="this.src='/assets/default-avatar.png'">
+        </div>
+        <div class="leaderboard-details">
+          <h4>${user.name}</h4>
+          <p>${user.progress}% Completed</p>
+          <div class="leaderboard-progress" style="--progress: ${user.progress}%"></div>
+        </div>
+      </div>
+    `).join('');
+  } catch (error) {
+    console.error('Leaderboard error:', error);
+    showNotification('Failed to load leaderboard', 'error');
+  }
 }
 
 // Admin action functions
 async function refreshLeaderboard() {
- await loadLeaderboard();
- showNotification('Leaderboard refreshed', 'success');
+  await loadLeaderboard();
+  showNotification('Leaderboard refreshed', 'success');
 }
 
 async function exportData() {
- try {
-   const response = await apiCall('/api/admin/export/all-progress');
-   const blob = await response.blob();
-   
-   const url = URL.createObjectURL(blob);
-   const a = document.createElement('a');
-   a.href = url;
-   a.download = `velocity-lab-progress-${new Date().toISOString().split('T')[0]}.csv`;
-   a.click();
-   URL.revokeObjectURL(url);
-   
-   showNotification('Report exported successfully', 'success');
- } catch (error) {
-   showNotification('Failed to export data', 'error');
- }
+  try {
+    const response = await apiCall('/api/admin/export/all-progress');
+    const blob = await response.blob();
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `velocity-lab-progress-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    showNotification('Report exported successfully', 'success');
+  } catch (error) {
+    showNotification('Failed to export data', 'error');
+  }
 }
 
 async function addAdmin() {
- const email = prompt('Enter the email address of the user to grant admin access:');
- 
- if (!email) return;
- 
- const formData = new FormData();
- formData.append('email', email);
- 
- try {
-   await apiCall('/api/admin/grant-admin', {
-     method: 'POST',
-     body: formData
-   });
-   
-   showNotification('Admin access granted successfully', 'success');
-   await loadLeaderboard();
- } catch (error) {
-   showNotification(error.message || 'Failed to grant admin access', 'error');
- }
+  const email = prompt('Enter the email address of the user to grant admin access:');
+
+  if (!email) return;
+
+  const formData = new FormData();
+  formData.append('email', email);
+
+  try {
+    await apiCall('/api/admin/grant-admin', {
+      method: 'POST',
+      body: formData
+    });
+
+    showNotification('Admin access granted successfully', 'success');
+    await loadLeaderboard();
+  } catch (error) {
+    showNotification(error.message || 'Failed to grant admin access', 'error');
+  }
 }
 
 // ===== Authentication Functions =====
 async function handleLogin(form) {
- await handleFormSubmission(
-   form,
-   '/api/login',
-   (data) => {
-     setCookie('user', JSON.stringify(data));
-     showNotification('Login successful! Redirecting...', 'success');
-     setTimeout(() => {
-       window.location.href = '/dashboard.html';
-     }, 1500);
-   }
- );
+  // Ensure CSRF token is set before submission
+  const csrfInput = form.querySelector('input[name="csrf_token"]');
+  if (!csrfInput.value) {
+    const token = await fetchCsrfToken();
+    if (!token) {
+      showNotification('Failed to initialize login. Please refresh the page.', 'error');
+      return;
+    }
+    csrfInput.value = token;
+  }
+
+  await handleFormSubmission(
+    form,
+    '/api/login',
+    (data) => {
+      setCookie('user', JSON.stringify(data));
+      showNotification('Login successful! Redirecting...', 'success');
+      console.log('Login successful, redirecting to /dashboard.html');
+      setTimeout(() => {
+        window.location.href = '/dashboard.html';
+      }, 1500);
+    }
+  );
 }
 
 async function handleRegister(form) {
- const password = form.querySelector('#password').value;
- const repeatPassword = form.querySelector('#repeatPassword').value;
- 
- if (password !== repeatPassword) {
-   showNotification('Passwords do not match', 'error');
-   return;
- }
+  const password = form.querySelector('#password').value;
+  const repeatPassword = form.querySelector('#repeatPassword').value;
 
- if (password.length < 8) {
-   showNotification('Password must be at least 8 characters', 'error');
-   return;
- }
+  if (password !== repeatPassword) {
+    showNotification('Passwords do not match', 'error');
+    return;
+  }
 
- await handleFormSubmission(
-   form,
-   '/api/register',
-   (data) => {
-     setCookie('user', JSON.stringify(data));
-     showNotification('Registration successful! Redirecting...', 'success');
-     setTimeout(() => {
-       window.location.href = '/dashboard.html';
-     }, 1500);
-   }
- );
+  if (password.length < 8) {
+    showNotification('Password must be at least 8 characters', 'error');
+    return;
+  }
+
+  // Ensure CSRF token is set
+  const csrfInput = form.querySelector('input[name="csrf_token"]');
+  if (!csrfInput.value) {
+    const token = await fetchCsrfToken();
+    if (!token) {
+      showNotification('Failed to initialize registration. Please refresh the page.', 'error');
+      return;
+    }
+    csrfInput.value = token;
+  }
+
+  await handleFormSubmission(
+    form,
+    '/api/register',
+    (data) => {
+      setCookie('user', JSON.stringify(data));
+      showNotification('Registration successful! Redirecting...', 'success');
+      console.log('Registration successful, redirecting to /dashboard.html');
+      setTimeout(() => {
+        window.location.href = '/dashboard.html';
+      }, 1500);
+    }
+  );
 }
 
 async function logout() {
- try {
-   await apiCall('/api/logout', { method: 'POST' });
- } catch (error) {
-   console.error('Logout error:', error);
- } finally {
-   deleteCookie('session');
-   deleteCookie('user');
-   window.location.href = '/login.html';
- }
+  try {
+    await apiCall('/api/logout', { method: 'POST' });
+  } catch (error) {
+    console.error('Logout error:', error);
+  } finally {
+    deleteCookie('session');
+    deleteCookie('user');
+    console.log('Logging out, redirecting to /login.html');
+    window.location.href = '/login.html';
+  }
 }
 
 // ===== Form Setup Functions =====
 function setupFormHandlers() {
- // Login Form
- const loginForm = document.querySelector('#loginForm');
- if (loginForm) {
-   loginForm.addEventListener('submit', async (e) => {
-     e.preventDefault();
-     await handleLogin(loginForm);
-   });
- }
+  // Login Form
+  const loginForm = document.querySelector('#loginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await handleLogin(loginForm);
+    });
+  }
 
- // Register Form
- const registerForm = document.querySelector('#registerForm');
- if (registerForm) {
-   registerForm.addEventListener('submit', async (e) => {
-     e.preventDefault();
-     await handleRegister(registerForm);
-   });
- }
+  // Register Form
+  const registerForm = document.querySelector('#registerForm');
+  if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await handleRegister(registerForm);
+    });
+  }
 
- // Logout Link
- const logoutLink = document.querySelector('#logout');
- if (logoutLink) {
-   logoutLink.addEventListener('click', async (e) => {
-     e.preventDefault();
-     await logout();
-   });
- }
+  // Logout Link
+  const logoutLink = document.querySelector('#logout');
+  if (logoutLink) {
+    logoutLink.addEventListener('click', async (e) => {
+      e.preventDefault();
+      await logout();
+    });
+  }
 }
 
 // ===== Modal Setup =====
 function setupModalHandlers() {
- const modal = document.querySelector('#taskModal');
- const closeBtn = document.querySelector('#closeModal');
- 
- if (closeBtn) {
-   closeBtn.addEventListener('click', closeModal);
- }
- 
- if (modal) {
-   modal.addEventListener('click', (e) => {
-     if (e.target === modal) {
-       closeModal();
-     }
-   });
- }
+  const modal = document.querySelector('#taskModal');
+  const closeBtn = document.querySelector('#closeModal');
 
- // Escape key to close
- document.addEventListener('keydown', (e) => {
-   if (e.key === 'Escape') {
-     closeModal();
-   }
- });
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeModal);
+  }
+
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+  }
+
+  // Escape key to close
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeModal();
+    }
+  });
 }
 
 // ===== Scroll Effects =====
 function setupScrollEffects() {
- let lastScroll = 0;
- const nav = document.querySelector('.nav-glass');
- 
- if (!nav) return;
- 
- window.addEventListener('scroll', throttle(() => {
-   const currentScroll = window.pageYOffset;
-   
-   if (currentScroll > 50) {
-     nav.classList.add('scrolled');
-   } else {
-     nav.classList.remove('scrolled');
-   }
-   
-   lastScroll = currentScroll;
- }, 100));
+  let lastScroll = 0;
+  const nav = document.querySelector('.nav-glass');
+
+  if (!nav) return;
+
+  window.addEventListener('scroll', throttle(() => {
+    const currentScroll = window.pageYOffset;
+
+    if (currentScroll > 50) {
+      nav.classList.add('scrolled');
+    } else {
+      nav.classList.remove('scrolled');
+    }
+
+    lastScroll = currentScroll;
+  }, 100));
 }
 
 // ===== Utility Functions =====
 function throttle(func, limit) {
- let inThrottle;
- return function(...args) {
-   if (!inThrottle) {
-     func.apply(this, args);
-     inThrottle = true;
-     setTimeout(() => inThrottle = false, limit);
-   }
- };
+  let inThrottle;
+  return function(...args) {
+    if (!inThrottle) {
+      func.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
 }
 
 function debounce(func, wait) {
- let timeout;
- return function executedFunction(...args) {
-   const later = () => {
-     clearTimeout(timeout);
-     func(...args);
-   };
-   clearTimeout(timeout);
-   timeout = setTimeout(later, wait);
- };
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
 }
 
 // ===== Resource Preloading =====
 function preloadImages() {
- const images = [
-   '/assets/Velocity-Logo.png',
-   '/assets/default-avatar.png',
-   '/assets/favicon.ico'
- ];
- 
- images.forEach(src => {
-   const img = new Image();
-   img.src = src;
- });
+  const images = [
+    '/assets/Velocity-Logo.png',
+    '/assets/default-avatar.png',
+    '/assets/favicon.ico'
+  ];
+
+  images.forEach(src => {
+    const img = new Image();
+    img.src = src;
+  });
 }
 
 // ===== Main Initialization =====
 async function init() {
- const user = JSON.parse(getCookie('user') || '{}');
- const path = window.location.pathname;
+  const user = JSON.parse(getCookie('user') || '{}');
+  const path = window.location.pathname;
 
- // Handle authentication state
- if (!user.name && !['/index.html', '/login.html', '/register.html', '/'].includes(path)) {
-   window.location.href = '/login.html';
-   return;
- }
+  console.log('Initializing, current path:', path, 'User:', user.name || 'None');
 
- // Redirect logged-in users from auth pages
- if (user.name && ['/login.html', '/register.html'].includes(path)) {
-   window.location.href = '/dashboard.html';
-   return;
- }
+  // Handle authentication state
+  if (!user.name && !['/index.html', '/login.html', '/register.html', '/'].includes(path)) {
+    console.log('No user logged in, redirecting to /login.html');
+    window.location.href = '/login.html';
+    return;
+  }
 
- // Initialize CSRF tokens
- await initForms();
+  // Redirect logged-in users from auth pages
+  if (user.name && ['/login.html', '/register.html'].includes(path)) {
+    console.log('User logged in, redirecting from', path, 'to /dashboard.html');
+    window.location.href = '/dashboard.html';
+    return;
+  }
 
- // Page-specific initialization
- switch (path) {
-   case '/dashboard.html':
-     await initDashboard();
-     break;
-   case '/profile.html':
-     await initProfile();
-     break;
-   case '/admin.html':
-     await initAdminDashboard();
-     break;
- }
+  // Initialize CSRF tokens
+  await initForms();
 
- // Setup common handlers
- setupFormHandlers();
- setupModalHandlers();
- setupScrollEffects();
+  // Page-specific initialization
+  switch (path) {
+    case '/dashboard.html':
+      await initDashboard();
+      break;
+    case '/profile.html':
+      await initProfile();
+      break;
+    case '/admin.html':
+      await initAdminDashboard();
+      break;
+  }
 
- // Update navigation visibility
- updateNavigationVisibility(user);
+  // Setup common handlers
+  setupFormHandlers();
+  setupModalHandlers();
+  setupScrollEffects();
+
+  // Update navigation visibility
+  updateNavigationVisibility(user);
 }
 
 function updateNavigationVisibility(user) {
- const authLinks = document.querySelectorAll('.auth a');
- const userInfo = document.querySelector('#userInfo');
- 
- if (user.name) {
-   // Show user info
-   if (userInfo) {
-     userInfo.textContent = user.name;
-     userInfo.style.display = 'inline';
-   }
-   
-   // Hide login/register links
-   authLinks.forEach(link => {
-     if (link.href.includes('/login.html') || link.href.includes('/register.html')) {
-       link.style.display = 'none';
-     }
-   });
- } else {
-   // Hide user-specific links
-   if (userInfo) userInfo.style.display = 'none';
-   
-   authLinks.forEach(link => {
-     if (link.href.includes('/dashboard.html') || 
-         link.href.includes('/profile.html') || 
-         link.href.includes('/admin.html') ||
-         link.id === 'logout') {
-       link.style.display = 'none';
-     }
-   });
- }
+  const authLinks = document.querySelectorAll('.auth a');
+  const userInfo = document.querySelector('#userInfo');
+
+  if (user.name) {
+    // Show user info
+    if (userInfo) {
+      userInfo.textContent = user.name;
+      userInfo.style.display = 'inline';
+    }
+
+    // Hide login/register links
+    authLinks.forEach(link => {
+      if (link.href.includes('/login.html') || link.href.includes('/register.html')) {
+        link.style.display = 'none';
+      }
+    });
+  } else {
+    // Hide user-specific links
+    if (userInfo) userInfo.style.display = 'none';
+
+    authLinks.forEach(link => {
+      if (link.href.includes('/dashboard.html') ||
+          link.href.includes('/profile.html') ||
+          link.href.includes('/admin.html') ||
+          link.id === 'logout') {
+        link.style.display = 'none';
+      }
+    });
+  }
 }
 
 // ===== Performance Monitoring =====
 function measurePerformance() {
- if (window.performance && window.performance.timing) {
-   window.addEventListener('load', () => {
-     setTimeout(() => {
-       const timing = window.performance.timing;
-       const loadTime = timing.loadEventEnd - timing.navigationStart;
-       console.log(`Page load time: ${loadTime}ms`);
-       
-       // Log to analytics if needed
-       if (loadTime > 3000) {
-         console.warn('Slow page load detected');
-       }
-     }, 0);
-   });
- }
+  if (window.performance && window.performance.timing) {
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const timing = window.performance.timing;
+        const loadTime = timing.loadEventEnd - timing.navigationStart;
+        console.log(`Page load time: ${loadTime}ms`);
+
+        // Log to analytics if needed
+        if (loadTime > 3000) {
+          console.warn('Slow page load detected');
+        }
+      }, 0);
+    });
+  }
 }
 
 // ===== Error Handling =====
 window.addEventListener('error', (e) => {
- console.error('Global error:', e.error);
- // Could send to error tracking service
+  console.error('Global error:', e.error);
+  // Could send to error tracking service
 });
 
 window.addEventListener('unhandledrejection', (e) => {
- console.error('Unhandled promise rejection:', e.reason);
- // Could send to error tracking service
+  console.error('Unhandled promise rejection:', e.reason);
+  // Could send to error tracking service
 });
 
 // ===== Service Worker Registration =====
 if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
- window.addEventListener('load', () => {
-   navigator.serviceWorker.register('/sw.js').catch(err => {
-     console.log('Service Worker registration failed:', err);
-   });
- });
+  window.addEventListener('load', async () => {
+    try {
+      // Unregister any existing service workers to force update
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (const registration of registrations) {
+        await registration.unregister();
+        console.log('Service Worker: Unregistered old service worker');
+      }
+
+      // Register new service worker
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      console.log('Service Worker: Registered successfully', registration);
+
+      // Force update if already installed
+      if (registration.active) {
+        registration.update();
+        console.log('Service Worker: Forced update');
+      }
+    } catch (err) {
+      console.error('Service Worker registration failed:', err);
+    }
+  });
 }
 
 // ===== Export Global Functions =====
 window.VelocityLab = {
- showNotification,
- exportData,
- refreshLeaderboard,
- addAdmin,
- logout,
- formatDate
+  showNotification,
+  exportData,
+  refreshLeaderboard,
+  addAdmin,
+  logout,
+  formatDate
 };
 
 // ===== Initialize Application =====
 if (document.readyState === 'loading') {
- document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('DOMContentLoaded', init);
 } else {
- init();
+  init();
 }
 
 // Preload resources
@@ -1350,10 +1408,10 @@ measurePerformance();
 
 // Add smooth page transitions
 document.addEventListener('DOMContentLoaded', () => {
- document.body.style.opacity = '0';
- document.body.style.transition = 'opacity 0.3s ease-in-out';
- 
- requestAnimationFrame(() => {
-   document.body.style.opacity = '1';
- });
+  document.body.style.opacity = '0';
+  document.body.style.transition = 'opacity 0.3s ease-in-out';
+
+  requestAnimationFrame(() => {
+    document.body.style.opacity = '1';
+  });
 });

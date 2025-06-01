@@ -1,11 +1,11 @@
 // functions/api/csrf.ts
 // CSRF token generation endpoint with CORS support
 
-import { generateSecureToken, jsonResponse, errorResponse, checkRateLimit } from './utils';
+import { generateSecureToken, checkRateLimit } from './utils';
 import type { Env } from './utils';
 
 const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',  // Replace '*' with your frontend domain in production, e.g. 'https://velocityvtglab.pages.dev'
+  'Access-Control-Allow-Origin': '*',  // In production, replace '*' with your exact frontend origin, e.g. 'https://velocityvtglab.pages.dev'
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
@@ -22,10 +22,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   try {
     const { env, request } = context;
 
-    // Rate limiting
+    // 1) Rate limiting by IP
     const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
     const canProceed = await checkRateLimit(env, `csrf:${clientIP}`, 20, 60);
-
     if (!canProceed) {
       return new Response(JSON.stringify({ error: 'Too many requests' }), {
         status: 429,
@@ -36,11 +35,11 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       });
     }
 
-    // Generate CSRF token
+    // 2) Generate a one‐hour CSRF token
     const token = generateSecureToken();
-    const expirationTtl = 3600; // 1 hour
+    const expirationTtl = 3600; // 1 hour in seconds
 
-    // Store token with expiration
+    // 3) Store token in KV for one‐time validation
     await env.USERS.put(
       `csrf:${token}`,
       JSON.stringify({
@@ -50,16 +49,20 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       { expirationTtl }
     );
 
-    return new Response(JSON.stringify({
-      token,
-      expires: new Date(Date.now() + expirationTtl * 1000).toISOString(),
-    }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        ...CORS_HEADERS,
-      },
-    });
+    // 4) Return JSON with token + expiry
+    return new Response(
+      JSON.stringify({
+        token,
+        expires: new Date(Date.now() + expirationTtl * 1000).toISOString(),
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          ...CORS_HEADERS,
+        },
+      }
+    );
   } catch (error) {
     console.error('CSRF generation error:', error);
     return new Response(JSON.stringify({ error: 'Failed to generate CSRF token' }), {
@@ -72,14 +75,13 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   }
 };
 
-// Validate CSRF token (exported for internal usage)
+// One-time validation helper (imported by login.ts / register.ts)
 export async function validateCSRFToken(env: Env, token: string | null): Promise<boolean> {
   if (!token) return false;
-
   const data = await env.USERS.get(`csrf:${token}`);
   if (!data) return false;
 
-  // Delete token after validation (one-time use)
+  // Delete immediately (one‐time use)
   await env.USERS.delete(`csrf:${token}`);
   return true;
 }
