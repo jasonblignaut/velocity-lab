@@ -51,9 +51,6 @@ const showNotification = (message, type = 'info', duration = 5000) => {
   }, duration);
 };
 
-// Make showNotification globally available
-window.showNotification = showNotification;
-
 // Fetch CSRF token from server
 const fetchCSRFToken = async () => {
   try {
@@ -106,10 +103,14 @@ const handleFormSubmit = async (form, endpoint, isRegister = false) => {
     showNotification(`Welcome, ${data.name}!`, 'success');
     setCookie('user', JSON.stringify({ name: data.name, role: data.role }), 1);
     
-    // Faster transition to dashboard
+    // Smooth transition to dashboard
     setTimeout(() => {
-      window.location.href = '/dashboard.html';
-    }, 300);
+      document.body.style.transition = 'opacity 0.3s ease';
+      document.body.style.opacity = '0';
+      setTimeout(() => {
+        window.location.href = '/dashboard.html';
+      }, 300);
+    }, 1000);
   } catch (error) {
     console.error(`${endpoint} error:`, error);
     showNotification(error.message || 'An error occurred.', 'error');
@@ -195,9 +196,13 @@ const initProfilePasswordForm = () => {
     spinner?.classList.add('active');
     
     try {
+      const token = await fetchCSRFToken();
+      if (!token) return;
+      
       const formData = new FormData();
       formData.append('currentPassword', currentPassword);
       formData.append('newPassword', newPassword);
+      formData.append('csrf_token', token);
       
       const response = await fetch('/api/profile/change-password', {
         method: 'POST',
@@ -308,7 +313,7 @@ const initDashboard = async () => {
         role: profileData.role 
       }), 1);
       
-      userInfo.textContent = `${profileData.name}`;
+      userInfo.textContent = `${profileData.name} (${profileData.role})`;
       
       // Show admin link for admin users
       const adminLink = $('#adminLink');
@@ -316,7 +321,7 @@ const initDashboard = async () => {
         adminLink.style.display = 'inline';
       }
     } else {
-      userInfo.textContent = `${user.name}`;
+      userInfo.textContent = `${user.name} (${user.role})`;
       
       // Show admin link for admin users (fallback)
       const adminLink = $('#adminLink');
@@ -326,7 +331,7 @@ const initDashboard = async () => {
     }
   } catch (error) {
     console.error('Failed to fetch profile:', error);
-    userInfo.textContent = `${user.name}`;
+    userInfo.textContent = `${user.name} (${user.role})`;
     
     // Show admin link for admin users (fallback)
     const adminLink = $('#adminLink');
@@ -355,8 +360,12 @@ const initDashboard = async () => {
         
         // Smooth transition to home
         setTimeout(() => {
-          window.location.href = '/index.html';
-        }, 500);
+          document.body.style.transition = 'opacity 0.5s ease';
+          document.body.style.opacity = '0';
+          setTimeout(() => {
+            window.location.href = '/index.html';
+          }, 500);
+        }, 1000);
       }
     } catch (error) {
       console.error('Logout error:', error);
@@ -398,12 +407,10 @@ const initDashboard = async () => {
         
         syncProgress(week, task, checkbox.checked);
         updateProgressBar();
-        updateSubTaskProgress();
       });
     });
 
     updateProgressBar();
-    updateSubTaskProgress();
   } catch (error) {
     console.error('Dashboard progress initialization error:', error);
   }
@@ -453,7 +460,7 @@ const initProfile = async () => {
         role: profileData.role 
       }), 1);
       
-      userInfo.textContent = `${profileData.name}`;
+      userInfo.textContent = `${profileData.name} (${profileData.role})`;
       
       // Show admin link for admin users
       const adminLink = $('#adminLink');
@@ -461,7 +468,7 @@ const initProfile = async () => {
         adminLink.style.display = 'inline';
       }
     } else {
-      userInfo.textContent = `${user.name}`;
+      userInfo.textContent = `${user.name} (${user.role})`;
       
       // Show admin link for admin users (fallback)
       const adminLink = $('#adminLink');
@@ -471,7 +478,7 @@ const initProfile = async () => {
     }
   } catch (error) {
     console.error('Failed to fetch profile:', error);
-    userInfo.textContent = `${user.name}`;
+    userInfo.textContent = `${user.name} (${user.role})`;
     
     // Show admin link for admin users (fallback)
     const adminLink = $('#adminLink');
@@ -498,8 +505,12 @@ const initProfile = async () => {
         showNotification('Logged out successfully', 'success', 2000);
         
         setTimeout(() => {
-          window.location.href = '/index.html';
-        }, 500);
+          document.body.style.transition = 'opacity 0.5s ease';
+          document.body.style.opacity = '0';
+          setTimeout(() => {
+            window.location.href = '/index.html';
+          }, 500);
+        }, 1000);
       }
     } catch (error) {
       console.error('Logout error:', error);
@@ -509,18 +520,17 @@ const initProfile = async () => {
     }
   });
 
-  // Load profile data faster
+  // Load profile data
   try {
     const response = await fetch('/api/profile', { credentials: 'same-origin' });
     if (response.ok) {
       const profileData = await response.json();
       
-      // Update profile information
+      // Update profile information (no avatar)
       const profileName = $('#profileName');
       const profileEmail = $('#profileEmail');
       const profileRole = $('#profileRole');
       const profileJoined = $('#profileJoined');
-      const profileLastLogin = $('#profileLastLogin');
       const totalProgress = $('#totalProgress');
       const completedTasks = $('#completedTasks');
       const currentWeek = $('#currentWeek');
@@ -528,41 +538,7 @@ const initProfile = async () => {
       if (profileName) profileName.textContent = profileData.name;
       if (profileEmail) profileEmail.textContent = profileData.email;
       if (profileRole) profileRole.textContent = profileData.role;
-      if (profileJoined) {
-        if (profileData.createdAt) {
-          const joinedDate = new Date(profileData.createdAt);
-          if (!isNaN(joinedDate.getTime())) {
-            profileJoined.textContent = joinedDate.toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            });
-          } else {
-            profileJoined.textContent = 'Registration date unavailable';
-          }
-        } else {
-          profileJoined.textContent = 'Registration date unavailable';
-        }
-      }
-      if (profileLastLogin) {
-        if (profileData.lastLogin) {
-          const lastLoginDate = new Date(profileData.lastLogin);
-          if (!isNaN(lastLoginDate.getTime())) {
-            profileLastLogin.textContent = lastLoginDate.toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric'
-            }) + ' at ' + lastLoginDate.toLocaleTimeString('en-US', {
-              hour: '2-digit',
-              minute: '2-digit'
-            });
-          } else {
-            profileLastLogin.textContent = 'Unknown';
-          }
-        } else {
-          profileLastLogin.textContent = 'Never';
-        }
-      }
+      if (profileJoined) profileJoined.textContent = new Date(profileData.createdAt).toLocaleDateString();
       if (totalProgress) totalProgress.textContent = `${profileData.progress}%`;
       if (completedTasks) completedTasks.textContent = `${profileData.completedTasks}/${profileData.totalTasks}`;
       if (currentWeek) {
@@ -579,130 +555,18 @@ const initProfile = async () => {
   initProfilePasswordForm();
 };
 
-// Store subtask states in memory
-let subTaskStates = {};
-
-// Function to update sub-task progress counter
-const updateSubTaskProgress = () => {
-  document.querySelectorAll('.task').forEach(task => {
-    const weekElement = task.closest('.week');
-    if (!weekElement) return;
-    
-    const week = weekElement.dataset.week;
-    const taskId = task.dataset.task;
-    const key = `${week}-${taskId}`;
-    
-    // Find existing counter or create one
-    let counter = task.querySelector('.subtask-counter');
-    if (!counter) {
-      counter = document.createElement('div');
-      counter.className = 'subtask-counter';
-      counter.style.cssText = `
-        font-size: 0.75rem;
-        color: var(--text-tertiary);
-        margin-top: 0.25rem;
-        font-weight: 500;
-      `;
-      task.querySelector('.task-content').appendChild(counter);
-    }
-    
-    // Count subtasks based on task content
-    const subtaskCounts = {
-      'week1-share': 6, // Map drives automatically, Share not visible, Use different methods (GPO, PowerShell, logon), auto map, set permissions, create share
-      'week4-external': 7, // MX, SPF, DKIM, DMARC, OAuth, TLS, reverse DNS
-      'week4-hybrid': 5, // Install Connect, sync identities, wizard, verify flow, test sharing
-      'week1-dc': 3,
-      'week1-vm': 3,
-      'week1-group': 4,
-      'week2-server': 3,
-      'week2-wsus': 3,
-      'week2-time': 3,
-      'week3-upgrade': 3,
-      'week3-exchange': 3,
-      'week3-mailbox': 3,
-      'week3-mail': 3,
-      'week4-hosting': 3
-    };
-    
-    const totalSubtasks = subtaskCounts[key] || 0;
-    if (totalSubtasks > 0) {
-      const completed = subTaskStates[key] || 0;
-      counter.textContent = `${completed}/${totalSubtasks} steps`;
-      
-      if (completed === totalSubtasks) {
-        counter.style.color = 'var(--success)';
-        counter.textContent += ' ✓';
-      } else {
-        counter.style.color = 'var(--text-tertiary)';
-      }
-    } else {
-      counter.style.display = 'none';
-    }
-  });
-};
-
-// Function to handle sub-task checkbox changes
-const updateSubTaskState = (week, task, subtask, checked) => {
-  const key = `${week}-${task}`;
-  if (!subTaskStates[key]) subTaskStates[key] = 0;
-  
-  const currentState = localStorage.getItem(`subtask-${key}-${subtask}`) === 'true';
-  
-  if (checked && !currentState) {
-    subTaskStates[key]++;
-    localStorage.setItem(`subtask-${key}-${subtask}`, 'true');
-  } else if (!checked && currentState) {
-    subTaskStates[key]--;
-    localStorage.removeItem(`subtask-${key}-${subtask}`);
-  }
-  
-  updateSubTaskProgress();
-};
-
-// Load subtask states from localStorage
-const loadSubTaskStates = () => {
-  subTaskStates = {};
-  
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && key.startsWith('subtask-')) {
-      const value = localStorage.getItem(key);
-      if (value === 'true') {
-        // Extract week-task from key
-        const match = key.match(/subtask-(week\d+-\w+)-/);
-        if (match) {
-          const taskKey = match[1];
-          if (!subTaskStates[taskKey]) subTaskStates[taskKey] = 0;
-          subTaskStates[taskKey]++;
-        }
-      }
-    }
-  }
-};
-
-// Modal content for tasks with updated content and reference links
+// Modal content for tasks
 const taskModalContent = {
   'week1-dc': {
     title: 'Promote Server 2012 to Domain Controller',
     description: `
       <p>Promote your Windows Server 2012 to a Domain Controller to set up Active Directory and DNS services.</p>
-      
-      <h3>Prerequisites</h3>
-      <p><strong>TIP:</strong> For first-time users - Where you decide to host this is up to you. Azure has some benefits, whereas an on-prem virtual lab has others. We suggest going through this lab at least once a year, especially the Exchange Hybrid portion.</p>
-      
       <h3>Steps</h3>
       <ol>
-        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'dc', 'install-adds', this.checked)"> Install Active Directory Domain Services role via Server Manager.</li>
-        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'dc', 'promote-dc', this.checked)"> Promote the server to a Domain Controller (new forest, e.g., lab.local).</li>
-        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'dc', 'configure-dns', this.checked)"> Configure DNS settings and verify replication.</li>
+        <li>Install Active Directory Domain Services role via Server Manager.</li>
+        <li>Promote the server to a Domain Controller (new forest, e.g., lab.local).</li>
+        <li>Configure DNS settings and verify replication.</li>
       </ol>
-      
-      <h3>Reference Links</h3>
-      <ul>
-        <li><a href="https://techcommunity.microsoft.com/blog/itopstalk/how-to-install-and-configure-active-directory-domain-services-on-windows-server-2012-r2/259064" target="_blank">Install and Configure Active Directory - Microsoft Tech Community</a></li>
-        <li><a href="https://alitajran.com/install-active-directory-windows-server-2019/" target="_blank">Active Directory Installation Guide - Ali Tajran</a></li>
-      </ul>
-      
       <p><strong>Tip:</strong> Use <code>dcpromo</code> for automation if preferred.</p>
     `,
   },
@@ -710,49 +574,320 @@ const taskModalContent = {
     title: 'Join VM to Domain',
     description: `
       <p>Join a virtual machine to the domain for centralized management.</p>
-      
       <h3>Steps</h3>
       <ol>
-        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'vm', 'network-access', this.checked)"> Ensure the VM has network access to the Domain Controller.</li>
-        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'vm', 'dns-config', this.checked)"> Set the DNS server to the DC's IP address.</li>
-        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'vm', 'join-domain', this.checked)"> Join the domain via System Properties (Computer Name).</li>
+        <li>Ensure the VM has network access to the Domain Controller.</li>
+        <li>Set the DNS server to the DC's IP address.</li>
+        <li>Join the domain via System Properties (Computer Name).</li>
       </ol>
-      
-      <h3>Reference Links</h3>
-      <ul>
-        <li><a href="https://techcommunity.microsoft.com/blog/itopstalk/how-to-join-a-computer-to-a-domain/341911" target="_blank">Join Computer to Domain - Microsoft Tech Community</a></li>
-        <li><a href="https://alitajran.com/join-computer-to-active-directory-domain/" target="_blank">Join Computer to Domain - Ali Tajran</a></li>
-      </ul>
     `,
   },
   'week1-share': {
     title: 'Configure Network Share on DC',
     description: `
       <p>Create a centralized file storage with secure access on the Domain Controller.</p>
-      
       <h3>Steps</h3>
       <ol>
-        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'share', 'create-share', this.checked)"> Create a shared folder (e.g., \\\\DC\\Share$) - Share must not be visible (hidden share).</li>
-        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'share', 'set-permissions', this.checked)"> Set NTFS and share permissions for the security group.</li>
-        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'share', 'map-gpo', this.checked)"> Map drive using Group Policy Object (GPO).</li>
-        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'share', 'map-powershell', this.checked)"> Map drive using PowerShell script.</li>
-        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'share', 'map-logon', this.checked)"> Map drive using logon script.</li>
-        <li><input type="checkbox" onchange="updateSubTaskState('week1', 'share', 'auto-map', this.checked)"> Ensure drives automatically map to machine on logon.</li>
+        <li>Create a shared folder (e.g., \\\\DC\\Share$).</li>
+        <li>Set NTFS and share permissions for the security group.</li>
+        <li>Map drives using GPO, PowerShell, or logon scripts.</li>
       </ol>
-      
-      <h3>Reference Links</h3>
-      <ul>
-        <li><a href="https://techcommunity.microsoft.com/blog/itopstalk/how-to-create-and-share-a-folder-in-windows-server/259088" target="_blank">Create Network Shares - Microsoft Tech Community</a></li>
-        <li><a href="https://alitajran.com/how-to-create-shared-folder-windows-server/" target="_blank">Network Share Configuration - Ali Tajran</a></li>
-      </ul>
-      
-      <p><strong>Tip:</strong> Use hidden shares (with $ suffix) for restricted access. Create three drives using different methods.</p>
+      <p><strong>Tip:</strong> Use hidden shares (with $ suffix) for restricted access.</p>
     `,
   },
   'week1-group': {
     title: 'Create Security Group',
     description: `
       <p>Restrict network share access to authorized users via a security group.</p>
-      
       <h3>Steps</h3>
       <ol>
+        <li>Open Active Directory Users and Computers.</li>
+        <li>Create a new security group (e.g., ShareAccess).</li>
+        <li>Add users to the group and assign permissions to the share.</li>
+      </ol>
+    `,
+  },
+  'week2-server': {
+    title: 'Install Second Server 2012',
+    description: `
+      <p>Add a second Windows Server 2012 for redundancy.</p>
+      <h3>Steps</h3>
+      <ol>
+        <li>Install Server 2012 on a new VM or hardware.</li>
+        <li>Join it to the domain.</li>
+        <li>Configure roles as needed (e.g., secondary DC).</li>
+      </ol>
+    `,
+  },
+  'week2-wsus': {
+    title: 'Setup WSUS',
+    description: `
+      <p>Manage updates with Windows Server Update Services.</p>
+      <h3>Steps</h3>
+      <ol>
+        <li>Install WSUS role on a server.</li>
+        <li>Configure update sources and client policies via GPO.</li>
+        <li>Approve and test updates.</li>
+      </ol>
+    `,
+  },
+  'week2-time': {
+    title: 'Configure Two Time Servers',
+    description: `
+      <p>Ensure time synchronization across the domain.</p>
+      <h3>Steps</h3>
+      <ol>
+        <li>Configure the primary DC as the PDC Emulator to sync with an external NTP server.</li>
+        <li>Set a secondary server as a backup time source.</li>
+        <li>Verify time sync with <code>w32tm /query /status</code>.</li>
+      </ol>
+    `,
+  },
+  'week3-upgrade': {
+    title: 'Upgrade Servers to 2016',
+    description: `
+      <p>Modernize infrastructure by upgrading to Server 2016.</p>
+      <h3>Steps</h3>
+      <ol>
+        <li>Back up existing servers.</li>
+        <li>Perform an in-place upgrade or migrate to new Server 2016 VMs.</li>
+        <li>Verify AD and DNS functionality post-upgrade.</li>
+      </ol>
+    `,
+  },
+  'week3-exchange': {
+    title: 'Install Exchange Server 2019',
+    description: `
+      <p>Deploy email services on a third server.</p>
+      <h3>Steps</h3>
+      <ol>
+        <li>Install Exchange Server 2019 prerequisites.</li>
+        <li>Run the Exchange setup and configure mailbox roles.</li>
+        <li>Test connectivity and services.</li>
+      </ol>
+    `,
+  },
+  'week3-mailbox': {
+    title: 'Create User Mailboxes',
+    description: `
+      <p>Set up email accounts for users.</p>
+      <h3>Steps</h3>
+      <ol>
+        <li>Open Exchange Admin Center.</li>
+        <li>Create mailboxes for domain users.</li>
+        <li>Test email sending/receiving.</li>
+      </ol>
+    `,
+  },
+  'week3-mail': {
+    title: 'Setup Internal Mail Flow',
+    description: `
+      <p>Enable email delivery between users.</p>
+      <h3>Steps</h3>
+      <ol>
+        <li>Configure accepted domains and email address policies.</li>
+        <li>Set up send/receive connectors.</li>
+        <li>Test internal mail flow.</li>
+      </ol>
+    `,
+  },
+  'week4-external': {
+    title: 'Publish Mail Externally',
+    description: `
+      <p>Enable secure external email access.</p>
+      <h3>Steps</h3>
+      <ol>
+        <li>Configure DNS records (MX, SPF, DKIM, DMARC).</li>
+        <li>Enable modern authentication (OAuth 2.0).</li>
+        <li>Install TLS certificates and set up reverse DNS.</li>
+      </ol>
+    `,
+  },
+  'week4-hybrid': {
+    title: 'Setup Microsoft 365 Hybrid Environment',
+    description: `
+      <p>Integrate on-premises Exchange with Microsoft 365.</p>
+      <h3>Steps</h3>
+      <ol>
+        <li>Install and configure Entra ID Connect.</li>
+        <li>Run the Hybrid Configuration Wizard.</li>
+        <li>Verify mail flow and calendar sharing.</li>
+      </ol>
+    `,
+  },
+  'week4-hosting': {
+    title: 'Choose Hosting Environment',
+    description: `
+      <p>Select Azure or on-premises for deployment.</p>
+      <h3>Steps</h3>
+      <ol>
+        <li>Evaluate Azure vs. on-premises for your workload.</li>
+        <li>Configure Azure resources or on-premises servers.</li>
+        <li>Test deployment and connectivity.</li>
+      </ol>
+    `,
+  },
+};
+
+// Enhanced modal with better animations
+const initModal = () => {
+  const modal = $('#taskModal');
+  const modalTitle = $('#modalTitle');
+  const modalDescription = $('#modalDescription');
+  const closeModal = $('#closeModal');
+
+  if (!modal || !modalTitle || !modalDescription || !closeModal) return;
+
+  const taskElements = document.querySelectorAll('.task');
+  
+  // Safety check for task elements
+  if (taskElements.length === 0) {
+    console.log('No task elements found - may not be on dashboard page');
+    return;
+  }
+
+  taskElements.forEach((task) => {
+    task.addEventListener('click', (e) => {
+      // Don't open modal if clicking checkbox
+      if (e.target.type === 'checkbox') return;
+      
+      const weekElement = task.closest('.week');
+      if (!weekElement) return;
+      
+      const week = weekElement.dataset.week;
+      const taskId = task.dataset.task;
+      const key = `${week}-${taskId}`;
+      const content = taskModalContent[key] || {
+        title: 'Task Details',
+        description: '<p>No details available.</p>',
+      };
+      
+      modalTitle.textContent = content.title;
+      modalDescription.innerHTML = content.description;
+      
+      // Enhanced modal opening animation
+      modal.style.display = 'flex';
+      modal.style.opacity = '0';
+      setTimeout(() => {
+        modal.style.opacity = '1';
+        const modalContent = modal.querySelector('.modal-content');
+        if (modalContent) {
+          modalContent.style.transform = 'scale(1)';
+        }
+      }, 10);
+      
+      modal.focus();
+    });
+
+    // Enhanced keyboard accessibility
+    task.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        task.click();
+      }
+    });
+  });
+
+  // Enhanced modal closing
+  const closeModalFunction = () => {
+    modal.style.opacity = '0';
+    const modalContent = modal.querySelector('.modal-content');
+    if (modalContent) {
+      modalContent.style.transform = 'scale(0.95)';
+    }
+    setTimeout(() => {
+      modal.style.display = 'none';
+      if (modalContent) {
+        modalContent.style.transform = '';
+      }
+    }, 200);
+  };
+
+  closeModal.addEventListener('click', closeModalFunction);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModalFunction();
+  });
+
+  // Close modal with Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.style.display === 'flex') {
+      closeModalFunction();
+    }
+  });
+};
+
+// Global VelocityLab object for admin functions
+window.VelocityLab = {
+  showNotification,
+  refreshLeaderboard: () => {
+    if (typeof loadUsersProgress === 'function') loadUsersProgress();
+  },
+  exportData: () => {
+    if (typeof exportData === 'function') exportData();
+  },
+  addAdmin: () => {
+    const email = prompt('Enter email address to grant admin access:');
+    if (email) {
+      showNotification('Admin access management available in user modal', 'info');
+    }
+  }
+};
+
+// Enhanced initialization
+const init = () => {
+  console.log('Initializing Velocity Lab...');
+  
+  try {
+    setupPasswordToggle();
+    console.log('Password toggle initialized');
+  } catch (error) {
+    console.error('Password toggle error:', error);
+  }
+  
+  try {
+    initLoginForm();
+    console.log('Login form initialized');
+  } catch (error) {
+    console.error('Login form error:', error);
+  }
+  
+  try {
+    initRegisterForm();
+    console.log('Register form initialized');
+  } catch (error) {
+    console.error('Register form error:', error);
+  }
+  
+  try {
+    initDashboard();
+    console.log('Dashboard initialized');
+  } catch (error) {
+    console.error('Dashboard error:', error);
+  }
+  
+  try {
+    initProfile();
+    console.log('Profile initialized');
+  } catch (error) {
+    console.error('Profile error:', error);
+  }
+  
+  try {
+    initModal();
+    console.log('Modal initialized');
+  } catch (error) {
+    console.error('Modal error:', error);
+  }
+  
+  // Add smooth page transitions
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    document.body.style.transition = 'opacity 0.5s ease';
+    document.body.style.opacity = '1';
+  }, 50);
+  
+  console.log('Velocity Lab initialization complete');
+};
+
+// Run initialization when DOM is loaded
+document.addEventListener('DOMContentLoaded', init);
