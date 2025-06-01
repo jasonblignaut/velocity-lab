@@ -682,23 +682,26 @@ async function loadLeaderboard() {
 
 // Main Initialization
 async function init() {
- const user = JSON.parse(getCookie('user') || '{}');
- const path = window.location.pathname;
+  const user = JSON.parse(getCookie('user') || '{}');
+  const path = window.location.pathname;
 
- // Update navigation based on user state
- if (user.name) {
-   document.querySelector('#userInfo').textContent = user.name;
-   document.querySelector('#userInfo').style.display = 'inline';
-   document.querySelectorAll('.auth a[href="/login.html"], .auth a[href="/register.html"]').forEach(el => {
-     el.style.display = 'none';
-   });
- } else {
-   document.querySelector('#logout')?.style.display = 'none';
-   if (path === '/dashboard.html' || path === '/profile.html' || path === '/admin.html') {
-     window.location.href = '/login.html';
-     return;
-   }
- }
+  // Update navigation based on user state
+  if (user.name) {
+    document.querySelector('#userInfo').textContent = user.name;
+    document.querySelector('#userInfo').style.display = 'inline';
+    document.querySelectorAll('.auth a[href="/login.html"], .auth a[href="/register.html"]').forEach(el => {
+      el.style.display = 'none';
+    });
+  } else {
+    const logoutEl = document.querySelector('#logout');
+    if (logoutEl) logoutEl.style.display = 'none';
+
+    if (path === '/dashboard.html' || path === '/profile.html' || path === '/admin.html') {
+      window.location.href = '/login.html';
+      return;
+    }
+  }
+}
 
  // Initialize CSRF tokens
  await initForms();
