@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Admin Dashboard - Velocity Lab">
+  <title>Admin Dashboard | Velocity Lab</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  
+  <nav class="nav-glass" role="navigation" aria-label="Main navigation">
+    <div class="brand">
+      <a href="/">
+        <img src="/assets/Velocity-Logo.png" alt="Velocity Lab" class="brand-logo" width="180" height="45">
+      </a>
+    </div>
+    <div class="auth">
+      <span id="userInfo" class="user-info"></span>
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/profile.html">My Profile</a>
+      <a href="#" id="logout">Logout</a>
+    </div>
+  </nav>
+
+  <main id="main" class="container">
+    <header class="header">
+      <h1>Admin Dashboard</h1>
+      <h2>Monitor Training Progress & Manage Users</h2>
+    </header>
+
+    <div id="notification" class="notification" role="alert" aria-live="polite"></div>
+
+    <!-- Admin Statistics -->
+    <div class="stats-grid" style="margin-bottom: 2rem;">
+      <div class="stat-card">
+        <div class="stat-value" id="totalUsers">0</div>
+        <div class="stat-label">Total Users</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="averageProgress">0%</div>
+        <div class="stat-label">Average Progress</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="completedUsers">0</div>
+        <div class="stat-label">Completed Training</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="activeToday">0</div>
+        <div class="stat-label">Active Today</div>
+      </div>
+    </div>
+
+    <!-- Admin Controls -->
+    <div class="admin-controls">
+      <h3>Admin Controls</h3>
+      <div class="admin-actions">
+        <button class="btn btn-primary" onclick="window.VelocityLab.refreshLeaderboard()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+          </svg>
+          <span>Refresh Data</span>
+        </button>
+        <button class="btn btn-secondary" onclick="window.VelocityLab.exportData()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+          </svg>
+          <span>Export Report</span>
+        </button>
+        <button class="btn btn-secondary" onclick="window.VelocityLab.addAdmin()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M8.5 11a4 4 0 100-8 4 4 0 000 8zM20 8v6M23 11h-6"/>
+          </svg>
+          <span>Add Admin</span>
+        </button>
+        <button class="btn btn-secondary" onclick="sendAnnouncement()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+          </svg>
+          <span>Send Announcement</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="admin-controls" style="margin-top: 1rem;">
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+        <input type="text" 
+               id="searchUsers" 
+               placeholder="Search users..." 
+               style="flex: 1; min-width: 200px; padding: 0.5rem 1rem; border: 1px solid var(--primary-gray); border-radius: var(--radius-sm);"
+               onkeyup="filterUsers()">
+        <select id="filterProgress" 
+                style="padding: 0.5rem 1rem; border: 1px solid var(--primary-gray); border-radius: var(--radius-sm);"
+                onchange="filterUsers()">
+          <option value="">All Progress</option>
+          <option value="0-25">0-25%</option>
+          <option value="26-50">26-50%</option>
+          <option value="51-75">51-75%</option>
+          <option value="76-99">76-99%</option>
+          <option value="100">Completed</option>
+        </select>
+        <select id="sortBy" 
+                style="padding: 0.5rem 1rem; border: 1px solid var(--primary-gray); border-radius: var(--radius-sm);"
+                onchange="sortUsers()">
+          <option value="progress">Sort by Progress</option>
+          <option value="name">Sort by Name</option>
+          <option value="recent">Sort by Activity</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- User Progress Leaderboard -->
+    <div class="profile-container" style="margin-top: 2rem;">
+      <h3 style="color: var(--primary-orange); margin-bottom: 2rem;">User Progress Leaderboard</h3>
+      <div id="leaderboard" class="leaderboard">
+        <!-- Loading skeleton -->
+        <div class="leaderboard-item skeleton" style="height: 100px;"></div>
+        <div class="leaderboard-item skeleton" style="height: 100px;"></div>
+        <div class="leaderboard-item skeleton" style="height: 100px;"></div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div style="text-align: center; margin-top: 2rem;">
+      <button class="btn btn-secondary" onclick="previousPage()" id="prevBtn" disabled>Previous</button>
+      <span id="pageInfo" style="margin: 0 1rem;">Page 1 of 1</span>
+      <button class="btn btn-secondary" onclick="nextPage()" id="nextBtn">Next</button>
+    </div>
+  </main>
+
+  <script src="/js/main.js" defer></script>
+  <script>
+    // Admin-specific functions
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    let allUsers = [];
+
+    function filterUsers() {
+      const searchTerm = document.getElementById('searchUsers').value.toLowerCase();
+      const progressFilter = document.getElementById('filterProgress').value;
+      
+      // Implement filtering logic
+      window.VelocityLab.refreshLeaderboard();
+    }
+
+    function sortUsers() {
+      const sortBy = document.getElementById('sortBy').value;
+      // Implement sorting logic
+      window.VelocityLab.refreshLeaderboard();
+    }
+
+    function sendAnnouncement() {
+      const message = prompt('Enter announcement message:');
+      if (message) {
+        // Implement announcement sending
+        window.VelocityLab.showNotification('Announcement sent to all users', 'success');
+      }
+    }
+
+    function previousPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        updatePagination();
+      }
+    }
+
+    function nextPage() {
+      const totalPages = Math.ceil(allUsers.length / itemsPerPage);
+      if (currentPage < totalPages) {
+        currentPage++;
+        updatePagination();
+      }
+    }
+
+    function updatePagination() {
+      const totalPages = Math.ceil(allUsers.length / itemsPerPage);
+      document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+      document.getElementById('prevBtn').disabled = currentPage === 1;
+      document.getElementById('nextBtn').disabled = currentPage === totalPages;
+      
+      // Update displayed users
+      window.VelocityLab.refreshLeaderboard();
+    }
+
+    // Load admin statistics
+    async function loadAdminStats() {
+      try {
+        const response = await fetch('/api/admin/stats', {
+          credentials: 'same-origin'
+        });
+        
+        if (response.ok) {
+          const stats = await response.json();
+          document.getElementById('totalUsers').textContent = stats.totalUsers;
+          document.getElementById('averageProgress').textContent = stats.averageProgress + '%';
+          document.getElementById('completedUsers').textContent = stats.completedUsers;
+          document.getElementById('activeToday').textContent = stats.activeToday;
+        }
+      } catch (error) {
+        console.error('Failed to load admin stats:', error);
+      }
+    }
+
+    // Initialize admin dashboard
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAdminStats();
+    });
+  </script>
+</body>
+</html>
