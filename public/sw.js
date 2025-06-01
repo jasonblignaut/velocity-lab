@@ -57,14 +57,17 @@ self.addEventListener('fetch', (event) => {
           return cachedResponse;
         }
 
-        return fetch(event.request)
+        return fetch(event.request, { redirect: 'follow' })
           .then((response) => {
-            // Don't cache non-successful responses
-            if (!response || response.status !== 200 || response.type !== 'basic') {
+            // Avoid caching redirects or opaque responses
+            if (
+              !response ||
+              response.status !== 200 ||
+              response.type !== 'basic'
+            ) {
               return response;
             }
 
-            // Clone the response
             const responseToCache = response.clone();
 
             caches.open(CACHE_NAME)
