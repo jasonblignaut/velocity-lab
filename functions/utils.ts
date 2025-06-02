@@ -897,40 +897,6 @@ export const getWeekProgress = (progress: Progress, week: string): { completed: 
   };
 };
 
-// ENHANCED: Initialize default admin user with better error handling
-export const initializeDefaultAdmin = async (env: Env): Promise<void> => {
-  try {
-    const adminEmail = 'asusautomation@gmail.com';
-    const existingAdmin = await getUserByEmail(env, adminEmail);
-    
-    if (!existingAdmin) {
-      const adminUser: User = {
-        id: crypto.randomUUID(),
-        name: 'MSP System Administrator',
-        email: adminEmail,
-        password: 'Superadmin@123',
-        role: 'admin',
-        createdAt: new Date().toISOString(),
-        labHistory: []
-      };
-      
-      await env.USERS.put(`user:${adminEmail}`, JSON.stringify(adminUser));
-      console.log('Default admin user created with role: admin');
-      
-      // Initialize admin's first lab
-      await startNewLab(env, adminUser.id);
-      
-    } else if (existingAdmin.role !== 'admin') {
-      // Ensure the default admin has admin role
-      existingAdmin.role = 'admin';
-      await env.USERS.put(`user:${adminEmail}`, JSON.stringify(existingAdmin));
-      console.log('Default admin user role updated to: admin');
-    }
-  } catch (error) {
-    console.error('Initialize default admin error:', error);
-  }
-};
-
 // Format date for display
 export const formatDate = (dateString: string): string => {
   if (!dateString) return 'Never';

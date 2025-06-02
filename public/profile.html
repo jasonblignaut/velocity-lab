@@ -4,528 +4,741 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile - Velocity Lab</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="Manage your profile and view your training progress">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/styles.css" as="style">
+    <link rel="preload" href="/app.js" as="script">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
 <body>
-    <!-- Skip Link for Accessibility -->
+    <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
-    <!-- Header Navigation -->
-    <header class="header">
-        <nav class="nav">
-            <div class="nav-brand">
-                <h1>🚀 Velocity Lab</h1>
-                <span class="nav-subtitle">Profile Settings</span>
-            </div>
-            <div class="nav-user">
-                <span id="userInfo" class="user-info">Loading...</span>
-                <a href="dashboard.html" class="nav-link">Dashboard</a>
-                <a href="admin.html" id="adminLink" class="nav-link admin-link" style="display: none;">Admin</a>
-                <button id="logout" class="btn btn-outline">Logout</button>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Main Content -->
-    <main id="main-content" class="main profile-main">
-        <div class="profile-container">
-            <!-- Profile Header -->
-            <section class="profile-header">
-                <div class="profile-avatar">
-                    <div class="avatar-circle">
-                        <span class="avatar-initials" id="avatarInitials">?</span>
+    <!-- Navigation -->
+    <nav class="nav-glass">
+        <div class="container">
+            <div class="nav-content">
+                <a href="/dashboard.html" class="nav-brand">
+                    <svg class="nav-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="40" height="40" rx="12" fill="url(#logoGradient)"/>
+                        <path d="M12 20l6 6 10-10" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#007aff"/>
+                                <stop offset="100%" style="stop-color:#5ac8fa"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="font-semibold text-xl">Velocity Lab</span>
+                </a>
+                
+                <div class="nav-links">
+                    <a href="/dashboard.html" class="nav-link">Dashboard</a>
+                    <a href="/profile.html" class="nav-link" style="color: var(--primary);">Profile</a>
+                    <a href="/admin.html" class="nav-link" id="adminLink" style="display: none;">Admin</a>
+                    <span class="text-sm text-secondary" id="userInfo">Loading...</span>
+                    <button class="btn btn-secondary btn-sm" id="logout">Sign Out</button>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="card" style="margin-top: 2rem;">
+                    <h3 style="margin-bottom: 1.5rem;">Quick Actions</h3>
+                    <div class="flex gap-4 flex-wrap">
+                        <a href="/dashboard.html" class="btn btn-primary">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5,3 19,12 5,21"></polygon>
+                            </svg>
+                            Continue Training
+                        </a>
+                        
+                        <button class="btn btn-secondary" onclick="refreshProgress()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="23,4 23,10 17,10"></polyline>
+                                <polyline points="1,20 1,14 7,14"></polyline>
+                                <path d="M20.49,9A9,9,0,0,0,5.64,5.64L1,10m22,4l-4.64,4.36A9,9,0,0,1,3.51,15"></path>
+                            </svg>
+                            Refresh Progress
+                        </button>
+                        
+                        <button class="btn btn-secondary" onclick="exportData()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7,10 12,15 17,10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Export Data
+                        </button>
                     </div>
-                    <button class="avatar-upload" aria-label="Upload profile picture">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                            <circle cx="12" cy="13" r="4"></circle>
+                </div>
+            </div>
+
+            <!-- Progress Tab -->
+            <div class="profile-tab" id="progress-tab">
+                <div class="card">
+                    <h3 style="margin-bottom: 1.5rem;">Detailed Progress Analytics</h3>
+                    <div class="text-center" style="padding: 3rem; color: var(--text-tertiary);">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 1rem;">
+                            <path d="M18 20V10"></path>
+                            <path d="M12 20V4"></path>
+                            <path d="M6 20v-6"></path>
                         </svg>
-                    </button>
+                        <p>Detailed progress charts and analytics will be displayed here</p>
+                        <p class="text-sm">Track your learning journey with comprehensive metrics</p>
+                    </div>
                 </div>
-                <div class="profile-info">
-                    <h2 id="profileName">Loading...</h2>
-                    <p id="profileEmail">Loading...</p>
-                    <p id="profileCompany" class="profile-company">Loading...</p>
-                </div>
-            </section>
+            </div>
 
-            <!-- Profile Navigation -->
-            <nav class="profile-nav" role="tablist">
-                <button class="profile-nav-item active" data-tab="overview" role="tab" aria-selected="true">
-                    📊 Overview
-                </button>
-                <button class="profile-nav-item" data-tab="settings" role="tab" aria-selected="false">
-                    ⚙️ Settings
-                </button>
-                <button class="profile-nav-item" data-tab="security" role="tab" aria-selected="false">
-                    🔒 Security
-                </button>
-                <button class="profile-nav-item" data-tab="history" role="tab" aria-selected="false">
-                    📚 Lab History
-                </button>
-            </nav>
-
-            <!-- Profile Content -->
-            <div class="profile-content">
-                <!-- Overview Tab -->
-                <section id="overview" class="profile-tab active" role="tabpanel">
-                    <h3>Training Overview</h3>
+            <!-- Security Tab -->
+            <div class="profile-tab" id="security-tab">
+                <div class="card">
+                    <h3 style="margin-bottom: 1.5rem;">Security Settings</h3>
                     
-                    <!-- Current Progress -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">📈</div>
-                            <div class="stat-content">
-                                <h4>Overall Progress</h4>
-                                <div class="stat-value" id="overallProgress">0%</div>
-                                <div class="stat-detail" id="taskProgress">0/42 tasks completed</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">🏆</div>
-                            <div class="stat-content">
-                                <h4>Current Week</h4>
-                                <div class="stat-value" id="currentWeek">Week 1</div>
-                                <div class="stat-detail" id="weekProgress">Foundation Setup</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">⏱️</div>
-                            <div class="stat-content">
-                                <h4>Time Invested</h4>
-                                <div class="stat-value" id="timeInvested">0 hours</div>
-                                <div class="stat-detail">Estimated completion time</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">🚀</div>
-                            <div class="stat-content">
-                                <h4>Labs Started</h4>
-                                <div class="stat-value" id="labsStarted">1</div>
-                                <div class="stat-detail">Training sessions</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Weekly Progress -->
-                    <div class="weekly-progress">
-                        <h4>Weekly Progress Breakdown</h4>
-                        <div class="week-progress-grid">
-                            <div class="week-progress-item" data-week="week1">
-                                <div class="week-progress-header">
-                                    <h5>📚 Week 1: Foundation Setup</h5>
-                                    <span class="week-progress-count">0/12</span>
-                                </div>
-                                <div class="progress-bar-small">
-                                    <div class="progress-fill-small" style="width: 0%"></div>
-                                </div>
-                            </div>
-                            
-                            <div class="week-progress-item" data-week="week2">
-                                <div class="week-progress-header">
-                                    <h5>🏗️ Week 2: Infrastructure Expansion</h5>
-                                    <span class="week-progress-count">0/8</span>
-                                </div>
-                                <div class="progress-bar-small">
-                                    <div class="progress-fill-small" style="width: 0%"></div>
-                                </div>
-                            </div>
-                            
-                            <div class="week-progress-item" data-week="week3">
-                                <div class="week-progress-header">
-                                    <h5>📧 Week 3: Email & Messaging</h5>
-                                    <span class="week-progress-count">0/12</span>
-                                </div>
-                                <div class="progress-bar-small">
-                                    <div class="progress-fill-small" style="width: 0%"></div>
-                                </div>
-                            </div>
-                            
-                            <div class="week-progress-item" data-week="week4">
-                                <div class="week-progress-header">
-                                    <h5>☁️ Week 4: Cloud Integration</h5>
-                                    <span class="week-progress-count">0/10</span>
-                                </div>
-                                <div class="progress-bar-small">
-                                    <div class="progress-fill-small" style="width: 0%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="quick-actions">
-                        <h4>Quick Actions</h4>
-                        <div class="action-buttons">
-                            <a href="dashboard.html" class="btn btn-primary">
-                                📚 Continue Training
-                            </a>
-                            <button id="exportDataBtn" class="btn btn-outline">
-                                📥 Export Progress
-                            </button>
-                            <button id="resetProgressBtn" class="btn btn-outline btn-warning">
-                                🔄 Start New Lab
-                            </button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Settings Tab -->
-                <section id="settings" class="profile-tab" role="tabpanel" hidden>
-                    <h3>Account Settings</h3>
-                    
-                    <form id="profileForm" class="settings-form">
+                    <!-- Change Password Form -->
+                    <form id="passwordForm">
                         <input type="hidden" id="csrfToken" name="csrf_token" value="">
                         
                         <div class="form-group">
-                            <label for="settingsName" class="form-label">Full Name</label>
-                            <input 
-                                type="text" 
-                                id="settingsName" 
-                                name="name" 
-                                class="form-input" 
-                                placeholder="Enter your full name"
-                                required
-                            >
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="settingsEmail" class="form-label">Email Address</label>
-                            <input 
-                                type="email" 
-                                id="settingsEmail" 
-                                name="email" 
-                                class="form-input" 
-                                placeholder="Enter your email"
-                                required
-                                readonly
-                            >
-                            <div class="field-help">Contact admin to change email address</div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="settingsCompany" class="form-label">Company</label>
-                            <input 
-                                type="text" 
-                                id="settingsCompany" 
-                                name="company" 
-                                class="form-input" 
-                                placeholder="Enter your company name"
-                            >
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="settingsTimezone" class="form-label">Timezone</label>
-                            <select id="settingsTimezone" name="timezone" class="form-select">
-                                <option value="UTC">UTC (Coordinated Universal Time)</option>
-                                <option value="America/New_York">Eastern Time (ET)</option>
-                                <option value="America/Chicago">Central Time (CT)</option>
-                                <option value="America/Denver">Mountain Time (MT)</option>
-                                <option value="America/Los_Angeles">Pacific Time (PT)</option>
-                                <option value="Europe/London">London (GMT/BST)</option>
-                                <option value="Europe/Paris">Paris (CET/CEST)</option>
-                                <option value="Asia/Tokyo">Tokyo (JST)</option>
-                                <option value="Australia/Sydney">Sydney (AEST/AEDT)</option>
-                            </select>
-                        </div>
-
-                        <!-- Notification Preferences -->
-                        <div class="form-section">
-                            <h4>Notification Preferences</h4>
-                            
-                            <label class="checkbox-wrapper">
-                                <input type="checkbox" name="emailNotifications" class="checkbox-input" checked>
-                                <span class="checkbox-custom"></span>
-                                <span class="checkbox-label">Email notifications for important updates</span>
-                            </label>
-                            
-                            <label class="checkbox-wrapper">
-                                <input type="checkbox" name="progressReminders" class="checkbox-input" checked>
-                                <span class="checkbox-custom"></span>
-                                <span class="checkbox-label">Weekly progress reminders</span>
-                            </label>
-                            
-                            <label class="checkbox-wrapper">
-                                <input type="checkbox" name="newFeatures" class="checkbox-input">
-                                <span class="checkbox-custom"></span>
-                                <span class="checkbox-label">Notifications about new features and content</span>
-                            </label>
-                        </div>
-                        
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">
-                                💾 Save Changes
-                            </button>
-                            <button type="button" class="btn btn-outline" id="cancelSettings">
-                                Cancel
-                            </button>
-                        </div>
-                    </form>
-                </section>
-
-                <!-- Security Tab -->
-                <section id="security" class="profile-tab" role="tabpanel" hidden>
-                    <h3>Security Settings</h3>
-                    
-                    <!-- Change Password -->
-                    <div class="security-section">
-                        <h4>Change Password</h4>
-                        <p class="section-description">Ensure your account is secure with a strong password</p>
-                        
-                        <form id="passwordForm" class="security-form">
-                            <input type="hidden" id="csrfTokenPassword" name="csrf_token" value="">
-                            
-                            <div class="form-group">
-                                <label for="currentPassword" class="form-label">Current Password</label>
-                                <div class="input-wrapper">
-                                    <input 
-                                        type="password" 
-                                        id="currentPassword" 
-                                        name="currentPassword" 
-                                        class="form-input" 
-                                        placeholder="Enter current password"
-                                        required
-                                        autocomplete="current-password"
-                                    >
-                                    <button type="button" class="toggle-password" aria-label="Toggle password visibility">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                            <circle cx="12" cy="12" r="3"></circle>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="newPassword" class="form-label">New Password</label>
-                                <div class="input-wrapper">
-                                    <input 
-                                        type="password" 
-                                        id="newPassword" 
-                                        name="newPassword" 
-                                        class="form-input" 
-                                        placeholder="Enter new password"
-                                        required
-                                        autocomplete="new-password"
-                                        minlength="8"
-                                    >
-                                    <button type="button" class="toggle-password" aria-label="Toggle password visibility">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                            <circle cx="12" cy="12" r="3"></circle>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div class="field-help">Password must be at least 8 characters long</div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
-                                <div class="input-wrapper">
-                                    <input 
-                                        type="password" 
-                                        id="confirmNewPassword" 
-                                        name="confirmNewPassword" 
-                                        class="form-input" 
-                                        placeholder="Confirm new password"
-                                        required
-                                        autocomplete="new-password"
-                                        minlength="8"
-                                    >
-                                    <button type="button" class="toggle-password" aria-label="Toggle password visibility">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                            <circle cx="12" cy="12" r="3"></circle>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">
-                                    🔒 Update Password
+                            <label class="form-label" for="currentPassword">Current Password</label>
+                            <div class="input-wrapper">
+                                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <circle cx="12" cy="16" r="1"></circle>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                                <input 
+                                    type="password" 
+                                    id="currentPassword" 
+                                    name="currentPassword" 
+                                    class="form-input" 
+                                    placeholder="Enter your current password"
+                                    required
+                                    autocomplete="current-password"
+                                >
+                                <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
                                 </button>
                             </div>
-                        </form>
-                    </div>
-
-                    <!-- Account Security -->
-                    <div class="security-section">
-                        <h4>Account Security</h4>
-                        <div class="security-info">
-                            <div class="security-item">
-                                <div class="security-icon">🛡️</div>
-                                <div class="security-content">
-                                    <h5>Last Password Change</h5>
-                                    <p id="lastPasswordChange">Never</p>
-                                </div>
-                            </div>
-                            
-                            <div class="security-item">
-                                <div class="security-icon">🌐</div>
-                                <div class="security-content">
-                                    <h5>Last Login</h5>
-                                    <p id="lastLogin">Loading...</p>
-                                </div>
-                            </div>
-                            
-                            <div class="security-item">
-                                <div class="security-icon">📱</div>
-                                <div class="security-content">
-                                    <h5>Active Sessions</h5>
-                                    <p>1 active session</p>
-                                    <button class="btn btn-outline btn-sm">Manage Sessions</button>
-                                </div>
-                            </div>
                         </div>
-                    </div>
-
-                    <!-- Danger Zone -->
-                    <div class="security-section danger-zone">
-                        <h4>Danger Zone</h4>
-                        <p class="section-description">These actions cannot be undone</p>
                         
-                        <div class="danger-actions">
-                            <button class="btn btn-danger" id="deleteAccountBtn">
-                                🗑️ Delete Account
-                            </button>
-                            <p class="danger-text">Permanently delete your account and all training data</p>
+                        <div class="form-group">
+                            <label class="form-label" for="newPassword">New Password</label>
+                            <div class="input-wrapper">
+                                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <circle cx="12" cy="16" r="1"></circle>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                                <input 
+                                    type="password" 
+                                    id="newPassword" 
+                                    name="newPassword" 
+                                    class="form-input" 
+                                    placeholder="Enter your new password"
+                                    required
+                                    autocomplete="new-password"
+                                    minlength="8"
+                                >
+                                <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="text-sm text-tertiary" style="margin-top: 0.5rem;">
+                                Minimum 8 characters required
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="confirmPassword">Confirm New Password</label>
+                            <div class="input-wrapper">
+                                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M9 16a1 1 0 0 1-1-1v-1a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1"></path>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                                <input 
+                                    type="password" 
+                                    id="confirmPassword" 
+                                    name="confirmPassword" 
+                                    class="form-input" 
+                                    placeholder="Confirm your new password"
+                                    required
+                                    autocomplete="new-password"
+                                >
+                                <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17,21 17,13 7,13 7,21"></polyline>
+                                <polyline points="7,3 7,8 15,8"></polyline>
+                            </svg>
+                            Update Password
+                        </button>
+                    </form>
+                    
+                    <!-- Security Information -->
+                    <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+                        <h4 style="margin-bottom: 1rem;">Security Information</h4>
+                        <div class="text-sm text-secondary">
+                            <p><strong>Password Last Changed:</strong> <span id="passwordChangedAt">Loading...</span></p>
+                            <p style="margin-top: 0.5rem;"><strong>Account Created:</strong> <span id="accountCreated">Loading...</span></p>
                         </div>
                     </div>
-                </section>
+                </div>
+            </div>
 
-                <!-- Lab History Tab -->
-                <section id="history" class="profile-tab" role="tabpanel" hidden>
-                    <h3>Lab History</h3>
-                    <p class="section-description">View your past training sessions and progress</p>
+            <!-- Data & Privacy Tab -->
+            <div class="profile-tab" id="data-tab">
+                <div class="card">
+                    <h3 style="margin-bottom: 1.5rem;">Data & Privacy</h3>
                     
-                    <div class="history-controls">
-                        <button id="exportHistoryBtn" class="btn btn-outline">
-                            📊 Export History
+                    <!-- Data Export -->
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="margin-bottom: 1rem;">Export Your Data</h4>
+                        <p class="text-sm text-secondary" style="margin-bottom: 1rem;">
+                            Download a complete copy of your training data, progress, and account information.
+                        </p>
+                        <button class="btn btn-secondary" onclick="exportPersonalData()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7,10 12,15 17,10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Download Data Export
                         </button>
                     </div>
                     
-                    <div id="labHistoryContainer" class="lab-history">
-                        <div class="loading-state">
-                            <div class="loading-spinner"></div>
-                            <p>Loading lab history...</p>
+                    <!-- Data Usage -->
+                    <div style="margin-bottom: 2rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+                        <h4 style="margin-bottom: 1rem;">How We Use Your Data</h4>
+                        <div class="text-sm text-secondary space-y-2">
+                            <p>• <strong>Training Progress:</strong> Track your completion of lab tasks and exercises</p>
+                            <p>• <strong>Performance Analytics:</strong> Help improve the training experience</p>
+                            <p>• <strong>Account Security:</strong> Secure login and session management</p>
+                            <p>• <strong>No Third-Party Sharing:</strong> Your data stays within our training platform</p>
                         </div>
                     </div>
-                </section>
+                    
+                    <!-- Data Retention -->
+                    <div style="padding-top: 2rem; border-top: 1px solid var(--border);">
+                        <h4 style="margin-bottom: 1rem;">Data Retention</h4>
+                        <div class="text-sm text-secondary">
+                            <p>Your training data and progress are retained for the duration of your account. 
+                            You can request data deletion by contacting support, though this will remove 
+                            access to your training progress and certifications.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
     </main>
 
     <!-- Notification System -->
-    <div id="notification" class="notification" role="alert" aria-live="polite"></div>
+    <div class="notification" id="notification" role="alert" aria-live="assertive">
+        <!-- Dynamic notification content -->
+    </div>
 
     <!-- Scripts -->
-    <script src="app.js"></script>
+    <script src="/app.js"></script>
+    
+    <!-- Profile Page JavaScript -->
     <script>
-        // Profile-specific JavaScript
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize profile tabs
-            initProfileTabs();
+            // Initialize profile page
+            initProfilePage();
             
-            // Load user profile data
+            // Load profile data
             loadProfileData();
             
-            // Load lab history
-            loadLabHistory();
+            // Setup tab navigation
+            setupProfileTabs();
             
-            // Set up profile form handlers
+            // Setup form handlers
             setupProfileForms();
         });
-
-        function initProfileTabs() {
-            const navItems = document.querySelectorAll('.profile-nav-item');
-            const tabPanels = document.querySelectorAll('.profile-tab');
+        
+        function initProfilePage() {
+            console.log('👤 Profile page initializing...');
             
-            navItems.forEach(item => {
-                item.addEventListener('click', (e) => {
-                    const targetTab = e.target.dataset.tab;
+            // Set active navigation
+            const profileLink = document.querySelector('a[href="/profile.html"]');
+            if (profileLink) {
+                profileLink.style.color = 'var(--primary)';
+                profileLink.style.fontWeight = 'var(--font-weight-semibold)';
+            }
+            
+            // Check authentication
+            const userCookie = getCookie('user');
+            if (!userCookie) {
+                window.location.href = '/login.html';
+                return;
+            }
+        }
+        
+        function setupProfileTabs() {
+            const tabButtons = document.querySelectorAll('.profile-nav-item');
+            const tabPanes = document.querySelectorAll('.profile-tab');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
                     
-                    // Update nav items
-                    navItems.forEach(nav => {
-                        nav.classList.remove('active');
-                        nav.setAttribute('aria-selected', 'false');
-                    });
-                    e.target.classList.add('active');
-                    e.target.setAttribute('aria-selected', 'true');
+                    // Update button states
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
                     
-                    // Update tab panels
-                    tabPanels.forEach(panel => {
-                        panel.classList.remove('active');
-                        panel.hidden = true;
-                    });
-                    const targetPanel = document.getElementById(targetTab);
-                    if (targetPanel) {
-                        targetPanel.classList.add('active');
-                        targetPanel.hidden = false;
+                    // Update tab panes
+                    tabPanes.forEach(pane => pane.classList.remove('active'));
+                    const targetPane = document.getElementById(tabId + '-tab');
+                    if (targetPane) {
+                        targetPane.classList.add('active');
+                        
+                        // Load tab-specific data
+                        if (tabId === 'security') {
+                            // Focus on security tab actions
+                            setTimeout(() => {
+                                const firstInput = targetPane.querySelector('input');
+                                if (firstInput) firstInput.focus();
+                            }, 100);
+                        }
                     }
                 });
             });
         }
-
-        function loadProfileData() {
-            // Load user info from cookie or API
-            const user = JSON.parse(getCookie('user') || '{}');
-            
-            if (user.name) {
-                document.getElementById('profileName').textContent = user.name;
-                document.getElementById('settingsName').value = user.name;
+        
+        async function loadProfileData() {
+            try {
+                const response = await fetch('/api/profile', {
+                    credentials: 'same-origin'
+                });
                 
-                // Set avatar initials
-                const initials = user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                document.getElementById('avatarInitials').textContent = initials;
-            }
-            
-            if (user.email) {
-                document.getElementById('profileEmail').textContent = user.email;
-                document.getElementById('settingsEmail').value = user.email;
-            }
-            
-            if (user.company) {
-                document.getElementById('profileCompany').textContent = user.company;
-                document.getElementById('settingsCompany').value = user.company;
-            } else {
-                document.getElementById('profileCompany').style.display = 'none';
+                if (!response.ok) {
+                    throw new Error('Failed to load profile data');
+                }
+                
+                const profile = await response.json();
+                
+                // Update profile header
+                document.getElementById('profileName').textContent = profile.name;
+                document.getElementById('profileEmail').textContent = profile.email;
+                document.getElementById('profileRole').textContent = profile.role;
+                document.getElementById('profileRole').className = `badge ${profile.role === 'admin' ? 'badge-warning' : 'badge-info'}`;
+                
+                // Update avatar
+                const avatarCircle = document.getElementById('avatarCircle');
+                const initials = profile.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                avatarCircle.textContent = initials;
+                
+                // Update member since
+                const memberSince = new Date(profile.createdAt).toLocaleDateString();
+                document.getElementById('memberSince').textContent = memberSince;
+                
+                // Update statistics
+                document.getElementById('overallProgress').textContent = Math.round(profile.progress) + '%';
+                document.getElementById('completedTasks').textContent = profile.completedTasks;
+                document.getElementById('globalRank').textContent = `#${profile.rank}`;
+                
+                // Update last activity
+                const lastActivity = profile.lastLogin ? formatRelativeTime(profile.lastLogin) : 'Never';
+                document.getElementById('lastActivity').textContent = lastActivity;
+                
+                // Update week progress
+                updateWeekProgress(profile.tasksByWeek);
+                
+                // Update security info
+                const passwordChanged = profile.passwordChangedAt ? 
+                    new Date(profile.passwordChangedAt).toLocaleDateString() : 'Never';
+                document.getElementById('passwordChangedAt').textContent = passwordChanged;
+                document.getElementById('accountCreated').textContent = memberSince;
+                
+            } catch (error) {
+                console.error('Error loading profile data:', error);
+                window.VelocityLab.showNotification('Failed to load profile data', 'error');
             }
         }
-
+        
+        function updateWeekProgress(tasksByWeek) {
+            const weeks = [
+                { key: 'week1', total: 12 },
+                { key: 'week2', total: 8 },
+                { key: 'week3', total: 12 },
+                { key: 'week4', total: 10 }
+            ];
+            
+            weeks.forEach(week => {
+                const completed = tasksByWeek[week.key] || 0;
+                const percentage = Math.round((completed / week.total) * 100);
+                
+                const progressBar = document.getElementById(week.key + 'Progress');
+                const countSpan = document.getElementById(week.key + 'Count');
+                
+                if (progressBar) {
+                    progressBar.style.width = percentage + '%';
+                }
+                
+                if (countSpan) {
+                    countSpan.textContent = `${completed}/${week.total}`;
+                }
+            });
+        }
+        
         function setupProfileForms() {
-            // Profile settings form
-            const profileForm = document.getElementById('profileForm');
-            if (profileForm) {
-                profileForm.addEventListener('submit', async (e) => {
+            // Password change form
+            const passwordForm = document.getElementById('passwordForm');
+            if (passwordForm) {
+                passwordForm.addEventListener('submit', async function(e) {
                     e.preventDefault();
-                    // Handle profile update
-                    showNotification('Profile updated successfully!', 'success');
-                });
-            }
-            
-            // Export data button
-            const exportBtn = document.getElementById('exportDataBtn');
-            if (exportBtn) {
-                exportBtn.addEventListener('click', () => {
-                    exportUserData();
-                });
-            }
-            
-            // Reset progress button
-            const resetBtn = document.getElementById('resetProgressBtn');
-            if (resetBtn) {
-                resetBtn.addEventListener('click', () => {
-                    startNewLab();
+                    
+                    const currentPassword = document.getElementById('currentPassword').value;
+                    const newPassword = document.getElementById('newPassword').value;
+                    const confirmPassword = document.getElementById('confirmPassword').value;
+                    
+                    // Validate passwords match
+                    if (newPassword !== confirmPassword) {
+                        window.VelocityLab.showNotification('New passwords do not match', 'error');
+                        return;
+                    }
+                    
+                    // Validate password strength
+                    if (newPassword.length < 8) {
+                        window.VelocityLab.showNotification('Password must be at least 8 characters long', 'error');
+                        return;
+                    }
+                    
+                    // Validate not same as current
+                    if (currentPassword === newPassword) {
+                        window.VelocityLab.showNotification('New password must be different from current password', 'error');
+                        return;
+                    }
+                    
+                    try {
+                        const formData = new FormData(this);
+                        
+                        const response = await fetch('/api/profile/change-password', {
+                            method: 'POST',
+                            body: formData,
+                            credentials: 'same-origin'
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (!response.ok) {
+                            throw new Error(result.error || 'Failed to change password');
+                        }
+                        
+                        window.VelocityLab.showNotification('Password updated successfully', 'success');
+                        
+                        // Reset form
+                        passwordForm.reset();
+                        
+                        // Update password changed date
+                        if (result.passwordChangedAt) {
+                            const changedDate = new Date(result.passwordChangedAt).toLocaleDateString();
+                            document.getElementById('passwordChangedAt').textContent = changedDate;
+                        }
+                        
+                    } catch (error) {
+                        console.error('Error changing password:', error);
+                        window.VelocityLab.showNotification(error.message, 'error');
+                    }
                 });
             }
         }
+        
+        // Action Functions
+        function refreshProgress() {
+            window.VelocityLab.showNotification('Refreshing progress data...', 'info');
+            loadProfileData();
+        }
+        
+        function exportData() {
+            window.VelocityLab.showNotification('Preparing data export...', 'info');
+            exportPersonalData();
+        }
+        
+        async function exportPersonalData() {
+            try {
+                const response = await fetch('/api/profile/export-data', {
+                    method: 'POST',
+                    credentials: 'same-origin'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to export data');
+                }
+                
+                // Download the file
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `velocity-lab-data-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                window.VelocityLab.showNotification('Data export downloaded successfully', 'success');
+                
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                window.VelocityLab.showNotification('Failed to export data', 'error');
+            }
+        }
+        
+        // Utility Functions
+        function formatRelativeTime(dateString) {
+            if (!dateString) return 'Never';
+            
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = now.getTime() - date.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+            const diffMinutes = Math.floor(diffTime / (1000 * 60));
+            
+            if (diffMinutes < 5) return 'Just now';
+            if (diffMinutes < 60) return `${diffMinutes} minutes ago`;
+            if (diffHours < 24) return `${diffHours} hours ago`;
+            if (diffDays < 7) return `${diffDays} days ago`;
+            if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
+            
+            return date.toLocaleDateString();
+        }
+        
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            return parts.length === 2 ? decodeURIComponent(parts.pop().split(';').shift()) : null;
+        }
+        
+        console.log('👤 Profile page enhanced features loaded successfully!');
     </script>
+    
+    <!-- Additional CSS for week progress cards -->
+    <style>
+        .week-progress-card {
+            padding: 1.5rem;
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            transition: all var(--transition-base);
+        }
+        
+        .week-progress-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .space-y-2 > * + * {
+            margin-top: 0.5rem;
+        }
+        
+        /* Dark mode adjustments */
+        @media (prefers-color-scheme: dark) {
+            .week-progress-card {
+                background: var(--surface);
+            }
+        }
+    </style>
 </body>
 </html>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        
+        <!-- Profile Header -->
+        <section class="container" style="margin-top: 2rem;">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <div class="avatar-circle" id="avatarCircle">
+                        <!-- User initials will be populated -->
+                    </div>
+                </div>
+                <div>
+                    <h1 id="profileName" class="text-3xl font-semibold">Loading...</h1>
+                    <p id="profileEmail" class="text-lg text-secondary">Loading...</p>
+                    <div class="flex items-center gap-4 mt-2">
+                        <span id="profileRole" class="badge badge-info">Loading...</span>
+                        <span class="text-sm text-tertiary">Member since <span id="memberSince">Loading...</span></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Navigation -->
+        <section class="container">
+            <div class="profile-nav">
+                <button class="profile-nav-item active" data-tab="overview">Overview</button>
+                <button class="profile-nav-item" data-tab="progress">Progress Details</button>
+                <button class="profile-nav-item" data-tab="security">Security</button>
+                <button class="profile-nav-item" data-tab="data">Data & Privacy</button>
+            </div>
+        </section>
+
+        <!-- Profile Content -->
+        <section class="container">
+            
+            <!-- Overview Tab -->
+            <div class="profile-tab active" id="overview-tab">
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--primary-light); color: var(--primary);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22,4 12,14.01 9,11.01"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Overall Progress</h4>
+                            <div class="stat-value" id="overallProgress">-</div>
+                            <div class="stat-detail">Lab completion</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--success-light); color: var(--success);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9,11 12,14 22,4"></polyline>
+                                <path d="M21,12v7a2,2,0,0,1-2,2H5a2,2,0,0,1-2-2V5a2,2,0,0,1,2-2h11"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Tasks Completed</h4>
+                            <div class="stat-value" id="completedTasks">-</div>
+                            <div class="stat-detail">Out of 42 total</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--warning-light); color: var(--warning);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 20V10"></path>
+                                <path d="M12 20V4"></path>
+                                <path d="M6 20v-6"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Global Rank</h4>
+                            <div class="stat-value" id="globalRank">-</div>
+                            <div class="stat-detail">Among all users</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--info-light); color: var(--info);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12,6 12,12 16,14"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Last Activity</h4>
+                            <div class="stat-value" id="lastActivity">-</div>
+                            <div class="stat-detail">Training session</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Week Progress Breakdown -->
+                <div class="card" style="margin-top: 2rem;">
+                    <h3 style="margin-bottom: 1.5rem;">Weekly Progress</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        
+                        <div class="week-progress-card">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-2xl">🏗️</span>
+                                    <div>
+                                        <h4 class="font-semibold">Week 1</h4>
+                                        <p class="text-sm text-secondary">Foundation Setup</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="progress-bar mb-2">
+                                <div class="progress-fill" id="week1Progress" style="width: 0%"></div>
+                            </div>
+                            <div class="text-sm text-tertiary">
+                                <span id="week1Count">0/12</span> tasks completed
+                            </div>
+                        </div>
+                        
+                        <div class="week-progress-card">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-2xl">🏢</span>
+                                    <div>
+                                        <h4 class="font-semibold">Week 2</h4>
+                                        <p class="text-sm text-secondary">Infrastructure</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="progress-bar mb-2">
+                                <div class="progress-fill" id="week2Progress" style="width: 0%"></div>
+                            </div>
+                            <div class="text-sm text-tertiary">
+                                <span id="week2Count">0/8</span> tasks completed
+                            </div>
+                        </div>
+                        
+                        <div class="week-progress-card">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-2xl">📧</span>
+                                    <div>
+                                        <h4 class="font-semibold">Week 3</h4>
+                                        <p class="text-sm text-secondary">Email & Messaging</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="progress-bar mb-2">
+                                <div class="progress-fill" id="week3Progress" style="width: 0%"></div>
+                            </div>
+                            <div class="text-sm text-tertiary">
+                                <span id="week3Count">0/12</span> tasks completed
+                            </div>
+                        </div>
+                        
+                        <div class="week-progress-card">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-2xl">☁️</span>
+                                    <div>
+                                        <h4 class="font-semibold">Week 4</h4>
+                                        <p class="text-sm text-secondary">Cloud Integration</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="progress-bar mb-2">
+                                <div class="progress-fill" id="week4Progress" style="width: 0%"></div>
+                            </div>
+                            <div class="text-sm text-tertiary">
+                                <span id="week4Count">0/10</span> tasks completed
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>

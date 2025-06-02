@@ -3,563 +3,525 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Velocity Lab</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Admin Dashboard - Velocity Lab</title>
+    <meta name="description" content="Comprehensive admin dashboard for managing users and tracking progress">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/styles.css" as="style">
+    <link rel="preload" href="/app.js" as="script">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    
+    <!-- Additional CSS for admin-specific components -->
+    <style>
+        .btn-error {
+            background: var(--error);
+            color: var(--text-inverse);
+            border: 1px solid var(--error);
+        }
+        
+        .btn-error:hover {
+            background: color-mix(in srgb, var(--error) 85%, black);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .table-actions .btn {
+            padding: 0.375rem;
+            min-width: auto;
+        }
+        
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 2rem;
+            color: var(--text-tertiary);
+        }
+        
+        .week-progress-card {
+            padding: 1.5rem;
+            background: var(--surface-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            transition: all var(--transition-base);
+        }
+        
+        .week-progress-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        @media (max-width: 768px) {
+            .table-container {
+                overflow-x: auto;
+            }
+            
+            .data-table {
+                min-width: 700px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Skip Link for Accessibility -->
+    <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
-    <!-- Header Navigation -->
-    <header class="header">
-        <nav class="nav">
-            <div class="nav-brand">
-                <h1>🚀 Velocity Lab</h1>
-                <span class="nav-subtitle">Administration Panel</span>
+    <!-- Navigation -->
+    <nav class="nav-glass">
+        <div class="container">
+            <div class="nav-content">
+                <a href="/dashboard.html" class="nav-brand">
+                    <svg class="nav-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="40" height="40" rx="12" fill="url(#logoGradient)"/>
+                        <path d="M12 20l6 6 10-10" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#007aff"/>
+                                <stop offset="100%" style="stop-color:#5ac8fa"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="font-semibold text-xl">Velocity Lab</span>
+                </a>
+                
+                <div class="nav-links">
+                    <a href="/dashboard.html" class="nav-link">Dashboard</a>
+                    <a href="/profile.html" class="nav-link">Profile</a>
+                    <a href="/admin.html" class="nav-link" style="color: var(--primary);">Admin</a>
+                    <span class="text-sm text-secondary" id="userInfo">Loading...</span>
+                    <button class="btn btn-secondary btn-sm" id="logout">Sign Out</button>
+                </div>
             </div>
-            <div class="nav-user">
-                <span id="userInfo" class="user-info">Loading...</span>
-                <a href="dashboard.html" class="nav-link">Dashboard</a>
-                <a href="profile.html" class="nav-link">Profile</a>
-                <button id="logout" class="btn btn-outline">Logout</button>
-            </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
 
     <!-- Main Content -->
-    <main id="main-content" class="main admin-main">
-        <div class="admin-container">
-            <!-- Admin Header -->
-            <section class="admin-header">
-                <h2>🛡️ Administration Panel</h2>
-                <p>Manage users, monitor progress, and configure system settings</p>
-            </section>
-
-            <!-- Admin Navigation -->
-            <nav class="admin-nav" role="tablist">
-                <button class="admin-nav-item active" data-tab="overview" role="tab" aria-selected="true">
-                    📊 Overview
-                </button>
-                <button class="admin-nav-item" data-tab="users" role="tab" aria-selected="false">
-                    👥 Users
-                </button>
-                <button class="admin-nav-item" data-tab="progress" role="tab" aria-selected="false">
-                    📈 Progress
-                </button>
-                <button class="admin-nav-item" data-tab="settings" role="tab" aria-selected="false">
-                    ⚙️ Settings
-                </button>
-                <button class="admin-nav-item" data-tab="logs" role="tab" aria-selected="false">
-                    📝 Logs
-                </button>
-            </nav>
-
-            <!-- Admin Content -->
-            <div class="admin-content">
-                <!-- Overview Tab -->
-                <section id="overview" class="admin-tab active" role="tabpanel">
-                    <h3>System Overview</h3>
+    <main id="main-content">
+        <!-- Admin Hero -->
+        <section class="hero">
+            <div class="container">
+                <div class="admin-header">
+                    <div class="hero-badge">
+                        ⚙️ Administration Dashboard
+                    </div>
                     
-                    <!-- System Stats -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">👥</div>
-                            <div class="stat-content">
-                                <h4>Total Users</h4>
-                                <div class="stat-value" id="totalUsers">0</div>
-                                <div class="stat-detail" id="newUsersToday">0 new today</div>
-                            </div>
+                    <h1 class="hero-title">
+                        System Management
+                    </h1>
+                    
+                    <p class="hero-subtitle">
+                        Monitor user progress, manage accounts, and oversee the Exchange hybrid migration training program.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Navigation -->
+        <section class="container">
+            <div class="admin-nav">
+                <button class="admin-nav-item active" data-tab="overview">Overview</button>
+                <button class="admin-nav-item" data-tab="users">User Management</button>
+                <button class="admin-nav-item" data-tab="progress">Progress Analytics</button>
+                <button class="admin-nav-item" data-tab="system">System Logs</button>
+            </div>
+        </section>
+
+        <!-- Admin Content -->
+        <section class="container">
+            
+            <!-- Overview Tab -->
+            <div class="admin-tab active" id="overview-tab">
+                <!-- Statistics Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--primary-light); color: var(--primary);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
                         </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">🏃</div>
-                            <div class="stat-content">
-                                <h4>Active Users</h4>
-                                <div class="stat-value" id="activeUsers">0</div>
-                                <div class="stat-detail">Last 7 days</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">✅</div>
-                            <div class="stat-content">
-                                <h4>Completion Rate</h4>
-                                <div class="stat-value" id="completionRate">0%</div>
-                                <div class="stat-detail">Average across all users</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">🏆</div>
-                            <div class="stat-content">
-                                <h4>Labs Completed</h4>
-                                <div class="stat-value" id="labsCompleted">0</div>
-                                <div class="stat-detail">Total completed labs</div>
-                            </div>
+                        <div class="stat-content">
+                            <h4>Total Users</h4>
+                            <div class="stat-value" id="totalUsers">-</div>
+                            <div class="stat-detail">Registered accounts</div>
                         </div>
                     </div>
-
-                    <!-- Recent Activity -->
-                    <div class="recent-activity">
-                        <h4>Recent Activity</h4>
-                        <div class="activity-list" id="recentActivity">
-                            <div class="loading-state">
-                                <div class="loading-spinner"></div>
-                                <p>Loading recent activity...</p>
-                            </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--success-light); color: var(--success);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22,4 12,14.01 9,11.01"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Completed Labs</h4>
+                            <div class="stat-value" id="completedUsers">-</div>
+                            <div class="stat-detail">100% progress</div>
                         </div>
                     </div>
-
-                    <!-- System Health -->
-                    <div class="system-health">
-                        <h4>System Health</h4>
-                        <div class="health-grid">
-                            <div class="health-item">
-                                <div class="health-icon status-good">✅</div>
-                                <div class="health-content">
-                                    <h5>Database</h5>
-                                    <p>Operational</p>
-                                </div>
-                            </div>
-                            
-                            <div class="health-item">
-                                <div class="health-icon status-good">✅</div>
-                                <div class="health-content">
-                                    <h5>API Services</h5>
-                                    <p>Operational</p>
-                                </div>
-                            </div>
-                            
-                            <div class="health-item">
-                                <div class="health-icon status-good">✅</div>
-                                <div class="health-content">
-                                    <h5>File Storage</h5>
-                                    <p>Operational</p>
-                                </div>
-                            </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--warning-light); color: var(--warning);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12,6 12,12 16,14"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Active Today</h4>
+                            <div class="stat-value" id="activeToday">-</div>
+                            <div class="stat-detail">Users logged in</div>
                         </div>
                     </div>
-                </section>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--info-light); color: var(--info);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3v5h5"></path>
+                                <path d="M3 8a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 4"></path>
+                                <path d="M21 21v-5h-5"></path>
+                                <path d="M21 16a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 20"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Average Progress</h4>
+                            <div class="stat-value" id="averageProgress">-</div>
+                            <div class="stat-detail">Across all users</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--primary-light); color: var(--primary);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 20V10"></path>
+                                <path d="M12 20V4"></path>
+                                <path d="M6 20v-6"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Completion Rate</h4>
+                            <div class="stat-value" id="completionRate">-</div>
+                            <div class="stat-detail">Overall success</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--success-light); color: var(--success);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Active This Week</h4>
+                            <div class="stat-value" id="activeThisWeek">-</div>
+                            <div class="stat-detail">7-day activity</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="card" style="margin-top: 2rem;">
+                    <h3 style="margin-bottom: 1.5rem;">Quick Actions</h3>
+                    <div class="flex gap-4 flex-wrap">
+                        <button class="btn btn-primary" onclick="refreshAllData()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="23,4 23,10 17,10"></polyline>
+                                <polyline points="1,20 1,14 7,14"></polyline>
+                                <path d="M20.49,9A9,9,0,0,0,5.64,5.64L1,10m22,4l-4.64,4.36A9,9,0,0,1,3.51,15"></path>
+                            </svg>
+                            Refresh Data
+                        </button>
+                        
+                        <button class="btn btn-secondary" onclick="exportUserData()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7,10 12,15 17,10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Export Data
+                        </button>
+                        
+                        <button class="btn btn-success" onclick="generateReport()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14,2 14,8 20,8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10,9 9,9 8,9"></polyline>
+                            </svg>
+                            Generate Report
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-                <!-- Users Tab -->
-                <section id="users" class="admin-tab" role="tabpanel" hidden>
-                    <div class="tab-header">
+            <!-- Users Tab -->
+            <div class="admin-tab" id="users-tab">
+                <div class="card">
+                    <div class="flex justify-between items-center" style="margin-bottom: 1.5rem;">
                         <h3>User Management</h3>
-                        <div class="tab-actions">
-                            <button class="btn btn-primary" id="addUserBtn">
-                                ➕ Add User
-                            </button>
-                            <button class="btn btn-outline" id="exportUsersBtn">
-                                📥 Export Users
+                        <div class="flex gap-2">
+                            <input type="search" class="form-input" placeholder="Search users..." id="userSearch" style="width: 300px;">
+                            <button class="btn btn-secondary" onclick="refreshUsers()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23,4 23,10 17,10"></polyline>
+                                    <polyline points="1,20 1,14 7,14"></polyline>
+                                    <path d="M20.49,9A9,9,0,0,0,5.64,5.64L1,10m22,4l-4.64,4.36A9,9,0,0,1,3.51,15"></path>
+                                </svg>
                             </button>
                         </div>
                     </div>
                     
-                    <!-- User Filters -->
-                    <div class="filters">
-                        <div class="filter-group">
-                            <input type="text" id="userSearch" class="form-input" placeholder="Search users...">
-                        </div>
-                        <div class="filter-group">
-                            <select id="roleFilter" class="form-select">
-                                <option value="">All Roles</option>
-                                <option value="user">User</option>
-                                <option value="admin">Admin</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <select id="statusFilter" class="form-select">
-                                <option value="">All Status</option>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <!-- Users Table -->
                     <div class="table-container">
-                        <table class="data-table" id="usersTable">
+                        <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Company</th>
+                                    <th>User</th>
                                     <th>Role</th>
                                     <th>Progress</th>
-                                    <th>Last Active</th>
+                                    <th>Tasks</th>
+                                    <th>Last Activity</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="usersTableBody">
                                 <tr>
-                                    <td colspan="7" class="loading-cell">
-                                        <div class="loading-spinner"></div>
-                                        Loading users...
+                                    <td colspan="6">
+                                        <div class="loading-state">
+                                            <div class="loading-spinner"></div>
+                                            <span>Loading users...</span>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    
-                    <!-- Pagination -->
-                    <div class="pagination" id="usersPagination">
-                        <button class="btn btn-outline btn-sm" id="prevUsers">Previous</button>
-                        <span class="pagination-info">Page 1 of 1</span>
-                        <button class="btn btn-outline btn-sm" id="nextUsers">Next</button>
-                    </div>
-                </section>
-
-                <!-- Progress Tab -->
-                <section id="progress" class="admin-tab" role="tabpanel" hidden>
-                    <div class="tab-header">
-                        <h3>Progress Analytics</h3>
-                        <div class="tab-actions">
-                            <button class="btn btn-outline" id="refreshProgressBtn">
-                                🔄 Refresh Data
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Progress Charts -->
-                    <div class="analytics-grid">
-                        <div class="chart-card">
-                            <h4>Overall Progress Distribution</h4>
-                            <div class="chart-container" id="progressChart">
-                                <div class="chart-placeholder">
-                                    📊 Progress chart will be displayed here
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="chart-card">
-                            <h4>Weekly Task Completion</h4>
-                            <div class="chart-container" id="weeklyChart">
-                                <div class="chart-placeholder">
-                                    📈 Weekly completion chart will be displayed here
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Task Statistics -->
-                    <div class="task-stats">
-                        <h4>Task Completion Statistics</h4>
-                        <div class="task-stats-grid">
-                            <div class="week-stats" data-week="week1">
-                                <h5>📚 Week 1: Foundation Setup</h5>
-                                <div class="progress-bar-small">
-                                    <div class="progress-fill-small" style="width: 0%"></div>
-                                </div>
-                                <p>0% average completion (0/12 tasks)</p>
-                            </div>
-                            
-                            <div class="week-stats" data-week="week2">
-                                <h5>🏗️ Week 2: Infrastructure Expansion</h5>
-                                <div class="progress-bar-small">
-                                    <div class="progress-fill-small" style="width: 0%"></div>
-                                </div>
-                                <p>0% average completion (0/8 tasks)</p>
-                            </div>
-                            
-                            <div class="week-stats" data-week="week3">
-                                <h5>📧 Week 3: Email & Messaging</h5>
-                                <div class="progress-bar-small">
-                                    <div class="progress-fill-small" style="width: 0%"></div>
-                                </div>
-                                <p>0% average completion (0/12 tasks)</p>
-                            </div>
-                            
-                            <div class="week-stats" data-week="week4">
-                                <h5>☁️ Week 4: Cloud Integration</h5>
-                                <div class="progress-bar-small">
-                                    <div class="progress-fill-small" style="width: 0%"></div>
-                                </div>
-                                <p>0% average completion (0/10 tasks)</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Settings Tab -->
-                <section id="settings" class="admin-tab" role="tabpanel" hidden>
-                    <h3>System Settings</h3>
-                    
-                    <!-- General Settings -->
-                    <div class="settings-section">
-                        <h4>General Settings</h4>
-                        <form class="settings-form" id="generalSettingsForm">
-                            <input type="hidden" id="csrfToken" name="csrf_token" value="">
-                            
-                            <div class="form-group">
-                                <label for="siteName" class="form-label">Site Name</label>
-                                <input 
-                                    type="text" 
-                                    id="siteName" 
-                                    name="siteName" 
-                                    class="form-input" 
-                                    value="Velocity Lab"
-                                >
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="adminEmail" class="form-label">Admin Email</label>
-                                <input 
-                                    type="email" 
-                                    id="adminEmail" 
-                                    name="adminEmail" 
-                                    class="form-input" 
-                                    placeholder="admin@velocitylab.com"
-                                >
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="maxUsers" class="form-label">Maximum Users</label>
-                                <input 
-                                    type="number" 
-                                    id="maxUsers" 
-                                    name="maxUsers" 
-                                    class="form-input" 
-                                    value="100"
-                                    min="1"
-                                >
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="checkbox-wrapper">
-                                    <input type="checkbox" name="allowRegistration" class="checkbox-input" checked>
-                                    <span class="checkbox-custom"></span>
-                                    <span class="checkbox-label">Allow user registration</span>
-                                </label>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="checkbox-wrapper">
-                                    <input type="checkbox" name="emailVerification" class="checkbox-input">
-                                    <span class="checkbox-custom"></span>
-                                    <span class="checkbox-label">Require email verification</span>
-                                </label>
-                            </div>
-                            
-                            <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">
-                                    💾 Save General Settings
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Security Settings -->
-                    <div class="settings-section">
-                        <h4>Security Settings</h4>
-                        <form class="settings-form" id="securitySettingsForm">
-                            <div class="form-group">
-                                <label for="sessionTimeout" class="form-label">Session Timeout (minutes)</label>
-                                <input 
-                                    type="number" 
-                                    id="sessionTimeout" 
-                                    name="sessionTimeout" 
-                                    class="form-input" 
-                                    value="60"
-                                    min="5"
-                                    max="1440"
-                                >
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="passwordMinLength" class="form-label">Minimum Password Length</label>
-                                <input 
-                                    type="number" 
-                                    id="passwordMinLength" 
-                                    name="passwordMinLength" 
-                                    class="form-input" 
-                                    value="8"
-                                    min="6"
-                                    max="20"
-                                >
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="maxLoginAttempts" class="form-label">Maximum Login Attempts</label>
-                                <input 
-                                    type="number" 
-                                    id="maxLoginAttempts" 
-                                    name="maxLoginAttempts" 
-                                    class="form-input" 
-                                    value="5"
-                                    min="3"
-                                    max="10"
-                                >
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="checkbox-wrapper">
-                                    <input type="checkbox" name="requireStrongPassword" class="checkbox-input" checked>
-                                    <span class="checkbox-custom"></span>
-                                    <span class="checkbox-label">Require strong passwords</span>
-                                </label>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="checkbox-wrapper">
-                                    <input type="checkbox" name="enableTwoFactor" class="checkbox-input">
-                                    <span class="checkbox-custom"></span>
-                                    <span class="checkbox-label">Enable two-factor authentication</span>
-                                </label>
-                            </div>
-                            
-                            <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">
-                                    🔒 Save Security Settings
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Backup Settings -->
-                    <div class="settings-section">
-                        <h4>Backup & Maintenance</h4>
-                        <div class="backup-controls">
-                            <div class="backup-item">
-                                <div class="backup-content">
-                                    <h5>Database Backup</h5>
-                                    <p>Last backup: <span id="lastBackup">Never</span></p>
-                                </div>
-                                <button class="btn btn-outline" id="createBackupBtn">
-                                    💾 Create Backup
-                                </button>
-                            </div>
-                            
-                            <div class="backup-item">
-                                <div class="backup-content">
-                                    <h5>Export All Data</h5>
-                                    <p>Export all user data and progress</p>
-                                </div>
-                                <button class="btn btn-outline" id="exportAllDataBtn">
-                                    📥 Export Data
-                                </button>
-                            </div>
-                            
-                            <div class="backup-item">
-                                <div class="backup-content">
-                                    <h5>System Maintenance</h5>
-                                    <p>Clear temporary files and optimize database</p>
-                                </div>
-                                <button class="btn btn-warning" id="maintenanceBtn">
-                                    🔧 Run Maintenance
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Logs Tab -->
-                <section id="logs" class="admin-tab" role="tabpanel" hidden>
-                    <div class="tab-header">
-                        <h3>System Logs</h3>
-                        <div class="tab-actions">
-                            <select id="logLevel" class="form-select">
-                                <option value="">All Levels</option>
-                                <option value="error">Error</option>
-                                <option value="warning">Warning</option>
-                                <option value="info">Info</option>
-                                <option value="debug">Debug</option>
-                            </select>
-                            <button class="btn btn-outline" id="refreshLogsBtn">
-                                🔄 Refresh
-                            </button>
-                            <button class="btn btn-outline" id="clearLogsBtn">
-                                🗑️ Clear Logs
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Logs Container -->
-                    <div class="logs-container">
-                        <div class="logs-list" id="logsList">
-                            <div class="loading-state">
-                                <div class="loading-spinner"></div>
-                                <p>Loading system logs...</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                </div>
             </div>
-        </div>
+
+            <!-- Progress Tab -->
+            <div class="admin-tab" id="progress-tab">
+                <div class="stats-grid" style="margin-bottom: 2rem;">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--primary-light); color: var(--primary);">
+                            🏗️
+                        </div>
+                        <div class="stat-content">
+                            <h4>Week 1 Average</h4>
+                            <div class="stat-value" id="week1Average">-</div>
+                            <div class="stat-detail">Foundation Setup</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--success-light); color: var(--success);">
+                            🏢
+                        </div>
+                        <div class="stat-content">
+                            <h4>Week 2 Average</h4>
+                            <div class="stat-value" id="week2Average">-</div>
+                            <div class="stat-detail">Infrastructure</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--warning-light); color: var(--warning);">
+                            📧
+                        </div>
+                        <div class="stat-content">
+                            <h4>Week 3 Average</h4>
+                            <div class="stat-value" id="week3Average">-</div>
+                            <div class="stat-detail">Email & Messaging</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--info-light); color: var(--info);">
+                            ☁️
+                        </div>
+                        <div class="stat-content">
+                            <h4>Week 4 Average</h4>
+                            <div class="stat-value" id="week4Average">-</div>
+                            <div class="stat-detail">Cloud Integration</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 style="margin-bottom: 1.5rem;">Progress Analytics</h3>
+                    <div id="progressChart" style="height: 400px; display: flex; align-items: center; justify-content: center; background: var(--background-secondary); border-radius: var(--radius); color: var(--text-tertiary);">
+                        📊 Progress visualization will be displayed here
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Tab -->
+            <div class="admin-tab" id="system-tab">
+                <div class="card">
+                    <h3 style="margin-bottom: 1.5rem;">System Activity Log</h3>
+                    <div class="text-center" style="padding: 3rem; color: var(--text-tertiary);">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 1rem;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14,2 14,8 20,8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10,9 9,9 8,9"></polyline>
+                        </svg>
+                        <p>System logs and activity monitoring will be displayed here</p>
+                        <p class="text-sm">Track user actions, system events, and security activities</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <!-- User Modal -->
-    <div id="userModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="userModalTitle">
+    <!-- User Action Modals -->
+    
+    <!-- Change Password Modal -->
+    <div class="modal" id="passwordModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="userModalTitle">User Details</h2>
-                <button id="closeUserModal" class="modal-close" aria-label="Close modal">&times;</button>
+                <h2 class="modal-title">Change User Password</h2>
+                <button class="modal-close" onclick="closeModal('passwordModal')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
             <div class="modal-body">
-                <form id="userForm" class="user-form">
-                    <input type="hidden" id="userId" name="userId" value="">
-                    <input type="hidden" id="csrfTokenUser" name="csrf_token" value="">
+                <form id="changePasswordForm">
+                    <input type="hidden" id="passwordUserEmail" name="email">
                     
                     <div class="form-group">
-                        <label for="userName" class="form-label">Full Name</label>
-                        <input 
-                            type="text" 
-                            id="userName" 
-                            name="name" 
-                            class="form-input" 
-                            required
-                        >
+                        <label class="form-label">User</label>
+                        <div id="passwordUserDisplay" class="text-lg font-medium"></div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="userEmail" class="form-label">Email Address</label>
-                        <input 
-                            type="email" 
-                            id="userEmail" 
-                            name="email" 
-                            class="form-input" 
-                            required
-                        >
+                        <label class="form-label" for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" name="newPassword" class="form-input" placeholder="Enter new password" required minlength="8">
+                        <div class="text-sm text-tertiary" style="margin-top: 0.5rem;">Minimum 8 characters required</div>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button type="submit" class="btn btn-primary">Update Password</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('passwordModal')">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Role Modal -->
+    <div class="modal" id="roleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Change User Role</h2>
+                <button class="modal-close" onclick="closeModal('roleModal')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="changeRoleForm">
+                    <input type="hidden" id="roleUserEmail" name="email">
+                    
+                    <div class="form-group">
+                        <label class="form-label">User</label>
+                        <div id="roleUserDisplay" class="text-lg font-medium"></div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="userCompany" class="form-label">Company</label>
-                        <input 
-                            type="text" 
-                            id="userCompany" 
-                            name="company" 
-                            class="form-input"
-                        >
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="userRole" class="form-label">Role</label>
-                        <select id="userRole" name="role" class="form-select" required>
+                        <label class="form-label" for="newRole">Role</label>
+                        <select id="newRole" name="role" class="form-select" required>
                             <option value="user">User</option>
                             <option value="admin">Admin</option>
                         </select>
                     </div>
                     
+                    <div class="flex gap-3">
+                        <button type="submit" class="btn btn-primary">Update Role</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('roleModal')">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete User Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Delete User</h2>
+                <button class="modal-close" onclick="closeModal('deleteModal')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="deleteUserForm">
+                    <input type="hidden" id="deleteUserEmail" name="email">
+                    
                     <div class="form-group">
-                        <label class="checkbox-wrapper">
-                            <input type="checkbox" id="userActive" name="active" class="checkbox-input">
-                            <span class="checkbox-custom"></span>
-                            <span class="checkbox-label">Account Active</span>
-                        </label>
+                        <div style="background: var(--error-light); padding: 1rem; border-radius: var(--radius); margin-bottom: 1rem;">
+                            <div class="flex items-start gap-3">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2" style="flex-shrink: 0; margin-top: 0.125rem;">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                </svg>
+                                <div>
+                                    <div class="font-medium text-error">Warning: This action cannot be undone</div>
+                                    <div class="text-sm text-error">All user data and progress will be permanently deleted.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <label class="form-label">User to Delete</label>
+                        <div id="deleteUserDisplay" class="text-lg font-medium"></div>
                     </div>
                     
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
-                            💾 Save User
-                        </button>
-                        <button type="button" class="btn btn-outline" id="cancelUser">
-                            Cancel
-                        </button>
-                        <button type="button" class="btn btn-danger" id="deleteUser" style="margin-left: auto;">
-                            🗑️ Delete User
-                        </button>
+                    <div class="form-group">
+                        <label class="form-label" for="confirmDelete">Type "DELETE" to confirm</label>
+                        <input type="text" id="confirmDelete" class="form-input" placeholder="Type DELETE" required>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button type="submit" class="btn btn-error">Delete User</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('deleteModal')">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -567,242 +529,492 @@
     </div>
 
     <!-- Notification System -->
-    <div id="notification" class="notification" role="alert" aria-live="polite"></div>
+    <div class="notification" id="notification" role="alert" aria-live="assertive">
+        <!-- Dynamic notification content -->
+    </div>
 
     <!-- Scripts -->
-    <script src="app.js"></script>
+    <script src="/app.js"></script>
+    
+    <!-- Admin Dashboard JavaScript -->
     <script>
-        // Admin-specific JavaScript
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize admin interface
-            initAdminTabs();
-            loadAdminData();
-            setupAdminHandlers();
+            // Check admin access
+            checkAdminAccess();
+            
+            // Initialize admin dashboard
+            initAdminDashboard();
+            
+            // Load initial data
+            loadAdminStats();
+            loadUsersProgress();
+            
+            // Setup tab navigation
+            setupTabNavigation();
+            
+            // Setup user search
+            setupUserSearch();
+            
+            // Setup form handlers
+            setupFormHandlers();
         });
-
-        function initAdminTabs() {
-            const navItems = document.querySelectorAll('.admin-nav-item');
-            const tabPanels = document.querySelectorAll('.admin-tab');
-            
-            navItems.forEach(item => {
-                item.addEventListener('click', (e) => {
-                    const targetTab = e.target.dataset.tab;
-                    
-                    // Update nav items
-                    navItems.forEach(nav => {
-                        nav.classList.remove('active');
-                        nav.setAttribute('aria-selected', 'false');
-                    });
-                    e.target.classList.add('active');
-                    e.target.setAttribute('aria-selected', 'true');
-                    
-                    // Update tab panels
-                    tabPanels.forEach(panel => {
-                        panel.classList.remove('active');
-                        panel.hidden = true;
-                    });
-                    const targetPanel = document.getElementById(targetTab);
-                    if (targetPanel) {
-                        targetPanel.classList.add('active');
-                        targetPanel.hidden = false;
-                    }
-                    
-                    // Load tab-specific data
-                    loadTabData(targetTab);
-                });
-            });
-        }
-
-        async function loadAdminData() {
-            try {
-                // Load overview data
-                const response = await fetch('/api/admin/overview', {
-                    credentials: 'same-origin'
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    updateOverviewStats(data);
-                }
-            } catch (error) {
-                console.error('Failed to load admin data:', error);
-                showNotification('Failed to load admin data', 'error');
-            }
-        }
-
-        function updateOverviewStats(data) {
-            // Update stat cards
-            document.getElementById('totalUsers').textContent = data.totalUsers || 0;
-            document.getElementById('newUsersToday').textContent = `${data.newUsersToday || 0} new today`;
-            document.getElementById('activeUsers').textContent = data.activeUsers || 0;
-            document.getElementById('completionRate').textContent = `${data.averageCompletion || 0}%`;
-            document.getElementById('labsCompleted').textContent = data.labsCompleted || 0;
-        }
-
-        function loadTabData(tabName) {
-            switch (tabName) {
-                case 'users':
-                    loadUsersData();
-                    break;
-                case 'progress':
-                    loadProgressData();
-                    break;
-                case 'logs':
-                    loadLogsData();
-                    break;
-            }
-        }
-
-        async function loadUsersData() {
-            try {
-                const response = await fetch('/api/admin/users', {
-                    credentials: 'same-origin'
-                });
-                
-                if (response.ok) {
-                    const users = await response.json();
-                    populateUsersTable(users);
-                }
-            } catch (error) {
-                console.error('Failed to load users:', error);
-                showNotification('Failed to load users data', 'error');
-            }
-        }
-
-        function populateUsersTable(users) {
-            const tbody = document.getElementById('usersTableBody');
-            
-            if (users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="no-data">No users found</td></tr>';
+        
+        function checkAdminAccess() {
+            const userCookie = getCookie('user');
+            if (!userCookie) {
+                window.location.href = '/login.html';
                 return;
             }
             
-            tbody.innerHTML = users.map(user => `
-                <tr>
-                    <td>${user.name}</td>
-                    <td>${user.email}</td>
-                    <td>${user.company || '-'}</td>
-                    <td><span class="role-badge ${user.role}">${user.role}</span></td>
-                    <td>
-                        <div class="progress-cell">
-                            <div class="progress-bar-mini">
-                                <div class="progress-fill-mini" style="width: ${user.progress || 0}%"></div>
-                            </div>
-                            <span>${user.progress || 0}%</span>
-                        </div>
-                    </td>
-                    <td>${formatDate(user.lastActive)}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn btn-sm btn-outline" onclick="editUser('${user.id}')">Edit</button>
-                            <button class="btn btn-sm btn-outline" onclick="exportUserData('${user.id}')">Export</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function setupAdminHandlers() {
-            // Add user button
-            const addUserBtn = document.getElementById('addUserBtn');
-            if (addUserBtn) {
-                addUserBtn.addEventListener('click', () => openUserModal());
-            }
-            
-            // Export buttons
-            const exportUsersBtn = document.getElementById('exportUsersBtn');
-            if (exportUsersBtn) {
-                exportUsersBtn.addEventListener('click', exportAllUsers);
-            }
-            
-            // Modal handlers
-            const closeUserModal = document.getElementById('closeUserModal');
-            if (closeUserModal) {
-                closeUserModal.addEventListener('click', () => {
-                    document.getElementById('userModal').style.display = 'none';
-                });
-            }
-            
-            // Settings forms
-            const generalForm = document.getElementById('generalSettingsForm');
-            if (generalForm) {
-                generalForm.addEventListener('submit', saveGeneralSettings);
-            }
-            
-            const securityForm = document.getElementById('securitySettingsForm');
-            if (securityForm) {
-                securityForm.addEventListener('submit', saveSecuritySettings);
-            }
-        }
-
-        function openUserModal(userId = null) {
-            const modal = document.getElementById('userModal');
-            const title = document.getElementById('userModalTitle');
-            
-            if (userId) {
-                title.textContent = 'Edit User';
-                // Load user data
-                loadUserForEdit(userId);
-            } else {
-                title.textContent = 'Add New User';
-                // Reset form
-                document.getElementById('userForm').reset();
-                document.getElementById('userId').value = '';
-            }
-            
-            modal.style.display = 'flex';
-        }
-
-        async function exportAllUsers() {
             try {
-                const response = await fetch('/api/admin/export-users', {
-                    method: 'POST',
+                const user = JSON.parse(userCookie);
+                if (user.role !== 'admin') {
+                    window.VelocityLab.showNotification('Admin access required', 'error');
+                    window.location.href = '/dashboard.html';
+                    return;
+                }
+            } catch (e) {
+                window.location.href = '/login.html';
+                return;
+            }
+        }
+        
+        function initAdminDashboard() {
+            console.log('🔧 Admin dashboard initializing...');
+            
+            // Set active navigation
+            const adminLink = document.querySelector('a[href="/admin.html"]');
+            if (adminLink) {
+                adminLink.style.color = 'var(--primary)';
+                adminLink.style.fontWeight = 'var(--font-weight-semibold)';
+            }
+        }
+        
+        function setupTabNavigation() {
+            const tabButtons = document.querySelectorAll('.admin-nav-item');
+            const tabPanes = document.querySelectorAll('.admin-tab');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Update button states
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update tab panes
+                    tabPanes.forEach(pane => pane.classList.remove('active'));
+                    const targetPane = document.getElementById(tabId + '-tab');
+                    if (targetPane) {
+                        targetPane.classList.add('active');
+                        
+                        // Load tab-specific data
+                        if (tabId === 'users') {
+                            loadUsersProgress();
+                        } else if (tabId === 'progress') {
+                            loadProgressAnalytics();
+                        }
+                    }
+                });
+            });
+        }
+        
+        async function loadAdminStats() {
+            try {
+                const response = await fetch('/api/admin/stats', {
                     credentials: 'same-origin'
                 });
                 
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `velocity-lab-users-${new Date().toISOString().split('T')[0]}.csv`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    
-                    showNotification('Users exported successfully', 'success');
+                if (!response.ok) {
+                    throw new Error('Failed to load admin stats');
                 }
+                
+                const stats = await response.json();
+                
+                // Update stat elements
+                document.getElementById('totalUsers').textContent = stats.totalUsers || 0;
+                document.getElementById('completedUsers').textContent = stats.completedUsers || 0;
+                document.getElementById('activeToday').textContent = stats.activeToday || 0;
+                document.getElementById('averageProgress').textContent = (stats.averageProgress || 0) + '%';
+                document.getElementById('completionRate').textContent = (stats.completionRate || 0) + '%';
+                document.getElementById('activeThisWeek').textContent = stats.activeThisWeek || 0;
+                
             } catch (error) {
-                console.error('Export failed:', error);
-                showNotification('Failed to export users', 'error');
+                console.error('Error loading admin stats:', error);
+                window.VelocityLab.showNotification('Failed to load statistics', 'error');
             }
         }
-
-        // Helper functions
-        function editUser(userId) {
-            openUserModal(userId);
+        
+        async function loadUsersProgress() {
+            const tableBody = document.getElementById('usersTableBody');
+            
+            try {
+                // Show loading state
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="loading-state">
+                                <div class="loading-spinner"></div>
+                                <span>Loading users...</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                
+                const response = await fetch('/api/admin/users-progress', {
+                    credentials: 'same-origin'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load users progress');
+                }
+                
+                const users = await response.json();
+                
+                if (users.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="text-center" style="padding: 2rem; color: var(--text-tertiary);">
+                                No users found
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                // Populate table
+                tableBody.innerHTML = users.map(user => `
+                    <tr>
+                        <td>
+                            <div>
+                                <div class="font-medium">${escapeHtml(user.name)}</div>
+                                <div class="text-sm text-secondary">${escapeHtml(user.email)}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge ${user.role === 'admin' ? 'badge-warning' : 'badge-info'}">
+                                ${user.role}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 60px; height: 6px; background: var(--gray-200); border-radius: var(--radius-full); overflow: hidden;">
+                                    <div style="width: ${user.progress}%; height: 100%; background: var(--primary); transition: width 0.3s ease;"></div>
+                                </div>
+                                <span class="text-sm font-medium">${user.progress}%</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-sm">
+                                <div>${user.completedTasks}/${user.totalTasks}</div>
+                                <div class="text-tertiary">
+                                    W1: ${user.weekProgress.week1 || 0} • 
+                                    W2: ${user.weekProgress.week2 || 0} • 
+                                    W3: ${user.weekProgress.week3 || 0} • 
+                                    W4: ${user.weekProgress.week4 || 0}
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-sm">
+                                ${formatRelativeTime(user.lastActivity)}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                <button class="btn btn-sm" onclick="changeUserPassword('${user.email}', '${escapeHtml(user.name)}')" title="Change Password">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                        <circle cx="12" cy="16" r="1"></circle>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    </svg>
+                                </button>
+                                <button class="btn btn-sm" onclick="changeUserRole('${user.email}', '${escapeHtml(user.name)}', '${user.role}')" title="Change Role">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                                    </svg>
+                                </button>
+                                <button class="btn btn-sm" onclick="deleteUser('${user.email}', '${escapeHtml(user.name)}')" title="Delete User" style="color: var(--error);">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="3,6 5,6 21,6"></polyline>
+                                        <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading users progress:', error);
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center" style="padding: 2rem; color: var(--error);">
+                            Failed to load users data
+                        </td>
+                    </tr>
+                `;
+                window.VelocityLab.showNotification('Failed to load users data', 'error');
+            }
         }
-
-        async function saveGeneralSettings(e) {
-            e.preventDefault();
-            // Implement settings save
-            showNotification('General settings saved', 'success');
+        
+        function setupUserSearch() {
+            const searchInput = document.getElementById('userSearch');
+            if (!searchInput) return;
+            
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const tableRows = document.querySelectorAll('#usersTableBody tr');
+                
+                tableRows.forEach(row => {
+                    const userCell = row.cells[0];
+                    if (userCell) {
+                        const userName = userCell.textContent.toLowerCase();
+                        if (userName.includes(searchTerm)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+                });
+            });
         }
-
-        async function saveSecuritySettings(e) {
-            e.preventDefault();
-            // Implement security settings save
-            showNotification('Security settings saved', 'success');
+        
+        function setupFormHandlers() {
+            // Change Password Form
+            const passwordForm = document.getElementById('changePasswordForm');
+            if (passwordForm) {
+                passwordForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    
+                    try {
+                        const response = await fetch('/api/admin/change-user-password', {
+                            method: 'POST',
+                            body: formData,
+                            credentials: 'same-origin'
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (!response.ok) {
+                            throw new Error(result.error || 'Failed to change password');
+                        }
+                        
+                        window.VelocityLab.showNotification('Password updated successfully', 'success');
+                        closeModal('passwordModal');
+                        loadUsersProgress(); // Refresh table
+                        
+                    } catch (error) {
+                        console.error('Error changing password:', error);
+                        window.VelocityLab.showNotification(error.message, 'error');
+                    }
+                });
+            }
+            
+            // Change Role Form
+            const roleForm = document.getElementById('changeRoleForm');
+            if (roleForm) {
+                roleForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    
+                    try {
+                        const response = await fetch('/api/admin/change-user-role', {
+                            method: 'POST',
+                            body: formData,
+                            credentials: 'same-origin'
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (!response.ok) {
+                            throw new Error(result.error || 'Failed to change role');
+                        }
+                        
+                        window.VelocityLab.showNotification('Role updated successfully', 'success');
+                        closeModal('roleModal');
+                        loadUsersProgress(); // Refresh table
+                        loadAdminStats(); // Refresh stats
+                        
+                    } catch (error) {
+                        console.error('Error changing role:', error);
+                        window.VelocityLab.showNotification(error.message, 'error');
+                    }
+                });
+            }
+            
+            // Delete User Form
+            const deleteForm = document.getElementById('deleteUserForm');
+            if (deleteForm) {
+                deleteForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const confirmInput = document.getElementById('confirmDelete');
+                    if (confirmInput.value !== 'DELETE') {
+                        window.VelocityLab.showNotification('Please type "DELETE" to confirm', 'error');
+                        return;
+                    }
+                    
+                    const formData = new FormData(this);
+                    
+                    try {
+                        const response = await fetch('/api/admin/delete-user', {
+                            method: 'POST',
+                            body: formData,
+                            credentials: 'same-origin'
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (!response.ok) {
+                            throw new Error(result.error || 'Failed to delete user');
+                        }
+                        
+                        window.VelocityLab.showNotification('User deleted successfully', 'success');
+                        closeModal('deleteModal');
+                        loadUsersProgress(); // Refresh table
+                        loadAdminStats(); // Refresh stats
+                        
+                    } catch (error) {
+                        console.error('Error deleting user:', error);
+                        window.VelocityLab.showNotification(error.message, 'error');
+                    }
+                });
+            }
         }
-
-        function loadProgressData() {
-            // Implement progress analytics loading
-            console.log('Loading progress analytics...');
+        
+        // Modal Functions
+        function changeUserPassword(email, name) {
+            document.getElementById('passwordUserEmail').value = email;
+            document.getElementById('passwordUserDisplay').textContent = name + ' (' + email + ')';
+            document.getElementById('newPassword').value = '';
+            openModal('passwordModal');
         }
-
-        function loadLogsData() {
-            // Implement logs loading
-            console.log('Loading system logs...');
+        
+        function changeUserRole(email, name, currentRole) {
+            document.getElementById('roleUserEmail').value = email;
+            document.getElementById('roleUserDisplay').textContent = name + ' (' + email + ')';
+            document.getElementById('newRole').value = currentRole;
+            openModal('roleModal');
         }
+        
+        function deleteUser(email, name) {
+            document.getElementById('deleteUserEmail').value = email;
+            document.getElementById('deleteUserDisplay').textContent = name + ' (' + email + ')';
+            document.getElementById('confirmDelete').value = '';
+            openModal('deleteModal');
+        }
+        
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.style.opacity = '0';
+                
+                requestAnimationFrame(() => {
+                    modal.style.transition = 'opacity 0.3s ease';
+                    modal.style.opacity = '1';
+                });
+                
+                // Focus first input
+                const firstInput = modal.querySelector('input[type="text"], input[type="password"], select');
+                if (firstInput) {
+                    setTimeout(() => firstInput.focus(), 100);
+                }
+            }
+        }
+        
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.transition = 'opacity 0.3s ease';
+                modal.style.opacity = '0';
+                
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            }
+        }
+        
+        // Quick Actions
+        function refreshAllData() {
+            window.VelocityLab.showNotification('Refreshing data...', 'info');
+            loadAdminStats();
+            loadUsersProgress();
+        }
+        
+        function exportUserData() {
+            window.VelocityLab.showNotification('Export functionality coming soon', 'info');
+        }
+        
+        function generateReport() {
+            window.VelocityLab.showNotification('Report generation coming soon', 'info');
+        }
+        
+        function refreshUsers() {
+            loadUsersProgress();
+        }
+        
+        function loadProgressAnalytics() {
+            // Placeholder for progress analytics
+            window.VelocityLab.showNotification('Loading progress analytics...', 'info');
+        }
+        
+        // Utility Functions
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function formatRelativeTime(dateString) {
+            if (!dateString) return 'Never';
+            
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = now.getTime() - date.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+            const diffMinutes = Math.floor(diffTime / (1000 * 60));
+            
+            if (diffMinutes < 5) return 'Just now';
+            if (diffMinutes < 60) return `${diffMinutes}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            if (diffDays < 30) return `${Math.ceil(diffDays / 7)}w ago`;
+            
+            return date.toLocaleDateString();
+        }
+        
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            return parts.length === 2 ? decodeURIComponent(parts.pop().split(';').shift()) : null;
+        }
+        
+        // Close modals when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                const modalId = e.target.id;
+                closeModal(modalId);
+            }
+        });
+        
+        // Close modals with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const openModal = document.querySelector('.modal[style*="display: flex"]');
+                if (openModal) {
+                    closeModal(openModal.id);
+                }
+            }
+        });
+        
+        console.log('🔧 Admin dashboard enhanced features loaded successfully!');
     </script>
 </body>
 </html>

@@ -3,309 +3,636 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Velocity Lab - Training Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Dashboard - Velocity Lab Exchange Hybrid Migration</title>
+    <meta name="description" content="Track your progress through 42 hands-on tasks in Exchange hybrid migration training">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/styles.css" as="style">
+    <link rel="preload" href="/app.js" as="script">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/styles.css">
+    
+    <!-- Meta tags for sharing -->
+    <meta property="og:title" content="Exchange Hybrid Migration Lab - Velocity Lab">
+    <meta property="og:description" content="Professional MSP training for Exchange hybrid deployments">
+    <meta property="og:type" content="website">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    
+    <!-- Additional CSS for dashboard-specific styles -->
+    <style>
+        /* Dashboard-specific enhancements */
+        .dashboard-hero {
+            background: linear-gradient(135deg, 
+                rgba(0, 122, 255, 0.05) 0%, 
+                rgba(52, 199, 89, 0.05) 50%, 
+                rgba(255, 149, 0, 0.05) 100%);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .progress-ring {
+            width: 120px;
+            height: 120px;
+            position: relative;
+        }
+        
+        .progress-ring svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring circle {
+            fill: none;
+            stroke-width: 8;
+            r: 52;
+            cx: 60;
+            cy: 60;
+        }
+        
+        .progress-ring .bg {
+            stroke: var(--gray-200);
+        }
+        
+        .progress-ring .progress {
+            stroke: url(#progressGradient);
+            stroke-linecap: round;
+            stroke-dasharray: 327;
+            stroke-dashoffset: 327;
+            transition: stroke-dashoffset 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .progress-percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--primary);
+        }
+        
+        .week-expand-icon {
+            transition: transform var(--transition-base);
+        }
+        
+        .week-expand-icon.expanded {
+            transform: rotate(180deg);
+        }
+        
+        /* Task completion animations */
+        @keyframes taskComplete {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .task-card.just-completed {
+            animation: taskComplete 0.6s ease-out;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .hero-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--space-4);
+            }
+            
+            .progress-ring {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .progress-ring circle {
+                r: 42;
+                cx: 50;
+                cy: 50;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Header Navigation -->
-    <header class="header">
-        <nav class="nav">
-            <div class="nav-brand">
-                <img src="Velocity-Logo.png" alt="Velocity Lab" class="nav-logo">
-                <div class="nav-text">
-                    <h1>Velocity Lab</h1>
-                    <span class="nav-subtitle">Exchange Hybrid Migration Training</span>
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Navigation -->
+    <nav class="nav-glass">
+        <div class="container">
+            <div class="nav-content">
+                <a href="/dashboard.html" class="nav-brand">
+                    <svg class="nav-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="40" height="40" rx="12" fill="url(#logoGradient)"/>
+                        <path d="M12 20l6 6 10-10" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#007aff"/>
+                                <stop offset="100%" style="stop-color:#5ac8fa"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="font-semibold text-xl">Velocity Lab</span>
+                </a>
+                
+                <div class="nav-links">
+                    <a href="/dashboard.html" class="nav-link">Dashboard</a>
+                    <a href="/profile.html" class="nav-link">Profile</a>
+                    <a href="/admin.html" class="nav-link" id="adminLink" style="display: none;">Admin</a>
+                    <span class="text-sm text-secondary" id="userInfo">Loading...</span>
+                    <button class="btn btn-secondary btn-sm" id="logout">Sign Out</button>
                 </div>
             </div>
-            <div class="nav-user">
-                <span id="userInfo" class="user-info">Loading...</span>
-                <a href="profile.html" class="nav-link">Profile</a>
-                <a href="admin.html" id="adminLink" class="nav-link admin-link" style="display: none;">Admin</a>
-                <button id="logout" class="btn btn-outline">Logout</button>
-            </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
 
     <!-- Main Content -->
-    <main id="main-content" class="main">
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="hero-content">
-                <h2>🏢 Exchange Hybrid Migration Lab</h2>
-                <p>Master the complete journey from on-premises Exchange to Microsoft 365 hybrid deployment</p>
-                <div class="hero-stats">
-                    <div class="stat">
-                        <span class="stat-number">42</span>
-                        <span class="stat-label">Training Tasks</span>
+    <main id="main-content">
+        <!-- Dashboard Hero Section -->
+        <section class="dashboard-hero">
+            <div class="container">
+                <div class="hero">
+                    <div class="hero-badge">
+                        🚀 Exchange Hybrid Migration Lab
                     </div>
-                    <div class="stat">
-                        <span class="stat-number">4</span>
-                        <span class="stat-label">Weeks</span>
+                    
+                    <h1 class="hero-title">
+                        Master Hybrid Deployments
+                    </h1>
+                    
+                    <p class="hero-subtitle">
+                        Complete 42 hands-on tasks to become proficient in Exchange hybrid migrations. 
+                        From Active Directory setup to Microsoft 365 integration.
+                    </p>
+                    
+                    <!-- Progress Overview -->
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <div class="progress-ring">
+                                <svg>
+                                    <defs>
+                                        <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#007aff"/>
+                                            <stop offset="50%" style="stop-color:#5ac8fa"/>
+                                            <stop offset="100%" style="stop-color:#34c759"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <circle class="bg" />
+                                    <circle class="progress" id="progressRing" />
+                                </svg>
+                                <div class="progress-percentage" id="progressPercentage">0%</div>
+                            </div>
+                            <div class="stat-label">Overall Progress</div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <span class="stat-number" id="completedTasks">0</span>
+                            <div class="stat-label">Tasks Completed</div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <span class="stat-number">42</span>
+                            <div class="stat-label">Total Tasks</div>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <span class="stat-number" id="currentWeek">Week 1</span>
+                            <div class="stat-label">Current Focus</div>
+                        </div>
                     </div>
-                    <div class="stat">
-                        <span class="stat-number">100%</span>
-                        <span class="stat-label">Hands-on</span>
+                    
+                    <div class="hero-actions">
+                        <button class="btn btn-primary btn-lg" id="continueBtn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5,3 19,12 5,21"></polygon>
+                            </svg>
+                            <span>Continue Learning</span>
+                        </button>
+                        
+                        <button class="btn btn-secondary btn-lg" id="restartLabBtn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="1,4 1,10 7,10"></polyline>
+                                <path d="M3.51,15a9,9 0,0,0,2.13,3.09l1.67,-1.67"></path>
+                                <path d="M13,5h8"></path>
+                                <path d="M17,1l4,4-4,4"></path>
+                            </svg>
+                            <span>Start New Lab</span>
+                        </button>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Progress Section -->
-        <section class="progress-section">
+        <section class="progress-section container">
             <div class="progress-header">
-                <h3>📊 Your Progress</h3>
-                <button id="restartLabBtn" class="btn btn-outline btn-sm">🔄 Start New Lab</button>
+                <h3>Lab Progress</h3>
+                <div class="text-sm text-secondary" id="progressText">
+                    0% Completed (0/42 tasks)
+                </div>
             </div>
+            
             <div class="progress-container">
                 <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                    <div class="progress-fill"></div>
+                    <div class="progress-fill" style="width: 0%"></div>
                 </div>
-                <p class="progress-text" id="progressText">0% Completed (0/42 tasks)</p>
             </div>
         </section>
 
-        <!-- Perfect 2x2 Training Weeks Grid -->
-        <section class="training-weeks">
-            <div class="weeks-header">
-                <h3>🎯 Your 4-Week Training Journey</h3>
-                <p>Each week builds upon the previous, taking you from foundation to expert level</p>
-            </div>
-
-            <!-- Perfect 2x2 Grid Layout -->
+        <!-- Week Grid -->
+        <section class="container">
             <div class="weeks-grid-container">
+                
                 <!-- Week 1: Foundation Setup -->
-                <div class="week-card week-1" data-week="week1">
+                <div class="week-card" data-week="week1">
                     <div class="week-header">
                         <div class="week-badge">
-                            <span class="week-number">01</span>
-                            <span class="week-icon">📚</span>
+                            <div class="week-number">1</div>
+                            <div class="week-icon">🏗️</div>
+                            <div>
+                                <h4 class="week-title">Foundation Setup</h4>
+                                <p class="week-description">Windows Server 2012 DC, domain joining, and network shares</p>
+                            </div>
                         </div>
                         <div class="week-progress">
-                            <span class="week-count">0/12 tasks</span>
-                            <div class="week-progress-bar">
-                                <div class="week-progress-fill" style="width: 0%"></div>
+                            <span class="week-count" data-week="week1">0/12 tasks</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" data-week="week1" style="width: 0%"></div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="week-content">
-                        <h4>Foundation Setup</h4>
-                        <p class="week-description">Windows Server 2012 DC, domain joining, and network shares</p>
-                        <div class="week-meta">
-                            <span class="difficulty-badge beginner">Beginner</span>
-                            <span class="week-duration">~8 hours</span>
-                        </div>
-                    </div>
-
-                    <div class="week-expand" onclick="toggleWeekTasks('week1')">
+                    <div class="week-expand" data-week="week3">
                         <span class="expand-text">View Tasks</span>
                         <svg class="expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="m6 9 6 6 6-6"/>
+                            <polyline points="6,9 12,15 18,9"></polyline>
                         </svg>
                     </div>
                     
-                    <div class="tasks-container" id="week1-tasks" style="display: none;">
+                    <div class="tasks-container" data-week="week3">
                         <div class="tasks-grid">
-                            <div class="task" data-week="week1" data-task="install-server2012">
+                            <!-- Week 3 Tasks -->
+                            <div class="task-card task" data-week="week3" data-task="backup-servers">
                                 <div class="task-header">
-                                    <input type="checkbox" id="week1-install-server2012" data-week="week1" data-task="install-server2012">
-                                    <label for="week1-install-server2012" class="task-title">Install Windows Server 2012</label>
+                                    <input type="checkbox" class="task-checkbox" data-week="week3" data-task="backup-servers">
+                                    <div>
+                                        <h5 class="task-title">Backup Domain Controllers</h5>
+                                        <p class="task-description">Create system state backups before major upgrades</p>
+                                    </div>
                                 </div>
-                                <p class="task-description">Set up the foundation server for your domain controller</p>
                                 <div class="task-meta">
-                                    <span class="task-type">🖥️ VM Setup</span>
-                                    <span class="task-time">⏱️ 30 min</span>
+                                    <span>⏱️ 25 min</span>
+                                    <span>📋 5 steps</span>
+                                    <span>💾 Backup</span>
                                 </div>
                             </div>
-
-                            <div class="task" data-week="week1" data-task="configure-static-ip">
+                            
+                            <div class="task-card task" data-week="week3" data-task="upgrade-dc1-2016">
                                 <div class="task-header">
-                                    <input type="checkbox" id="week1-configure-static-ip" data-week="week1" data-task="configure-static-ip">
-                                    <label for="week1-configure-static-ip" class="task-title">Configure Static IP Address</label>
+                                    <input type="checkbox" class="task-checkbox" data-week="week3" data-task="upgrade-dc1-2016">
+                                    <div>
+                                        <h5 class="task-title">Upgrade DC1 to Server 2016</h5>
+                                        <p class="task-description">Perform in-place upgrade of primary domain controller</p>
+                                    </div>
                                 </div>
-                                <p class="task-description">Set up reliable static IP addressing for domain controller</p>
                                 <div class="task-meta">
-                                    <span class="task-type">🌐 Networking</span>
-                                    <span class="task-time">⏱️ 15 min</span>
+                                    <span>⏱️ 60 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>⬆️ Upgrade</span>
                                 </div>
                             </div>
-
-                            <div class="task" data-week="week1" data-task="install-adds-role">
+                            
+                            <div class="task-card task" data-week="week3" data-task="upgrade-dc2-2016">
                                 <div class="task-header">
-                                    <input type="checkbox" id="week1-install-adds-role" data-week="week1" data-task="install-adds-role">
-                                    <label for="week1-install-adds-role" class="task-title">Install Active Directory Domain Services Role</label>
+                                    <input type="checkbox" class="task-checkbox" data-week="week3" data-task="upgrade-dc2-2016">
+                                    <div>
+                                        <h5 class="task-title">Upgrade DC2 to Server 2016</h5>
+                                        <p class="task-description">Complete domain controller upgrade to Windows Server 2016</p>
+                                    </div>
                                 </div>
-                                <p class="task-description">Install the foundational AD DS role on Windows Server 2012</p>
                                 <div class="task-meta">
-                                    <span class="task-type">🏗️ Roles & Features</span>
-                                    <span class="task-time">⏱️ 20 min</span>
+                                    <span>⏱️ 60 min</span>
+                                    <span>📋 5 steps</span>
+                                    <span>⬆️ Upgrade</span>
                                 </div>
                             </div>
-
-                            <div class="task" data-week="week1" data-task="promote-to-dc">
+                            
+                            <div class="task-card task" data-week="week3" data-task="raise-functional-levels">
                                 <div class="task-header">
-                                    <input type="checkbox" id="week1-promote-to-dc" data-week="week1" data-task="promote-to-dc">
-                                    <label for="week1-promote-to-dc" class="task-title">Promote Server to Domain Controller</label>
+                                    <input type="checkbox" class="task-checkbox" data-week="week3" data-task="raise-functional-levels">
+                                    <div>
+                                        <h5 class="task-title">Raise Domain/Forest Functional Levels</h5>
+                                        <p class="task-description">Enable Server 2016 features by raising functional levels</p>
+                                    </div>
                                 </div>
-                                <p class="task-description">Configure as primary DC with DNS services and create new forest</p>
                                 <div class="task-meta">
-                                    <span class="task-type">🏰 Active Directory</span>
-                                    <span class="task-time">⏱️ 45 min</span>
+                                    <span>⏱️ 15 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>📈 Level Up</span>
                                 </div>
                             </div>
-
-                            <!-- Additional Week 1 tasks would continue here... -->
-                            <!-- For brevity, showing pattern for first 4 tasks -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Week 2: Infrastructure Expansion -->
-                <div class="week-card week-2" data-week="week2">
-                    <div class="week-header">
-                        <div class="week-badge">
-                            <span class="week-number">02</span>
-                            <span class="week-icon">🏗️</span>
-                        </div>
-                        <div class="week-progress">
-                            <span class="week-count">0/8 tasks</span>
-                            <div class="week-progress-bar">
-                                <div class="week-progress-fill" style="width: 0%"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="week-content">
-                        <h4>Infrastructure Expansion</h4>
-                        <p class="week-description">Second DC, WSUS, and time synchronization</p>
-                        <div class="week-meta">
-                            <span class="difficulty-badge intermediate">Intermediate</span>
-                            <span class="week-duration">~6 hours</span>
-                        </div>
-                    </div>
-
-                    <div class="week-expand" onclick="toggleWeekTasks('week2')">
-                        <span class="expand-text">View Tasks</span>
-                        <svg class="expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="m6 9 6 6 6-6"/>
-                        </svg>
-                    </div>
-                    
-                    <div class="tasks-container" id="week2-tasks" style="display: none;">
-                        <div class="tasks-grid">
-                            <div class="task" data-week="week2" data-task="install-second-server">
+                            
+                            <div class="task-card task" data-week="week3" data-task="prepare-exchange-server">
                                 <div class="task-header">
-                                    <input type="checkbox" id="week2-install-second-server" data-week="week2" data-task="install-second-server">
-                                    <label for="week2-install-second-server" class="task-title">Install Second Windows Server 2012</label>
+                                    <input type="checkbox" class="task-checkbox" data-week="week3" data-task="prepare-exchange-server">
+                                    <div>
+                                        <h5 class="task-title">Prepare Exchange Server VM</h5>
+                                        <p class="task-description">Deploy and configure Windows Server 2016 for Exchange 2019</p>
+                                    </div>
                                 </div>
-                                <p class="task-description">Deploy second server for redundancy and load distribution</p>
                                 <div class="task-meta">
-                                    <span class="task-type">🖥️ VM Setup</span>
-                                    <span class="task-time">⏱️ 30 min</span>
+                                    <span>⏱️ 45 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>📧 Exchange</span>
                                 </div>
                             </div>
-                            <!-- Additional Week 2 tasks would continue here... -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Week 3: Email & Messaging -->
-                <div class="week-card week-3" data-week="week3">
-                    <div class="week-header">
-                        <div class="week-badge">
-                            <span class="week-number">03</span>
-                            <span class="week-icon">📧</span>
-                        </div>
-                        <div class="week-progress">
-                            <span class="week-count">0/12 tasks</span>
-                            <div class="week-progress-bar">
-                                <div class="week-progress-fill" style="width: 0%"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="week-content">
-                        <h4>Email & Messaging</h4>
-                        <p class="week-description">Server 2016 upgrade and Exchange 2019 deployment</p>
-                        <div class="week-meta">
-                            <span class="difficulty-badge advanced">Advanced</span>
-                            <span class="week-duration">~10 hours</span>
-                        </div>
-                    </div>
-
-                    <div class="week-expand" onclick="toggleWeekTasks('week3')">
-                        <span class="expand-text">View Tasks</span>
-                        <svg class="expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="m6 9 6 6 6-6"/>
-                        </svg>
-                    </div>
-                    
-                    <div class="tasks-container" id="week3-tasks" style="display: none;">
-                        <div class="tasks-grid">
-                            <div class="task" data-week="week3" data-task="backup-servers">
+                            
+                            <div class="task-card task" data-week="week3" data-task="install-exchange-prereqs">
                                 <div class="task-header">
-                                    <input type="checkbox" id="week3-backup-servers" data-week="week3" data-task="backup-servers">
-                                    <label for="week3-backup-servers" class="task-title">Backup Servers Before Upgrade</label>
+                                    <input type="checkbox" class="task-checkbox" data-week="week3" data-task="install-exchange-prereqs">
+                                    <div>
+                                        <h5 class="task-title">Install Exchange Prerequisites</h5>
+                                        <p class="task-description">Install required Windows features and components for Exchange 2019</p>
+                                    </div>
                                 </div>
-                                <p class="task-description">Create full system backups and verify restore capabilities</p>
                                 <div class="task-meta">
-                                    <span class="task-type">💾 Backup</span>
-                                    <span class="task-time">⏱️ 30 min</span>
+                                    <span>⏱️ 40 min</span>
+                                    <span>📋 5 steps</span>
+                                    <span>⚙️ Prerequisites</span>
                                 </div>
                             </div>
-                            <!-- Additional Week 3 tasks would continue here... -->
+                            
+                            <div class="task-card task" data-week="week3" data-task="extend-ad-schema">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week3" data-task="extend-ad-schema">
+                                    <div>
+                                        <h5 class="task-title">Extend Active Directory Schema</h5>
+                                        <p class="task-description">Prepare Active Directory for Exchange 2019 installation</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 30 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>🔧 Schema</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week3" data-task="install-exchange-2019">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week3" data-task="install-exchange-2019">
+                                    <div>
+                                        <h5 class="task-title">Install Exchange Server 2019</h5>
+                                        <p class="task-description">Deploy Exchange 2019 with Mailbox and Client Access roles</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 90 min</span>
+                                    <span>📋 8 steps</span>
+                                    <span>📧 Exchange</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week3" data-task="configure-exchange-basic">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week3" data-task="configure-exchange-basic">
+                                    <div>
+                                        <h5 class="task-title">Configure Basic Exchange Settings</h5>
+                                        <p class="task-description">Set up Exchange organization and initial configuration</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 35 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>⚙️ Config</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week3" data-task="create-mailboxes">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week3" data-task="create-mailboxes">
+                                    <div>
+                                        <h5 class="task-title">Create Test Mailboxes</h5>
+                                        <p class="task-description">Set up user mailboxes for testing Exchange functionality</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 20 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>📫 Mailboxes</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week3" data-task="test-mailbox-access">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week3" data-task="test-mailbox-access">
+                                    <div>
+                                        <h5 class="task-title">Test Mailbox Access</h5>
+                                        <p class="task-description">Verify Outlook Web Access and internal client connectivity</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 25 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>✅ Testing</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week3" data-task="configure-internal-mailflow">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week3" data-task="configure-internal-mailflow">
+                                    <div>
+                                        <h5 class="task-title">Configure Internal Mail Flow</h5>
+                                        <p class="task-description">Set up proper mail routing and transport within organization</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 30 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>📮 Mail Flow</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Week 4: Cloud Integration -->
-                <div class="week-card week-4" data-week="week4">
+                <div class="week-card" data-week="week4">
                     <div class="week-header">
                         <div class="week-badge">
-                            <span class="week-number">04</span>
-                            <span class="week-icon">☁️</span>
+                            <div class="week-number">4</div>
+                            <div class="week-icon">☁️</div>
+                            <div>
+                                <h4 class="week-title">Cloud Integration</h4>
+                                <p class="week-description">External mail publishing and Microsoft 365 hybrid setup</p>
+                            </div>
                         </div>
                         <div class="week-progress">
-                            <span class="week-count">0/10 tasks</span>
-                            <div class="week-progress-bar">
-                                <div class="week-progress-fill" style="width: 0%"></div>
+                            <span class="week-count" data-week="week4">0/10 tasks</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" data-week="week4" style="width: 0%"></div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="week-content">
-                        <h4>Cloud Integration</h4>
-                        <p class="week-description">External mail publishing and Microsoft 365 hybrid setup</p>
-                        <div class="week-meta">
-                            <span class="difficulty-badge expert">Expert</span>
-                            <span class="week-duration">~12 hours</span>
-                        </div>
-                    </div>
-
-                    <div class="week-expand" onclick="toggleWeekTasks('week4')">
+                    <div class="week-expand" data-week="week4">
                         <span class="expand-text">View Tasks</span>
                         <svg class="expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="m6 9 6 6 6-6"/>
+                            <polyline points="6,9 12,15 18,9"></polyline>
                         </svg>
                     </div>
                     
-                    <div class="tasks-container" id="week4-tasks" style="display: none;">
+                    <div class="tasks-container" data-week="week4">
                         <div class="tasks-grid">
-                            <div class="task" data-week="week4" data-task="configure-external-dns">
+                            <!-- Week 4 Tasks -->
+                            <div class="task-card task" data-week="week4" data-task="configure-external-dns">
                                 <div class="task-header">
-                                    <input type="checkbox" id="week4-configure-external-dns" data-week="week4" data-task="configure-external-dns">
-                                    <label for="week4-configure-external-dns" class="task-title">Configure External DNS Records</label>
+                                    <input type="checkbox" class="task-checkbox" data-week="week4" data-task="configure-external-dns">
+                                    <div>
+                                        <h5 class="task-title">Configure External DNS Records</h5>
+                                        <p class="task-description">Set up public DNS records for external mail flow and hybrid</p>
+                                    </div>
                                 </div>
-                                <p class="task-description">Set up MX, SPF, DKIM, and DMARC records for email authentication</p>
                                 <div class="task-meta">
-                                    <span class="task-type">🌐 DNS</span>
-                                    <span class="task-time">⏱️ 30 min</span>
+                                    <span>⏱️ 30 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>🌐 DNS</span>
                                 </div>
                             </div>
-                            <!-- Additional Week 4 tasks would continue here... -->
+                            
+                            <div class="task-card task" data-week="week4" data-task="setup-firewall-rules">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week4" data-task="setup-firewall-rules">
+                                    <div>
+                                        <h5 class="task-title">Setup Firewall Rules</h5>
+                                        <p class="task-description">Configure network firewall for Exchange external access</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 25 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>🔥 Firewall</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week4" data-task="install-ssl-certificates">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week4" data-task="install-ssl-certificates">
+                                    <div>
+                                        <h5 class="task-title">Install SSL Certificates</h5>
+                                        <p class="task-description">Deploy SSL certificates for secure external communication</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 40 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>🔒 SSL</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week4" data-task="configure-external-mailflow">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week4" data-task="configure-external-mailflow">
+                                    <div>
+                                        <h5 class="task-title">Configure External Mail Flow</h5>
+                                        <p class="task-description">Enable secure email communication with external organizations</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 35 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>📮 External Flow</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week4" data-task="setup-modern-auth">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week4" data-task="setup-modern-auth">
+                                    <div>
+                                        <h5 class="task-title">Setup Modern Authentication</h5>
+                                        <p class="task-description">Enable OAuth and modern authentication for Office 365 integration</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 30 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>🔐 OAuth</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week4" data-task="prepare-m365-tenant">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week4" data-task="prepare-m365-tenant">
+                                    <div>
+                                        <h5 class="task-title">Prepare Microsoft 365 Tenant</h5>
+                                        <p class="task-description">Set up Office 365 tenant and verify domain ownership</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 45 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>☁️ M365</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week4" data-task="install-aad-connect">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week4" data-task="install-aad-connect">
+                                    <div>
+                                        <h5 class="task-title">Install Azure AD Connect</h5>
+                                        <p class="task-description">Deploy directory synchronization between on-premises AD and Azure AD</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 50 min</span>
+                                    <span>📋 7 steps</span>
+                                    <span>🔗 AD Connect</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week4" data-task="run-hybrid-wizard">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week4" data-task="run-hybrid-wizard">
+                                    <div>
+                                        <h5 class="task-title">Run Exchange Hybrid Configuration Wizard</h5>
+                                        <p class="task-description">Configure Exchange hybrid deployment for coexistence</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 60 min</span>
+                                    <span>📋 7 steps</span>
+                                    <span>🧙‍♂️ Wizard</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week4" data-task="configure-hybrid-mailflow">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week4" data-task="configure-hybrid-mailflow">
+                                    <div>
+                                        <h5 class="task-title">Configure Hybrid Mail Flow</h5>
+                                        <p class="task-description">Set up mail routing between on-premises and cloud environments</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 40 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>🔄 Hybrid Flow</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week4" data-task="verify-hybrid-functionality">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week4" data-task="verify-hybrid-functionality">
+                                    <div>
+                                        <h5 class="task-title">Verify Hybrid Functionality</h5>
+                                        <p class="task-description">Test and validate all hybrid features and functionality</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 45 min</span>
+                                    <span>📋 8 steps</span>
+                                    <span>✅ Validation</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -313,784 +640,620 @@
         </section>
     </main>
 
-    <!-- Task Detail Modal -->
-    <div id="taskModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <!-- Task Modal -->
+    <div class="modal" id="taskModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalTitle">Task Title</h2>
-                <button id="closeModal" class="modal-close" aria-label="Close modal">&times;</button>
+                <h2 class="modal-title" id="modalTitle">Task Title</h2>
+                <button class="modal-close" id="closeModal" aria-label="Close modal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
             </div>
             <div class="modal-body">
-                <div id="modalDescription">Task description will be loaded here...</div>
+                <div id="modalDescription">
+                    <!-- Task description content will be dynamically populated -->
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Notification System -->
-    <div id="notification" class="notification" role="alert" aria-live="polite"></div>
-
-    <!-- CSRF Token (hidden) -->
-    <input type="hidden" id="csrfToken" name="csrf_token" value="">
+    <div class="notification" id="notification" role="alert" aria-live="assertive">
+        <!-- Dynamic notification content -->
+    </div>
 
     <!-- Scripts -->
-    <script src="app.js"></script>
+    <script src="/app.js"></script>
     
+    <!-- Additional Dashboard JavaScript -->
     <script>
-        // Week task toggle functionality
-        function toggleWeekTasks(weekId) {
-            const tasksContainer = document.getElementById(weekId + '-tasks');
-            const expandIcon = document.querySelector(`[data-week="${weekId}"] .expand-icon`);
-            const expandText = document.querySelector(`[data-week="${weekId}"] .expand-text`);
-            
-            if (tasksContainer.style.display === 'none') {
-                tasksContainer.style.display = 'block';
-                expandIcon.style.transform = 'rotate(180deg)';
-                expandText.textContent = 'Hide Tasks';
-                
-                // Smooth scroll animation
-                setTimeout(() => {
-                    tasksContainer.scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'nearest' 
-                    });
-                }, 100);
-            } else {
-                tasksContainer.style.display = 'none';
-                expandIcon.style.transform = 'rotate(0deg)';
-                expandText.textContent = 'View Tasks';
-            }
-        }
-
-        // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize user info and progress
-            initUserInfo();
-            loadProgress();
-            
-            // Setup task interactions
-            setupTaskInteractions();
-            
-            // Setup week card animations
-            setupWeekAnimations();
-        });
-
-        function setupTaskInteractions() {
-            // Task click handlers for modal
-            document.querySelectorAll('.task').forEach(task => {
-                const week = task.getAttribute('data-week');
-                const taskId = task.getAttribute('data-task');
-                const taskKey = `${week}-${taskId}`;
-                
-                task.addEventListener('click', (e) => {
-                    if (e.target.type === 'checkbox') return;
-                    openTaskModal(taskKey, e);
-                });
-                
-                // Checkbox handlers
-                const checkbox = task.querySelector('input[type="checkbox"]');
-                if (checkbox) {
-                    checkbox.addEventListener('change', (e) => {
-                        e.stopPropagation();
-                        updateTaskProgress(week, taskId, e.target.checked);
-                    });
-                }
-            });
-        }
-
-        function setupWeekAnimations() {
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('animate-in');
+            // Enhanced week expansion functionality
+            const weekExpanders = document.querySelectorAll('.week-expand');
+            weekExpanders.forEach(expander => {
+                expander.addEventListener('click', function() {
+                    const week = this.getAttribute('data-week');
+                    const tasksContainer = document.querySelector(`.tasks-container[data-week="${week}"]`);
+                    const expandIcon = this.querySelector('.expand-icon');
+                    const expandText = this.querySelector('.expand-text');
+                    
+                    if (tasksContainer.classList.contains('show')) {
+                        // Collapse
+                        tasksContainer.classList.remove('show');
+                        expandIcon.classList.remove('expanded');
+                        expandText.textContent = 'View Tasks';
+                        
+                        // Smooth height transition
+                        tasksContainer.style.maxHeight = '0px';
+                    } else {
+                        // Expand
+                        tasksContainer.classList.add('show');
+                        expandIcon.classList.add('expanded');
+                        expandText.textContent = 'Hide Tasks';
+                        
+                        // Calculate and set max height for smooth transition
+                        const scrollHeight = tasksContainer.scrollHeight;
+                        tasksContainer.style.maxHeight = scrollHeight + 'px';
+                        
+                        // Scroll to week if needed
+                        setTimeout(() => {
+                            const weekCard = this.closest('.week-card');
+                            weekCard.scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'start' 
+                            });
+                        }, 200);
                     }
                 });
-            }, observerOptions);
-            
-            document.querySelectorAll('.week-card').forEach(week => {
-                observer.observe(week);
             });
-        }
+            
+            // Continue button functionality
+            const continueBtn = document.getElementById('continueBtn');
+            if (continueBtn) {
+                continueBtn.addEventListener('click', function() {
+                    // Find the first incomplete task and scroll to it
+                    const incompleteTasks = document.querySelectorAll('.task-checkbox:not(:checked)');
+                    if (incompleteTasks.length > 0) {
+                        const firstIncompleteTask = incompleteTasks[0];
+                        const week = firstIncompleteTask.getAttribute('data-week');
+                        
+                        // Expand the week if needed
+                        const tasksContainer = document.querySelector(`.tasks-container[data-week="${week}"]`);
+                        if (!tasksContainer.classList.contains('show')) {
+                            const expander = document.querySelector(`.week-expand[data-week="${week}"]`);
+                            if (expander) expander.click();
+                        }
+                        
+                        // Scroll to the task
+                        setTimeout(() => {
+                            firstIncompleteTask.closest('.task-card').scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center'
+                            });
+                            
+                            // Highlight the task briefly
+                            const taskCard = firstIncompleteTask.closest('.task-card');
+                            taskCard.style.transform = 'scale(1.02)';
+                            taskCard.style.boxShadow = 'var(--shadow-lg)';
+                            taskCard.style.borderColor = 'var(--primary)';
+                            
+                            setTimeout(() => {
+                                taskCard.style.transform = '';
+                                taskCard.style.boxShadow = '';
+                                taskCard.style.borderColor = '';
+                            }, 2000);
+                        }, 300);
+                    } else {
+                        // All tasks complete!
+                        window.VelocityLab.showNotification('🎉 All tasks completed! You\'re ready for production hybrid deployments!', 'success', 6000);
+                    }
+                });
+            }
+            
+            // Enhanced progress ring animation
+            function updateProgressRing(percentage) {
+                const progressRing = document.getElementById('progressRing');
+                const progressPercentage = document.getElementById('progressPercentage');
+                
+                if (progressRing && progressPercentage) {
+                    const circumference = 2 * Math.PI * 52; // r=52 from CSS
+                    const offset = circumference - (percentage / 100) * circumference;
+                    
+                    progressRing.style.strokeDashoffset = offset;
+                    progressPercentage.textContent = Math.round(percentage) + '%';
+                }
+            }
+            
+            // Week progress calculation
+            function updateWeekProgress() {
+                Object.keys(window.VelocityLab.TASK_STRUCTURE).forEach(week => {
+                    const tasks = window.VelocityLab.TASK_STRUCTURE[week].tasks;
+                    const completedTasks = tasks.filter(task => {
+                        const checkbox = document.querySelector(`input[data-week="${week}"][data-task="${task}"]`);
+                        return checkbox && checkbox.checked;
+                    }).length;
+                    
+                    const percentage = (completedTasks / tasks.length) * 100;
+                    
+                    // Update week progress bar
+                    const weekProgressBar = document.querySelector(`.progress-fill[data-week="${week}"]`);
+                    const weekCount = document.querySelector(`.week-count[data-week="${week}"]`);
+                    
+                    if (weekProgressBar) {
+                        weekProgressBar.style.width = percentage + '%';
+                    }
+                    
+                    if (weekCount) {
+                        weekCount.textContent = `${completedTasks}/${tasks.length} tasks`;
+                    }
+                });
+                
+                // Update overall progress ring
+                const totalCompleted = Array.from(document.querySelectorAll('.task-checkbox:checked')).length;
+                const overallPercentage = (totalCompleted / 42) * 100;
+                updateProgressRing(overallPercentage);
+                
+                // Update stats
+                const completedTasksEl = document.getElementById('completedTasks');
+                if (completedTasksEl) {
+                    completedTasksEl.textContent = totalCompleted;
+                }
+                
+                // Update current week
+                const currentWeekEl = document.getElementById('currentWeek');
+                if (currentWeekEl && totalCompleted < 42) {
+                    if (totalCompleted < 12) currentWeekEl.textContent = 'Week 1';
+                    else if (totalCompleted < 20) currentWeekEl.textContent = 'Week 2';
+                    else if (totalCompleted < 32) currentWeekEl.textContent = 'Week 3';
+                    else currentWeekEl.textContent = 'Week 4';
+                } else if (currentWeekEl) {
+                    currentWeekEl.textContent = 'Complete!';
+                }
+            }
+            
+            // Listen for task completion events
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('task-checkbox')) {
+                    setTimeout(updateWeekProgress, 100); // Small delay to ensure state is updated
+                }
+            });
+            
+            // Initial progress calculation
+            setTimeout(updateWeekProgress, 500);
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // J/K for navigation like vim
+                if (e.key === 'j' || e.key === 'ArrowDown') {
+                    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                        const checkbox = focused.querySelector('.task-checkbox');
+                        if (checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    }
+                }
+            });
+            
+            // Add focus outline styles for keyboard navigation
+            const style = document.createElement('style');
+            style.textContent = `
+                .task-card.focused {
+                    outline: 2px solid var(--primary);
+                    outline-offset: 2px;
+                    transform: translateY(-1px);
+                    box-shadow: var(--shadow-md);
+                }
+            `;
+            document.head.appendChild(style);
+            
+            console.log('🎯 Dashboard enhanced features loaded successfully!');
+        });
     </script>
-
-    <style>
-        /* Dashboard-specific styles for perfect Week layout */
-        :root {
-            --primary: #0078d4;
-            --primary-light: #106ebe;
-            --success: #107c10;
-            --warning: #ffb900;
-            --error: #d13438;
-            
-            --surface: #ffffff;
-            --surface-light: #f8f9fa;
-            --surface-card: rgba(255, 255, 255, 0.98);
-            --border: #e1e5e9;
-            --border-light: #edebe9;
-            
-            --text-primary: #323130;
-            --text-secondary: #605e5c;
-            --text-tertiary: #8a8886;
-            
-            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-            --radius: 8px;
-            --radius-lg: 12px;
-            --radius-xl: 16px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            color: var(--text-primary);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* Header Navigation */
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            margin-bottom: 2rem;
-        }
-
-        .nav {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: var(--shadow);
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .nav-logo {
-            height: 40px;
-            width: auto;
-        }
-
-        .nav-text h1 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin: 0;
-        }
-
-        .nav-subtitle {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .nav-user {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .user-info {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            background: var(--surface-light);
-            border-radius: var(--radius);
-        }
-
-        .nav-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius);
-            transition: all 0.3s ease;
-        }
-
-        .nav-link:hover {
-            color: var(--primary);
-            background: rgba(0, 120, 212, 0.1);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--radius-lg);
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            border: none;
-            font-size: 0.875rem;
-        }
-
-        .btn-outline {
-            background: var(--surface);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-        }
-
-        .btn-outline:hover {
-            background: var(--surface-light);
-            border-color: var(--primary);
-            transform: translateY(-1px);
-        }
-
-        .btn-sm {
-            padding: 0.5rem 1rem;
-            font-size: 0.8125rem;
-        }
-
-        /* Main Content */
-        .main {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        /* Hero Section */
-        .hero {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .hero-content h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-            letter-spacing: -0.02em;
-        }
-
-        .hero-content p {
-            font-size: 1.125rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto 2rem;
-        }
-
-        .hero-stats {
-            display: flex;
-            justify-content: center;
-            gap: 3rem;
-            flex-wrap: wrap;
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat-number {
-            display: block;
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        /* Progress Section */
-        .progress-section {
-            margin-bottom: 4rem;
-        }
-
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .progress-header h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .progress-container {
-            background: var(--surface-card);
-            padding: 2rem;
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-light);
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: var(--surface-light);
-            border-radius: var(--radius);
-            overflow: hidden;
-            margin-bottom: 1rem;
-        }
-
-        .progress-fill {
-            height: 100%;
-            width: var(--progress, 0%);
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
-            border-radius: var(--radius);
-            transition: width 0.8s ease;
-        }
-
-        .progress-text {
-            text-align: center;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-
-        /* Perfect Week Grid Layout */
-        .training-weeks {
-            margin-bottom: 4rem;
-        }
-
-        .weeks-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .weeks-header h3 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-        }
-
-        .weeks-header p {
-            font-size: 1.125rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Perfect 2x2 Grid for Desktop, Stacked for Mobile */
-        .weeks-grid-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .week-card {
-            background: var(--surface-card);
-            border-radius: var(--radius-xl);
-            padding: 2rem;
-            border: 1px solid var(--border-light);
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .week-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .week-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--primary-light));
-        }
-
-        .week-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1.5rem;
-        }
-
-        .week-badge {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .week-number {
-            width: 3rem;
-            height: 3rem;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            font-weight: 700;
-        }
-
-        .week-icon {
-            font-size: 2rem;
-        }
-
-        .week-progress {
-            text-align: right;
-        }
-
-        .week-count {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--primary);
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-
-        .week-progress-bar {
-            width: 80px;
-            height: 6px;
-            background: var(--surface-light);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .week-progress-fill {
-            height: 100%;
-            background: var(--primary);
-            border-radius: 3px;
-            transition: width 0.8s ease;
-        }
-
-        .week-content h4 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .week-description {
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            line-height: 1.5;
-        }
-
-        .week-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .difficulty-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .difficulty-badge.beginner {
-            background: rgba(16, 124, 16, 0.1);
-            color: var(--success);
-        }
-
-        .difficulty-badge.intermediate {
-            background: rgba(255, 185, 0, 0.1);
-            color: var(--warning);
-        }
-
-        .difficulty-badge.advanced {
-            background: rgba(0, 120, 212, 0.1);
-            color: var(--primary);
-        }
-
-        .difficulty-badge.expert {
-            background: rgba(209, 52, 56, 0.1);
-            color: var(--error);
-        }
-
-        .week-duration {
-            font-size: 0.875rem;
-            color: var(--text-tertiary);
-            font-weight: 500;
-        }
-
-        .week-expand {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.75rem;
-            background: var(--surface-light);
-            border-radius: var(--radius-lg);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 1rem;
-        }
-
-        .week-expand:hover {
-            background: rgba(0, 120, 212, 0.1);
-            color: var(--primary);
-        }
-
-        .expand-text {
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .expand-icon {
-            transition: transform 0.3s ease;
-        }
-
-        .tasks-container {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-light);
-        }
-
-        .tasks-grid {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .task {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            padding: 1rem;
-            border-radius: var(--radius-lg);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: 1px solid transparent;
-            background: rgba(255, 255, 255, 0.5);
-        }
-
-        .task:hover {
-            background: rgba(0, 120, 212, 0.02);
-            border-color: var(--border-light);
-            transform: translateX(3px);
-        }
-
-        .task-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .task input[type="checkbox"] {
-            width: 1.125rem;
-            height: 1.125rem;
-            cursor: pointer;
-            accent-color: var(--success);
-        }
-
-        .task-title {
-            font-size: 0.9375rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            cursor: pointer;
-            margin: 0;
-        }
-
-        .task-description {
-            font-size: 0.8125rem;
-            color: var(--text-secondary);
-            line-height: 1.4;
-            margin: 0;
-        }
-
-        .task-meta {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .task-type,
-        .task-time {
-            font-size: 0.75rem;
-            color: var(--text-tertiary);
-            font-weight: 500;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: var(--surface);
-            border-radius: var(--radius-xl);
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .modal-header {
-            padding: 2rem 2rem 1rem;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-tertiary);
-            width: 2rem;
-            height: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: var(--radius);
-        }
-
-        .modal-close:hover {
-            background: var(--surface-light);
-            color: var(--text-primary);
-        }
-
-        .modal-body {
-            padding: 2rem;
-        }
-
-        /* Animations */
-        .animate-in {
-            animation: fadeInUp 0.6s ease-out forwards;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Perfect Responsive Design */
-        @media (max-width: 768px) {
-            .main {
-                padding: 0 1rem;
-            }
-
-            .nav {
-                padding: 1rem;
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-user {
-                gap: 0.5rem;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .hero-content h2 {
-                font-size: 2rem;
-            }
-
-            .hero-stats {
-                gap: 2rem;
-            }
-
-            .progress-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            /* Perfect Mobile Layout: Single Column */
-            .weeks-grid-container {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-
-            .week-card {
-                padding: 1.5rem;
-            }
-
-            .week-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            .week-meta {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-
-            .modal-content {
-                width: 95%;
-                margin: 1rem;
-            }
-
-            .modal-header,
-            .modal-body {
-                padding: 1.5rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .week-card {
-                padding: 1rem;
-            }
-
-            .task {
-                padding: 0.75rem;
-            }
-
-            .hero-content h2 {
-                font-size: 1.75rem;
-            }
-
-            .weeks-header h3 {
-                font-size: 1.5rem;
-            }
-        }
-
-        /* Skip link - completely hidden */
-        .skip-link {
-            position: absolute !important;
-            left: -10000px !important;
-            top: auto !important;
-            width: 1px !important;
-            height: 1px !important;
-            overflow: hidden !important;
-        }
-    </style>
+</body>
+</html>const tasks = document.querySelectorAll('.task-card');
+                        const current = document.querySelector('.task-card.focused') || tasks[0];
+                        const currentIndex = Array.from(tasks).indexOf(current);
+                        const next = tasks[currentIndex + 1] || tasks[0];
+                        
+                        current.classList.remove('focused');
+                        next.classList.add('focused');
+                        next.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+                
+                if (e.key === 'k' || e.key === 'ArrowUp') {
+                    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                        e.preventDefault();
+                        const tasks = document.querySelectorAll('.task-card');
+                        const current = document.querySelector('.task-card.focused') || tasks[0];
+                        const currentIndex = Array.from(tasks).indexOf(current);
+                        const prev = tasks[currentIndex - 1] || tasks[tasks.length - 1];
+                        
+                        current.classList.remove('focused');
+                        prev.classList.add('focused');
+                        prev.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+                
+                // Enter to open focused task
+                if (e.key === 'Enter') {
+                    const focused = document.querySelector('.task-card.focused');
+                    if (focused && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                        focused.click();
+                    }
+                }
+                
+                // Space to toggle focused task checkbox
+                if (e.key === ' ') {
+                    const focused = document.querySelector('.task-card.focused');
+                    if (focused && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                        e.preventDefault();
+                        week="week1">
+                        <span class="expand-text">View Tasks</span>
+                        <svg class="expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                    </div>
+                    
+                    <div class="tasks-container" data-week="week1">
+                        <div class="tasks-grid">
+                            <!-- Week 1 Tasks -->
+                            <div class="task-card task" data-week="week1" data-task="install-server2012">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week1" data-task="install-server2012">
+                                    <div>
+                                        <h5 class="task-title">Install Windows Server 2012</h5>
+                                        <p class="task-description">Set up the foundation server for your domain controller</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 30 min</span>
+                                    <span>📋 5 steps</span>
+                                    <span>🎯 Foundation</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week1" data-task="configure-static-ip">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week1" data-task="configure-static-ip">
+                                    <div>
+                                        <h5 class="task-title">Configure Static IP Address</h5>
+                                        <p class="task-description">Set up reliable static IP addressing for domain controller</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 15 min</span>
+                                    <span>📋 7 steps</span>
+                                    <span>🌐 Network</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week1" data-task="install-adds-role">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week1" data-task="install-adds-role">
+                                    <div>
+                                        <h5 class="task-title">Install Active Directory Domain Services Role</h5>
+                                        <p class="task-description">Install the foundational AD DS role on Windows Server 2012</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 20 min</span>
+                                    <span>📋 7 steps</span>
+                                    <span>🔐 Identity</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week1" data-task="promote-to-dc">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week1" data-task="promote-to-dc">
+                                    <div>
+                                        <h5 class="task-title">Promote Server to Domain Controller</h5>
+                                        <p class="task-description">Configure as primary DC with DNS services and create new forest</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 45 min</span>
+                                    <span>📋 9 steps</span>
+                                    <span>🏰 Domain</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week1" data-task="configure-dns-server">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week1" data-task="configure-dns-server">
+                                    <div>
+                                        <h5 class="task-title">Configure DNS Server Settings</h5>
+                                        <p class="task-description">Set up DNS zones and ensure proper name resolution</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 25 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>🌐 DNS</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week1" data-task="create-domain-users">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week1" data-task="create-domain-users">
+                                    <div>
+                                        <h5 class="task-title">Create Domain Users and OUs</h5>
+                                        <p class="task-description">Set up organizational units and create test user accounts</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 30 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>👥 Users</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week1" data-task="setup-vm-dns">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week1" data-task="setup-vm-dns">
+                                    <div>
+                                        <h5 class="task-title">Configure VM DNS Settings</h5>
+                                        <p class="task-description">Point virtual machine to use domain controller as DNS server</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 15 min</span>
+                                    <span>📋 8 steps</span>
+                                    <span>🖥️ Client</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week1" data-task="join-vm-domain">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week1" data-task="join-vm-domain">
+                                    <div>
+                                        <h5 class="task-title">Join VM to Domain</h5>
+                                        <p class="task-description">Add virtual machine to domain for centralized management</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 20 min</span>
+                                    <span>📋 8 steps</span>
+                                    <span>🔗 Domain Join</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week1" data-task="create-hidden-share">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week1" data-task="create-hidden-share">
+                                    <div>
+                                        <h5 class="task-title">Create Hidden Network Share</h5>
+                                        <p class="task-description">Set up centralized file storage with hidden share</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 25 min</span>
+                                    <span>📋 8 steps</span>
+                                    <span>📁 Shares</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week1" data-task="map-drive-gpo">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week1" data-task="map-drive-gpo">
+                                    <div>
+                                        <h5 class="task-title">Map Drive via Group Policy</h5>
+                                        <p class="task-description">Configure automatic drive mapping through GPO preferences</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 35 min</span>
+                                    <span>📋 8 steps</span>
+                                    <span>📄 GPO</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week1" data-task="map-drive-script">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week1" data-task="map-drive-script">
+                                    <div>
+                                        <h5 class="task-title">Map Drive via Logon Script</h5>
+                                        <p class="task-description">Create PowerShell logon script for automatic drive mapping</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 30 min</span>
+                                    <span>📋 7 steps</span>
+                                    <span>💻 Script</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week1" data-task="create-security-group">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week1" data-task="create-security-group">
+                                    <div>
+                                        <h5 class="task-title">Create Security Group for Share Access</h5>
+                                        <p class="task-description">Implement role-based access control using AD security groups</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 25 min</span>
+                                    <span>📋 8 steps</span>
+                                    <span>🔒 Security</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Week 2: Infrastructure Expansion -->
+                <div class="week-card" data-week="week2">
+                    <div class="week-header">
+                        <div class="week-badge">
+                            <div class="week-number">2</div>
+                            <div class="week-icon">🏢</div>
+                            <div>
+                                <h4 class="week-title">Infrastructure Expansion</h4>
+                                <p class="week-description">Second DC, WSUS, and time synchronization</p>
+                            </div>
+                        </div>
+                        <div class="week-progress">
+                            <span class="week-count" data-week="week2">0/8 tasks</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" data-week="week2" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="week-expand" data-week="week2">
+                        <span class="expand-text">View Tasks</span>
+                        <svg class="expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                    </div>
+                    
+                    <div class="tasks-container" data-week="week2">
+                        <div class="tasks-grid">
+                            <!-- Week 2 Tasks -->
+                            <div class="task-card task" data-week="week2" data-task="install-second-server">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week2" data-task="install-second-server">
+                                    <div>
+                                        <h5 class="task-title">Install Second Windows Server 2012</h5>
+                                        <p class="task-description">Deploy second server for redundancy and load distribution</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 35 min</span>
+                                    <span>📋 5 steps</span>
+                                    <span>🔄 Redundancy</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week2" data-task="promote-additional-dc">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week2" data-task="promote-additional-dc">
+                                    <div>
+                                        <h5 class="task-title">Promote to Additional Domain Controller</h5>
+                                        <p class="task-description">Add redundancy with second domain controller</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 40 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>🏰 Domain</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week2" data-task="install-wsus-role">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week2" data-task="install-wsus-role">
+                                    <div>
+                                        <h5 class="task-title">Install WSUS Role</h5>
+                                        <p class="task-description">Deploy Windows Server Update Services for centralized updates</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 30 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>🔄 Updates</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week2" data-task="configure-wsus-settings">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week2" data-task="configure-wsus-settings">
+                                    <div>
+                                        <h5 class="task-title">Configure WSUS Settings</h5>
+                                        <p class="task-description">Set up update approval and client targeting policies</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 25 min</span>
+                                    <span>📋 5 steps</span>
+                                    <span>⚙️ Config</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week2" data-task="setup-wsus-gpo">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week2" data-task="setup-wsus-gpo">
+                                    <div>
+                                        <h5 class="task-title">Setup WSUS Group Policy</h5>
+                                        <p class="task-description">Configure client update policies and automatic settings</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 35 min</span>
+                                    <span>📋 7 steps</span>
+                                    <span>📄 GPO</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week2" data-task="configure-primary-time">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week2" data-task="configure-primary-time">
+                                    <div>
+                                        <h5 class="task-title">Configure Primary Time Server</h5>
+                                        <p class="task-description">Set PDC Emulator as authoritative time source with external NTP</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 20 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>🕒 Time</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week2" data-task="configure-secondary-time">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week2" data-task="configure-secondary-time">
+                                    <div>
+                                        <h5 class="task-title">Configure Secondary Time Server</h5>
+                                        <p class="task-description">Set second DC as backup time source with domain hierarchy sync</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 15 min</span>
+                                    <span>📋 5 steps</span>
+                                    <span>🕓 Sync</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-card task" data-week="week2" data-task="test-infrastructure">
+                                <div class="task-header">
+                                    <input type="checkbox" class="task-checkbox" data-week="week2" data-task="test-infrastructure">
+                                    <div>
+                                        <h5 class="task-title">Test Infrastructure Setup</h5>
+                                        <p class="task-description">Verify all services, replication, and connectivity</p>
+                                    </div>
+                                </div>
+                                <div class="task-meta">
+                                    <span>⏱️ 30 min</span>
+                                    <span>📋 6 steps</span>
+                                    <span>✅ Testing</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Week 3: Email & Messaging -->
+                <div class="week-card" data-week="week3">
+                    <div class="week-header">
+                        <div class="week-badge">
+                            <div class="week-number">3</div>
+                            <div class="week-icon">📧</div>
+                            <div>
+                                <h4 class="week-title">Email & Messaging</h4>
+                                <p class="week-description">Server 2016 upgrade and Exchange 2019 deployment</p>
+                            </div>
+                        </div>
+                        <div class="week-progress">
+                            <span class="week-count" data-week="week3">0/12 tasks</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" data-week="week3" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="week-expand" data-
