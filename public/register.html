@@ -8,7 +8,7 @@
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
-  <script src="/js/app.js" defer></script>
+  <script src="/app.js" defer></script>
 </head>
 <body>
   <nav class="nav-glass">
@@ -19,7 +19,7 @@
     </div>
     <div class="auth">
       <a href="/register.html" aria-label="Join your team">Join Team</a>
-      <a href="/login.html" aria-label="Login to Velocity Lab">Login</a>
+      <a href="/login.html" aria-label="Sign in">Sign in</a>
     </div>
   </nav>
   
@@ -134,7 +134,7 @@
   </div>
 
   <script>
-    // Enhanced client-side validation - FIXED: Removed role validation
+    // Enhanced client-side validation
     document.addEventListener('DOMContentLoaded', function() {
       const form = document.getElementById('registerForm');
       const nameInput = document.getElementById('name');
@@ -253,7 +253,7 @@
         }
       }
 
-      // FIXED: Enhanced form submission validation without role field
+      // Enhanced form submission validation
       form.addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -268,7 +268,9 @@
           // All validation passed, proceed with form submission
           // The app.js handleFormSubmit will take over from here
         } else {
-          showNotification('Please fix the errors above before submitting', 'error');
+          if (typeof showNotification === 'function') {
+            showNotification('Please fix the errors above before submitting', 'error');
+          }
         }
       });
     });

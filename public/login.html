@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Continue your Exchange Online Hybrid Migration training with your MSP team.">
-  <title>Continue Training - Velocity Lab</title>
+  <meta name="description" content="Sign in to continue your Exchange Online Hybrid Migration training with your MSP team.">
+  <title>Sign in - Velocity Lab</title>
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
-  <script src="/js/app.js" defer></script>
+  <script src="/app.js" defer></script>
 </head>
 <body>
   <nav class="nav-glass">
@@ -19,7 +19,7 @@
     </div>
     <div class="auth">
       <a href="/register.html" aria-label="Join your team">Join Team</a>
-      <a href="/login.html" aria-label="Continue training">Continue Training</a>
+      <a href="/login.html" aria-label="Sign in">Sign in</a>
     </div>
   </nav>
   
@@ -27,7 +27,7 @@
     <div class="form-container">
       <h2>Welcome Back</h2>
       <p style="text-align: center; color: var(--text-secondary); margin-bottom: var(--space-xl);">
-        Continue your Velocity Lab training
+        Sign in to your Velocity Lab account
       </p>
       
       <div class="notification" id="notification"></div>
@@ -76,7 +76,7 @@
         
         <div class="form-group">
           <button type="submit" id="loginButton" class="btn btn-primary">
-            <span>Continue Training</span>
+            <span>Sign in</span>
             <span class="spinner">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <path d="M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 12 2z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-dasharray="15 45"/>
@@ -93,7 +93,7 @@
   </div>
 
   <script>
-    // Enhanced client-side validation for login - REMOVED FORGOT PASSWORD
+    // Enhanced client-side validation for login
     document.addEventListener('DOMContentLoaded', function() {
       const form = document.getElementById('loginForm');
       const emailInput = document.getElementById('email');
@@ -156,9 +156,11 @@
         
         if (isEmailValid && isPasswordValid) {
           // All validation passed, proceed with form submission
-          // The main.js handleFormSubmit will take over from here
+          // The app.js handleFormSubmit will take over from here
         } else {
-          showNotification('Please fix the errors above before submitting', 'error');
+          if (typeof showNotification === 'function') {
+            showNotification('Please fix the errors above before submitting', 'error');
+          }
         }
       });
     });
