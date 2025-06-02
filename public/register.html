@@ -8,7 +8,7 @@
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
-  <script src="/js/main.js" defer></script>
+  <script src="/js/app.js" defer></script>
 </head>
 <body>
   <nav class="nav-glass">
@@ -266,7 +266,7 @@
         
         if (isNameValid && isEmailValid && isPasswordValid && isRepeatPasswordValid && isTermsValid) {
           // All validation passed, proceed with form submission
-          // The main.js handleFormSubmit will take over from here
+          // The app.js handleFormSubmit will take over from here
         } else {
           showNotification('Please fix the errors above before submitting', 'error');
         }
