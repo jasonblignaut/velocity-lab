@@ -3,242 +3,349 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Velocity Lab: Your team's guided timeline for mastering Microsoft Exchange Online Hybrid Migration.">
-  <meta name="keywords" content="Microsoft Exchange, hybrid migration, MSP training, Exchange Online, Microsoft 365, hybrid setup">
-  <title>Velocity Lab - Microsoft Exchange Online Hybrid Migration Guided Timeline</title>
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <meta name="description" content="Velocity Lab: Internal MSP training platform for Exchange Online Hybrid Migration mastery">
+  <title>Velocity Lab - Exchange Hybrid Migration Training</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/styles.css">
-  <script src="/js/app.js" defer></script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
 </head>
 <body>
+  <!-- Modern Navigation -->
   <nav class="nav-glass">
     <div class="brand">
-      <a href="/index.html">
-        <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="brand-logo">
-      </a>
+      <img src="Velocity-Logo.png" alt="Velocity Lab" class="brand-logo">
+      <div class="brand-text">
+        <span class="brand-title">Velocity Lab</span>
+        <span class="brand-subtitle">Exchange Hybrid Migration Training</span>
+      </div>
     </div>
     <div class="auth">
-      <a href="/register.html" aria-label="Join your team training">Join Training</a>
-      <a href="/login.html" aria-label="Continue your training">Continue</a>
+      <a href="register.html" class="nav-link">Join Training</a>
+      <a href="login.html" class="nav-link nav-link-primary">Continue</a>
     </div>
   </nav>
   
   <div class="container">
-    <header class="header">
-      <h1>Velocity Lab</h1>
-      <h2>Microsoft Exchange Online Hybrid Migration Guided Timeline</h2>
-      <p class="hero-description">
-        Your team's step-by-step training program to master Exchange Online hybrid migrations. 
-        Follow our proven 4-week timeline from basic Active Directory setup through complete Microsoft 365 hybrid deployment.
+    <!-- Hero Section -->
+    <header class="hero">
+      <div class="hero-badge">
+        <span>🏢 Internal MSP Training Platform</span>
+      </div>
+      <h1 class="hero-title">Master Exchange Hybrid Migration</h1>
+      <p class="hero-subtitle">
+        Our comprehensive 4-week training program designed specifically for technical staff. 
+        From basic Active Directory setup through complete Microsoft 365 hybrid deployment.
       </p>
+      
       <div class="hero-actions">
-        <a href="/register.html" class="btn btn-primary hero-btn">
+        <a href="register.html" class="btn btn-primary btn-large">
           <span>Start Your Training</span>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="m9 18 6-6-6-6"/>
           </svg>
         </a>
-        <a href="/login.html" class="btn btn-secondary hero-btn">
-          <span>Resume Training</span>
+        <a href="login.html" class="btn btn-secondary btn-large">
+          <span>Resume Progress</span>
         </a>
+      </div>
+
+      <!-- Training Overview -->
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-number">4</div>
+          <div class="stat-label">Week Program</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">3</div>
+          <div class="stat-label">Minimum VMs</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">Real-world</div>
+        </div>
       </div>
     </header>
 
-    <!-- Course Overview -->
-    <section class="course-overview">
-      <h3>Your 4-Week Learning Path</h3>
-      <div class="overview-grid">
-        <div class="overview-card">
-          <div class="overview-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 6h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2"/>
-            </svg>
-          </div>
-          <h4>Week 1: Foundation Setup</h4>
-          <p>Build your Windows Server 2012 domain controller, join virtual machines, and create secure network shares with automatic drive mapping.</p>
+    <!-- CTO Message -->
+    <section class="cto-message">
+      <div class="message-header">
+        <div class="message-avatar">👨‍💼</div>
+        <div class="message-meta">
+          <h3>Message from our CTO</h3>
+          <p>Guidelines for your lab environment</p>
         </div>
-        <div class="overview-card">
-          <div class="overview-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m1 5v4h4v2h-4v4h-2v-4H7v-2h4V9h2"/>
-            </svg>
+      </div>
+      <div class="message-content">
+        <blockquote>
+          "I encourage you all to make the lab something that you are proud of, go crazy if you want to. 
+          The things you learn while doing this will be with you for the rest of your life! Maybe not mine, because I am super old 😄"
+        </blockquote>
+        <div class="message-highlights">
+          <div class="highlight-item">
+            <span class="highlight-icon">⚠️</span>
+            <span>Please don't use VTG tenant or accounts - this must be 100% separate</span>
           </div>
-          <h4>Week 2: Infrastructure Expansion</h4>
-          <p>Deploy your second domain controller for redundancy, implement WSUS for centralized updates, and configure enterprise time synchronization.</p>
-        </div>
-        <div class="overview-card">
-          <div class="overview-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2"/>
-            </svg>
+          <div class="highlight-item">
+            <span class="highlight-icon">☁️</span>
+            <span>If using Azure, remember to shut down VMs when not in use</span>
           </div>
-          <h4>Week 3: Exchange Deployment</h4>
-          <p>Upgrade to Server 2016, install Exchange Server 2019, create user mailboxes, and establish reliable internal mail flow between users.</p>
-        </div>
-        <div class="overview-card">
-          <div class="overview-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M19 18H6a4 4 0 0 1-4-4 4 4 0 0 1 4-4h.71a5.5 5.5 0 0 1 0-1A5.37 5.37 0 0 1 12 3.59a5.26 5.26 0 0 1 5.33 4.71A4.33 4.33 0 0 1 22 13a4.5 4.5 0 0 1-3 4.2"/>
-            </svg>
+          <div class="highlight-item">
+            <span class="highlight-icon">🔄</span>
+            <span>Complete this lab at least once a year, especially the Exchange Hybrid portion</span>
           </div>
-          <h4>Week 4: Hybrid Migration</h4>
-          <p>Configure external mail publishing, implement SSL certificates, and complete your Microsoft 365 hybrid setup with successful Exchange Online migration.</p>
         </div>
       </div>
     </section>
 
-    <!-- Lab Prerequisites - Enhanced for MSP Environment -->
-    <section class="prerequisites">
-      <h3>Lab Prerequisites</h3>
-      <p class="prerequisites-intro">
-        Before you begin your training, make sure you have these essentials ready. Choose between Azure VMs or physical hardware for your lab environment.
-      </p>
+    <!-- Lab Environment Choice -->
+    <section class="lab-environment">
+      <div class="section-header">
+        <h3>Choose Your Lab Environment</h3>
+        <p>Both approaches have their benefits - choose what works best for your learning style</p>
+      </div>
       
-      <div class="lab-environment-choice">
-        <h4>🏗️ Choose Your Lab Environment</h4>
-        <div class="environment-options">
-          <div class="environment-option">
-            <div class="option-header">
-              <h5>💻 Physical Lab (Recommended)</h5>
-              <span class="option-badge recommended">Recommended</span>
-            </div>
-            <p>Use spare physical hardware for the most realistic experience. Best for understanding real-world deployment scenarios.</p>
+      <div class="environment-grid">
+        <div class="environment-card recommended">
+          <div class="card-badge">CTO Recommended</div>
+          <div class="card-icon">🖥️</div>
+          <h4>Physical Lab Setup</h4>
+          <p>Use older hardware like Dell or Lenovo mini PCs for the most realistic experience</p>
+          
+          <div class="benefits">
+            <h5>Why This Approach:</h5>
             <ul>
-              <li>Old laptop or Dell/Lenovo mini PC (minimum 16GB RAM, 200GB storage)</li>
-              <li>VirtualBox or Hyper-V for hosting your 3 required VMs</li>
-              <li>No SMTP gotchas - true real-world mail flow experience</li>
-              <li>Static IP from your ISP (~R25/month via Afrihost or Telkom)</li>
+              <li>No SMTP gotchas - real-world mail flow behavior</li>
+              <li>Unlimited time - no subscription costs</li>
+              <li>True production-like experience</li>
+              <li>Learn actual hardware considerations</li>
             </ul>
           </div>
-          <div class="environment-option">
-            <div class="option-header">
-              <h5>☁️ Azure Virtual Lab</h5>
-              <span class="option-badge alternative">Alternative</span>
-            </div>
-            <p>Deploy in Azure for convenience, but be aware of SMTP limitations that differ from real-world scenarios.</p>
+
+          <div class="requirements">
+            <h5>Hardware Requirements:</h5>
             <ul>
-              <li>Azure subscription with adequate credits</li>
-              <li>3x Azure VMs (DS2_v2 or equivalent)</li>
-              <li>Azure Virtual Network with proper subnetting</li>
-              <li>Note: Some SMTP features may behave differently than on-premises</li>
+              <li>Old laptop or mini PC (16GB RAM recommended)</li>
+              <li>At least 200GB storage space</li>
+              <li>VirtualBox or Hyper-V capable</li>
+              <li>Stable internet connection</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="environment-card">
+          <div class="card-badge">Alternative</div>
+          <div class="card-icon">☁️</div>
+          <h4>Azure Virtual Lab</h4>
+          <p>Cloud-based approach with some limitations but good for learning</p>
+          
+          <div class="benefits">
+            <h5>Benefits:</h5>
+            <ul>
+              <li>Quick setup and deployment</li>
+              <li>Scalable resources on demand</li>
+              <li>Access from anywhere</li>
+              <li>No physical hardware needed</li>
+            </ul>
+          </div>
+
+          <div class="limitations">
+            <h5>Important Limitations:</h5>
+            <ul>
+              <li>SMTP gotchas that differ from real-world</li>
+              <li>Subscription costs can add up quickly</li>
+              <li>Must shut down when not in use</li>
+              <li>Some networking differences</li>
             </ul>
           </div>
         </div>
       </div>
 
-      <div class="prerequisites-grid">
-        <div class="prerequisite-category">
-          <h4>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 4h16v12H4V4m2 2v8h12V6H6m2 8h8v2H8v-2"/>
-            </svg>
-            Required Virtual Machines
-          </h4>
-          <ul>
-            <li><strong>VM1:</strong> Domain Controller (Windows Server 2012 → 2016)</li>
-            <li><strong>VM2:</strong> Additional DC + WSUS (Windows Server 2012 → 2016)</li>
-            <li><strong>VM3:</strong> Exchange Server (Windows Server 2016 + Exchange 2019)</li>
-            <li><strong>Bonus:</strong> Windows 10/11 workstation for testing (optional but helpful)</li>
-          </ul>
+      <div class="environment-note">
+        <p><strong>Pro Tip:</strong> Consider doing the lab on both environments, or even joining your labs for the ultimate learning experience!</p>
+      </div>
+    </section>
+
+    <!-- 4-Week Training Program -->
+    <section class="training-program">
+      <div class="section-header">
+        <h3>Your 4-Week Training Journey</h3>
+        <p>Carefully structured progression from foundation to expert-level hybrid deployment</p>
+      </div>
+
+      <div class="weeks-timeline">
+        <!-- Week 1 -->
+        <div class="week-card">
+          <div class="week-header">
+            <div class="week-number">01</div>
+            <div class="week-icon">🏗️</div>
+            <div class="week-title">
+              <h4>Foundation Setup</h4>
+              <p>Build your core infrastructure</p>
+            </div>
+          </div>
+          
+          <div class="week-requirements">
+            <h5>Minimum VMs Required:</h5>
+            <div class="vm-list">
+              <div class="vm-item">
+                <span class="vm-icon">🖥️</span>
+                <span>DC: Windows Server 2012 promoted to Domain Controller</span>
+              </div>
+              <div class="vm-item">
+                <span class="vm-icon">💻</span>
+                <span>Workstation: VM joined to domain</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="week-tasks">
+            <h5>Key Tasks:</h5>
+            <ul>
+              <li>Create network share on DC with hidden visibility</li>
+              <li>Map drives automatically on logon using different methods (3 drives)</li>
+              <li>Create security group with exclusive network drive access</li>
+              <li>Test domain join and file sharing functionality</li>
+            </ul>
+          </div>
         </div>
-        
-        <div class="prerequisite-category">
-          <h4>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M19 18H6a4 4 0 0 1-4-4 4 4 0 0 1 4-4h.71a5.5 5.5 0 0 1 0-1A5.37 5.37 0 0 1 12 3.59a5.26 5.26 0 0 1 5.33 4.71A4.33 4.33 0 0 1 22 13a4.5 4.5 0 0 1-3 4.2"/>
-            </svg>
-            Microsoft 365 & Licensing
-          </h4>
-          <ul>
-            <li>Microsoft 365 Business Premium trial (30 days free)</li>
-            <li>Your own test domain (e.g., migrationlab-yourname.co.za)</li>
-            <li>Global Administrator access to M365 tenant</li>
-            <li>Exchange Online Plan 1 or 2 licenses</li>
-          </ul>
+
+        <!-- Week 2 -->
+        <div class="week-card">
+          <div class="week-header">
+            <div class="week-number">02</div>
+            <div class="week-icon">🔄</div>
+            <div class="week-title">
+              <h4>Infrastructure Expansion</h4>
+              <p>Add redundancy and services</p>
+            </div>
+          </div>
+          
+          <div class="week-requirements">
+            <h5>Additional Infrastructure:</h5>
+            <div class="vm-list">
+              <div class="vm-item">
+                <span class="vm-icon">🖥️</span>
+                <span>Second Server 2012 for redundancy</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="week-tasks">
+            <h5>Key Tasks:</h5>
+            <ul>
+              <li>Install and configure second Server 2012</li>
+              <li>Setup WSUS for centralized update management</li>
+              <li>Configure 2x time servers for proper synchronization</li>
+              <li>Test failover and redundancy scenarios</li>
+            </ul>
+          </div>
         </div>
-        
-        <div class="prerequisite-category">
-          <h4>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-            </svg>
-            Network & Connectivity
-          </h4>
-          <ul>
-            <li>Stable internet connection (minimum 20 Mbps for smooth operation)</li>
-            <li>Router with port forwarding capabilities</li>
-            <li>Firewall ports: 25 (SMTP), 587 (SMTPS), 443 (HTTPS), 993 (IMAPS), 995 (POP3S)</li>
-            <li>DNS management access for your test domain</li>
-          </ul>
+
+        <!-- Week 3 -->
+        <div class="week-card">
+          <div class="week-header">
+            <div class="week-number">03</div>
+            <div class="week-icon">📧</div>
+            <div class="week-title">
+              <h4>Exchange Deployment</h4>
+              <p>Email infrastructure setup</p>
+            </div>
+          </div>
+          
+          <div class="week-requirements">
+            <h5>Exchange Infrastructure:</h5>
+            <div class="vm-list">
+              <div class="vm-item">
+                <span class="vm-icon">⬆️</span>
+                <span>Upgrade existing servers to Server 2016</span>
+              </div>
+              <div class="vm-item">
+                <span class="vm-icon">📧</span>
+                <span>Third server dedicated for Exchange</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="week-tasks">
+            <h5>Key Tasks:</h5>
+            <ul>
+              <li>Upgrade all servers to Server 2016</li>
+              <li>Install and configure Exchange Server</li>
+              <li>Create user mailboxes</li>
+              <li>Establish internal mail flow between users</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Week 4 -->
+        <div class="week-card">
+          <div class="week-header">
+            <div class="week-number">04</div>
+            <div class="week-icon">☁️</div>
+            <div class="week-title">
+              <h4>Hybrid Integration</h4>
+              <p>Microsoft 365 connection</p>
+            </div>
+          </div>
+          
+          <div class="week-requirements">
+            <h5>Cloud Requirements:</h5>
+            <div class="vm-list">
+              <div class="vm-item">
+                <span class="vm-icon">🌐</span>
+                <span>External mail publishing setup</span>
+              </div>
+              <div class="vm-item">
+                <span class="vm-icon">☁️</span>
+                <span>Separate M365 tenant (not VTG)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="week-tasks">
+            <h5>Key Tasks:</h5>
+            <ul>
+              <li>Configure external mail publishing</li>
+              <li>Set up separate Microsoft 365 tenant</li>
+              <li>Establish hybrid environment connection</li>
+              <li>Test bidirectional mail flow and functionality</li>
+            </ul>
+          </div>
+
+          <div class="week-note">
+            <p><strong>Important:</strong> Only proceed with M365 hybrid setup after completing external mail publishing</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Why Choose Our Training -->
-    <section class="features">
-      <h3>Why Our Training Works</h3>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2h-4M9 11V9a3 3 0 116 0v2M9 11h6"/>
-            </svg>
-          </div>
-          <h4>Real Production Experience</h4>
-          <p>Build actual Microsoft servers and services, not simulations. Experience the real challenges and solutions you'll face with clients.</p>
+    <!-- Domain Examples -->
+    <section class="domain-examples">
+      <div class="section-header">
+        <h3>Test Domain Examples</h3>
+        <p>Use separate domains for your lab - never use production VTG accounts</p>
+      </div>
+      
+      <div class="domain-grid">
+        <div class="domain-card">
+          <h5>Previous Lab Domains Used:</h5>
+          <ul>
+            <li><code>greatested.co.za</code></li>
+            <li><code>migrationslab82.ga</code></li>
+            <li><code>hybridlab-yourname.com</code></li>
+            <li><code>exchangetest-initials.net</code></li>
+          </ul>
         </div>
         
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-            </svg>
-          </div>
-          <h4>Proven 4-Week Timeline</h4>
-          <p>Our structured approach gets you from zero to hybrid migration expert in just one month, following industry best practices.</p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M8.5 11a4 4 0 100-8 4 4 0 000 8zM20 8v6M23 11h-6"/>
-            </svg>
-          </div>
-          <h4>Team Progress Tracking</h4>
-          <p>Monitor individual progress and compete with teammates. See who's leading the leaderboard and help each other succeed.</p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
-            </svg>
-          </div>
-          <h4>Step-by-Step Guidance</h4>
-          <p>Detailed instructions with troubleshooting tips and reference links. Never get stuck - every task has the resources you need.</p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-            </svg>
-          </div>
-          <h4>Current Technology Stack</h4>
-          <p>Learn with 2025-current technologies: Exchange 2019, Microsoft 365, modern authentication, and current hybrid best practices.</p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
-              <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
-              <line x1="12" y1="22.08" x2="12" y2="12"/>
-            </svg>
-          </div>
-          <h4>Repeat & Master</h4>
-          <p>Complete the lab multiple times to reinforce learning. Perfect for annual team training and onboarding new staff members.</p>
+        <div class="domain-card">
+          <h5>Naming Suggestions:</h5>
+          <ul>
+            <li>Include your initials or name</li>
+            <li>Add current year for uniqueness</li>
+            <li>Use descriptive lab-related terms</li>
+            <li>Keep it professional but memorable</li>
+          </ul>
         </div>
       </div>
     </section>
@@ -246,56 +353,89 @@
     <!-- Call to Action -->
     <section class="cta">
       <div class="cta-content">
-        <h3>Ready to Master Exchange Hybrid Migration?</h3>
-        <p>Join your team and start building the skills that matter. This training has been specifically designed based on real MSP deployment scenarios.</p>
+        <h3>Ready to Begin Your Training?</h3>
+        <p>Join your colleagues in mastering Exchange hybrid migration. Build skills that will serve you throughout your career.</p>
         <div class="cta-actions">
-          <a href="/register.html" class="btn btn-primary">
+          <a href="register.html" class="btn btn-primary btn-large">
             <span>Start Training Now</span>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="m9 18 6-6-6-6"/>
             </svg>
           </a>
-          <div class="cta-note">
-            <small>✓ Team registration • ✓ Immediate access • ✓ Progress tracking • ✓ Repeatable training</small>
-          </div>
+        </div>
+        <div class="cta-features">
+          <span>✓ Progress tracking</span>
+          <span>✓ Detailed guidance</span>
+          <span>✓ Real-world scenarios</span>
+          <span>✓ Career development</span>
         </div>
       </div>
     </section>
   </div>
 
+  <!-- Footer -->
   <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-brand">
-          <img src="/assets/Velocity-Logo.png" alt="Velocity Lab" class="footer-logo">
-          <p>Your team's pathway to Exchange Online hybrid migration mastery.</p>
+    <div class="footer-content">
+      <div class="footer-brand">
+        <img src="Velocity-Logo.png" alt="Velocity Lab" class="footer-logo">
+        <p>Internal training platform for Exchange hybrid migration mastery.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-column">
+          <h5>Training</h5>
+          <ul>
+            <li><a href="register.html">Join Platform</a></li>
+            <li><a href="login.html">Continue Training</a></li>
+          </ul>
         </div>
-        <div class="footer-links">
-          <div class="footer-column">
-            <h4>Training</h4>
-            <ul>
-              <li><a href="/register.html">Join Your Team</a></li>
-              <li><a href="/login.html">Continue Training</a></li>
-              <li><a href="#" onclick="showInfo('Complete 4-week Exchange hybrid migration training')">Course Overview</a></li>
-            </ul>
-          </div>
-          <div class="footer-column">
-            <h4>Support</h4>
-            <ul>
-              <li><a href="#" onclick="showInfo('Contact your team lead or system administrator for support')">Team Support</a></li>
-              <li><a href="#" onclick="showInfo('3 VMs required: DC, additional DC+WSUS, Exchange server')">Lab Requirements</a></li>
-              <li><a href="#" onclick="showInfo('Follow the guided timeline for successful hybrid migration')">Training Guide</a></li>
-            </ul>
-          </div>
+        <div class="footer-column">
+          <h5>Support</h5>
+          <ul>
+            <li><a href="#" onclick="showInfo('Contact your team lead for technical support')">Technical Support</a></li>
+            <li><a href="#" onclick="showInfo('Refer to CTO guidance above for lab setup')">Lab Setup Help</a></li>
+          </ul>
         </div>
       </div>
-      <div class="footer-bottom">
-        <p>&copy; 2025 Velocity Lab. Your team's Exchange hybrid migration training platform.</p>
-      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Velocity Lab. Internal MSP training platform.</p>
     </div>
   </footer>
 
   <script>
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      // Smooth animations on scroll
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-in');
+          }
+        });
+      }, observerOptions);
+
+      // Observe sections for animation
+      document.querySelectorAll('section, .week-card, .environment-card').forEach(el => {
+        observer.observe(el);
+      });
+
+      // Environment card interactions
+      document.querySelectorAll('.environment-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0) scale(1)';
+        });
+      });
+    });
+
     function showInfo(message) {
       if (typeof showNotification === 'function') {
         showNotification(message, 'info', 6000);
@@ -306,118 +446,852 @@
   </script>
 
   <style>
-    /* Enhanced prerequisites styling for lab environment choice */
-    .lab-environment-choice {
-      margin-bottom: var(--space-12);
-      padding: var(--space-8);
-      background: var(--gradient-surface);
-      border-radius: var(--radius-xl);
-      border: 1px solid var(--border-light);
+    /* Modern Apple/Azure Aesthetic for MSP */
+    :root {
+      --primary: #0078d4; /* Microsoft Blue */
+      --primary-light: #106ebe;
+      --primary-dark: #005a9e;
+      --accent: #00bcf2; /* Azure Blue */
+      --success: #107c10;
+      --warning: #ffb900;
+      --error: #d13438;
+      
+      --surface: #ffffff;
+      --surface-light: #f8f9fa;
+      --surface-card: rgba(255, 255, 255, 0.98);
+      --border: #e1e5e9;
+      --border-light: #edebe9;
+      
+      --text-primary: #323130;
+      --text-secondary: #605e5c;
+      --text-tertiary: #8a8886;
+      
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+      --radius: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
     }
 
-    .lab-environment-choice h4 {
-      text-align: center;
-      margin-bottom: var(--space-8);
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
       color: var(--text-primary);
-      font-size: 1.25rem;
-      font-weight: 600;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      font-size: 16px;
     }
 
-    .environment-options {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: var(--space-6);
-    }
-
-    .environment-option {
-      padding: var(--space-6);
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border-light);
-      transition: var(--transition);
-    }
-
-    .environment-option:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-sm);
-      border-color: var(--primary);
-    }
-
-    .option-header {
+    /* Navigation */
+    .nav-glass {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-light);
+      padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: var(--space-4);
     }
 
-    .option-header h5 {
-      margin: 0;
-      font-size: 1.125rem;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-logo {
+      height: 40px;
+      width: auto;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
       font-weight: 600;
       color: var(--text-primary);
     }
 
-    .option-badge {
-      padding: var(--space-1) var(--space-3);
-      border-radius: var(--radius-sm);
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .option-badge.recommended {
-      background: var(--gradient-accent);
-      color: white;
-    }
-
-    .option-badge.alternative {
-      background: var(--surface-light);
+    .brand-subtitle {
+      font-size: 0.875rem;
       color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .auth {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      color: var(--text-secondary);
+    }
+
+    .nav-link:hover {
+      background: rgba(0, 120, 212, 0.1);
+      color: var(--primary);
+    }
+
+    .nav-link-primary {
+      background: var(--primary);
+      color: white !important;
+      box-shadow: var(--shadow);
+    }
+
+    .nav-link-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 4rem 0 6rem;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(0, 120, 212, 0.1);
+      color: var(--primary);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(0, 120, 212, 0.2);
+    }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      max-width: 700px;
+      margin: 0 auto 3rem;
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 4rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      border-radius: var(--radius-lg);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .btn-large {
+      padding: 1.25rem 2.5rem;
+      font-size: 1.125rem;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: var(--shadow);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text-primary);
       border: 1px solid var(--border);
     }
 
-    .environment-option p {
-      color: var(--text-secondary);
-      margin-bottom: var(--space-4);
-      line-height: 1.5;
+    .btn-secondary:hover {
+      background: var(--surface-light);
+      transform: translateY(-1px);
     }
 
-    .environment-option ul {
-      list-style: none;
-      padding: 0;
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      display: block;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* CTO Message */
+    .cto-message {
+      background: var(--surface-card);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      margin: 4rem 0;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow);
+    }
+
+    .message-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .message-avatar {
+      font-size: 2.5rem;
+      width: 4rem;
+      height: 4rem;
+      border-radius: 50%;
+      background: rgba(0, 120, 212, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .message-meta h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .message-meta p {
+      color: var(--text-secondary);
       margin: 0;
     }
 
-    .environment-option li {
-      padding: var(--space-2) 0;
-      border-bottom: 1px solid var(--border-light);
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      line-height: 1.4;
-    }
-
-    .environment-option li:last-child {
-      border-bottom: none;
-    }
-
-    .environment-option li strong {
+    .message-content blockquote {
+      font-size: 1.125rem;
       color: var(--text-primary);
+      font-style: italic;
+      margin-bottom: 1.5rem;
+      padding-left: 1rem;
+      border-left: 3px solid var(--primary);
+    }
+
+    .message-highlights {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .highlight-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+      background: var(--surface-light);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-light);
+    }
+
+    .highlight-icon {
+      font-size: 1.25rem;
+    }
+
+    /* Environment Section */
+    .lab-environment {
+      margin: 6rem 0;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .section-header h3 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    .section-header p {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .environment-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .environment-card {
+      background: var(--surface-card);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      border: 1px solid var(--border-light);
+      position: relative;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow);
+    }
+
+    .environment-card.recommended {
+      border-color: var(--success);
+      background: rgba(16, 124, 16, 0.02);
+    }
+
+    .environment-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: var(--success);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
       font-weight: 600;
     }
 
-    /* Mobile responsiveness */
+    .environment-card:not(.recommended) .card-badge {
+      background: var(--text-tertiary);
+    }
+
+    .card-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .environment-card h4 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    .environment-card p {
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    .benefits,
+    .requirements,
+    .limitations {
+      margin-bottom: 1.5rem;
+    }
+
+    .benefits h5,
+    .requirements h5,
+    .limitations h5 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+    }
+
+    .benefits ul,
+    .requirements ul,
+    .limitations ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .benefits li,
+    .requirements li,
+    .limitations li {
+      padding: 0.5rem 0;
+      color: var(--text-secondary);
+      position: relative;
+      padding-left: 1.5rem;
+      font-size: 0.875rem;
+    }
+
+    .benefits li::before,
+    .requirements li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .limitations li::before {
+      content: '⚠';
+      position: absolute;
+      left: 0;
+      color: var(--warning);
+    }
+
+    .environment-note {
+      text-align: center;
+      padding: 1.5rem;
+      background: rgba(0, 188, 242, 0.05);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(0, 188, 242, 0.2);
+    }
+
+    .environment-note p {
+      color: var(--text-primary);
+      margin: 0;
+      font-weight: 500;
+    }
+
+    /* Training Program */
+    .training-program {
+      margin: 6rem 0;
+    }
+
+    .weeks-timeline {
+      display: grid;
+      gap: 2rem;
+    }
+
+    .week-card {
+      background: var(--surface-card);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+    }
+
+    .week-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .week-header {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .week-number {
+      width: 3rem;
+      height: 3rem;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .week-icon {
+      font-size: 2rem;
+    }
+
+    .week-title h4 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .week-title p {
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .week-requirements,
+    .week-tasks {
+      margin-bottom: 2rem;
+    }
+
+    .week-requirements h5,
+    .week-tasks h5 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    .vm-list {
+      display: grid;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .vm-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: var(--surface-light);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-light);
+    }
+
+    .vm-icon {
+      font-size: 1.25rem;
+    }
+
+    .week-tasks ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .week-tasks li {
+      padding: 0.5rem 0;
+      color: var(--text-secondary);
+      position: relative;
+      padding-left: 1.5rem;
+      font-size: 0.875rem;
+    }
+
+    .week-tasks li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .week-note {
+      background: rgba(255, 185, 0, 0.1);
+      border: 1px solid rgba(255, 185, 0, 0.3);
+      border-radius: var(--radius);
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+
+    .week-note p {
+      margin: 0;
+      color: var(--text-primary);
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    /* Domain Examples */
+    .domain-examples {
+      margin: 6rem 0;
+    }
+
+    .domain-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .domain-card {
+      background: var(--surface-card);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow);
+    }
+
+    .domain-card h5 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    .domain-card ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .domain-card li {
+      padding: 0.5rem 0;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .domain-card code {
+      background: var(--surface-light);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'SF Mono', Monaco, monospace;
+      color: var(--primary);
+      border: 1px solid var(--border-light);
+    }
+
+    /* Call to Action */
+    .cta {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: linear-gradient(135deg, rgba(0, 120, 212, 0.05) 0%, rgba(0, 188, 242, 0.05) 100%);
+      border-radius: var(--radius-xl);
+      margin: 4rem 0;
+    }
+
+    .cta-content h3 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    .cta-content p {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+
+    .cta-actions {
+      margin-bottom: 2rem;
+    }
+
+    .cta-features {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .cta-features span {
+      font-size: 0.875rem;
+      color: var(--success);
+      font-weight: 500;
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--text-primary);
+      color: white;
+      padding: 3rem 0 1.5rem;
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      margin-top: 6rem;
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0 2rem;
+    }
+
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .footer-logo {
+      height: 40px;
+      width: auto;
+      filter: brightness(0) invert(1);
+    }
+
+    .footer-brand p {
+      color: rgba(255, 255, 255, 0.7);
+      margin: 0;
+    }
+
+    .footer-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 2rem;
+    }
+
+    .footer-column h5 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+
+    .footer-column ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .footer-column li {
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-column a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.3s ease;
+    }
+
+    .footer-column a:hover {
+      color: white;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+
+    .footer-bottom p {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.875rem;
+      margin: 0;
+    }
+
+    /* Animations */
+    .animate-in {
+      animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Design */
     @media (max-width: 768px) {
-      .environment-options {
+      .container {
+        padding: 0 1rem;
+      }
+
+      .nav-glass {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .brand {
+        order: 1;
+      }
+
+      .auth {
+        order: 2;
+      }
+
+      .hero {
+        padding: 2rem 0 4rem;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .hero-stats {
+        gap: 2rem;
+      }
+
+      .environment-grid {
         grid-template-columns: 1fr;
       }
-      
-      .option-header {
+
+      .domain-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-content {
+        grid-template-columns: 1fr;
+        padding: 0 1rem;
+      }
+
+      .footer-bottom {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .cta-features {
         flex-direction: column;
-        align-items: flex-start;
-        gap: var(--space-2);
+        gap: 1rem;
+      }
+
+      .message-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .week-header {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .environment-card,
+      .week-card,
+      .domain-card {
+        padding: 1.5rem;
+      }
+
+      .btn-large {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+      }
+
+      .hero-title {
+        font-size: 2rem;
+      }
+
+      .section-header h3 {
+        font-size: 1.75rem;
       }
     }
   </style>
-</body>
-</html>
