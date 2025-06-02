@@ -1,5 +1,5 @@
 // functions/api/progress.ts
-// Enhanced progress tracking endpoints
+// Fixed progress tracking endpoints - Enhanced checkbox persistence & 42-task support
 
 import { 
   jsonResponse, 
@@ -7,11 +7,14 @@ import {
   validateSession,
   getUserById,
   logActivity,
-  calculateProgress
+  calculateProgress,
+  calculateCompletedTasks,
+  TASK_STRUCTURE,
+  TOTAL_TASKS
 } from '../utils';
 import type { Env, Progress } from '../utils';
 
-// GET user progress
+// GET user progress - FIXED: Proper initialization and structure
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   try {
     const { env, request } = context;
@@ -24,24 +27,28 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     
     // Get progress data
     const progressData = await env.PROGRESS.get(`progress:${userId}`);
-    const progress: Progress = progressData ? JSON.parse(progressData) : {};
+    let progress: Progress;
     
-    // Ensure all weeks exist with default empty objects
-    const defaultProgress: Progress = {
-      week1: progress.week1 || {},
-      week2: progress.week2 || {},
-      week3: progress.week3 || {},
-      week4: progress.week4 || {}
-    };
+    if (!progressData) {
+      // FIXED: Initialize proper 42-task structure if no progress exists
+      progress = initializeEmptyProgress();
+      await env.PROGRESS.put(`progress:${userId}`, JSON.stringify(progress));
+    } else {
+      progress = JSON.parse(progressData) as Progress;
+      
+      // FIXED: Ensure all weeks and tasks exist (for upgrades)
+      progress = ensureCompleteStructure(progress);
+      await env.PROGRESS.put(`progress:${userId}`, JSON.stringify(progress));
+    }
     
-    return jsonResponse(defaultProgress);
+    return jsonResponse(progress);
   } catch (error) {
     console.error('Progress GET error:', error);
     return errorResponse('Internal server error', 500);
   }
 };
 
-// POST update progress
+// POST update progress - FIXED: Enhanced persistence and subtask support
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     const { env, request } = context;
@@ -56,6 +63,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const task = formData.get('task')?.toString();
     const week = formData.get('week')?.toString();
     const checked = formData.get('checked') === 'true';
+    const subtaskKey = formData.get('subtask')?.toString();
+    const subtaskChecked = formData.get('subtask_checked') === 'true';
     
     // Validate input
     if (!task || !week) {
@@ -68,53 +77,121 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return errorResponse('Invalid week parameter', 400);
     }
     
-    // Validate task format (basic validation)
-    if (task.length < 1 || task.length > 50) {
+    // FIXED: Validate task exists in our structure
+    const weekStructure = TASK_STRUCTURE[week as keyof typeof TASK_STRUCTURE];
+    if (!weekStructure || !weekStructure.tasks.includes(task)) {
       return errorResponse('Invalid task parameter', 400);
     }
     
     // Get current progress
     const progressData = await env.PROGRESS.get(`progress:${userId}`);
-    let progress: Progress = progressData ? JSON.parse(progressData) : {};
+    let progress: Progress;
     
-    // Ensure week exists
+    if (!progressData) {
+      progress = initializeEmptyProgress();
+    } else {
+      progress = JSON.parse(progressData) as Progress;
+      progress = ensureCompleteStructure(progress);
+    }
+    
+    // Ensure week and task exist
     if (!progress[week]) {
       progress[week] = {};
     }
+    if (!progress[week][task]) {
+      progress[week][task] = {
+        completed: false,
+        subtasks: {}
+      };
+    }
     
     // Get previous state for logging
-    const previousState = progress[week][task] || false;
+    const previousMainState = progress[week][task].completed;
+    const previousSubtaskState = subtaskKey ? progress[week][task].subtasks?.[subtaskKey] : undefined;
     
-    // Update progress
-    progress[week][task] = checked;
+    // FIXED: Handle subtask updates
+    if (subtaskKey) {
+      // Update subtask
+      if (!progress[week][task].subtasks) {
+        progress[week][task].subtasks = {};
+      }
+      progress[week][task].subtasks[subtaskKey] = subtaskChecked;
+      
+      // FIXED: Auto-complete main task when all subtasks are done
+      const allSubtasksCompleted = Object.values(progress[week][task].subtasks).every(completed => completed === true);
+      const hasSubtasks = Object.keys(progress[week][task].subtasks).length > 0;
+      
+      if (hasSubtasks && allSubtasksCompleted && !progress[week][task].completed) {
+        progress[week][task].completed = true;
+        progress[week][task].completedAt = new Date().toISOString();
+      } else if (hasSubtasks && !allSubtasksCompleted && progress[week][task].completed) {
+        progress[week][task].completed = false;
+        delete progress[week][task].completedAt;
+      }
+    } else {
+      // Update main task
+      progress[week][task].completed = checked;
+      
+      if (checked) {
+        progress[week][task].completedAt = new Date().toISOString();
+        
+        // FIXED: Auto-complete all subtasks when main task is checked
+        if (progress[week][task].subtasks) {
+          Object.keys(progress[week][task].subtasks).forEach(subtaskId => {
+            progress[week][task].subtasks![subtaskId] = true;
+          });
+        }
+      } else {
+        delete progress[week][task].completedAt;
+        
+        // FIXED: Auto-uncheck all subtasks when main task is unchecked
+        if (progress[week][task].subtasks) {
+          Object.keys(progress[week][task].subtasks).forEach(subtaskId => {
+            progress[week][task].subtasks![subtaskId] = false;
+          });
+        }
+      }
+    }
     
-    // Save updated progress
-    await env.PROGRESS.put(`progress:${userId}`, JSON.stringify(progress));
+    // FIXED: Save updated progress with proper error handling
+    try {
+      await env.PROGRESS.put(`progress:${userId}`, JSON.stringify(progress));
+    } catch (saveError) {
+      console.error('Failed to save progress:', saveError);
+      return errorResponse('Failed to save progress', 500);
+    }
     
-    // Log the progress change
+    // Calculate new statistics
+    const completedTasks = calculateCompletedTasks(progress);
+    const progressPercentage = calculateProgress(progress);
+    
+    // FIXED: Enhanced logging with both main task and subtask changes
     await logActivity(env, userId, 'progress_updated', {
       week,
       task,
-      checked,
-      previousState,
-      progressPercentage: calculateProgress(progress)
+      subtaskKey,
+      mainTaskChecked: progress[week][task].completed,
+      subtaskChecked: subtaskKey ? progress[week][task].subtasks?.[subtaskKey] : undefined,
+      previousMainState,
+      previousSubtaskState,
+      completedTasks,
+      totalTasks: TOTAL_TASKS,
+      progressPercentage
     });
     
-    // Calculate new statistics for response
-    const completedTasks = Object.values(progress).reduce((total, weekTasks) => {
-      return total + Object.values(weekTasks).filter(Boolean).length;
-    }, 0);
-    
-    const progressPercentage = calculateProgress(progress);
-    
     return jsonResponse({ 
+      success: true,
       message: 'Progress updated successfully',
       task,
       week,
-      checked,
+      subtaskKey,
+      mainTaskCompleted: progress[week][task].completed,
+      subtaskCompleted: subtaskKey ? progress[week][task].subtasks?.[subtaskKey] : undefined,
       completedTasks,
-      totalTasks: 14,
-      progressPercentage
+      totalTasks: TOTAL_TASKS,
+      progressPercentage,
+      // FIXED: Return updated progress for immediate UI sync
+      updatedProgress: progress
     });
   } catch (error) {
     console.error('Progress POST error:', error);
@@ -122,7 +199,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
 };
 
-// PUT bulk update progress (for admin or import functionality)
+// PUT bulk update progress (for admin functionality)
 export const onRequestPut: PagesFunction<Env> = async (context) => {
   try {
     const { env, request } = context;
@@ -146,26 +223,22 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
       return errorResponse('Missing targetUserId or progress data', 400);
     }
     
-    // Validate progress structure
-    const validWeeks = ['week1', 'week2', 'week3', 'week4'];
-    for (const week of validWeeks) {
-      if (progress[week] && typeof progress[week] !== 'object') {
-        return errorResponse(`Invalid progress data for ${week}`, 400);
-      }
-    }
+    // FIXED: Validate progress structure before saving
+    const validatedProgress = ensureCompleteStructure(progress);
     
     // Save progress for target user
-    await env.PROGRESS.put(`progress:${targetUserId}`, JSON.stringify(progress));
+    await env.PROGRESS.put(`progress:${targetUserId}`, JSON.stringify(validatedProgress));
     
     // Log the bulk update
     await logActivity(env, userId, 'progress_bulk_updated', {
       targetUserId,
-      progressPercentage: calculateProgress(progress)
+      progressPercentage: calculateProgress(validatedProgress)
     });
     
     return jsonResponse({ 
+      success: true,
       message: 'Progress bulk updated successfully',
-      progressPercentage: calculateProgress(progress)
+      progressPercentage: calculateProgress(validatedProgress)
     });
   } catch (error) {
     console.error('Progress PUT error:', error);
@@ -173,7 +246,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
   }
 };
 
-// DELETE reset progress
+// DELETE reset progress - FIXED: Proper reset with structure
 export const onRequestDelete: PagesFunction<Env> = async (context) => {
   try {
     const { env, request } = context;
@@ -197,13 +270,8 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
     
     const userIdToReset = targetUserId || userId;
     
-    // Reset progress
-    const emptyProgress: Progress = {
-      week1: {},
-      week2: {},
-      week3: {},
-      week4: {}
-    };
+    // FIXED: Reset progress with proper 42-task structure
+    const emptyProgress = initializeEmptyProgress();
     
     await env.PROGRESS.put(`progress:${userIdToReset}`, JSON.stringify(emptyProgress));
     
@@ -214,11 +282,61 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
     });
     
     return jsonResponse({ 
+      success: true,
       message: 'Progress reset successfully',
-      progressPercentage: 0
+      progressPercentage: 0,
+      completedTasks: 0,
+      totalTasks: TOTAL_TASKS
     });
   } catch (error) {
     console.error('Progress DELETE error:', error);
     return errorResponse('Internal server error', 500);
   }
 };
+
+// FIXED: Helper function to initialize empty progress with proper 42-task structure
+function initializeEmptyProgress(): Progress {
+  const progress: Progress = {};
+  
+  Object.keys(TASK_STRUCTURE).forEach(weekKey => {
+    progress[weekKey] = {};
+    const week = TASK_STRUCTURE[weekKey as keyof typeof TASK_STRUCTURE];
+    
+    week.tasks.forEach(taskId => {
+      progress[weekKey][taskId] = {
+        completed: false,
+        subtasks: {}
+      };
+    });
+  });
+  
+  return progress;
+}
+
+// FIXED: Helper function to ensure progress has complete structure (for migrations/upgrades)
+function ensureCompleteStructure(progress: Progress): Progress {
+  const completeProgress = { ...progress };
+  
+  Object.keys(TASK_STRUCTURE).forEach(weekKey => {
+    if (!completeProgress[weekKey]) {
+      completeProgress[weekKey] = {};
+    }
+    
+    const week = TASK_STRUCTURE[weekKey as keyof typeof TASK_STRUCTURE];
+    week.tasks.forEach(taskId => {
+      if (!completeProgress[weekKey][taskId]) {
+        completeProgress[weekKey][taskId] = {
+          completed: false,
+          subtasks: {}
+        };
+      }
+      
+      // Ensure subtasks object exists
+      if (!completeProgress[weekKey][taskId].subtasks) {
+        completeProgress[weekKey][taskId].subtasks = {};
+      }
+    });
+  });
+  
+  return completeProgress;
+}

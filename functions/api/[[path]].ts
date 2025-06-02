@@ -1,5 +1,5 @@
 // functions/api/[[path]].ts
-// Centralized API router for Velocity Lab - ADMIN INITIALIZATION REMOVED
+// Fixed API router for Velocity Lab - Added Missing Lab Management Endpoints
 
 import { 
   jsonResponse, 
@@ -28,6 +28,12 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     if (path === '/api/profile') {
       const { onRequestGet: handleProfile } = await import('../api/profile');
       return handleProfile(context);
+    }
+
+    // FIXED: Lab history endpoint
+    if (path === '/api/profile/lab-history') {
+      const { onRequestGet: handleLabHistory } = await import('../api/profile');
+      return handleLabHistory(context);
     }
 
     // Progress endpoints
@@ -79,6 +85,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (path === '/api/logout') {
       const { onRequestPost: handleLogout } = await import('../api/logout');
       return handleLogout(context);
+    }
+
+    // FIXED: Lab management endpoints
+    if (path === '/api/lab/start-new') {
+      return await handleStartNewLab(context);
+    }
+
+    if (path === '/api/lab/complete') {
+      return await handleCompleteLab(context);
     }
 
     // Progress endpoints
@@ -143,3 +158,79 @@ export const onRequestDelete: PagesFunction<Env> = async (context) => {
     return errorResponse('Internal server error', 500);
   }
 };
+
+// FIXED: Lab Management Handlers
+
+async function handleStartNewLab(context: { env: Env; request: Request }) {
+  const { env, request } = context;
+  
+  try {
+    // Validate session
+    const userId = await validateSession(env, request);
+    if (!userId) {
+      return errorResponse('Unauthorized', 401);
+    }
+
+    const user = await getUserById(env, userId);
+    if (!user) {
+      return errorResponse('User not found', 404);
+    }
+
+    // Import the startNewLab function
+    const { startNewLab } = await import('../utils');
+    
+    // Start new lab
+    const labId = await startNewLab(env, userId);
+    
+    // Log activity
+    const { logActivity } = await import('../utils');
+    await logActivity(env, userId, 'lab_started', { labId });
+    
+    return jsonResponse({
+      success: true,
+      labId,
+      message: 'New lab started successfully',
+      totalTasks: 42
+    });
+    
+  } catch (error) {
+    console.error('Start new lab error:', error);
+    return errorResponse('Failed to start new lab', 500);
+  }
+}
+
+async function handleCompleteLab(context: { env: Env; request: Request }) {
+  const { env, request } = context;
+  
+  try {
+    // Validate session
+    const userId = await validateSession(env, request);
+    if (!userId) {
+      return errorResponse('Unauthorized', 401);
+    }
+
+    const user = await getUserById(env, userId);
+    if (!user) {
+      return errorResponse('User not found', 404);
+    }
+
+    // Import the completeLab function
+    const { completeLab } = await import('../utils');
+    
+    // Complete current lab
+    await completeLab(env, userId);
+    
+    // Log activity
+    const { logActivity } = await import('../utils');
+    await logActivity(env, userId, 'lab_completed', { labId: user.currentLabId });
+    
+    return jsonResponse({
+      success: true,
+      message: 'Lab completed successfully'
+    });
+    
+  } catch (error) {
+    console.error('Complete lab error:', error);
+    return errorResponse('Failed to complete lab', 500);
+  }
+}
