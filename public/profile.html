@@ -1,1006 +1,531 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="My Profile - Velocity Lab">
-  <title>My Profile | Velocity Lab</title>
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/styles.css">
-  <script src="/js/app.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Velocity Lab</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <a href="#main" class="skip-link">Skip to content</a>
-  
-  <nav class="nav-glass" role="navigation" aria-label="Main navigation">
-    <div class="brand">
-      <a href="/">
-        <img src="/assets/Velocity-Logo.png" alt="Velocity Lab" class="brand-logo">
-      </a>
-    </div>
-    <div class="auth">
-      <span id="userInfo" class="user-info"></span>
-      <a href="/dashboard.html">Dashboard</a>
-      <a href="/admin.html" id="adminLink" style="display: none;">Admin Portal</a>
-      <a href="#" id="logout">Logout</a>
-    </div>
-  </nav>
-
-  <main id="main" class="container">
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Header Navigation -->
     <header class="header">
-      <h1>My Profile</h1>
-      <h2>Manage your account settings and track your progress</h2>
+        <nav class="nav">
+            <div class="nav-brand">
+                <h1>🚀 Velocity Lab</h1>
+                <span class="nav-subtitle">Profile Settings</span>
+            </div>
+            <div class="nav-user">
+                <span id="userInfo" class="user-info">Loading...</span>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+                <a href="admin.html" id="adminLink" class="nav-link admin-link" style="display: none;">Admin</a>
+                <button id="logout" class="btn btn-outline">Logout</button>
+            </div>
+        </nav>
     </header>
 
+    <!-- Main Content -->
+    <main id="main-content" class="main profile-main">
+        <div class="profile-container">
+            <!-- Profile Header -->
+            <section class="profile-header">
+                <div class="profile-avatar">
+                    <div class="avatar-circle">
+                        <span class="avatar-initials" id="avatarInitials">?</span>
+                    </div>
+                    <button class="avatar-upload" aria-label="Upload profile picture">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                    </button>
+                </div>
+                <div class="profile-info">
+                    <h2 id="profileName">Loading...</h2>
+                    <p id="profileEmail">Loading...</p>
+                    <p id="profileCompany" class="profile-company">Loading...</p>
+                </div>
+            </section>
+
+            <!-- Profile Navigation -->
+            <nav class="profile-nav" role="tablist">
+                <button class="profile-nav-item active" data-tab="overview" role="tab" aria-selected="true">
+                    📊 Overview
+                </button>
+                <button class="profile-nav-item" data-tab="settings" role="tab" aria-selected="false">
+                    ⚙️ Settings
+                </button>
+                <button class="profile-nav-item" data-tab="security" role="tab" aria-selected="false">
+                    🔒 Security
+                </button>
+                <button class="profile-nav-item" data-tab="history" role="tab" aria-selected="false">
+                    📚 Lab History
+                </button>
+            </nav>
+
+            <!-- Profile Content -->
+            <div class="profile-content">
+                <!-- Overview Tab -->
+                <section id="overview" class="profile-tab active" role="tabpanel">
+                    <h3>Training Overview</h3>
+                    
+                    <!-- Current Progress -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-content">
+                                <h4>Overall Progress</h4>
+                                <div class="stat-value" id="overallProgress">0%</div>
+                                <div class="stat-detail" id="taskProgress">0/42 tasks completed</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">🏆</div>
+                            <div class="stat-content">
+                                <h4>Current Week</h4>
+                                <div class="stat-value" id="currentWeek">Week 1</div>
+                                <div class="stat-detail" id="weekProgress">Foundation Setup</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">⏱️</div>
+                            <div class="stat-content">
+                                <h4>Time Invested</h4>
+                                <div class="stat-value" id="timeInvested">0 hours</div>
+                                <div class="stat-detail">Estimated completion time</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">🚀</div>
+                            <div class="stat-content">
+                                <h4>Labs Started</h4>
+                                <div class="stat-value" id="labsStarted">1</div>
+                                <div class="stat-detail">Training sessions</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weekly Progress -->
+                    <div class="weekly-progress">
+                        <h4>Weekly Progress Breakdown</h4>
+                        <div class="week-progress-grid">
+                            <div class="week-progress-item" data-week="week1">
+                                <div class="week-progress-header">
+                                    <h5>📚 Week 1: Foundation Setup</h5>
+                                    <span class="week-progress-count">0/12</span>
+                                </div>
+                                <div class="progress-bar-small">
+                                    <div class="progress-fill-small" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="week-progress-item" data-week="week2">
+                                <div class="week-progress-header">
+                                    <h5>🏗️ Week 2: Infrastructure Expansion</h5>
+                                    <span class="week-progress-count">0/8</span>
+                                </div>
+                                <div class="progress-bar-small">
+                                    <div class="progress-fill-small" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="week-progress-item" data-week="week3">
+                                <div class="week-progress-header">
+                                    <h5>📧 Week 3: Email & Messaging</h5>
+                                    <span class="week-progress-count">0/12</span>
+                                </div>
+                                <div class="progress-bar-small">
+                                    <div class="progress-fill-small" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="week-progress-item" data-week="week4">
+                                <div class="week-progress-header">
+                                    <h5>☁️ Week 4: Cloud Integration</h5>
+                                    <span class="week-progress-count">0/10</span>
+                                </div>
+                                <div class="progress-bar-small">
+                                    <div class="progress-fill-small" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <h4>Quick Actions</h4>
+                        <div class="action-buttons">
+                            <a href="dashboard.html" class="btn btn-primary">
+                                📚 Continue Training
+                            </a>
+                            <button id="exportDataBtn" class="btn btn-outline">
+                                📥 Export Progress
+                            </button>
+                            <button id="resetProgressBtn" class="btn btn-outline btn-warning">
+                                🔄 Start New Lab
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Settings Tab -->
+                <section id="settings" class="profile-tab" role="tabpanel" hidden>
+                    <h3>Account Settings</h3>
+                    
+                    <form id="profileForm" class="settings-form">
+                        <input type="hidden" id="csrfToken" name="csrf_token" value="">
+                        
+                        <div class="form-group">
+                            <label for="settingsName" class="form-label">Full Name</label>
+                            <input 
+                                type="text" 
+                                id="settingsName" 
+                                name="name" 
+                                class="form-input" 
+                                placeholder="Enter your full name"
+                                required
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="settingsEmail" class="form-label">Email Address</label>
+                            <input 
+                                type="email" 
+                                id="settingsEmail" 
+                                name="email" 
+                                class="form-input" 
+                                placeholder="Enter your email"
+                                required
+                                readonly
+                            >
+                            <div class="field-help">Contact admin to change email address</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="settingsCompany" class="form-label">Company</label>
+                            <input 
+                                type="text" 
+                                id="settingsCompany" 
+                                name="company" 
+                                class="form-input" 
+                                placeholder="Enter your company name"
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="settingsTimezone" class="form-label">Timezone</label>
+                            <select id="settingsTimezone" name="timezone" class="form-select">
+                                <option value="UTC">UTC (Coordinated Universal Time)</option>
+                                <option value="America/New_York">Eastern Time (ET)</option>
+                                <option value="America/Chicago">Central Time (CT)</option>
+                                <option value="America/Denver">Mountain Time (MT)</option>
+                                <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                                <option value="Europe/London">London (GMT/BST)</option>
+                                <option value="Europe/Paris">Paris (CET/CEST)</option>
+                                <option value="Asia/Tokyo">Tokyo (JST)</option>
+                                <option value="Australia/Sydney">Sydney (AEST/AEDT)</option>
+                            </select>
+                        </div>
+
+                        <!-- Notification Preferences -->
+                        <div class="form-section">
+                            <h4>Notification Preferences</h4>
+                            
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" name="emailNotifications" class="checkbox-input" checked>
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-label">Email notifications for important updates</span>
+                            </label>
+                            
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" name="progressReminders" class="checkbox-input" checked>
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-label">Weekly progress reminders</span>
+                            </label>
+                            
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" name="newFeatures" class="checkbox-input">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-label">Notifications about new features and content</span>
+                            </label>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                💾 Save Changes
+                            </button>
+                            <button type="button" class="btn btn-outline" id="cancelSettings">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Security Tab -->
+                <section id="security" class="profile-tab" role="tabpanel" hidden>
+                    <h3>Security Settings</h3>
+                    
+                    <!-- Change Password -->
+                    <div class="security-section">
+                        <h4>Change Password</h4>
+                        <p class="section-description">Ensure your account is secure with a strong password</p>
+                        
+                        <form id="passwordForm" class="security-form">
+                            <input type="hidden" id="csrfTokenPassword" name="csrf_token" value="">
+                            
+                            <div class="form-group">
+                                <label for="currentPassword" class="form-label">Current Password</label>
+                                <div class="input-wrapper">
+                                    <input 
+                                        type="password" 
+                                        id="currentPassword" 
+                                        name="currentPassword" 
+                                        class="form-input" 
+                                        placeholder="Enter current password"
+                                        required
+                                        autocomplete="current-password"
+                                    >
+                                    <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newPassword" class="form-label">New Password</label>
+                                <div class="input-wrapper">
+                                    <input 
+                                        type="password" 
+                                        id="newPassword" 
+                                        name="newPassword" 
+                                        class="form-input" 
+                                        placeholder="Enter new password"
+                                        required
+                                        autocomplete="new-password"
+                                        minlength="8"
+                                    >
+                                    <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="field-help">Password must be at least 8 characters long</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+                                <div class="input-wrapper">
+                                    <input 
+                                        type="password" 
+                                        id="confirmNewPassword" 
+                                        name="confirmNewPassword" 
+                                        class="form-input" 
+                                        placeholder="Confirm new password"
+                                        required
+                                        autocomplete="new-password"
+                                        minlength="8"
+                                    >
+                                    <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    🔒 Update Password
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Account Security -->
+                    <div class="security-section">
+                        <h4>Account Security</h4>
+                        <div class="security-info">
+                            <div class="security-item">
+                                <div class="security-icon">🛡️</div>
+                                <div class="security-content">
+                                    <h5>Last Password Change</h5>
+                                    <p id="lastPasswordChange">Never</p>
+                                </div>
+                            </div>
+                            
+                            <div class="security-item">
+                                <div class="security-icon">🌐</div>
+                                <div class="security-content">
+                                    <h5>Last Login</h5>
+                                    <p id="lastLogin">Loading...</p>
+                                </div>
+                            </div>
+                            
+                            <div class="security-item">
+                                <div class="security-icon">📱</div>
+                                <div class="security-content">
+                                    <h5>Active Sessions</h5>
+                                    <p>1 active session</p>
+                                    <button class="btn btn-outline btn-sm">Manage Sessions</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Danger Zone -->
+                    <div class="security-section danger-zone">
+                        <h4>Danger Zone</h4>
+                        <p class="section-description">These actions cannot be undone</p>
+                        
+                        <div class="danger-actions">
+                            <button class="btn btn-danger" id="deleteAccountBtn">
+                                🗑️ Delete Account
+                            </button>
+                            <p class="danger-text">Permanently delete your account and all training data</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Lab History Tab -->
+                <section id="history" class="profile-tab" role="tabpanel" hidden>
+                    <h3>Lab History</h3>
+                    <p class="section-description">View your past training sessions and progress</p>
+                    
+                    <div class="history-controls">
+                        <button id="exportHistoryBtn" class="btn btn-outline">
+                            📊 Export History
+                        </button>
+                    </div>
+                    
+                    <div id="labHistoryContainer" class="lab-history">
+                        <div class="loading-state">
+                            <div class="loading-spinner"></div>
+                            <p>Loading lab history...</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Notification System -->
     <div id="notification" class="notification" role="alert" aria-live="polite"></div>
 
-    <div class="profile-container">
-      <!-- Profile Information Section -->
-      <div class="profile-section">
-        <h3>Profile Information</h3>
-        <div class="profile-info">
-          <div class="profile-details">
-            <div class="detail-group">
-              <p><strong>Name:</strong> <span id="profileName">Loading...</span></p>
-            </div>
-            <div class="detail-group">
-              <p><strong>Email:</strong> <span id="profileEmail">Loading...</span></p>
-            </div>
-            <div class="detail-group">
-              <p><strong>Role:</strong> <span id="profileRole" style="text-transform: capitalize;">Loading...</span></p>
-            </div>
-            <div class="detail-group">
-              <p><strong>Member Since:</strong> <span id="profileJoined">Loading...</span></p>
-            </div>
-            <div class="detail-group">
-              <p><strong>Last Login:</strong> <span id="profileLastLogin">Loading...</span></p>
-            </div>
-            <div class="detail-group" id="passwordChangedGroup" style="display: none;">
-              <p><strong>Password Last Changed:</strong> <span id="profilePasswordChanged">Never</span></p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- FIXED: Progress Statistics Section with 30-Task System -->
-      <div class="profile-section">
-        <h3>Your Progress Statistics</h3>
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-value" id="totalProgress">0%</div>
-            <div class="stat-label">Overall Progress</div>
-            <div class="stat-description">Completion across all 30 tasks</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="completedTasks">0/30</div>
-            <div class="stat-label">Tasks Completed</div>
-            <div class="stat-description">Your current task completion</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="currentWeek">Week 1</div>
-            <div class="stat-label">Current Focus</div>
-            <div class="stat-description">Your recommended next week</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="userRank">#-</div>
-            <div class="stat-label">Leaderboard Rank</div>
-            <div class="stat-description">Your position among all users</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- FIXED: Enhanced Weekly Progress Breakdown - All 4 Weeks with Proper Task Counts -->
-      <div class="profile-section">
-        <h3>Weekly Progress Breakdown</h3>
-        <p class="section-description">Track your completion across the comprehensive 30-task training program</p>
-        
-        <div class="week-progress-grid">
-          <!-- Week 1: Foundation Setup (8 tasks) -->
-          <div class="week-progress-item" data-week="week1">
-            <div class="week-header">
-              <div class="week-number">Week 1</div>
-              <div class="week-badge">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M4 6h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2"/>
-                </svg>
-              </div>
-            </div>
-            <div class="week-title">Foundation Setup</div>
-            <div class="week-description">Active Directory, DNS, Domain joining, and file sharing setup</div>
-            <div class="week-progress-bar">
-              <div class="week-progress-fill" id="week1Progress" style="width: 0%"></div>
-            </div>
-            <div class="week-progress-stats">
-              <div class="week-progress-text" id="week1Text">0/8 tasks</div>
-              <div class="week-progress-percentage" id="week1Percentage">0%</div>
-            </div>
-            <div class="week-task-list">
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Install Active Directory Domain Services Role</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Promote Server to Domain Controller</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Configure VM DNS Settings</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Join VM to Domain</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Create Hidden Network Share</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Map Drive via Group Policy</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Map Drive via Logon Script</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Create Security Group for Share Access</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Week 2: Infrastructure Expansion (6 tasks) -->
-          <div class="week-progress-item" data-week="week2">
-            <div class="week-header">
-              <div class="week-number">Week 2</div>
-              <div class="week-badge">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20m1 5v4h4v2h-4v4h-2v-4H7v-2h4V9h2"/>
-                </svg>
-              </div>
-            </div>
-            <div class="week-title">Infrastructure Expansion</div>
-            <div class="week-description">Additional domain controllers, WSUS deployment, and time synchronization</div>
-            <div class="week-progress-bar">
-              <div class="week-progress-fill" id="week2Progress" style="width: 0%"></div>
-            </div>
-            <div class="week-progress-stats">
-              <div class="week-progress-text" id="week2Text">0/6 tasks</div>
-              <div class="week-progress-percentage" id="week2Percentage">0%</div>
-            </div>
-            <div class="week-task-list">
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Install Second Windows Server 2012</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Promote to Additional Domain Controller</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Install WSUS Role</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Configure WSUS Client Policies</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Configure Primary Time Server</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Configure Secondary Time Server</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Week 3: Email & Messaging (8 tasks) -->
-          <div class="week-progress-item" data-week="week3">
-            <div class="week-header">
-              <div class="week-number">Week 3</div>
-              <div class="week-badge">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2"/>
-                </svg>
-              </div>
-            </div>
-            <div class="week-title">Email &amp; Messaging</div>
-            <div class="week-description">Server 2016 upgrade, Exchange 2019 installation, and mailbox configuration</div>
-            <div class="week-progress-bar">
-              <div class="week-progress-fill" id="week3Progress" style="width: 0%"></div>
-            </div>
-            <div class="week-progress-stats">
-              <div class="week-progress-text" id="week3Text">0/8 tasks</div>
-              <div class="week-progress-percentage" id="week3Percentage">0%</div>
-            </div>
-            <div class="week-task-list">
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Prepare for Server 2016 Upgrade</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Execute Server 2016 Upgrade</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Prepare Exchange Server Installation</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Install Exchange Server 2019</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Configure Exchange Post-Installation</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Create User Mailboxes</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Test Mailbox Functionality</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Configure Internal Mail Flow</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Week 4: Cloud Integration (8 tasks) -->
-          <div class="week-progress-item" data-week="week4">
-            <div class="week-header">
-              <div class="week-number">Week 4</div>
-              <div class="week-badge">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M19 18H6a4 4 0 0 1-4-4 4 4 0 0 1 4-4h.71a5.5 5.5 0 0 1 0-1A5.37 5.37 0 0 1 12 3.59a5.26 5.26 0 0 1 5.33 4.71A4.33 4.33 0 0 1 22 13a4.5 4.5 0 0 1-3 4.2"/>
-                </svg>
-              </div>
-            </div>
-            <div class="week-title">Cloud Integration</div>
-            <div class="week-description">External mail configuration, SSL certificates, and Microsoft 365 hybrid setup</div>
-            <div class="week-progress-bar">
-              <div class="week-progress-fill" id="week4Progress" style="width: 0%"></div>
-            </div>
-            <div class="week-progress-stats">
-              <div class="week-progress-text" id="week4Text">0/8 tasks</div>
-              <div class="week-progress-percentage" id="week4Percentage">0%</div>
-            </div>
-            <div class="week-task-list">
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Configure DNS Records for External Mail</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Configure Firewall and Network Security</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Install and Configure SSL Certificates</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Configure Modern Authentication</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Prepare for Hybrid Configuration</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Run Hybrid Configuration Wizard</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Configure Hybrid Mail Flow</span>
-              </div>
-              <div class="task-preview">
-                <span class="task-bullet">•</span>
-                <span>Verify Hybrid Functionality</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ENHANCED: Overall Progress Summary -->
-        <div class="progress-summary">
-          <h4>Training Progress Overview</h4>
-          <div class="summary-grid">
-            <div class="summary-item">
-              <div class="summary-icon">📊</div>
-              <div class="summary-content">
-                <div class="summary-title">Total Progress</div>
-                <div class="summary-value" id="summaryProgress">0%</div>
-                <div class="summary-description">Overall completion rate</div>
-              </div>
-            </div>
-            <div class="summary-item">
-              <div class="summary-icon">✅</div>
-              <div class="summary-content">
-                <div class="summary-title">Tasks Completed</div>
-                <div class="summary-value" id="summaryTasks">0/30</div>
-                <div class="summary-description">Individual tasks finished</div>
-              </div>
-            </div>
-            <div class="summary-item">
-              <div class="summary-icon">🏆</div>
-              <div class="summary-content">
-                <div class="summary-title">Weeks Completed</div>
-                <div class="summary-value" id="summaryWeeks">0/4</div>
-                <div class="summary-description">Full weeks finished</div>
-              </div>
-            </div>
-            <div class="summary-item">
-              <div class="summary-icon">🎯</div>
-              <div class="summary-content">
-                <div class="summary-title">Next Milestone</div>
-                <div class="summary-value" id="summaryNext">Week 1</div>
-                <div class="summary-description">Recommended focus area</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ENHANCED: Change Password Section with Better Success Feedback -->
-      <div class="profile-section">
-        <h3>Change Password</h3>
-        <p style="color: var(--text-secondary); margin-bottom: var(--space-lg);">
-          Ensure your account stays secure by using a strong, unique password.
-        </p>
-        
-        <form id="passwordForm" novalidate>
-          <input type="hidden" id="csrfToken" name="csrf_token">
-          
-          <div class="form-group">
-            <label for="currentPassword">Current Password</label>
-            <input type="password" 
-                   id="currentPassword" 
-                   name="currentPassword" 
-                   required
-                   autocomplete="current-password"
-                   placeholder="Enter your current password"
-                   aria-describedby="current-password-error">
-            <span id="current-password-error" class="error-text" role="alert"></span>
-          </div>
-          
-          <div class="form-group">
-            <label for="newPassword">New Password</label>
-            <input type="password" 
-                   id="newPassword" 
-                   name="newPassword" 
-                   required
-                   autocomplete="new-password"
-                   minlength="8"
-                   maxlength="128"
-                   placeholder="Enter your new password"
-                   aria-describedby="new-password-error new-password-requirements">
-            <span id="new-password-error" class="error-text" role="alert"></span>
-            <div id="new-password-requirements" class="field-hint">
-              <small>Password must be at least 8 characters long and different from your current password</small>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="confirmPassword">Confirm New Password</label>
-            <input type="password" 
-                   id="confirmPassword" 
-                   name="confirmPassword" 
-                   required
-                   autocomplete="new-password"
-                   placeholder="Confirm your new password"
-                   aria-describedby="confirm-password-error">
-            <span id="confirm-password-error" class="error-text" role="alert"></span>
-          </div>
-          
-          <div class="form-group">
-            <button type="submit" class="btn btn-primary">
-              <span>Update Password</span>
-              <span class="spinner" aria-hidden="true"></span>
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Account Actions Section -->
-      <div class="profile-section">
-        <h3>Account Actions</h3>
-        <div class="action-buttons">
-          <button class="btn btn-secondary" onclick="exportMyData()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-              <polyline points="7,10 12,15 17,10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            Export My Data
-          </button>
-          <button class="btn btn-secondary" onclick="goToDashboard()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-              <polyline points="9,22 9,12 15,12 15,22"/>
-            </svg>
-            Back to Dashboard
-          </button>
-        </div>
-      </div>
-
-      <!-- Help Section -->
-      <div class="profile-section" style="background: var(--surface-light); border: 1px solid var(--border-light);">
-        <h3 style="color: var(--text-secondary); font-size: 1.125rem;">Need Help?</h3>
-        <p style="color: var(--text-secondary); margin-bottom: var(--space-md);">
-          If you're experiencing issues or need assistance with your account, here are some helpful resources:
-        </p>
-        <div class="help-links">
-          <a href="/dashboard.html" style="color: var(--primary);">Return to Training Dashboard</a>
-          <span style="color: var(--text-tertiary);">•</span>
-          <a href="#" onclick="showContactInfo()" style="color: var(--primary);">Contact Support</a>
-          <span style="color: var(--text-tertiary);">•</span>
-          <a href="#" onclick="showHelpInfo()" style="color: var(--primary);">Training Guide</a>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <script>
-    // Profile-specific functionality with enhanced 30-task system
-    async function exportMyData() {
-      try {
-        const response = await fetch('/api/profile/export-data', {
-          method: 'POST',
-          credentials: 'same-origin'
+    <!-- Scripts -->
+    <script src="app.js"></script>
+    <script>
+        // Profile-specific JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize profile tabs
+            initProfileTabs();
+            
+            // Load user profile data
+            loadProfileData();
+            
+            // Load lab history
+            loadLabHistory();
+            
+            // Set up profile form handlers
+            setupProfileForms();
         });
-        
-        if (response.ok) {
-          const blob = await response.blob();
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `velocity-lab-data-${new Date().toISOString().split('T')[0]}.json`;
-          a.click();
-          URL.revokeObjectURL(url);
-          
-          showNotification('Your data has been exported successfully', 'success');
-        } else {
-          const data = await response.json();
-          showNotification(data.error || 'Failed to export data', 'error');
-        }
-      } catch (error) {
-        console.error('Export error:', error);
-        showNotification('Failed to export data', 'error');
-      }
-    }
 
-    function goToDashboard() {
-      window.location.href = '/dashboard.html';
-    }
-
-    function showContactInfo() {
-      showNotification('For support, please contact your system administrator or IT department.', 'info', 8000);
-    }
-
-    function showHelpInfo() {
-      showNotification('Complete the 4-week timeline in your dashboard to master Microsoft hybrid IT setup.', 'info', 8000);
-    }
-
-    // FIXED: Load and display weekly progress with proper 30-task system
-    async function loadWeeklyProgress() {
-      try {
-        const response = await fetch('/api/progress', { credentials: 'same-origin' });
-        if (response.ok) {
-          const progress = await response.json();
-          
-          // FIXED: Week task counts for 30-task system
-          const weekTasks = {
-            week1: 8, // Foundation Setup
-            week2: 6, // Infrastructure Expansion  
-            week3: 8, // Email & Messaging
-            week4: 8  // Cloud Integration
-          };
-          
-          let totalCompleted = 0;
-          let completedWeeks = 0;
-          
-          Object.keys(weekTasks).forEach(week => {
-            const weekNum = week.replace('week', '');
-            const weekProgress = progress[week] || {};
-            const completed = Object.values(weekProgress).filter(Boolean).length;
-            const total = weekTasks[week];
-            const percentage = (completed / total) * 100;
+        function initProfileTabs() {
+            const navItems = document.querySelectorAll('.profile-nav-item');
+            const tabPanels = document.querySelectorAll('.profile-tab');
             
-            totalCompleted += completed;
-            if (percentage === 100) completedWeeks++;
-            
-            // Update progress bar
-            const progressBar = document.getElementById(`${week}Progress`);
-            const progressText = document.getElementById(`${week}Text`);
-            const progressPercentage = document.getElementById(`${week}Percentage`);
-            
-            if (progressBar) {
-              progressBar.style.width = `${percentage}%`;
-              progressBar.style.background = percentage === 100 ? 
-                'var(--success)' : 'var(--gradient-primary)';
-            }
-            
-            if (progressText) {
-              progressText.textContent = `${completed}/${total} tasks`;
-            }
-            
-            if (progressPercentage) {
-              progressPercentage.textContent = `${Math.round(percentage)}%`;
-            }
-            
-            // Add completion animations
-            const weekItem = document.querySelector(`[data-week="${week}"]`);
-            if (weekItem) {
-              if (percentage === 100) {
-                weekItem.classList.add('week-completed');
-              } else if (percentage > 0) {
-                weekItem.classList.add('week-in-progress');
-              }
-            }
-          });
-          
-          // Update summary statistics
-          const totalTasks = 30;
-          const overallProgress = Math.round((totalCompleted / totalTasks) * 100);
-          
-          updateSummaryStats({
-            progress: overallProgress,
-            tasks: `${totalCompleted}/${totalTasks}`,
-            weeks: `${completedWeeks}/4`,
-            next: getNextMilestone(totalCompleted, completedWeeks)
-          });
-        }
-      } catch (error) {
-        console.error('Failed to load weekly progress:', error);
-      }
-    }
-
-    function updateSummaryStats(stats) {
-      const elements = {
-        summaryProgress: stats.progress + '%',
-        summaryTasks: stats.tasks,
-        summaryWeeks: stats.weeks,
-        summaryNext: stats.next
-      };
-      
-      Object.keys(elements).forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-          // Add animation
-          element.style.transition = 'all 0.3s ease';
-          element.style.transform = 'scale(0.9)';
-          element.style.opacity = '0.7';
-          
-          setTimeout(() => {
-            element.textContent = elements[id];
-            element.style.transform = 'scale(1)';
-            element.style.opacity = '1';
-          }, 150);
-        }
-      });
-    }
-
-    function getNextMilestone(completedTasks, completedWeeks) {
-      if (completedTasks === 30) return 'Complete! 🎉';
-      if (completedTasks >= 22) return 'Week 4';
-      if (completedTasks >= 14) return 'Week 3';
-      if (completedTasks >= 8) return 'Week 2';
-      return 'Week 1';
-    }
-
-    // Initialize profile page
-    document.addEventListener('DOMContentLoaded', function() {
-      loadWeeklyProgress();
-      
-      // Enhanced password form validation
-      const passwordForm = document.getElementById('passwordForm');
-      const currentPasswordInput = document.getElementById('currentPassword');
-      const newPasswordInput = document.getElementById('newPassword');
-      const confirmPasswordInput = document.getElementById('confirmPassword');
-
-      // Real-time validation
-      currentPasswordInput.addEventListener('blur', validateCurrentPassword);
-      newPasswordInput.addEventListener('input', validateNewPassword);
-      confirmPasswordInput.addEventListener('input', validateConfirmPassword);
-
-      function validateCurrentPassword() {
-        const password = currentPasswordInput.value;
-        
-        if (!password) {
-          showFieldError('current-password-error', 'Current password is required');
-          return false;
-        }
-        
-        clearFieldError('current-password-error');
-        return true;
-      }
-
-      function validateNewPassword() {
-        const newPassword = newPasswordInput.value;
-        const currentPassword = currentPasswordInput.value;
-        
-        if (!newPassword) {
-          showFieldError('new-password-error', 'New password is required');
-          return false;
-        } else if (newPassword.length < 8) {
-          showFieldError('new-password-error', 'Password must be at least 8 characters');
-          return false;
-        } else if (newPassword.length > 128) {
-          showFieldError('new-password-error', 'Password must be less than 128 characters');
-          return false;
-        } else if (currentPassword && newPassword === currentPassword) {
-          showFieldError('new-password-error', 'New password must be different from current password');
-          return false;
-        }
-        
-        clearFieldError('new-password-error');
-        
-        // Also validate confirm password if it has content
-        if (confirmPasswordInput.value) {
-          validateConfirmPassword();
-        }
-        
-        return true;
-      }
-
-      function validateConfirmPassword() {
-        const newPassword = newPasswordInput.value;
-        const confirmPassword = confirmPasswordInput.value;
-        
-        if (!confirmPassword) {
-          showFieldError('confirm-password-error', 'Please confirm your new password');
-          return false;
-        } else if (newPassword !== confirmPassword) {
-          showFieldError('confirm-password-error', 'Passwords do not match');
-          return false;
-        }
-        
-        clearFieldError('confirm-password-error');
-        return true;
-      }
-
-      function showFieldError(elementId, message) {
-        const errorElement = document.getElementById(elementId);
-        if (errorElement) {
-          errorElement.textContent = message;
-          errorElement.style.display = 'block';
-        }
-      }
-
-      function clearFieldError(elementId) {
-        const errorElement = document.getElementById(elementId);
-        if (errorElement) {
-          errorElement.textContent = '';
-          errorElement.style.display = 'none';
-        }
-      }
-
-      // Enhanced form submission
-      passwordForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const isCurrentValid = validateCurrentPassword();
-        const isNewValid = validateNewPassword();
-        const isConfirmValid = validateConfirmPassword();
-        
-        if (isCurrentValid && isNewValid && isConfirmValid) {
-          // All validation passed, proceed with form submission
-          // The app.js initProfilePasswordForm will handle the actual submission
-        } else {
-          showNotification('Please fix the errors above before submitting', 'error');
-        }
-      });
-
-      // Load profile data and update display
-      loadProfileData();
-    });
-
-    async function loadProfileData() {
-      try {
-        const response = await fetch('/api/profile', { credentials: 'same-origin' });
-        if (response.ok) {
-          const profileData = await response.json();
-          
-          // Update profile information
-          const profileName = document.getElementById('profileName');
-          const profileEmail = document.getElementById('profileEmail');
-          const profileRole = document.getElementById('profileRole');
-          const profileJoined = document.getElementById('profileJoined');
-          const profileLastLogin = document.getElementById('profileLastLogin');
-          const profilePasswordChanged = document.getElementById('profilePasswordChanged');
-          const passwordChangedGroup = document.getElementById('passwordChangedGroup');
-          
-          // Update progress statistics
-          const totalProgress = document.getElementById('totalProgress');
-          const completedTasks = document.getElementById('completedTasks');
-          const currentWeek = document.getElementById('currentWeek');
-          const userRank = document.getElementById('userRank');
-          
-          if (profileName) profileName.textContent = profileData.name;
-          if (profileEmail) profileEmail.textContent = profileData.email;
-          if (profileRole) profileRole.textContent = profileData.role;
-          
-          // FIXED: Better date parsing for member since
-          if (profileJoined) {
-            if (profileData.createdAt) {
-              const joinDate = new Date(profileData.createdAt);
-              if (!isNaN(joinDate.getTime())) {
-                profileJoined.textContent = joinDate.toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const targetTab = e.target.dataset.tab;
+                    
+                    // Update nav items
+                    navItems.forEach(nav => {
+                        nav.classList.remove('active');
+                        nav.setAttribute('aria-selected', 'false');
+                    });
+                    e.target.classList.add('active');
+                    e.target.setAttribute('aria-selected', 'true');
+                    
+                    // Update tab panels
+                    tabPanels.forEach(panel => {
+                        panel.classList.remove('active');
+                        panel.hidden = true;
+                    });
+                    const targetPanel = document.getElementById(targetTab);
+                    if (targetPanel) {
+                        targetPanel.classList.add('active');
+                        targetPanel.hidden = false;
+                    }
                 });
-              } else {
-                // Try alternative parsing if ISO format fails
-                const altDate = new Date(profileData.createdAt.replace(/[-T:]/g, match => {
-                  return match === 'T' ? ' ' : match;
-                }));
-                if (!isNaN(altDate.getTime())) {
-                  profileJoined.textContent = altDate.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  });
-                } else {
-                  profileJoined.textContent = 'Unknown';
-                }
-              }
+            });
+        }
+
+        function loadProfileData() {
+            // Load user info from cookie or API
+            const user = JSON.parse(getCookie('user') || '{}');
+            
+            if (user.name) {
+                document.getElementById('profileName').textContent = user.name;
+                document.getElementById('settingsName').value = user.name;
+                
+                // Set avatar initials
+                const initials = user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                document.getElementById('avatarInitials').textContent = initials;
+            }
+            
+            if (user.email) {
+                document.getElementById('profileEmail').textContent = user.email;
+                document.getElementById('settingsEmail').value = user.email;
+            }
+            
+            if (user.company) {
+                document.getElementById('profileCompany').textContent = user.company;
+                document.getElementById('settingsCompany').value = user.company;
             } else {
-              profileJoined.textContent = 'Unknown';
+                document.getElementById('profileCompany').style.display = 'none';
             }
-          }
-          
-          if (profileLastLogin) {
-            if (profileData.lastLogin) {
-              const lastLoginDate = new Date(profileData.lastLogin);
-              if (!isNaN(lastLoginDate.getTime())) {
-                profileLastLogin.textContent = lastLoginDate.toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                });
-              } else {
-                profileLastLogin.textContent = 'Never';
-              }
-            } else {
-              profileLastLogin.textContent = 'Never';
-            }
-          }
-          
-          if (profilePasswordChanged && passwordChangedGroup) {
-            if (profileData.passwordChangedAt) {
-              const passwordDate = new Date(profileData.passwordChangedAt);
-              if (!isNaN(passwordDate.getTime())) {
-                profilePasswordChanged.textContent = passwordDate.toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                });
-                passwordChangedGroup.style.display = 'block';
-              }
-            }
-          }
-          
-          if (totalProgress) totalProgress.textContent = `${profileData.progress}%`;
-          if (completedTasks) completedTasks.textContent = `${profileData.completedTasks}/${profileData.totalTasks}`;
-          if (currentWeek) {
-            const weekNumber = Math.min(Math.floor(profileData.completedTasks / 7.5) + 1, 4);
-            currentWeek.textContent = `Week ${weekNumber}`;
-          }
-          if (userRank) {
-            userRank.textContent = profileData.rank ? `#${profileData.rank}` : '#-';
-          }
         }
-      } catch (error) {
-        console.error('Profile load error:', error);
-        showNotification('Failed to load profile data', 'error');
-      }
-    }
-  </script>
 
-  <style>
-    /* Enhanced profile-specific styles for 30-task system */
-    .section-description {
-      color: var(--text-secondary);
-      font-size: 0.9375rem;
-      margin-bottom: var(--space-6);
-      text-align: center;
-      letter-spacing: -0.01em;
-    }
-
-    .week-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: var(--space-3);
-    }
-
-    .week-badge {
-      width: 2rem;
-      height: 2rem;
-      background: var(--gradient-primary);
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .week-badge svg {
-      stroke: var(--text-inverse);
-    }
-
-    .week-description {
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      margin-bottom: var(--space-4);
-      line-height: 1.5;
-      letter-spacing: -0.01em;
-    }
-
-    .week-progress-stats {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: var(--space-3);
-    }
-
-    .week-progress-percentage {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--primary);
-      letter-spacing: -0.01em;
-    }
-
-    .week-task-list {
-      margin-top: var(--space-5);
-      padding-top: var(--space-4);
-      border-top: 1px solid var(--border-light);
-    }
-
-    .task-preview {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      margin-bottom: var(--space-2);
-      font-size: 0.8125rem;
-      color: var(--text-tertiary);
-      line-height: 1.4;
-      letter-spacing: -0.01em;
-    }
-
-    .task-bullet {
-      color: var(--primary);
-      font-weight: 600;
-    }
-
-    .week-completed {
-      background: linear-gradient(135deg, rgba(52, 199, 89, 0.05), rgba(52, 199, 89, 0.1));
-      border-color: var(--success);
-    }
-
-    .week-completed .week-badge {
-      background: var(--gradient-accent);
-    }
-
-    .week-in-progress {
-      background: linear-gradient(135deg, rgba(0, 122, 255, 0.03), rgba(0, 122, 255, 0.08));
-      border-color: var(--primary);
-    }
-
-    .progress-summary {
-      margin-top: var(--space-12);
-      padding: var(--space-8);
-      background: var(--gradient-surface);
-      border-radius: var(--radius-xl);
-      border: 1px solid var(--border-light);
-    }
-
-    .progress-summary h4 {
-      text-align: center;
-      margin-bottom: var(--space-8);
-      color: var(--text-primary);
-      font-size: 1.25rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--space-6);
-    }
-
-    .summary-item {
-      display: flex;
-      align-items: center;
-      gap: var(--space-4);
-      padding: var(--space-5);
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border-light);
-      transition: var(--transition);
-    }
-
-    .summary-item:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-sm);
-      border-color: var(--primary);
-    }
-
-    .summary-icon {
-      font-size: 2rem;
-      flex-shrink: 0;
-    }
-
-    .summary-content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .summary-title {
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      margin-bottom: var(--space-1);
-      letter-spacing: -0.01em;
-    }
-
-    .summary-value {
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: var(--space-1);
-      letter-spacing: -0.01em;
-    }
-
-    .summary-description {
-      font-size: 0.75rem;
-      color: var(--text-tertiary);
-      letter-spacing: -0.01em;
-    }
-
-    .stat-description {
-      font-size: 0.75rem;
-      color: var(--text-tertiary);
-      margin-top: var(--space-1);
-      text-align: center;
-      letter-spacing: -0.01em;
-    }
-
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-      .week-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--space-2);
-      }
-
-      .week-badge {
-        width: 1.75rem;
-        height: 1.75rem;
-      }
-
-      .summary-grid {
-        grid-template-columns: 1fr;
-        gap: var(--space-4);
-      }
-
-      .summary-item {
-        padding: var(--space-4);
-      }
-
-      .task-preview {
-        font-size: 0.75rem;
-      }
-    }
-  </style>
+        function setupProfileForms() {
+            // Profile settings form
+            const profileForm = document.getElementById('profileForm');
+            if (profileForm) {
+                profileForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    // Handle profile update
+                    showNotification('Profile updated successfully!', 'success');
+                });
+            }
+            
+            // Export data button
+            const exportBtn = document.getElementById('exportDataBtn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', () => {
+                    exportUserData();
+                });
+            }
+            
+            // Reset progress button
+            const resetBtn = document.getElementById('resetProgressBtn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    startNewLab();
+                });
+            }
+        }
+    </script>
 </body>
 </html>

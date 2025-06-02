@@ -1,342 +1,497 @@
-// functions/api/progress.ts
-// Fixed progress tracking endpoints - Enhanced checkbox persistence & 42-task support
+// progress.js - Backend progress handling for Velocity Lab
+// This should be integrated into your Express.js backend
 
-import { 
-  jsonResponse, 
-  errorResponse, 
-  validateSession,
-  getUserById,
-  logActivity,
-  calculateProgress,
-  calculateCompletedTasks,
-  TASK_STRUCTURE,
-  TOTAL_TASKS
-} from '../utils';
-import type { Env, Progress } from '../utils';
+const express = require('express');
+const router = express.Router();
 
-// GET user progress - FIXED: Proper initialization and structure
-export const onRequestGet: PagesFunction<Env> = async (context) => {
-  try {
-    const { env, request } = context;
-    
-    // Validate session
-    const userId = await validateSession(env, request);
-    if (!userId) {
-      return errorResponse('Unauthorized', 401);
-    }
-    
-    // Get progress data
-    const progressData = await env.PROGRESS.get(`progress:${userId}`);
-    let progress: Progress;
-    
-    if (!progressData) {
-      // FIXED: Initialize proper 42-task structure if no progress exists
-      progress = initializeEmptyProgress();
-      await env.PROGRESS.put(`progress:${userId}`, JSON.stringify(progress));
-    } else {
-      progress = JSON.parse(progressData) as Progress;
-      
-      // FIXED: Ensure all weeks and tasks exist (for upgrades)
-      progress = ensureCompleteStructure(progress);
-      await env.PROGRESS.put(`progress:${userId}`, JSON.stringify(progress));
-    }
-    
-    return jsonResponse(progress);
-  } catch (error) {
-    console.error('Progress GET error:', error);
-    return errorResponse('Internal server error', 500);
+// In-memory storage for demo (replace with database in production)
+let progressData = {};
+let userSessions = {};
+
+// Middleware to check authentication
+const requireAuth = (req, res, next) => {
+  // Check if user is logged in (implement your auth logic)
+  const user = req.session?.user || req.cookies?.user;
+  if (!user) {
+    return res.status(401).json({ error: 'Authentication required' });
   }
+  req.user = typeof user === 'string' ? JSON.parse(user) : user;
+  next();
 };
 
-// POST update progress - FIXED: Enhanced persistence and subtask support
-export const onRequestPost: PagesFunction<Env> = async (context) => {
+// GET /api/progress - Load user's progress
+router.get('/progress', requireAuth, (req, res) => {
   try {
-    const { env, request } = context;
+    const userId = req.user.id || req.user.email; // Use email as fallback ID
     
-    // Validate session
-    const userId = await validateSession(env, request);
-    if (!userId) {
-      return errorResponse('Unauthorized', 401);
-    }
-    
-    const formData = await request.formData();
-    const task = formData.get('task')?.toString();
-    const week = formData.get('week')?.toString();
-    const checked = formData.get('checked') === 'true';
-    const subtaskKey = formData.get('subtask')?.toString();
-    const subtaskChecked = formData.get('subtask_checked') === 'true';
-    
-    // Validate input
-    if (!task || !week) {
-      return errorResponse('Missing task or week parameter', 400);
-    }
-    
-    // Validate week format
-    const validWeeks = ['week1', 'week2', 'week3', 'week4'];
-    if (!validWeeks.includes(week)) {
-      return errorResponse('Invalid week parameter', 400);
-    }
-    
-    // FIXED: Validate task exists in our structure
-    const weekStructure = TASK_STRUCTURE[week as keyof typeof TASK_STRUCTURE];
-    if (!weekStructure || !weekStructure.tasks.includes(task)) {
-      return errorResponse('Invalid task parameter', 400);
-    }
-    
-    // Get current progress
-    const progressData = await env.PROGRESS.get(`progress:${userId}`);
-    let progress: Progress;
-    
-    if (!progressData) {
-      progress = initializeEmptyProgress();
-    } else {
-      progress = JSON.parse(progressData) as Progress;
-      progress = ensureCompleteStructure(progress);
-    }
-    
-    // Ensure week and task exist
-    if (!progress[week]) {
-      progress[week] = {};
-    }
-    if (!progress[week][task]) {
-      progress[week][task] = {
-        completed: false,
-        subtasks: {}
+    // Initialize empty progress if user doesn't exist
+    if (!progressData[userId]) {
+      progressData[userId] = {
+        week1: {},
+        week2: {},
+        week3: {},
+        week4: {},
+        lastUpdated: new Date().toISOString(),
+        totalTasks: 42,
+        completedTasks: 0
       };
     }
     
-    // Get previous state for logging
-    const previousMainState = progress[week][task].completed;
-    const previousSubtaskState = subtaskKey ? progress[week][task].subtasks?.[subtaskKey] : undefined;
+    console.log(`Loading progress for user: ${userId}`);
+    res.json(progressData[userId]);
+  } catch (error) {
+    console.error('Error loading progress:', error);
+    res.status(500).json({ error: 'Failed to load progress' });
+  }
+});
+
+// POST /api/progress - Save user's progress
+router.post('/progress', requireAuth, (req, res) => {
+  try {
+    const userId = req.user.id || req.user.email;
+    const { task, week, checked, subtask, subtask_checked } = req.body;
     
-    // FIXED: Handle subtask updates
-    if (subtaskKey) {
-      // Update subtask
-      if (!progress[week][task].subtasks) {
-        progress[week][task].subtasks = {};
-      }
-      progress[week][task].subtasks[subtaskKey] = subtaskChecked;
-      
-      // FIXED: Auto-complete main task when all subtasks are done
-      const allSubtasksCompleted = Object.values(progress[week][task].subtasks).every(completed => completed === true);
-      const hasSubtasks = Object.keys(progress[week][task].subtasks).length > 0;
-      
-      if (hasSubtasks && allSubtasksCompleted && !progress[week][task].completed) {
-        progress[week][task].completed = true;
-        progress[week][task].completedAt = new Date().toISOString();
-      } else if (hasSubtasks && !allSubtasksCompleted && progress[week][task].completed) {
-        progress[week][task].completed = false;
-        delete progress[week][task].completedAt;
-      }
-    } else {
-      // Update main task
-      progress[week][task].completed = checked;
-      
-      if (checked) {
-        progress[week][task].completedAt = new Date().toISOString();
-        
-        // FIXED: Auto-complete all subtasks when main task is checked
-        if (progress[week][task].subtasks) {
-          Object.keys(progress[week][task].subtasks).forEach(subtaskId => {
-            progress[week][task].subtasks![subtaskId] = true;
-          });
-        }
-      } else {
-        delete progress[week][task].completedAt;
-        
-        // FIXED: Auto-uncheck all subtasks when main task is unchecked
-        if (progress[week][task].subtasks) {
-          Object.keys(progress[week][task].subtasks).forEach(subtaskId => {
-            progress[week][task].subtasks![subtaskId] = false;
-          });
-        }
-      }
+    // Initialize progress if doesn't exist
+    if (!progressData[userId]) {
+      progressData[userId] = {
+        week1: {},
+        week2: {},
+        week3: {},
+        week4: {},
+        lastUpdated: new Date().toISOString(),
+        totalTasks: 42,
+        completedTasks: 0
+      };
     }
     
-    // FIXED: Save updated progress with proper error handling
-    try {
-      await env.PROGRESS.put(`progress:${userId}`, JSON.stringify(progress));
-    } catch (saveError) {
-      console.error('Failed to save progress:', saveError);
-      return errorResponse('Failed to save progress', 500);
+    // Initialize week data if doesn't exist
+    if (!progressData[userId][week]) {
+      progressData[userId][week] = {};
     }
     
-    // Calculate new statistics
-    const completedTasks = calculateCompletedTasks(progress);
-    const progressPercentage = calculateProgress(progress);
+    // Initialize task data if doesn't exist
+    if (!progressData[userId][week][task]) {
+      progressData[userId][week][task] = {
+        completed: false,
+        subtasks: {},
+        lastUpdated: new Date().toISOString()
+      };
+    }
     
-    // FIXED: Enhanced logging with both main task and subtask changes
-    await logActivity(env, userId, 'progress_updated', {
-      week,
-      task,
-      subtaskKey,
-      mainTaskChecked: progress[week][task].completed,
-      subtaskChecked: subtaskKey ? progress[week][task].subtasks?.[subtaskKey] : undefined,
-      previousMainState,
-      previousSubtaskState,
-      completedTasks,
-      totalTasks: TOTAL_TASKS,
-      progressPercentage
+    const taskData = progressData[userId][week][task];
+    
+    // Update subtask if provided
+    if (subtask !== undefined) {
+      taskData.subtasks[subtask] = subtask_checked === 'true';
+      console.log(`Updated subtask ${subtask} for ${week}-${task}: ${subtask_checked}`);
+    }
+    
+    // Update main task
+    if (checked !== undefined) {
+      taskData.completed = checked === 'true';
+      console.log(`Updated task ${week}-${task}: ${checked}`);
+    }
+    
+    taskData.lastUpdated = new Date().toISOString();
+    progressData[userId].lastUpdated = new Date().toISOString();
+    
+    // Calculate total completed tasks
+    let completedCount = 0;
+    Object.values(progressData[userId]).forEach(weekData => {
+      if (typeof weekData === 'object' && weekData !== null && !Array.isArray(weekData)) {
+        Object.values(weekData).forEach(taskData => {
+          if (taskData && taskData.completed) {
+            completedCount++;
+          }
+        });
+      }
     });
+    progressData[userId].completedTasks = completedCount;
     
-    return jsonResponse({ 
-      success: true,
-      message: 'Progress updated successfully',
-      task,
-      week,
-      subtaskKey,
-      mainTaskCompleted: progress[week][task].completed,
-      subtaskCompleted: subtaskKey ? progress[week][task].subtasks?.[subtaskKey] : undefined,
-      completedTasks,
-      totalTasks: TOTAL_TASKS,
-      progressPercentage,
-      // FIXED: Return updated progress for immediate UI sync
-      updatedProgress: progress
+    console.log(`Progress saved for user ${userId}. Total completed: ${completedCount}/42`);
+    
+    res.json({ 
+      success: true, 
+      completedTasks: completedCount,
+      totalTasks: 42,
+      progress: Math.round((completedCount / 42) * 100)
     });
   } catch (error) {
-    console.error('Progress POST error:', error);
-    return errorResponse('Internal server error', 500);
+    console.error('Error saving progress:', error);
+    res.status(500).json({ error: 'Failed to save progress' });
   }
-};
+});
 
-// PUT bulk update progress (for admin functionality)
-export const onRequestPut: PagesFunction<Env> = async (context) => {
+// POST /api/lab/start-new - Start a new lab session
+router.post('/lab/start-new', requireAuth, (req, res) => {
   try {
-    const { env, request } = context;
+    const userId = req.user.id || req.user.email;
     
-    // Validate session
-    const userId = await validateSession(env, request);
-    if (!userId) {
-      return errorResponse('Unauthorized', 401);
+    // Save current progress to history (in production, save to database)
+    const currentProgress = progressData[userId];
+    if (currentProgress && currentProgress.completedTasks > 0) {
+      // Save to history (implement history storage)
+      console.log(`Saving progress to history for user ${userId}`);
     }
     
-    // Get user to check if admin (only admins can bulk update)
-    const user = await getUserById(env, userId);
-    if (!user || user.role !== 'admin') {
-      return errorResponse('Admin access required', 403);
-    }
-    
-    const body = await request.json();
-    const { targetUserId, progress } = body;
-    
-    if (!targetUserId || !progress) {
-      return errorResponse('Missing targetUserId or progress data', 400);
-    }
-    
-    // FIXED: Validate progress structure before saving
-    const validatedProgress = ensureCompleteStructure(progress);
-    
-    // Save progress for target user
-    await env.PROGRESS.put(`progress:${targetUserId}`, JSON.stringify(validatedProgress));
-    
-    // Log the bulk update
-    await logActivity(env, userId, 'progress_bulk_updated', {
-      targetUserId,
-      progressPercentage: calculateProgress(validatedProgress)
-    });
-    
-    return jsonResponse({ 
-      success: true,
-      message: 'Progress bulk updated successfully',
-      progressPercentage: calculateProgress(validatedProgress)
-    });
-  } catch (error) {
-    console.error('Progress PUT error:', error);
-    return errorResponse('Internal server error', 500);
-  }
-};
-
-// DELETE reset progress - FIXED: Proper reset with structure
-export const onRequestDelete: PagesFunction<Env> = async (context) => {
-  try {
-    const { env, request } = context;
-    
-    // Validate session
-    const userId = await validateSession(env, request);
-    if (!userId) {
-      return errorResponse('Unauthorized', 401);
-    }
-    
-    const url = new URL(request.url);
-    const targetUserId = url.searchParams.get('userId');
-    
-    // If targetUserId is provided, check admin access
-    if (targetUserId && targetUserId !== userId) {
-      const user = await getUserById(env, userId);
-      if (!user || user.role !== 'admin') {
-        return errorResponse('Admin access required', 403);
-      }
-    }
-    
-    const userIdToReset = targetUserId || userId;
-    
-    // FIXED: Reset progress with proper 42-task structure
-    const emptyProgress = initializeEmptyProgress();
-    
-    await env.PROGRESS.put(`progress:${userIdToReset}`, JSON.stringify(emptyProgress));
-    
-    // Log the reset
-    await logActivity(env, userId, 'progress_reset', {
-      targetUserId: userIdToReset,
-      resetBy: userId === userIdToReset ? 'self' : 'admin'
-    });
-    
-    return jsonResponse({ 
-      success: true,
-      message: 'Progress reset successfully',
-      progressPercentage: 0,
+    // Reset progress
+    progressData[userId] = {
+      week1: {},
+      week2: {},
+      week3: {},
+      week4: {},
+      lastUpdated: new Date().toISOString(),
+      totalTasks: 42,
       completedTasks: 0,
-      totalTasks: TOTAL_TASKS
+      labStarted: new Date().toISOString()
+    };
+    
+    console.log(`Started new lab for user ${userId}`);
+    
+    res.json({ 
+      success: true, 
+      message: 'New lab started successfully',
+      progress: progressData[userId]
     });
   } catch (error) {
-    console.error('Progress DELETE error:', error);
-    return errorResponse('Internal server error', 500);
+    console.error('Error starting new lab:', error);
+    res.status(500).json({ error: 'Failed to start new lab' });
   }
-};
+});
 
-// FIXED: Helper function to initialize empty progress with proper 42-task structure
-function initializeEmptyProgress(): Progress {
-  const progress: Progress = {};
+// GET /api/csrf - Get CSRF token
+router.get('/csrf', (req, res) => {
+  // Generate a simple CSRF token (in production, use proper CSRF protection)
+  const token = Math.random().toString(36).substring(2, 15) + 
+                Math.random().toString(36).substring(2, 15);
   
-  Object.keys(TASK_STRUCTURE).forEach(weekKey => {
-    progress[weekKey] = {};
-    const week = TASK_STRUCTURE[weekKey as keyof typeof TASK_STRUCTURE];
+  // Store token in session
+  req.session = req.session || {};
+  req.session.csrfToken = token;
+  
+  res.json({ token });
+});
+
+// POST /api/login - User login
+router.post('/login', (req, res) => {
+  try {
+    const { email, password } = req.body;
     
-    week.tasks.forEach(taskId => {
-      progress[weekKey][taskId] = {
-        completed: false,
-        subtasks: {}
+    // Simple demo login (replace with proper authentication)
+    if (email && password) {
+      const user = {
+        id: email.split('@')[0], // Use email prefix as ID
+        email: email,
+        name: email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1),
+        role: email.includes('admin') ? 'admin' : 'user',
+        lastLogin: new Date().toISOString()
       };
-    });
-  });
-  
-  return progress;
-}
+      
+      // Store user in session
+      req.session = req.session || {};
+      req.session.user = user;
+      
+      console.log(`User logged in: ${email}`);
+      
+      res.json({
+        success: true,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      });
+    } else {
+      res.status(400).json({ error: 'Email and password required' });
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
 
-// FIXED: Helper function to ensure progress has complete structure (for migrations/upgrades)
-function ensureCompleteStructure(progress: Progress): Progress {
-  const completeProgress = { ...progress };
-  
-  Object.keys(TASK_STRUCTURE).forEach(weekKey => {
-    if (!completeProgress[weekKey]) {
-      completeProgress[weekKey] = {};
+// POST /api/register - User registration
+router.post('/register', (req, res) => {
+  try {
+    const { name, email, password, company } = req.body;
+    
+    // Simple demo registration (replace with proper user creation)
+    if (name && email && password) {
+      const user = {
+        id: email.split('@')[0], // Use email prefix as ID
+        email: email,
+        name: name,
+        company: company || '',
+        role: 'user',
+        createdAt: new Date().toISOString(),
+        lastLogin: new Date().toISOString()
+      };
+      
+      // Store user in session
+      req.session = req.session || {};
+      req.session.user = user;
+      
+      console.log(`User registered: ${email}`);
+      
+      res.json({
+        success: true,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      });
+    } else {
+      res.status(400).json({ error: 'Name, email and password required' });
+    }
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ error: 'Registration failed' });
+  }
+});
+
+// POST /api/logout - User logout
+router.post('/logout', (req, res) => {
+  try {
+    // Clear session
+    req.session = null;
+    
+    res.json({ success: true, message: 'Logged out successfully' });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({ error: 'Logout failed' });
+  }
+});
+
+// Admin routes
+router.get('/admin/overview', requireAuth, (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
     }
     
-    const week = TASK_STRUCTURE[weekKey as keyof typeof TASK_STRUCTURE];
-    week.tasks.forEach(taskId => {
-      if (!completeProgress[weekKey][taskId]) {
-        completeProgress[weekKey][taskId] = {
-          completed: false,
-          subtasks: {}
-        };
-      }
-      
-      // Ensure subtasks object exists
-      if (!completeProgress[weekKey][taskId].subtasks) {
-        completeProgress[weekKey][taskId].subtasks = {};
+    // Calculate overview stats
+    const userCount = Object.keys(progressData).length;
+    let totalCompletion = 0;
+    let completedLabs = 0;
+    
+    Object.values(progressData).forEach(userData => {
+      if (userData.completedTasks) {
+        totalCompletion += userData.completedTasks;
+        if (userData.completedTasks === 42) {
+          completedLabs++;
+        }
       }
     });
+    
+    const averageCompletion = userCount > 0 ? Math.round((totalCompletion / (userCount * 42)) * 100) : 0;
+    
+    res.json({
+      totalUsers: userCount,
+      newUsersToday: 0, // Implement based on registration dates
+      activeUsers: userCount, // Implement based on recent activity
+      averageCompletion: averageCompletion,
+      labsCompleted: completedLabs
+    });
+  } catch (error) {
+    console.error('Admin overview error:', error);
+    res.status(500).json({ error: 'Failed to load admin overview' });
+  }
+});
+
+// GET /api/admin/users - Get all users (admin only)
+router.get('/admin/users', requireAuth, (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    
+    // Return mock users data (replace with database query)
+    const users = Object.keys(progressData).map(userId => {
+      const userData = progressData[userId];
+      const progress = userData.completedTasks ? Math.round((userData.completedTasks / 42) * 100) : 0;
+      
+      return {
+        id: userId,
+        name: userId.charAt(0).toUpperCase() + userId.slice(1),
+        email: `${userId}@example.com`,
+        company: 'Demo Company',
+        role: userId.includes('admin') ? 'admin' : 'user',
+        progress: progress,
+        lastActive: userData.lastUpdated || new Date().toISOString(),
+        createdAt: new Date().toISOString()
+      };
+    });
+    
+    res.json(users);
+  } catch (error) {
+    console.error('Admin users error:', error);
+    res.status(500).json({ error: 'Failed to load users' });
+  }
+});
+
+// POST /api/admin/export-users - Export users data (admin only)
+router.post('/admin/export-users', requireAuth, (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    
+    // Generate CSV data
+    let csvData = 'Name,Email,Company,Role,Progress,Last Active\n';
+    
+    Object.keys(progressData).forEach(userId => {
+      const userData = progressData[userId];
+      const progress = userData.completedTasks ? Math.round((userData.completedTasks / 42) * 100) : 0;
+      
+      csvData += `${userId},${userId}@example.com,Demo Company,user,${progress}%,${userData.lastUpdated || 'Never'}\n`;
+    });
+    
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=users.csv');
+    res.send(csvData);
+  } catch (error) {
+    console.error('Export users error:', error);
+    res.status(500).json({ error: 'Failed to export users' });
+  }
+});
+
+// POST /api/profile/export-data - Export user's own data
+router.post('/profile/export-data', requireAuth, (req, res) => {
+  try {
+    const userId = req.user.id || req.user.email;
+    const userData = progressData[userId] || {};
+    
+    // Create export data
+    const exportData = {
+      user: req.user,
+      progress: userData,
+      exportDate: new Date().toISOString(),
+      totalTasks: 42,
+      completedTasks: userData.completedTasks || 0,
+      completionPercentage: userData.completedTasks ? Math.round((userData.completedTasks / 42) * 100) : 0
+    };
+    
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename=velocity-lab-data-${userId}.json`);
+    res.json(exportData);
+  } catch (error) {
+    console.error('Export data error:', error);
+    res.status(500).json({ error: 'Failed to export data' });
+  }
+});
+
+// GET /api/profile/lab-history - Get user's lab history
+router.get('/profile/lab-history', requireAuth, (req, res) => {
+  try {
+    const userId = req.user.id || req.user.email;
+    
+    // Mock lab history data (replace with database query)
+    const history = [
+      {
+        id: 1,
+        startedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
+        completedAt: null,
+        completedTasks: progressData[userId]?.completedTasks || 0,
+        totalTasks: 42,
+        progressPercentage: progressData[userId]?.completedTasks ? 
+          Math.round((progressData[userId].completedTasks / 42) * 100) : 0,
+        durationDays: 7
+      }
+    ];
+    
+    res.json(history);
+  } catch (error) {
+    console.error('Lab history error:', error);
+    res.status(500).json({ error: 'Failed to load lab history' });
+  }
+});
+
+// POST /api/profile/change-password - Change user password
+router.post('/profile/change-password', requireAuth, (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'Current and new passwords required' });
+    }
+    
+    if (newPassword.length < 8) {
+      return res.status(400).json({ error: 'New password must be at least 8 characters long' });
+    }
+    
+    // In production, verify current password and hash new password
+    console.log(`Password changed for user: ${req.user.email}`);
+    
+    res.json({ success: true, message: 'Password changed successfully' });
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ error: 'Failed to change password' });
+  }
+});
+
+// Utility function to initialize demo data
+function initializeDemoData() {
+  // Create some demo progress data
+  const demoUsers = ['demo', 'admin', 'testuser'];
+  
+  demoUsers.forEach(userId => {
+    if (!progressData[userId]) {
+      progressData[userId] = {
+        week1: {
+          'install-server2012': { completed: true, subtasks: { '1': true, '2': true, '3': true } },
+          'configure-static-ip': { completed: true, subtasks: {} },
+          'install-adds-role': { completed: false, subtasks: {} }
+        },
+        week2: {},
+        week3: {},
+        week4: {},
+        lastUpdated: new Date().toISOString(),
+        totalTasks: 42,
+        completedTasks: 2,
+        labStarted: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() // 3 days ago
+      };
+    }
   });
   
-  return completeProgress;
+  console.log('Demo data initialized');
 }
+
+// Initialize demo data on startup
+initializeDemoData();
+
+module.exports = router;
+
+// Example Express.js integration:
+/*
+const express = require('express');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const progressRoutes = require('./progress');
+
+const app = express();
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(session({
+  secret: 'your-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+}));
+
+// Serve static files
+app.use(express.static('public'));
+
+// API routes
+app.use('/api', progressRoutes);
+
+// Serve HTML files
+app.get('/', (req, res) => res.sendFile(__dirname + '/public/login.html'));
+app.get('/dashboard', (req, res) => res.sendFile(__dirname + '/public/dashboard.html'));
+app.get('/profile', (req, res) => res.sendFile(__dirname + '/public/profile.html'));
+app.get('/admin', (req, res) => res.sendFile(__dirname + '/public/admin.html'));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Velocity Lab server running on port ${PORT}`);
+});
+*/

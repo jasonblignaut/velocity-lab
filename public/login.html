@@ -1,169 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Sign in to continue your Exchange Online Hybrid Migration training with your MSP team.">
-  <title>Sign in - Velocity Lab</title>
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/styles.css">
-  <script src="/app.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Velocity Lab</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-  <nav class="nav-glass">
-    <div class="brand">
-      <a href="/">
-        <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="brand-logo">
-      </a>
+<body class="auth-page">
+    <!-- Background Pattern -->
+    <div class="auth-background">
+        <div class="auth-pattern"></div>
     </div>
-    <div class="auth">
-      <a href="/register.html" aria-label="Join your team">Join Team</a>
-      <a href="/login.html" aria-label="Sign in">Sign in</a>
-    </div>
-  </nav>
-  
-  <div class="container">
-    <div class="form-container">
-      <h2>Welcome Back</h2>
-      <p style="text-align: center; color: var(--text-secondary); margin-bottom: var(--space-xl);">
-        Sign in to your Velocity Lab account
-      </p>
-      
-      <div class="notification" id="notification"></div>
-      
-      <form id="loginForm" aria-label="Login form" novalidate>
-        <input type="hidden" name="csrf_token" id="csrfToken">
-        
-        <div class="form-group">
-          <label for="email">Work Email</label>
-          <input type="email" 
-                 id="email" 
-                 name="email" 
-                 required 
-                 aria-required="true" 
-                 placeholder="Enter your work email address"
-                 autocomplete="email"
-                 maxlength="100">
-          <span class="error-text" id="email-error"></span>
+
+    <!-- Main Content -->
+    <main class="auth-main">
+        <div class="auth-container">
+            <!-- Header -->
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <h1>🚀 Velocity Lab</h1>
+                    <p class="auth-subtitle">Hybrid Migration Training Platform</p>
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <div class="auth-card">
+                <div class="auth-card-header">
+                    <h2>Welcome Back</h2>
+                    <p>Sign in to continue your hybrid migration training</p>
+                </div>
+
+                <form id="loginForm" class="auth-form" novalidate>
+                    <!-- CSRF Token -->
+                    <input type="hidden" id="csrfToken" name="csrf_token" value="">
+
+                    <!-- Email Field -->
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                class="form-input" 
+                                placeholder="Enter your email"
+                                required 
+                                autocomplete="email"
+                                aria-describedby="email-error"
+                            >
+                            <div class="input-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                        <div id="email-error" class="field-error" role="alert"></div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="form-input" 
+                                placeholder="Enter your password"
+                                required 
+                                autocomplete="current-password"
+                                aria-describedby="password-error"
+                            >
+                            <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="password-error" class="field-error" role="alert"></div>
+                    </div>
+
+                    <!-- Remember Me & Forgot Password -->
+                    <div class="auth-extras">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" name="remember" class="checkbox-input">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">Remember me</span>
+                        </label>
+                        <a href="forgot-password.html" class="auth-link">Forgot password?</a>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <div class="spinner" style="display: none;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 12a9 9 0 11-6.219-8.56"></path>
+                            </svg>
+                        </div>
+                        <span>Sign In</span>
+                    </button>
+                </form>
+
+                <!-- Sign Up Link -->
+                <div class="auth-footer">
+                    <p>Don't have an account? <a href="register.html" class="auth-link">Sign up here</a></p>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="auth-features">
+                <div class="feature">
+                    <div class="feature-icon">🏢</div>
+                    <div class="feature-content">
+                        <h3>Enterprise Exchange</h3>
+                        <p>Learn real-world Exchange Server 2019 deployment and configuration</p>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">☁️</div>
+                    <div class="feature-content">
+                        <h3>Hybrid Cloud</h3>
+                        <p>Master Microsoft 365 hybrid deployments and mail flow</p>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-content">
+                        <h3>Hands-on Labs</h3>
+                        <p>42 practical tasks covering complete migration scenarios</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="form-group password-group">
-          <label for="password">Password</label>
-          <input type="password" 
-                 id="password" 
-                 name="password" 
-                 required 
-                 aria-required="true" 
-                 placeholder="Enter your password"
-                 autocomplete="current-password"
-                 maxlength="128">
-          <button type="button" class="toggle-password" aria-label="Toggle password visibility">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-              <circle cx="12" cy="12" r="3"/>
-            </svg>
-          </button>
-          <span class="error-text" id="password-error"></span>
-        </div>
-        
-        <div class="form-group">
-          <div class="checkbox-wrapper">
-            <input type="checkbox" id="remember" name="remember">
-            <label for="remember" class="checkbox-label">Keep me signed in for 30 days</label>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <button type="submit" id="loginButton" class="btn btn-primary">
-            <span>Sign in</span>
-            <span class="spinner">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 12 2z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-dasharray="15 45"/>
-              </svg>
-            </span>
-          </button>
-        </div>
-        
-        <div class="form-footer">
-          <p>Need to join the team? <a href="/register.html">Register here</a></p>
-        </div>
-      </form>
-    </div>
-  </div>
+    </main>
 
-  <script>
-    // Enhanced client-side validation for login
-    document.addEventListener('DOMContentLoaded', function() {
-      const form = document.getElementById('loginForm');
-      const emailInput = document.getElementById('email');
-      const passwordInput = document.getElementById('password');
+    <!-- Notification System -->
+    <div id="notification" class="notification" role="alert" aria-live="polite"></div>
 
-      // Real-time validation
-      emailInput.addEventListener('blur', validateEmail);
-      passwordInput.addEventListener('blur', validatePassword);
-
-      function validateEmail() {
-        const email = emailInput.value.trim();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
-        if (!email) {
-          showFieldError('email-error', 'Email is required');
-          return false;
-        } else if (!emailRegex.test(email)) {
-          showFieldError('email-error', 'Please enter a valid email address');
-          return false;
-        }
-        
-        clearFieldError('email-error');
-        return true;
-      }
-
-      function validatePassword() {
-        const password = passwordInput.value;
-        
-        if (!password) {
-          showFieldError('password-error', 'Password is required');
-          return false;
-        }
-        
-        clearFieldError('password-error');
-        return true;
-      }
-
-      function showFieldError(elementId, message) {
-        const errorElement = document.getElementById(elementId);
-        if (errorElement) {
-          errorElement.textContent = message;
-          errorElement.style.display = 'block';
-        }
-      }
-
-      function clearFieldError(elementId) {
-        const errorElement = document.getElementById(elementId);
-        if (errorElement) {
-          errorElement.textContent = '';
-          errorElement.style.display = 'none';
-        }
-      }
-
-      // Enhanced form submission with validation
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const isEmailValid = validateEmail();
-        const isPasswordValid = validatePassword();
-        
-        if (isEmailValid && isPasswordValid) {
-          // All validation passed, proceed with form submission
-          // The app.js handleFormSubmit will take over from here
-        } else {
-          if (typeof showNotification === 'function') {
-            showNotification('Please fix the errors above before submitting', 'error');
-          }
-        }
-      });
-    });
-  </script>
+    <!-- Scripts -->
+    <script src="app.js"></script>
 </body>
 </html>
