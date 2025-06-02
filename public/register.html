@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Register for Velocity Lab to start your 4-week Microsoft hybrid IT journey.">
-  <title>Register - Velocity Lab</title>
+  <meta name="description" content="Join your team's Velocity Lab training - Microsoft Exchange Online Hybrid Migration mastery.">
+  <title>Join Your Team - Velocity Lab</title>
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
@@ -18,25 +18,25 @@
       </a>
     </div>
     <div class="auth">
-      <a href="/register.html" aria-label="Register for Velocity Lab">Register</a>
+      <a href="/register.html" aria-label="Join your team">Join Team</a>
       <a href="/login.html" aria-label="Login to Velocity Lab">Login</a>
     </div>
   </nav>
   
   <div class="container">
     <div class="form-container">
-      <h2>Create Your Account</h2>
+      <h2>Join Your Team</h2>
       <p style="text-align: center; color: var(--text-secondary); margin-bottom: var(--space-xl);">
-        Join Velocity Lab and start your Microsoft hybrid IT mastery journey
+        Start your Exchange Online Hybrid Migration training with your MSP team
       </p>
       
       <div class="notification" id="notification"></div>
       
-      <form id="registerForm" aria-label="Registration form" novalidate>
+      <form id="registerForm" aria-label="Team registration form" novalidate>
         <input type="hidden" name="csrf_token" id="csrfToken">
         
         <div class="form-group">
-          <label for="name">Full Name</label>
+          <label for="name">Your Name</label>
           <input type="text" 
                  id="name" 
                  name="name" 
@@ -50,20 +50,20 @@
         </div>
         
         <div class="form-group">
-          <label for="email">Email Address</label>
+          <label for="email">Work Email</label>
           <input type="email" 
                  id="email" 
                  name="email" 
                  required 
                  aria-required="true" 
-                 placeholder="Enter your email address"
+                 placeholder="Enter your work email address"
                  autocomplete="email"
                  maxlength="100">
           <span class="error-text" id="email-error"></span>
         </div>
         
         <div class="form-group password-group">
-          <label for="password">Password</label>
+          <label for="password">Create Password</label>
           <input type="password" 
                  id="password" 
                  name="password" 
@@ -79,31 +79,37 @@
               <circle cx="12" cy="12" r="3"/>
             </svg>
           </button>
-          <span class="error-text" id="repeat-password-error"></span>
+          <span class="error-text" id="password-error"></span>
+          <div class="field-hint">
+            <small>Password must be at least 8 characters long</small>
+          </div>
         </div>
         
-        <div class="form-group">
-          <label for="role">Job Role</label>
-          <input type="text" 
-                 id="role" 
-                 name="role" 
+        <div class="form-group password-group">
+          <label for="repeatPassword">Confirm Password</label>
+          <input type="password" 
+                 id="repeatPassword" 
+                 name="repeatPassword" 
                  required 
                  aria-required="true" 
-                 placeholder="e.g., IT Administrator, System Engineer"
-                 autocomplete="organization-title"
-                 maxlength="100">
-          <span class="error-text" id="role-error"></span>
-          <div class="field-hint">
-            <small>This helps us understand your background and experience level</small>
-          </div>
+                 placeholder="Confirm your password"
+                 autocomplete="new-password"
+                 minlength="8"
+                 maxlength="128">
+          <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+          <span class="error-text" id="repeat-password-error"></span>
         </div>
         
         <div class="form-group">
           <div class="checkbox-wrapper">
             <input type="checkbox" id="terms" name="terms" required aria-required="true">
             <label for="terms" class="checkbox-label">
-              I agree to the <a href="#" target="_blank" rel="noopener">Terms of Service</a> 
-              and <a href="#" target="_blank" rel="noopener">Privacy Policy</a>
+              I agree to participate in the team training program
             </label>
           </div>
           <span class="error-text" id="terms-error"></span>
@@ -111,7 +117,7 @@
         
         <div class="form-group">
           <button type="submit" id="registerButton" class="btn btn-primary">
-            <span>Create Account</span>
+            <span>Join Training</span>
             <span class="spinner">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <path d="M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 12 2z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-dasharray="15 45"/>
@@ -121,21 +127,20 @@
         </div>
         
         <div class="form-footer">
-          <p>Already have an account? <a href="/login.html">Sign in here</a></p>
+          <p>Already part of the team? <a href="/login.html">Sign in here</a></p>
         </div>
       </form>
     </div>
   </div>
 
   <script>
-    // Enhanced client-side validation
+    // Enhanced client-side validation - FIXED: Removed role validation
     document.addEventListener('DOMContentLoaded', function() {
       const form = document.getElementById('registerForm');
       const nameInput = document.getElementById('name');
       const emailInput = document.getElementById('email');
       const passwordInput = document.getElementById('password');
       const repeatPasswordInput = document.getElementById('repeatPassword');
-      const roleInput = document.getElementById('role');
       const termsInput = document.getElementById('terms');
 
       // Real-time validation
@@ -143,12 +148,10 @@
       emailInput.addEventListener('blur', validateEmail);
       passwordInput.addEventListener('input', validatePassword);
       repeatPasswordInput.addEventListener('input', validateRepeatPassword);
-      roleInput.addEventListener('blur', validateRole);
       termsInput.addEventListener('change', validateTerms);
 
       function validateName() {
         const name = nameInput.value.trim();
-        const errorElement = document.getElementById('name-error');
         
         if (!name) {
           showFieldError('name-error', 'Name is required');
@@ -168,7 +171,6 @@
       function validateEmail() {
         const email = emailInput.value.trim();
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const errorElement = document.getElementById('email-error');
         
         if (!email) {
           showFieldError('email-error', 'Email is required');
@@ -187,7 +189,6 @@
 
       function validatePassword() {
         const password = passwordInput.value;
-        const errorElement = document.getElementById('password-error');
         
         if (!password) {
           showFieldError('password-error', 'Password is required');
@@ -213,7 +214,6 @@
       function validateRepeatPassword() {
         const password = passwordInput.value;
         const repeatPassword = repeatPasswordInput.value;
-        const errorElement = document.getElementById('repeat-password-error');
         
         if (!repeatPassword) {
           showFieldError('repeat-password-error', 'Please confirm your password');
@@ -227,27 +227,9 @@
         return true;
       }
 
-      function validateRole() {
-        const role = roleInput.value.trim();
-        const errorElement = document.getElementById('role-error');
-        
-        if (!role) {
-          showFieldError('role-error', 'Job role is required');
-          return false;
-        } else if (role.length > 100) {
-          showFieldError('role-error', 'Job role must be less than 100 characters');
-          return false;
-        }
-        
-        clearFieldError('role-error');
-        return true;
-      }
-
       function validateTerms() {
-        const errorElement = document.getElementById('terms-error');
-        
         if (!termsInput.checked) {
-          showFieldError('terms-error', 'You must agree to the terms and privacy policy');
+          showFieldError('terms-error', 'You must agree to participate in the training program');
           return false;
         }
         
@@ -271,7 +253,7 @@
         }
       }
 
-      // Enhanced form submission with validation
+      // FIXED: Enhanced form submission validation without role field
       form.addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -280,10 +262,9 @@
         const isEmailValid = validateEmail();
         const isPasswordValid = validatePassword();
         const isRepeatPasswordValid = validateRepeatPassword();
-        const isRoleValid = validateRole();
         const isTermsValid = validateTerms();
         
-        if (isNameValid && isEmailValid && isPasswordValid && isRepeatPasswordValid && isRoleValid && isTermsValid) {
+        if (isNameValid && isEmailValid && isPasswordValid && isRepeatPasswordValid && isTermsValid) {
           // All validation passed, proceed with form submission
           // The main.js handleFormSubmit will take over from here
         } else {
@@ -293,27 +274,4 @@
     });
   </script>
 </body>
-</html> 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-              <circle cx="12" cy="12" r="3"/>
-            </svg>
-          </button>
-          <span class="error-text" id="password-error"></span>
-          <div class="password-requirements">
-            <small>Password must be at least 8 characters long</small>
-          </div>
-        </div>
-        
-        <div class="form-group password-group">
-          <label for="repeatPassword">Confirm Password</label>
-          <input type="password" 
-                 id="repeatPassword" 
-                 name="repeatPassword" 
-                 required 
-                 aria-required="true" 
-                 placeholder="Confirm your password"
-                 autocomplete="new-password"
-                 minlength="8"
-                 maxlength="128">
-          <button type="button" class="toggle-password" aria-label="Toggle password visibility">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M1
+</html>

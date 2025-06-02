@@ -1,5 +1,5 @@
 // functions/utils.ts
-// Enhanced utilities for Velocity Lab
+// Enhanced utilities for Velocity Lab - 42-Task System with Lab History
 
 export interface Env {
   USERS: KVNamespace;
@@ -16,11 +16,19 @@ export interface User {
   createdAt: string;
   lastLogin?: string;
   passwordChangedAt?: string;
+  labHistory?: LabHistory[];
+  currentLabId?: string;
 }
 
 export interface Progress {
   [week: string]: {
-    [task: string]: boolean;
+    [task: string]: {
+      completed: boolean;
+      subtasks?: {
+        [subtaskKey: string]: boolean;
+      };
+      completedAt?: string;
+    };
   };
 }
 
@@ -29,6 +37,111 @@ export interface Session {
   createdAt: string;
   expiresAt: string;
 }
+
+export interface LabHistory {
+  labId: string;
+  startedAt: string;
+  completedAt?: string;
+  totalTasks: number;
+  completedTasks: number;
+  progressPercentage: number;
+  durationDays?: number;
+}
+
+export interface SubtaskDefinition {
+  id: string;
+  title: string;
+  description?: string;
+}
+
+export interface TaskDefinition {
+  id: string;
+  title: string;
+  description: string;
+  subtasks: SubtaskDefinition[];
+  referenceLinks?: Array<{
+    title: string;
+    url: string;
+    type: 'official' | 'community' | 'video' | 'blog';
+  }>;
+}
+
+// FIXED: Enhanced task structure for comprehensive 42-task hybrid migration lab
+export const TASK_STRUCTURE = {
+  week1: {
+    title: "Foundation Setup",
+    description: "Windows Server 2012 DC, domain joining, and network shares",
+    taskCount: 12,
+    tasks: [
+      'install-server2012',
+      'configure-static-ip',
+      'install-adds-role',
+      'promote-to-dc',
+      'configure-dns-server',
+      'create-domain-users',
+      'setup-vm-dns',
+      'join-vm-domain',
+      'create-hidden-share',
+      'map-drive-gpo',
+      'map-drive-script',
+      'create-security-group'
+    ]
+  },
+  week2: {
+    title: "Infrastructure Expansion", 
+    description: "Second DC, WSUS, and time synchronization",
+    taskCount: 8,
+    tasks: [
+      'install-second-server',
+      'promote-additional-dc',
+      'install-wsus-role',
+      'configure-wsus-settings',
+      'setup-wsus-gpo',
+      'configure-primary-time',
+      'configure-secondary-time',
+      'test-infrastructure'
+    ]
+  },
+  week3: {
+    title: "Email & Messaging",
+    description: "Server 2016 upgrade and Exchange 2019 deployment", 
+    taskCount: 12,
+    tasks: [
+      'backup-servers',
+      'upgrade-dc1-2016',
+      'upgrade-dc2-2016',
+      'raise-functional-levels',
+      'prepare-exchange-server',
+      'install-exchange-prereqs',
+      'extend-ad-schema',
+      'install-exchange-2019',
+      'configure-exchange-basic',
+      'create-mailboxes',
+      'test-mailbox-access',
+      'configure-internal-mailflow'
+    ]
+  },
+  week4: {
+    title: "Cloud Integration",
+    description: "External mail publishing and Microsoft 365 hybrid setup",
+    taskCount: 10,
+    tasks: [
+      'configure-external-dns',
+      'setup-firewall-rules',
+      'install-ssl-certificates',
+      'configure-external-mailflow',
+      'setup-modern-auth',
+      'prepare-m365-tenant',
+      'install-aad-connect',
+      'run-hybrid-wizard',
+      'configure-hybrid-mailflow',
+      'verify-hybrid-functionality'
+    ]
+  }
+};
+
+// FIXED: Total task count calculation
+export const TOTAL_TASKS = Object.values(TASK_STRUCTURE).reduce((sum, week) => sum + week.taskCount, 0); // 42 tasks
 
 // JSON response helper
 export const jsonResponse = (data: any, status: number = 200): Response => {
@@ -67,7 +180,6 @@ export const validateSession = async (env: Env, request: Request): Promise<strin
 // Get user by ID
 export const getUserById = async (env: Env, userId: string): Promise<User | null> => {
   try {
-    // First, try to find user by ID in all user records
     const users = await env.USERS.list({ prefix: 'user:' });
     
     for (const { name: userKey } of users.keys) {
@@ -199,45 +311,175 @@ export const sanitizeInput = (input: string): string => {
   return input.trim().replace(/[<>]/g, '');
 };
 
-// Calculate user progress percentage
+// ENHANCED: Calculate user progress percentage with subtask support
 export const calculateProgress = (progress: Progress): number => {
-  let completedTasks = 0;
-  const totalTasks = 14;
+  let completedMainTasks = 0;
+  let completedSubtasks = 0;
+  let totalSubtasks = 0;
   
-  Object.values(progress).forEach(week => {
-    completedTasks += Object.values(week).filter(Boolean).length;
+  Object.keys(TASK_STRUCTURE).forEach(weekKey => {
+    const week = TASK_STRUCTURE[weekKey as keyof typeof TASK_STRUCTURE];
+    const weekProgress = progress[weekKey] || {};
+    
+    week.tasks.forEach(taskId => {
+      const taskProgress = weekProgress[taskId];
+      
+      if (taskProgress?.completed) {
+        completedMainTasks++;
+      }
+      
+      // Count subtasks if they exist
+      if (taskProgress?.subtasks) {
+        const subtaskEntries = Object.entries(taskProgress.subtasks);
+        totalSubtasks += subtaskEntries.length;
+        completedSubtasks += subtaskEntries.filter(([_, completed]) => completed).length;
+      }
+    });
   });
   
-  return Math.round((completedTasks / totalTasks) * 100);
+  // Weight main tasks more heavily than subtasks
+  const mainTaskWeight = 0.7;
+  const subtaskWeight = 0.3;
+  
+  const mainTaskProgress = (completedMainTasks / TOTAL_TASKS) * 100;
+  const subtaskProgress = totalSubtasks > 0 ? (completedSubtasks / totalSubtasks) * 100 : 0;
+  
+  const overallProgress = (mainTaskProgress * mainTaskWeight) + (subtaskProgress * subtaskWeight);
+  
+  return Math.round(overallProgress);
 };
 
-// Initialize default admin user
-export const initializeDefaultAdmin = async (env: Env): Promise<void> => {
+// NEW: Start a new lab for a user
+export const startNewLab = async (env: Env, userId: string): Promise<string> => {
   try {
-    const adminEmail = 'asusautomation@gmail.com';
-    const existingAdmin = await getUserByEmail(env, adminEmail);
+    const user = await getUserById(env, userId);
+    if (!user) throw new Error('User not found');
     
-    if (!existingAdmin) {
-      const adminUser: User = {
-        id: crypto.randomUUID(),
-        name: 'System Administrator',
-        email: adminEmail,
-        password: 'Superadmin@123',
-        role: 'admin',
-        createdAt: new Date().toISOString()
-      };
-      
-      await env.USERS.put(`user:${adminEmail}`, JSON.stringify(adminUser));
-      console.log('Default admin user created with role: admin');
-    } else if (existingAdmin.role !== 'admin') {
-      // Ensure the default admin has admin role
-      existingAdmin.role = 'admin';
-      await env.USERS.put(`user:${adminEmail}`, JSON.stringify(existingAdmin));
-      console.log('Default admin user role updated to: admin');
-    }
+    const labId = crypto.randomUUID();
+    const now = new Date().toISOString();
+    
+    // Initialize empty progress for new lab
+    const emptyProgress: Progress = {};
+    Object.keys(TASK_STRUCTURE).forEach(weekKey => {
+      emptyProgress[weekKey] = {};
+      const week = TASK_STRUCTURE[weekKey as keyof typeof TASK_STRUCTURE];
+      week.tasks.forEach(taskId => {
+        emptyProgress[weekKey][taskId] = {
+          completed: false,
+          subtasks: {}
+        };
+      });
+    });
+    
+    // Save new lab progress
+    await env.PROGRESS.put(`progress:${userId}:${labId}`, JSON.stringify(emptyProgress));
+    
+    // Update user's current lab
+    user.currentLabId = labId;
+    if (!user.labHistory) user.labHistory = [];
+    
+    user.labHistory.push({
+      labId,
+      startedAt: now,
+      totalTasks: TOTAL_TASKS,
+      completedTasks: 0,
+      progressPercentage: 0
+    });
+    
+    await env.USERS.put(`user:${user.email}`, JSON.stringify(user));
+    
+    // Log lab start
+    await logActivity(env, userId, 'lab_started', { labId, totalTasks: TOTAL_TASKS });
+    
+    return labId;
   } catch (error) {
-    console.error('Initialize default admin error:', error);
+    console.error('Start new lab error:', error);
+    throw error;
   }
+};
+
+// NEW: Complete current lab
+export const completeLab = async (env: Env, userId: string): Promise<void> => {
+  try {
+    const user = await getUserById(env, userId);
+    if (!user || !user.currentLabId) return;
+    
+    const labId = user.currentLabId;
+    const progressData = await env.PROGRESS.get(`progress:${userId}:${labId}`);
+    if (!progressData) return;
+    
+    const progress = JSON.parse(progressData) as Progress;
+    const completedTasks = calculateCompletedTasks(progress);
+    const progressPercentage = calculateProgress(progress);
+    
+    // Update lab history
+    if (user.labHistory) {
+      const labIndex = user.labHistory.findIndex(lab => lab.labId === labId);
+      if (labIndex !== -1) {
+        const lab = user.labHistory[labIndex];
+        lab.completedAt = new Date().toISOString();
+        lab.completedTasks = completedTasks;
+        lab.progressPercentage = progressPercentage;
+        
+        // Calculate duration
+        const startDate = new Date(lab.startedAt);
+        const endDate = new Date(lab.completedAt);
+        lab.durationDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      }
+    }
+    
+    await env.USERS.put(`user:${user.email}`, JSON.stringify(user));
+    
+    // Log lab completion
+    await logActivity(env, userId, 'lab_completed', { 
+      labId, 
+      completedTasks, 
+      totalTasks: TOTAL_TASKS,
+      progressPercentage 
+    });
+  } catch (error) {
+    console.error('Complete lab error:', error);
+  }
+};
+
+// NEW: Get current lab progress
+export const getCurrentLabProgress = async (env: Env, userId: string): Promise<Progress | null> => {
+  try {
+    const user = await getUserById(env, userId);
+    if (!user) return null;
+    
+    // If no current lab, create one
+    if (!user.currentLabId) {
+      const labId = await startNewLab(env, userId);
+      user.currentLabId = labId;
+    }
+    
+    const progressData = await env.PROGRESS.get(`progress:${userId}:${user.currentLabId}`);
+    if (!progressData) return null;
+    
+    return JSON.parse(progressData) as Progress;
+  } catch (error) {
+    console.error('Get current lab progress error:', error);
+    return null;
+  }
+};
+
+// NEW: Calculate completed tasks count
+export const calculateCompletedTasks = (progress: Progress): number => {
+  let completed = 0;
+  
+  Object.keys(TASK_STRUCTURE).forEach(weekKey => {
+    const week = TASK_STRUCTURE[weekKey as keyof typeof TASK_STRUCTURE];
+    const weekProgress = progress[weekKey] || {};
+    
+    week.tasks.forEach(taskId => {
+      if (weekProgress[taskId]?.completed) {
+        completed++;
+      }
+    });
+  });
+  
+  return completed;
 };
 
 // Format date for display
@@ -267,7 +509,6 @@ export const validateEmail = (email: string): boolean => {
 export const cleanExpiredSessions = async (env: Env): Promise<void> => {
   try {
     const sessions = await env.USERS.list({ prefix: 'session:' });
-    const now = Date.now();
     
     for (const { name: sessionKey } of sessions.keys) {
       // Sessions automatically expire due to TTL, but we can clean up manually if needed
