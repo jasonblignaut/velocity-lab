@@ -1,6 +1,1723 @@
-<h3>📚 Reference Links</h3>
+// Enhanced Main.js for Velocity Lab - COMPLETE 42-Task System
+// FIXED: Modal positioning, checkbox persistence, hierarchical checkboxes, MSP-focused
+
+// Utility Functions with Performance Optimizations
+const $ = (selector, context = document) => context.querySelector(selector);
+const $$ = (selector, context = document) => context.querySelectorAll(selector);
+
+// Enhanced Cookie Management
+const setCookie = (name, value, days) => {
+  const date = new Date();
+  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/;SameSite=Strict;Secure`;
+};
+
+const getCookie = (name) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  return parts.length === 2 ? parts.pop().split(';').shift() : null;
+};
+
+const deleteCookie = (name) => {
+  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Strict;Secure`;
+};
+
+// COMPLETE 42-TASK STRUCTURE - Matching backend exactly
+const TASK_STRUCTURE = {
+  week1: {
+    title: "Foundation Setup",
+    description: "Windows Server 2012 DC, domain joining, and network shares",
+    taskCount: 12,
+    tasks: [
+      'install-server2012',
+      'configure-static-ip', 
+      'install-adds-role',
+      'promote-to-dc',
+      'configure-dns-server',
+      'create-domain-users',
+      'setup-vm-dns',
+      'join-vm-domain',
+      'create-hidden-share',
+      'map-drive-gpo',
+      'map-drive-script',
+      'create-security-group'
+    ]
+  },
+  week2: {
+    title: "Infrastructure Expansion",
+    description: "Second DC, WSUS, and time synchronization", 
+    taskCount: 8,
+    tasks: [
+      'install-second-server',
+      'promote-additional-dc',
+      'install-wsus-role',
+      'configure-wsus-settings',
+      'setup-wsus-gpo',
+      'configure-primary-time',
+      'configure-secondary-time',
+      'test-infrastructure'
+    ]
+  },
+  week3: {
+    title: "Email & Messaging",
+    description: "Server 2016 upgrade and Exchange 2019 deployment",
+    taskCount: 12,
+    tasks: [
+      'backup-servers',
+      'upgrade-dc1-2016',
+      'upgrade-dc2-2016', 
+      'raise-functional-levels',
+      'prepare-exchange-server',
+      'install-exchange-prereqs',
+      'extend-ad-schema',
+      'install-exchange-2019',
+      'configure-exchange-basic',
+      'create-mailboxes',
+      'test-mailbox-access',
+      'configure-internal-mailflow'
+    ]
+  },
+  week4: {
+    title: "Cloud Integration", 
+    description: "External mail publishing and Microsoft 365 hybrid setup",
+    taskCount: 10,
+    tasks: [
+      'configure-external-dns',
+      'setup-firewall-rules',
+      'install-ssl-certificates',
+      'configure-external-mailflow',
+      'setup-modern-auth',
+      'prepare-m365-tenant',
+      'install-aad-connect',
+      'run-hybrid-wizard',
+      'configure-hybrid-mailflow',
+      'verify-hybrid-functionality'
+    ]
+  }
+};
+
+// TOTAL TASK COUNT: 42 tasks (12 + 8 + 12 + 10)
+const TOTAL_TASKS = Object.values(TASK_STRUCTURE).reduce((sum, week) => sum + week.taskCount, 0);
+
+// COMPLETE TASK DEFINITIONS - All 42 Tasks with Current 2025 Links
+const TASK_DEFINITIONS = {
+  // ================================
+  // WEEK 1: Foundation Setup (12 tasks)
+  // ================================
+  
+  'week1-install-server2012': {
+    title: 'Install Windows Server 2012',
+    description: `
+      <p><strong>Set up the foundation server for your domain controller with proper VM configuration.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Create new VM with minimum 4GB RAM, 60GB disk</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Boot from Windows Server 2012 R2 ISO</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Complete Windows installation wizard</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Set administrator password</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Install VM integration services/tools</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
       <ul>
-        <li><a href="https://learn.microsoft.com/en-us/exchange/hybrid-deployment/transport-routing" target="_blank">📖 MS Learn: Hybrid Mail Routing</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/get-started/installation-and-upgrade" target="_blank">📖 MS Learn: Server Installation</a></li>
+        <li><a href="https://www.youtube.com/watch?v=h4HbGvwFqzM" target="_blank">🎥 YouTube: Install Windows Server 2012</a></li>
+      </ul>
+    `
+  },
+  
+  'week1-configure-static-ip': {
+    title: 'Configure Static IP Address',
+    description: `
+      <p><strong>Set up reliable static IP addressing for domain controller communication.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Open Network and Sharing Center</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Click "Change adapter settings"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Right-click network adapter, select Properties</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Select IPv4 properties and configure static IP (e.g., 192.168.1.10)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Set subnet mask (255.255.255.0) and default gateway</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Configure DNS servers (initially use ISP DNS)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Test connectivity with ping commands</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/networking/technologies/ipam/ipam-top" target="_blank">📖 MS Learn: IP Address Management</a></li>
+      </ul>
+    `
+  },
+
+  'week1-install-adds-role': {
+    title: 'Install Active Directory Domain Services Role',
+    description: `
+      <p><strong>Install the foundational AD DS role on Windows Server 2012.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Open Server Manager Dashboard</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Click "Add roles and features"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Select "Role-based or feature-based installation"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Choose your server from the server pool</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Select "Active Directory Domain Services" role</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Add required features when prompted</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Complete the installation wizard</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-active-directory-domain-services--level-100-" target="_blank">📖 MS Learn: Install Active Directory Domain Services</a></li>
+        <li><a href="https://www.youtube.com/watch?v=h4HbGvwFqzM" target="_blank">🎥 YouTube: Install Active Directory Domain Controller</a></li>
+      </ul>
+    `
+  },
+
+  'week1-promote-to-dc': {
+    title: 'Promote Server to Domain Controller',
+    description: `
+      <p><strong>Configure as primary DC with DNS services and create new forest (lab.local).</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Click the notification flag in Server Manager</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Select "Promote this server to a domain controller"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Choose "Add a new forest" and specify domain name (e.g., lab.local)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Set Forest and Domain functional levels to Windows Server 2012</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Ensure "Domain Name System (DNS) server" is checked</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Set Directory Services Restore Mode (DSRM) password</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Review DNS options and NetBIOS domain name</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="8">
+          <label>8. Specify database, log files, and SYSVOL paths</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="9">
+          <label>9. Complete the promotion and restart when prompted</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-a-new-windows-server-2016-active-directory-forest--level-200-" target="_blank">📖 MS Learn: Install New AD Forest</a></li>
+        <li><a href="https://www.youtube.com/watch?v=h4HbGvwFqzM" target="_blank">🎥 YouTube: Domain Controller Promotion</a></li>
+      </ul>
+    `
+  },
+
+  'week1-configure-dns-server': {
+    title: 'Configure DNS Server Settings',
+    description: `
+      <p><strong>Set up DNS zones and ensure proper name resolution for the domain.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Open DNS Manager from Server Manager Tools</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Verify forward lookup zone for your domain exists</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Create reverse lookup zone for your subnet</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Configure DNS forwarders for external resolution</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Test DNS resolution with nslookup commands</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Verify _msdcs and other SRV records are created</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/networking/dns/dns-top" target="_blank">📖 MS Learn: DNS Server Overview</a></li>
+        <li><a href="https://www.youtube.com/watch?v=WfCWqNb_4DI" target="_blank">🎥 YouTube: DNS Management</a></li>
+      </ul>
+    `
+  },
+
+  'week1-create-domain-users': {
+    title: 'Create Domain Users and OUs',
+    description: `
+      <p><strong>Set up organizational units and create test user accounts for the domain.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Open Active Directory Users and Computers</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Create OU structure (Users, Computers, Groups)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Create test user accounts (TestUser1, TestUser2)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Set strong passwords and configure account options</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Add users to appropriate groups</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Test user logon from domain controller</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/reviewing-ou-design-concepts" target="_blank">📖 MS Learn: OU Design Concepts</a></li>
+      </ul>
+    `
+  },
+
+  'week1-setup-vm-dns': {
+    title: 'Configure VM DNS Settings',
+    description: `
+      <p><strong>Point virtual machine to use domain controller as DNS server.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Open Network and Sharing Center on the VM</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Click "Change adapter settings"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Right-click network adapter and select "Properties"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Select "Internet Protocol Version 4 (TCP/IPv4)" and click "Properties"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Select "Use the following DNS server addresses"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Enter the Domain Controller's IP address as Preferred DNS</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Click "OK" to save settings</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="8">
+          <label>8. Test connectivity with <code>nslookup lab.local</code></label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/networking/dns/troubleshoot/troubleshoot-dns-clients" target="_blank">📖 MS Learn: Configure DNS Clients</a></li>
+      </ul>
+    `
+  },
+
+  'week1-join-vm-domain': {
+    title: 'Join VM to Domain',
+    description: `
+      <p><strong>Add virtual machine to domain for centralized management.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Right-click "This PC" and select "Properties"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Click "Change settings" next to Computer name</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Click "Change..." button</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Select "Domain" and enter your domain name (e.g., lab.local)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Provide domain administrator credentials when prompted</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Welcome message confirms successful domain join</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Restart the computer when prompted</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="8">
+          <label>8. Log in with domain account to verify</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/join-a-computer-to-a-domain" target="_blank">📖 MS Learn: Join Computer to Domain</a></li>
+      </ul>
+    `
+  },
+
+  'week1-create-hidden-share': {
+    title: 'Create Hidden Network Share',
+    description: `
+      <p><strong>Set up centralized file storage with hidden share (CompanyData$).</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Create folder "C:\\CompanyData" on Domain Controller</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Right-click folder and select "Properties"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Go to "Sharing" tab and click "Advanced Sharing"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Check "Share this folder"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Change share name to "CompanyData$" ($ makes it hidden)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Click "Permissions" and set appropriate access</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Go to "Security" tab and configure NTFS permissions</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="8">
+          <label>8. Test access from another machine using \\\\servername\\CompanyData$</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/storage/file-server/file-server-resource-manager/file-server-resource-manager-overview" target="_blank">📖 MS Learn: File Server Management</a></li>
+      </ul>
+    `
+  },
+
+  'week1-map-drive-gpo': {
+    title: 'Map Drive via Group Policy (Method 1)',
+    description: `
+      <p><strong>Configure automatic drive mapping through Group Policy preferences for H: drive.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Open Group Policy Management Console (gpmc.msc)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Create new GPO named "Drive Mapping Policy"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Right-click and "Edit" the GPO</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Navigate to User Configuration > Preferences > Windows Settings > Drive Maps</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Right-click and select "New > Mapped Drive"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Set Action to "Create", Location to \\\\servername\\CompanyData$</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Set Drive Letter to "H:" and configure options</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="8">
+          <label>8. Link GPO to appropriate OU and test</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/dn581922(v=ws.11)" target="_blank">📖 MS Learn: Group Policy Preferences</a></li>
+      </ul>
+    `
+  },
+
+  'week1-map-drive-script': {
+    title: 'Map Drive via Logon Script (Method 2)',
+    description: `
+      <p><strong>Create PowerShell logon script for automatic drive mapping to S: drive.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Create PowerShell script file "MapDrives.ps1" in SYSVOL</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Add command: <code>New-PSDrive -Name "S" -PSProvider FileSystem -Root "\\\\servername\\CompanyData$" -Persist</code></label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Set execution policy if needed</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Open Group Policy Management Console</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Navigate to User Configuration > Policies > Windows Settings > Scripts</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Double-click "Logon" and add PowerShell script</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Configure script parameters and test deployment</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/new-psdrive" target="_blank">📖 MS Learn: New-PSDrive Cmdlet</a></li>
+      </ul>
+    `
+  },
+
+  'week1-create-security-group': {
+    title: 'Create Security Group for Share Access',
+    description: `
+      <p><strong>Implement role-based access control using AD security groups.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Open Active Directory Users and Computers (dsa.msc)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Navigate to appropriate OU or create new OU "Groups"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Right-click and select "New > Group"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Name the group "CompanyData_Access"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Set Group scope to "Global" and type to "Security"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Add users to the group who need share access</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Modify share and NTFS permissions to grant access only to this group</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="8">
+          <label>8. Test access with group member and non-member accounts</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-groups" target="_blank">📖 MS Learn: Security Groups Overview</a></li>
+      </ul>
+    `
+  },
+
+  // ================================
+  // WEEK 2: Infrastructure Expansion (8 tasks)
+  // ================================
+
+  'week2-install-second-server': {
+    title: 'Install Second Windows Server 2012',
+    description: `
+      <p><strong>Deploy second server for redundancy and load distribution.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Create new VM with adequate resources (4GB RAM, 60GB disk)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Install Windows Server 2012 R2</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Configure network settings with static IP</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Point DNS to existing domain controller</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Join server to domain</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-a-replica-windows-server-2016-domain-controller-in-an-existing-domain--level-200-" target="_blank">📖 MS Learn: Multiple Domain Controllers</a></li>
+      </ul>
+    `
+  },
+
+  'week2-promote-additional-dc': {
+    title: 'Promote to Additional Domain Controller',
+    description: `
+      <p><strong>Add redundancy with second domain controller in environment.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Install AD DS role on second server</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Run domain controller promotion wizard</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Select "Add a domain controller to an existing domain"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Configure DNS and Global Catalog options</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Test replication between domain controllers</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Verify SYSVOL replication is working</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-a-replica-windows-server-2016-domain-controller-in-an-existing-domain--level-200-" target="_blank">📖 MS Learn: Additional Domain Controller</a></li>
+      </ul>
+    `
+  },
+
+  'week2-install-wsus-role': {
+    title: 'Install WSUS Role',
+    description: `
+      <p><strong>Deploy Windows Server Update Services for centralized updates.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Add WSUS role in Server Manager on second DC</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Configure database location (WID or SQL)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Set content storage location</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Run post-deployment configuration wizard</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Configure update languages and products</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Perform initial synchronization with Microsoft Update</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-server-update-services/get-started/windows-server-update-services-wsus" target="_blank">📖 MS Learn: WSUS Overview</a></li>
+      </ul>
+    `
+  },
+
+  'week2-configure-wsus-settings': {
+    title: 'Configure WSUS Settings',
+    description: `
+      <p><strong>Set up update approval and client targeting policies.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Open WSUS Administration Console</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Create computer groups for different server types</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Configure automatic approvals for critical updates</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Set up email notifications for administrators</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Configure update storage and cleanup options</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-server-update-services/deploy/4-configure-group-policy-settings-for-automatic-updates" target="_blank">📖 MS Learn: WSUS Configuration</a></li>
+      </ul>
+    `
+  },
+
+  'week2-setup-wsus-gpo': {
+    title: 'Setup WSUS Group Policy',
+    description: `
+      <p><strong>Configure client update policies and automatic update settings.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Open Group Policy Management Console</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Create or edit WSUS Client Configuration policy</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Configure intranet update service location</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Set automatic update configuration and install schedule</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Enable client-side targeting</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Link policy to appropriate OUs</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Test client connectivity to WSUS server</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-server-update-services/deploy/4-configure-group-policy-settings-for-automatic-updates" target="_blank">📖 MS Learn: WSUS Group Policy</a></li>
+      </ul>
+    `
+  },
+
+  'week2-configure-primary-time': {
+    title: 'Configure Primary Time Server',
+    description: `
+      <p><strong>Set PDC Emulator as authoritative time source with external NTP.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Identify PDC Emulator with <code>netdom query fsmo</code></label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Configure external time source: <code>w32tm /config /manualpeerlist:"time.nist.gov,0x1" /syncfromflags:manual</code></label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Set as reliable time server: <code>w32tm /config /reliable:yes</code></label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Restart Windows Time service: <code>net stop w32time && net start w32time</code></label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Force time synchronization: <code>w32tm /resync</code></label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Verify configuration: <code>w32tm /query /status</code></label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/networking/windows-time-service/windows-time-service-top" target="_blank">📖 MS Learn: Windows Time Service</a></li>
+      </ul>
+    `
+  },
+
+  'week2-configure-secondary-time': {
+    title: 'Configure Secondary Time Server',
+    description: `
+      <p><strong>Set second DC as backup time source with domain hierarchy sync.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. On second DC, configure domain hierarchy sync: <code>w32tm /config /syncfromflags:domhier</code></label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Set as non-reliable time source: <code>w32tm /config /reliable:no</code></label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Restart Windows Time service</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Force synchronization with PDC: <code>w32tm /resync</code></label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Verify time sync across domain: <code>w32tm /monitor</code></label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/networking/windows-time-service/windows-time-service-top" target="_blank">📖 MS Learn: Time Service Configuration</a></li>
+      </ul>
+    `
+  },
+
+  'week2-test-infrastructure': {
+    title: 'Test Infrastructure Setup',
+    description: `
+      <p><strong>Verify all services, replication, and connectivity before proceeding.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Test AD replication: <code>repadmin /replsummary</code></label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Verify WSUS client connectivity</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Check time synchronization across all servers</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Validate DNS resolution from all DCs</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Test user logon from both domain controllers</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Verify network shares are accessible</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/troubleshoot/troubleshooting-active-directory-replication-problems" target="_blank">📖 MS Learn: AD Troubleshooting</a></li>
+      </ul>
+    `
+  },
+
+  // ================================
+  // WEEK 3: Email & Messaging (12 tasks)
+  // ================================
+
+  'week3-backup-servers': {
+    title: 'Backup Servers Before Upgrade',
+    description: `
+      <p><strong>Create full system backups and verify restore capabilities.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Install Windows Server Backup feature</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Create VM snapshots for all domain controllers</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Export AD database backup</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Document current system configuration</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Test backup restoration process</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-server-backup/windows-server-backup-overview" target="_blank">📖 MS Learn: Windows Server Backup</a></li>
+      </ul>
+    `
+  },
+
+  'week3-upgrade-dc1-2016': {
+    title: 'Upgrade DC1 to Server 2016',
+    description: `
+      <p><strong>Perform in-place upgrade of primary domain controller.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Run Windows Server 2016 setup from mounted ISO</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Choose "Upgrade" installation option</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Monitor upgrade progress and handle any prompts</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Complete post-upgrade configuration</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Verify AD services are running properly</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Test domain functionality</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/get-started/installation-and-upgrade" target="_blank">📖 MS Learn: Server Upgrade Process</a></li>
+      </ul>
+    `
+  },
+
+  'week3-upgrade-dc2-2016': {
+    title: 'Upgrade DC2 to Server 2016',
+    description: `
+      <p><strong>Upgrade secondary domain controller to Server 2016.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Verify first DC upgrade was successful</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Run Windows Server 2016 setup</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Choose "Upgrade" installation option</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Complete upgrade process</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Verify replication between upgraded DCs</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Test WSUS functionality post-upgrade</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/get-started/installation-and-upgrade" target="_blank">📖 MS Learn: Server Upgrade Process</a></li>
+      </ul>
+    `
+  },
+
+  'week3-raise-functional-levels': {
+    title: 'Raise Domain and Forest Functional Levels',
+    description: `
+      <p><strong>Enable Server 2016 functional levels and new features.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Open Active Directory Domains and Trusts</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Right-click domain and select "Raise Domain Functional Level"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Select "Windows Server 2016" functional level</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Right-click root domain and select "Raise Forest Functional Level"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Select "Windows Server 2016" forest functional level</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Verify new features are available</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/active-directory-functional-levels" target="_blank">📖 MS Learn: AD Functional Levels</a></li>
+      </ul>
+    `
+  },
+
+  'week3-prepare-exchange-server': {
+    title: 'Prepare Exchange Server Installation',
+    description: `
+      <p><strong>Install Server 2016 on third server and prepare for Exchange.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Create new VM for Exchange (8GB RAM, 100GB disk minimum)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Install Windows Server 2016</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Configure static IP and DNS settings</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Join server to domain</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Install Windows Updates</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Verify server meets Exchange 2019 requirements</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/system-requirements" target="_blank">📖 MS Learn: Exchange System Requirements</a></li>
+      </ul>
+    `
+  },
+
+  'week3-install-exchange-prereqs': {
+    title: 'Install Exchange Prerequisites',
+    description: `
+      <p><strong>Install .NET Framework, Visual C++, and other required components.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Install .NET Framework 4.8 or later</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Install Visual C++ Redistributable packages</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Install IIS with required features via PowerShell</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Install Windows features: <code>Install-WindowsFeature Server-Media-Foundation, NET-Framework-45-Features, RPC-over-HTTP-proxy, RSAT-Clustering, RSAT-Clustering-CmdInterface, RSAT-Clustering-Mgmt, RSAT-Clustering-PowerShell, WAS-Process-Model, Web-Asp-Net45, Web-Basic-Auth, Web-Client-Auth, Web-Digest-Auth, Web-Dir-Browsing, Web-Dyn-Compression, Web-Http-Errors, Web-Http-Logging, Web-Http-Redirect, Web-Http-Tracing, Web-ISAPI-Ext, Web-ISAPI-Filter, Web-Lgcy-Mgmt-Console, Web-Metabase, Web-Mgmt-Console, Web-Mgmt-Service, Web-Net-Ext45, Web-Request-Monitor, Web-Server, Web-Stat-Compression, Web-Static-Content, Web-Windows-Auth, Web-WMI, Windows-Identity-Foundation, RSAT-ADDS</code></label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Restart server after installing prerequisites</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Run Exchange Server 2019 prerequisite analyzer</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/prerequisites" target="_blank">📖 MS Learn: Exchange Prerequisites</a></li>
+      </ul>
+    `
+  },
+
+  'week3-extend-ad-schema': {
+    title: 'Extend Active Directory Schema',
+    description: `
+      <p><strong>Prepare Active Directory for Exchange Server 2019.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Download Exchange Server 2019 installation media</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Mount Exchange ISO on Exchange server</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Open elevated command prompt</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Run schema extension: <code>Setup.exe /PrepareSchema /IAcceptExchangeServerLicenseTerms</code></label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Run AD preparation: <code>Setup.exe /PrepareAD /OrganizationName:"Lab Organization" /IAcceptExchangeServerLicenseTerms</code></label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Run domain preparation: <code>Setup.exe /PrepareDomain /IAcceptExchangeServerLicenseTerms</code></label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Verify schema extension completed successfully</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/prepare-ad-and-domains" target="_blank">📖 MS Learn: Prepare AD for Exchange</a></li>
+      </ul>
+    `
+  },
+
+  'week3-install-exchange-2019': {
+    title: 'Install Exchange Server 2019',
+    description: `
+      <p><strong>Deploy Exchange with Mailbox role and latest cumulative update.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Run Exchange setup: <code>Setup.exe /Mode:Install /Role:Mailbox /IAcceptExchangeServerLicenseTerms</code></label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Complete Exchange installation wizard</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Wait for installation to complete (may take 30-60 minutes)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Restart server after installation</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Download and install latest Exchange 2019 Cumulative Update</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Verify Exchange services are running</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Test Exchange Management Shell: <code>Get-ExchangeServer</code></label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/deploy-new-installations/install-mailbox-role" target="_blank">📖 MS Learn: Install Exchange Mailbox Role</a></li>
+      </ul>
+    `
+  },
+
+  'week3-configure-exchange-basic': {
+    title: 'Configure Exchange Post-Installation',
+    description: `
+      <p><strong>Set up Exchange Admin Center, domains, and email policies.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Access Exchange Admin Center via https://servername/ecp</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Configure accepted domains for your lab environment</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Set up email address policies</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Configure virtual directories and URLs</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Set up Outlook Web App (OWA) access</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Configure basic transport settings</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/architecture/client-access/exchange-admin-center" target="_blank">📖 MS Learn: Exchange Admin Center</a></li>
+      </ul>
+    `
+  },
+
+  'week3-create-mailboxes': {
+    title: 'Create User Mailboxes',
+    description: `
+      <p><strong>Provision mailboxes for domain users and configure settings.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Open Exchange Admin Center</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Navigate to Recipients > Mailboxes</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Enable mailboxes for existing domain users</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Create new user with mailbox for testing</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Configure mailbox quotas and limits</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Set up shared mailbox for testing</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Verify mailboxes are created successfully</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/recipients/user-mailboxes/user-mailboxes" target="_blank">📖 MS Learn: User Mailboxes</a></li>
+      </ul>
+    `
+  },
+
+  'week3-test-mailbox-access': {
+    title: 'Test Mailbox Access',
+    description: `
+      <p><strong>Verify OWA access, Outlook configuration, and basic features.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Test OWA access via https://servername/owa</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Log in with domain user credentials</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Send test email within organization</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Configure Outlook 2016/2019 client profile</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Test Outlook connectivity and send/receive</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Verify calendar and contacts functionality</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/clients/outlook-web-app/outlook-web-app" target="_blank">📖 MS Learn: Outlook Web App</a></li>
+      </ul>
+    `
+  },
+
+  'week3-configure-internal-mailflow': {
+    title: 'Configure Internal Mail Flow',
+    description: `
+      <p><strong>Set up connectors and test email delivery between users.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Review default receive connectors</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Configure client receive connector settings</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Test message flow between multiple users</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Check message tracking logs</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Verify transport service functionality</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Test group email distribution</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/mail-flow/connectors/connectors" target="_blank">📖 MS Learn: Exchange Connectors</a></li>
+      </ul>
+    `
+  },
+
+  // ================================
+  // WEEK 4: Cloud Integration (10 tasks)
+  // ================================
+
+  'week4-configure-external-dns': {
+    title: 'Configure External DNS Records',
+    description: `
+      <p><strong>Set up MX, SPF, DKIM, and DMARC records for email authentication.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Access your domain's DNS management console</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Create MX record pointing to your Exchange server</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Create A record for mail server (mail.yourdomain.com)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Configure SPF record: "v=spf1 mx include:spf.protection.outlook.com ~all"</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Set up DKIM records for domain authentication</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Create DMARC record for email security policy</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Test DNS resolution with nslookup</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-about" target="_blank">📖 MS Learn: Email Authentication</a></li>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/mail-flow-best-practices/how-to-set-up-a-multifunction-device-or-application-to-send-email-using-microsoft-365-or-office-365" target="_blank">📖 MS Learn: DNS Records for Exchange</a></li>
+      </ul>
+    `
+  },
+
+  'week4-setup-firewall-rules': {
+    title: 'Configure Firewall and Network Security',
+    description: `
+      <p><strong>Set up port forwarding and security rules for external access.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Configure Windows Firewall on Exchange server</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Open required ports: 25 (SMTP), 443 (HTTPS), 993 (IMAPS), 995 (POP3S)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Configure router/firewall port forwarding</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Set up network security policies</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Configure reverse proxy if available</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Test external connectivity to Exchange services</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/post-installation-tasks/security/exchange-firewalls-or-port-restrictions" target="_blank">📖 MS Learn: Exchange Firewall Configuration</a></li>
+      </ul>
+    `
+  },
+
+  'week4-install-ssl-certificates': {
+    title: 'Install SSL Certificates',
+    description: `
+      <p><strong>Secure external communications with proper TLS certificates.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Generate Certificate Signing Request (CSR) in Exchange</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Obtain SSL certificate from trusted CA (or use Let's Encrypt)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Install certificate in Exchange Admin Center</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Assign certificate to Exchange services</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Update virtual directory URLs with external FQDN</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Test HTTPS access to OWA and ECP</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Verify certificate chain and trust</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/architecture/client-access/certificates" target="_blank">📖 MS Learn: Exchange Certificates</a></li>
+      </ul>
+    `
+  },
+
+  'week4-configure-external-mailflow': {
+    title: 'Configure External Mail Flow',
+    description: `
+      <p><strong>Set up external mail routing and test internet mail delivery.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Configure send connector for external mail delivery</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Set up receive connector for inbound internet mail</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Configure accepted domains for external delivery</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Test outbound mail to external recipients</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Test inbound mail from external senders</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Configure message size and connection limits</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Set up basic anti-spam and malware protection</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/mail-flow/connectors/internet-mail-send-connectors" target="_blank">📖 MS Learn: Internet Mail Connectors</a></li>
+      </ul>
+    `
+  },
+
+  'week4-setup-modern-auth': {
+    title: 'Setup Modern Authentication',
+    description: `
+      <p><strong>Implement OAuth 2.0 and modern authentication protocols.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Enable modern authentication in Exchange Online PowerShell</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Configure OAuth authentication for Exchange</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Update client connectivity settings</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Test modern auth with Outlook 2016/2019</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Configure conditional access policies</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Verify multi-factor authentication setup</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/enable-or-disable-modern-authentication-in-exchange-online" target="_blank">📖 MS Learn: Modern Authentication</a></li>
+      </ul>
+    `
+  },
+
+  'week4-prepare-m365-tenant': {
+    title: 'Prepare Microsoft 365 Tenant',
+    description: `
+      <p><strong>Set up M365 tenant, licenses, and domain verification.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Sign up for Microsoft 365 Business Premium trial</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Add and verify your custom domain</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Assign Exchange Online licenses to users</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Configure Exchange Online settings</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Create test users in Microsoft 365</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Verify tenant is ready for hybrid deployment</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/microsoft-365/admin/setup/setup" target="_blank">📖 MS Learn: Microsoft 365 Setup</a></li>
+      </ul>
+    `
+  },
+
+  'week4-install-aad-connect': {
+    title: 'Install Azure AD Connect',
+    description: `
+      <p><strong>Set up directory synchronization between on-premises and cloud.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Download Azure AD Connect from Microsoft</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Install Azure AD Connect on domain controller</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Run Azure AD Connect configuration wizard</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Connect to Microsoft 365 tenant with global admin</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Configure directory synchronization options</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Perform initial synchronization</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Verify users appear in Microsoft 365 admin center</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/azure/active-directory/hybrid/how-to-connect-install-express" target="_blank">📖 MS Learn: Install Azure AD Connect</a></li>
+      </ul>
+    `
+  },
+
+  'week4-run-hybrid-wizard': {
+    title: 'Run Hybrid Configuration Wizard',
+    description: `
+      <p><strong>Execute wizard to establish trust and mail routing between environments.</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Download Hybrid Configuration Wizard from Microsoft</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Run wizard on Exchange server as Exchange Organization Management member</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Sign in with Microsoft 365 global administrator account</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Configure Exchange Online organization settings</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Set up federation trust and sharing policies</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Configure transport settings and connectors</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="7">
+          <label>7. Complete wizard configuration and verify setup</label>
+        </div>
+      </div>
+      <h3>📚 Reference Links</h3>
+      <ul>
+        <li><a href="https://learn.microsoft.com/en-us/exchange/hybrid-deployment/hybrid-configuration-wizard" target="_blank">📖 MS Learn: Hybrid Configuration Wizard</a></li>
       </ul>
     `
   },
