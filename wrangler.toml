@@ -11,5 +11,5 @@ binding = "PROGRESS"
 id = "72beb3bc668347b584984bc61aed9492"
 
 [[kv_namespaces]]
-binding = "kv_namespaces"
+binding = "SESSIONS"
 id = "9270297f918d4ef6b970f1b0cec1b997"
