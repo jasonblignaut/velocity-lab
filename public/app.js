@@ -184,6 +184,7 @@ const auth = {
       if (App.user.role === 'admin') {
         show($('adminPortalBtn'));
       }
+      console.log('Cookies after login:', document.cookie);
       ui.update();
       dashboard.load();
       modal.close();
@@ -206,6 +207,7 @@ const auth = {
       if (App.user.role === 'admin') {
         show($('adminPortalBtn'));
       }
+      console.log('Cookies after register:', document.cookie);
       ui.update();
       dashboard.load();
       modal.close();
@@ -630,18 +632,15 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       auth.login(new FormData(e.target));
     });
-  const registerForm = () => {
-    modal.hide('loginModal');
-    modal.show('registerModal');
-  };
+  }
 
   const registerForm = $('registerForm');
   if (registerForm) {
-    registerForm.addEventListener('submit', e => {
-      e.preventDefault;
+    registerForm.addEventListener('submit', (e) => {
+      e.preventDefault();
       auth.register(new FormData(e.target));
     });
-  };
+  }
 
   // Click outside modal to close
   document.addEventListener('click', (e) => {
@@ -660,5 +659,5 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize authentication
   auth.check();
 
-  console.log('🚀 Application completed application!');
+  console.log('🚀 Velocity Lab - Premium Exchange Hybrid Migration Training Ready!');
 });
