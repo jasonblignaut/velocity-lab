@@ -6,6 +6,7 @@
     <title>Velocity Lab - Exchange Hybrid Migration Training</title>
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     <style>
+        /* CSS remains unchanged (copied from your provided index.html) */
         :root {
             /* Premium Apple-inspired color palette */
             --primary: #0071e3;
@@ -995,19 +996,19 @@
         /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
-            height: 8px;
+            height: var(--primary);
         }
 
         ::-webkit-scrollbar-track {
             background: var(--gray-100);
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: var(--gray-400);
-            border-radius: 4px;
+        ::-webkit-scrollbar .thumb {
+            background: var(--primary);
+            border-radius: var(--radius);
         }
 
-        ::-webkit-scrollbar-thumb:hover {
+        .task-checkbox::-webkit-scrollbar-thumb:hover {
             background: var(--gray-500);
         }
     </style>
@@ -1026,20 +1027,21 @@
     <!-- Header -->
     <header id="header">
         <nav class="container">
-            <a href="/" class="logo">
-                <img src="/assets/Velocity-Logo.png" alt="Velocity Lab">
+            <a href="#" class="logo">
+                <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo">
                 <span>Velocity Lab</span>
             </a>
             <div class="nav-links">
                 <span id="authLinks">
+                    <span id="login-btn">
                     <a href="#" onclick="showLogin()">Sign In</a>
                     <a href="#" onclick="showRegister()" class="btn btn-primary">Get Started</a>
                 </span>
                 <span id="userLinks" class="hidden">
                     <span id="userName"></span>
                     <button id="adminPortalBtn" class="btn btn-admin hidden" onclick="showAdminPortal()">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M8 1l2.5 5 5.5 1-4 4 1 5.5L8 12l-4.5 2.5 1-5.5-4-4 5.5-1z" fill="currentColor"/>
+                        <svg width="16" height="16px" viewBox="0 0 16 16" fill="none">
+                            <path d="M8 1 l2.5 5.4 5.5 1-4 4.1 1-4.5 L5.5 8-12 0 l-4-4.5 2.5.1-5.5-4 z" fill="currentColor"/>
                         </svg>
                         Admin Portal
                     </button>
@@ -1054,7 +1056,7 @@
         <section id="landingPage">
             <div class="container">
                 <h1>Master Exchange<br>Hybrid Migration</h1>
-                <p>Complete 42 hands-on tasks to become proficient in Exchange hybrid deployments. From Active Directory setup to Microsoft 365 integration.</p>
+                <p>Complete 42 hands-on tasks to become proficient in Exchange hybrid deployments. From Active Directory to Microsoft 365 integration.</p>
                 <div class="hero-buttons">
                     <a href="#" class="btn btn-primary" onclick="showRegister()">Get Started</a>
                     <a href="#" class="btn btn-secondary" onclick="showLogin()">Sign In</a>
@@ -1071,9 +1073,9 @@
                     <!-- Progress Ring -->
                     <div class="progress-container">
                         <div class="progress-ring-wrapper">
-                            <svg class="progress-ring">
+                            <div class="svg class="progress-ring">
                                 <circle cx="90" cy="90" r="78" class="bg" />
-                                <circle cx="90" cy="90" r="78" class="progress" id="progressRing" />
+                                <circle cx="90" cy="90" r="78" class="progress-circle" id="progressRing" />
                             </svg>
                             <div class="progress-text-wrapper">
                                 <div id="progressText">0%</div>
@@ -1081,32 +1083,33 @@
                             </div>
                         </div>
                         
-                        <!-- Stats -->
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-value" id="completedTasks">0</div>
-                                <div class="stat-label">Tasks Done</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">42</div>
-                                <div class="stat-label">Total Tasks</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value" id="currentWeek">Week 1</div>
-                                <div class="stat-label">Current</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">4</div>
-                                <div class="stat-label">Weeks</div>
+                            <!-- Stats -->
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="completedTasks">0</div>
+                                    <div class="stat-label">Tasks Done</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value">42</div>
+                                    <div class="stat-label">Total Tasks</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="currentWeek">Week 1</div>
+                                    <div class="stat-label">Current</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value">4</div>
+                                    <div class="stat-label">Weeks</div>
+                                </div>
                             </div>
                         </div>
+                        
+                        <button class="btn btn-primary" onclick="startNewLab()">Start New Lab</button>
                     </div>
-                    
-                    <button class="btn btn-primary" onclick="startNewLab()">Start New Lab</button>
                 </div>
                 
                 <!-- Week Cards Container -->
-                <div id="weeksContainer"></div>
+                    <div id="weeksContainer"></div>
             </div>
         </section>
     </main>
@@ -1117,15 +1120,18 @@
             <div class="modal-header">
                 <h2>Welcome Back</h2>
                 <button class="modal-close" onclick="closeModal()">×</button>
+                
             </div>
             <form id="loginForm">
                 <div class="form-group">
                     <label class="form-label">Email</label>
                     <input type="email" name="email" placeholder="you@example.com" required>
+                    
                 </div>
                 <div class="form-group">
                     <label class="form-label">Password</label>
                     <input type="password" name="password" placeholder="••••••••" required>
+                    
                 </div>
                 <div class="checkbox-group">
                     <input type="checkbox" name="remember" id="remember">
@@ -1145,26 +1151,30 @@
             <div class="modal-header">
                 <h2>Get Started</h2>
                 <button class="modal-close" onclick="closeModal()">×</button>
+                
             </div>
             <form id="registerForm">
                 <div class="form-group">
                     <label class="form-label">Full Name</label>
-                    <input type="text" name="name" placeholder="John Doe" required>
+                    <label input type="text" name="name" placeholder="John Doe" required>
+                    
                 </div>
                 <div class="form-group">
                     <label class="form-label">Email</label>
                     <input type="email" name="email" placeholder="you@example.com" required>
+                    
                 </div>
                 <div class="form-group">
                     <label class="form-label">Password</label>
                     <input type="password" name="password" placeholder="••••••••" required minlength="8">
+                    
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
                 <div class="form-footer">
-                    Already have an account? <a href="#" onclick="showLogin()">Sign in</a>
+                    Already have an account? <a href="#" onclick="showLogin()">Sign In</a>
                 </div>
             </form>
-        </div>
+            </div>
     </div>
 
     <!-- Task Modal -->
@@ -1174,6 +1184,7 @@
                 <h2 id="modalTitle"></h2>
                 <button class="modal-close" onclick="closeModal()">×</button>
             </div>
+
             <div id="modalBody"></div>
         </div>
     </div>
@@ -1184,15 +1195,16 @@
             <div class="modal-header">
                 <h2>Admin Portal - Leaderboard</h2>
                 <button class="modal-close" onclick="closeModal()">×</button>
+                
             </div>
-            <div id="leaderboardBody"></div>
+            <div id="leaderboardContent"></div>
         </div>
     </div>
 
     <!-- Notification -->
     <div id="notification" class="notification"></div>
 
-    <script src="/app.js"></script>
+    <script src="/app.js" defer></script>
     <script>
         // Add scroll effect to header
         window.addEventListener('scroll', () => {
