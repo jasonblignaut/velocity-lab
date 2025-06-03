@@ -1,25 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Velocity Lab - Exchange Hybrid Migration Training</title>
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <meta charset="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Velocity Lab: Hands-on training for Exchange Hybrid Migration with Microsoft 365 integration.">
+  <title>Velocity Lab - Exchange Hybrid Migration Training
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;500;700&display=swap" rel="stylesheet">
+  <link href="/assets/favicon.ico" type="image/icon" rel="icon">
   <style>
+    /* Root Variables */
     :root {
-      --primary: #3b82f6;
-      --primary-dark: #2563eb;
-      --bg-primary: #1f2937;
-      --bg-secondary: #2d3748;
-      --border-light: #4b5563;
-      --gray-600: #4b5563;
-      --gray-400: #9ca3af;
-      --gray-200: #e5e7eb;
-      --text-primary: #f3f4f6;
-      --radius: 8px;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --primary: #0078D4; /* Azure-inspired blue */
+      --primary-dark: #005BB5; /* Darker blue for hover */
+      --background-primary: #FFFFFF; /* Pure white background */
+      --background-secondary: #F5F5F7; /* Off-white for cards */
+      --text-primary: #333333; /* Dark gray for readability */
+      --text-secondary: #6666666; /* Lighter gray for secondary text
+      --border-light: #E0E0E0; /* Light gray for borders */
+      --shadow: 0 2px 8px rgba(0, 0,0 0, 0.1); /* Subtle shadow */
+      --radius: 8px; /* Rounded corners */
     }
 
+    /* Reset and Base Styles */
     * {
       margin: 0;
       padding: 0;
@@ -27,8 +28,8 @@
     }
 
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: var(--bg-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--background-primary);
       color: var(--text-primary);
       line-height: 1.5;
       overflow-x: hidden;
@@ -40,8 +41,9 @@
       padding: 0 24px;
     }
 
+    /* Header */
     header {
-      background: var(--bg-secondary);
+      background: var(--background-secondary);
       padding: 16px 0;
       position: sticky;
       top: 0;
@@ -62,10 +64,11 @@
     .nav-links {
       display: flex;
       gap: 24px;
+      align-items: center;
     }
 
     .nav-links a {
-      color: var(--gray-200);
+      color: var(--text-primary);
       text-decoration: none;
       font-weight: 500;
       transition: color 0.2s;
@@ -77,7 +80,7 @@
 
     .btn {
       background: var(--primary);
-      color: white;
+      color: #FFFFFF;
       padding: 10px 20px;
       border-radius: var(--radius);
       text-decoration: none;
@@ -89,6 +92,7 @@
       background: var(--primary-dark);
     }
 
+    /* Hero Section */
     .hero {
       text-align: center;
       padding: 80px 0;
@@ -96,15 +100,17 @@
 
     .hero h1 {
       font-size: 48px;
+      font-weight: 600;
       margin-bottom: 16px;
     }
 
     .hero p {
       font-size: 20px;
-      color: var(--gray-400);
+      color: var(--text-secondary);
       margin-bottom: 32px;
     }
 
+    /* Stats Grid */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -113,27 +119,36 @@
     }
 
     .stat-card {
-      background: var(--bg-secondary);
+      background: var(--background-secondary);
       padding: 24px;
       border-radius: var(--radius);
       text-align: center;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
     }
 
     .stat-card h3 {
       font-size: 36px;
       color: var(--primary);
       margin-bottom: 8px;
+      font-weight: 600;
     }
 
     .stat-card p {
-      color: var(--gray-400);
+      color: var(--text-secondary);
     }
 
+    /* Week Card */
     .week-card {
-      background: var(--bg-secondary);
+      background: var(--background-secondary);
       border-radius: var(--radius);
       margin-bottom: 24px;
       overflow: hidden;
+      box-shadow: var(--shadow);
     }
 
     .week-header {
@@ -145,16 +160,17 @@
     }
 
     .week-header:hover {
-      background: #374151;
+      background: #EAEAEC;
     }
 
     .week-info h3 {
       font-size: 24px;
+      font-weight: 600;
       margin-bottom: 8px;
     }
 
     .week-info p {
-      color: var(--gray-400);
+      color: var(--text-secondary);
     }
 
     .week-progress {
@@ -162,14 +178,14 @@
     }
 
     .progress-count {
-      color: var(--gray-400);
+      color: var(--text-secondary);
       margin-bottom: 8px;
     }
 
     .progress-bar {
       width: 100px;
       height: 8px;
-      background: #4b5563;
+      background: var(--border-light);
       border-radius: 4px;
       overflow: hidden;
     }
@@ -187,7 +203,7 @@
       padding: 24px;
       max-height: 0;
       overflow: hidden;
-      transition: max-height 0.3s;
+      transition: max-height 0.3s ease;
     }
 
     .tasks-grid.show {
@@ -195,10 +211,11 @@
     }
 
     .task {
-      background: #374151;
+      background: #FFFFFF;
       padding: 16px;
       border-radius: var(--radius);
       cursor: pointer;
+      box-shadow: var(--shadow);
       transition: transform 0.2s;
     }
 
@@ -207,7 +224,7 @@
     }
 
     .task.completed {
-      background: #1e3a8a;
+      background: #E6F0FA;
     }
 
     .task-header {
@@ -219,6 +236,7 @@
     .task-checkbox {
       width: 20px;
       height: 20px;
+      accent-color: var(--primary);
     }
 
     .task-title {
@@ -228,9 +246,10 @@
 
     .task-desc {
       font-size: 14px;
-      color: var(--gray-400);
+      color: var(--text-secondary);
     }
 
+    /* Modal */
     .modal {
       display: none;
       position: fixed;
@@ -249,7 +268,7 @@
     }
 
     .modal-content {
-      background: var(--bg-primary);
+      background: #FFFFFF;
       border-radius: var(--radius);
       max-width: 600px;
       width: 90%;
@@ -257,6 +276,7 @@
       overflow-y: auto;
       padding: 24px;
       position: relative;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     }
 
     .modal-close {
@@ -265,11 +285,17 @@
       right: 16px;
       font-size: 24px;
       cursor: pointer;
-      color: var(--gray-400);
+      color: var(--text-secondary);
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+      color: var(--primary);
     }
 
     .modal-content h2 {
       font-size: 24px;
+      font-weight: 600;
       margin-bottom: 16px;
     }
 
@@ -288,8 +314,9 @@
       padding: 10px;
       border: 1px solid var(--border-light);
       border-radius: var(--radius);
-      background: #374151;
+      background: #F9FAFB;
       color: var(--text-primary);
+      font-size: 16px;
     }
 
     .subtask-container {
@@ -308,8 +335,10 @@
     .subtask-checkbox {
       width: 18px;
       height: 18px;
+      accent-color: var(--primary);
     }
 
+    /* Progress Circle */
     .progress-circle {
       position: relative;
       width: 200px;
@@ -329,7 +358,7 @@
     }
 
     .progress-circle .bg {
-      stroke: #4b5563;
+      stroke: var(--border-light);
     }
 
     .progress-circle .fg {
@@ -345,8 +374,10 @@
       transform: translate(-50%, -50%);
       font-size: 24px;
       font-weight: 600;
+      color: var(--text-primary);
     }
 
+    /* Leaderboard Table */
     .leaderboard-table {
       width: 100%;
       border-collapse: collapse;
@@ -361,7 +392,7 @@
 
     .leaderboard-table th {
       font-weight: 600;
-      color: var(--gray-200);
+      color: var(--text-primary);
     }
 
     .medal {
@@ -375,20 +406,21 @@
     }
 
     .gold {
-      background: #fef3c7;
-      color: #b45309;
+      background: #FEF3C7;
+      color: #B45309;
     }
 
     .silver {
-      background: #e5e7eb;
-      color: #4b5563;
+      background: #E5E7EB;
+      color: #4B5563;
     }
 
     .bronze {
-      background: #fef3c7;
-      color: #b45309;
+      background: #F4E8D8;
+      color: #8D5524;
     }
 
+    /* Notification */
     .notification {
       position: fixed;
       top: 20px;
@@ -406,13 +438,13 @@
     }
 
     .notification.success {
-      background: #10b981;
-      color: white;
+      background: #10B981;
+      color: #FFFFFF;
     }
 
     .notification.error {
-      background: #ef4444;
-      color: white;
+      background: #EF4444;
+      color: #FFFFFF;
     }
 
     @keyframes slideIn {
@@ -425,10 +457,22 @@
       to { transform: translateX(100%); }
     }
 
+    /* Hidden Class */
     .hidden {
       display: none;
     }
 
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stat-card, .week-card, .task, .btn {
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Responsive Design */
     @media (max-width: 768px) {
       .hero h1 {
         font-size: 32px;
@@ -451,12 +495,16 @@
         text-align: left;
         margin-top: 16px;
       }
+
+      .container {
+        padding: 0 16px;
+      }
     }
   </style>
 </head>
 <body>
   <!-- Notification -->
-  <div id="notification" class="notification"></div>
+  <div id="notification" class="notification" role="alert"></div>
 
   <!-- Header -->
   <header>
@@ -467,12 +515,12 @@
         </div>
         <div class="nav-links">
           <div id="authLinks">
-            <a href="#" id="signInLink">Sign In</a>
+            <a href="#" id="signInLink" aria-label="Sign In">Sign In</a>
             <a href="#" id="getStartedLink" class="btn">Get Started</a>
           </div>
           <div id="userLinks" class="hidden">
-            <span id="userName"></span>
-            <a href="#" onclick="logout()">Sign Out</a>
+            <span id="userName" aria-live="polite"></span>
+            <a href="#" onclick="logout()" aria-label="Sign Out">Sign Out</a>
             <a href="#" id="adminPortalBtn" class="hidden" onclick="showAdminPortal()">Admin Portal</a>
           </div>
         </div>
@@ -481,30 +529,30 @@
   </header>
 
   <!-- Landing Page -->
-  <main id="landingPage">
+  <main id="landingPage" aria-label="Landing Page">
     <section class="hero">
       <div class="container">
         <h1>Velocity Lab</h1>
         <p>Master Exchange Hybrid Migration with Hands-On Training</p>
-        <a href="#" id="getStartedHero" class="btn">Get Started</a>
+        <a href="#" id="getStartedHero" class="btn" aria-label="Get Started">Get Started</a>
       </div>
     </section>
   </main>
 
   <!-- Dashboard Page -->
-  <main id="dashboardPage" class="hidden">
+  <main id="dashboardPage" class="hidden" aria-label="Dashboard">
     <div class="container">
       <!-- Stats -->
       <div class="stats-grid">
-        <div class="stat-card">
+        <div class="stat-card" role="region" aria-label="Tasks Completed">
           <h3 id="completedTasks">0</h3>
           <p>Tasks Completed</p>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" role="region" aria-label="Current Week">
           <h3 id="currentWeek">Week 1</h3>
           <p>Current Week</p>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" role="region" aria-label="Overall Progress">
           <div class="progress-circle">
             <svg>
               <circle class="bg" cx="100" cy="100" r="78"></circle>
@@ -517,41 +565,41 @@
       </div>
 
       <!-- Weeks -->
-      <div id="weeksContainer"></div>
+      <div id="weeksContainer" aria-live="polite"></div>
 
       <!-- Start New Lab -->
       <div style="text-align: center; margin: 40px 0;">
-        <a href="#" onclick="startNewLab()" class="btn">Start New Lab</a>
+        <a href="#" onclick="startNewLab()" class="btn" aria-label="Start New Lab">Start New Lab</a>
       </div>
     </div>
   </main>
 
   <!-- Task Modal -->
-  <div id="taskModal" class="modal">
+  <div id="taskModal" class="modal" role="dialog" aria-labelledby="modalTitle">
     <div class="modal-content">
-      <span class="modal-close" onclick="closeModal()">&times;</span>
+      <span class="modal-close" onclick="closeModal()" aria-label="Close Modal">×</span>
       <h2 id="modalTitle"></h2>
       <div id="modalBody"></div>
     </div>
   </div>
 
   <!-- Login Modal -->
-  <div id="loginModal" class="modal">
+  <div id="loginModal" class="modal" role="dialog" aria-labelledby="loginModalTitle">
     <div class="modal-content">
-      <span class="modal-close" onclick="closeModal()">&times;</span>
-      <h2>Sign In</h2>
+      <span class="modal-close" onclick="closeModal()" aria-label="Close Modal">×</span>
+      <h2 id="loginModalTitle">Sign In</h2>
       <form id="loginForm">
         <div class="form-group">
           <label for="loginEmail">Email</label>
-          <input type="email" id="loginEmail" name="email" required>
+          <input type="email" id="loginEmail" name="email" required aria-required="true">
         </div>
         <div class="form-group">
           <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" name="password" required>
+          <input type="password" id="loginPassword" name="password" required aria-required="true">
         </div>
         <div class="form-group">
           <label>
-            <input type="checkbox" name="remember"> Remember me
+            <input type="checkbox" name="remember" aria-label="Remember me"> Remember me
           </label>
         </div>
         <button type="submit" class="btn">Sign In</button>
@@ -563,22 +611,22 @@
   </div>
 
   <!-- Register Modal -->
-  <div id="registerModal" class="modal">
+  <div id="registerModal" class="modal" role="dialog" aria-labelledby="registerModalTitle">
     <div class="modal-content">
-      <span class="modal-close" onclick="closeModal()">&times;</span>
-      <h2>Sign Up</h2>
+      <span class="modal-close" onclick="closeModal()" aria-label="Close Modal">×</span>
+      <h2 id="registerModalTitle">Sign Up</h2>
       <form id="registerForm">
         <div class="form-group">
           <label for="registerName">Name</label>
-          <input type="text" id="registerName" name="name" required>
+          <input type="text" id="registerName" name="name" required aria-required="true">
         </div>
         <div class="form-group">
           <label for="registerEmail">Email</label>
-          <input type="email" id="registerEmail" name="email" required>
+          <input type="email" id="registerEmail" name="email" required aria-required="true">
         </div>
         <div class="form-group">
           <label for="registerPassword">Password</label>
-          <input type="password" id="registerPassword" name="password" required>
+          <input type="password" id="registerPassword" name="password" required aria-required="true">
         </div>
         <button type="submit" class="btn">Sign Up</button>
         <p style="margin-top: 16px;">
@@ -589,10 +637,10 @@
   </div>
 
   <!-- Admin Portal Modal -->
-  <div id="adminPortalModal" class="modal">
+  <div id="adminPortalModal" class="modal" role="dialog" aria-labelledby="adminPortalTitle">
     <div class="modal-content">
-      <span class="modal-close" onclick="closeModal()">&times;</span>
-      <h2>Admin Portal</h2>
+      <span class="modal-close" onclick="closeModal()" aria-label="Close Modal">×</span>
+      <h2 id="adminPortalTitle">Admin Portal</h2>
       <div id="leaderboardBody"></div>
     </div>
   </div>
@@ -602,6 +650,18 @@
   <script src="/app.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // Fallback if scripts fail to load
+      if (typeof window.TASK_DEFINITIONS === 'undefined' || typeof window.renderTasks === 'undefined') {
+        const weeksContainer = document.getElementById('weeksContainer');
+        if (weeksContainer) {
+          weeksContainer.innerHTML = `
+            <div class="notification error show">
+              Error loading tasks. Please ensure task-definitions.js is correctly loaded. Check console for details.
+            </div>
+          `;
+        }
+      }
+
       // Sign In links
       const signInLinks = [document.getElementById('signInLink'), document.getElementById('toLoginLink')];
       signInLinks.forEach(link => {
