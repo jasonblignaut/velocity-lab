@@ -1,5 +1,6 @@
 // app.js
-// TaskDefinitions data structure
+
+// Task data
 const TASKS = {
     tasks: [
         {
@@ -12,7 +13,7 @@ const TASKS = {
                     description: "Deploy a Windows Server 2019 and configure Active Directory with a new forest and domain.",
                     steps: [
                         "Install Windows Server 2019 on a virtual machine.",
-                        "Configure server hostname: as 'DC01'.",
+                        "Configure server hostname as 'DC01'.",
                         "Install Active Directory Domain Services role.",
                         "Promote server to domain controller with domain 'example.com'.",
                         "Verify DNS settings and connectivity."
@@ -23,7 +24,7 @@ const TASKS = {
                     title: "Configure DNS Records",
                     description: "Set up DNS records for Exchange hybrid connectivity.",
                     steps: [
-                        "Create A and MX records for mail exchanger.example.com.",
+                        "Create A and MX records for mail.exchanger.example.com.",
                         "Configure SPF records for spam prevention.",
                         "Verify DNS propagation using nslookup."
                     ]
@@ -39,7 +40,7 @@ const TASKS = {
                     title: "Install Exchange Server 2019",
                     description: "Deploy Exchange Server 2019 in the on-premises environment.",
                     steps: [
-                        "Install prerequisites for Exchange Server (2019).",
+                        "Install prerequisites for Exchange Server 2019.",
                         "Join server to example.com domain.",
                         "Run Exchange Server setup wizard.",
                         "Verify Exchange services are running."
@@ -124,105 +125,85 @@ function showNotification(message, type) {
     const notification = document.getElementById('notification');
     notification.textContent = message;
     notification.classList.add('show', type);
-    setTimeout(() => {
-        notification.classList.remove('show');
-    }, 3000);
+    setTimeout(() => notification.classList.remove('show', type), 3000);
 }
 
 function toggleModal(id, show) {
     document.getElementById(id).style.display = show ? 'flex' : 'none';
 }
 
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 // Modal handlers
 function showLogin() {
     toggleModal('loginModal', true);
     toggleModal('registerModal', false);
+    toggleModal('taskModal', false);
+    toggleModal('adminPortalModal', false);
 }
 
 function showRegister() {
     toggleModal('registerModal', true);
     toggleModal('loginModal', false);
+    toggleModal('taskModal', false);
+    toggleModal('adminPortalModal', false);
 }
 
 function closeModal() {
     document.querySelectorAll('.modal').forEach(modal => modal.style.display = 'none');
 }
 
-function showTaskModal(taskId) {
-    const task = TASKS.tasks.flatMap(week => week.tasks).find(t => t.id === taskId);
-    if (!taskId) return;
-
-    document.getElementById('modalTitle').textContent = task.title;
-    const modalBody = document.getElementById('modalBody');
-    modalContent = `
-        <p><strong>Description:</strong> ${p.task.description}</p>
-        <h3>Steps:</h3>
-        <ul>
-            ${task.steps.map(step => `<li>${step}</li>`).join('')}
-        </ul>
-        <div class="markComplete(taskId) btn btn-primary" onclick="btn btn-primary" style="markComplete('${taskId}')">${completedTasks.includes(taskId) ? 'Mark Incomplete' : 'Mark Complete'}</button>
-    `;
-    modalBody.innerHTML = modalContent;
-    toggleModal('taskModal', true);
+function showAdminPortal() {
+    toggleModal('adminPortalModal', true);
+    renderLeaderboard();
 }
 
 // Authentication handlers
-function handleLogin(event) {
-    event.preventDefault();
-    const form = document.getElementById('loginForm');
-    const email = form.email.value;
-    const password = form.password.value;
-
-    // Mock authentication
-    if (email && password && email && password) {
+document.getElementById('loginForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+    if (email && password) {
         currentUser = { email, name: email.split('@')[0], isAdmin: email === 'admin@example.com' };
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        showNotification('Signed in successfully!', 'success');
         updateUI();
         closeModal();
-        showNotification('Logged in successfully!', 'success');
     } else {
-        showNotification('Invalid email or password!', 'error');
+        showNotification('Invalid credentials', 'error');
     }
-}
+});
 
-function handleRegister(event) {
-    event.preventDefault();
-    const form = document.getElementById('eventregisterForm');
-    const name = form.name.value;
-    const email = form.email.value;
-    const password = form.password.value;
-
-    // Mock registration
+document.getElementById('registerForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = e.target.name.value;
+    const email = e.target.email.value;
+    const password = e.target.password.value;
     if (name && email && password.length >= 8) {
-        currentUser = { name, email, isAdmin: false };
+        currentUser = { email, name, isAdmin: false };
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        showNotification('Account created successfully!', 'success');
         updateUI();
         closeModal();
-        showNotification('Account created successfully!', 'success');
     } else {
-        showNotification('Please fill out all fields correctly!', 'error');
+        showNotification('Please fill all fields correctly', 'error');
     }
-}
+});
 
 function logout() {
     currentUser = null;
-    localStorage.removeItem('currentUser');
     completedTasks = [];
-    localStorage.removeItem('completedTasks', []);
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('completedTasks');
+    showNotification('Signed out successfully!', 'success');
     updateUI();
-    showNotification('Logged out successfully!', 'success');
-}
-
-// Task progress
-function markComplete(taskId) {
-    if (completedTasks.includes(taskId)) {
-        completedTasks = completedTasks.filter(id => t !== taskId);
-    } else {
-        completedTasks.push(taskId);
-    }
-    localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
-    updateDashboard();
-    showNotification(completedTasks.includes(taskId) ? 'Task completed!' : 'Task marked incomplete!', 'success');
 }
 
 // Dashboard rendering
@@ -233,15 +214,19 @@ function updateDashboard() {
     const completedTasksEl = document.getElementById('completedTasks');
     const currentWeekEl = document.getElementById('currentWeek');
 
-    // Calculate total tasks
-    const totalTasks = TASKS.tasks.flatMap(week => week.tasks).length;
-    const completedCount = completedTasks.length;
-    const progress = (completedCount / totalTasks) * 100;
-    // Update progress ring
-    progressText.textContent = `${Math.round(progress)}%`;
-    const dashOffset = 490 * ((100 - progress) / 100);
-    progressRing.style.strokeDashoffset = dashOffset;
+    weeksContainer.innerHTML = '';
 
+    // Calculate total tasks and progress
+    let totalTasks = 0;
+    let completedCount = 0;
+    TASKS.tasks.forEach(week => {
+        totalTasks += week.tasks.length;
+        completedCount += week.tasks.filter(task => completedTasks.includes(task.id)).length;
+    });
+
+    const progressPercent = totalTasks ? Math.round((completedCount / totalTasks) * 100) : 0;
+    progressText.textContent = `${progressPercent}%`;
+    progressRing.style.strokeDashoffset = 490 - (490 * progressPercent / 100);
     completedTasksEl.textContent = completedCount;
 
     // Determine current week
@@ -251,40 +236,37 @@ function updateDashboard() {
         const weekTasks = week.tasks.map(t => t.id);
         if (weekTasks.some(id => !completedTaskIds.has(id))) {
             currentWeek = Math.min(currentWeek, week.week);
-        });
+        }
     });
     currentWeekEl.textContent = `Week ${currentWeek}`;
 
     // Render weeks
-    weeksContainer.innerHTML = '';
-    TASKS.tasks.forEach(week => {
+    TASKS.tasks.forEach((week, index) => {
         const weekTasks = week.tasks;
-        const completedInWeek = weekTasks.filter(task => completedTasks.includes(task.id)).length;
-        const progressPercent = (completedInWeek / weekTasks.length) * 100;
-
+        const weekCompleted = weekTasks.filter(task => completedTasks.includes(task.id)).length;
         const weekCard = document.createElement('div');
-        weekCard.classList.add('week-card');
+        weekCard.className = 'week-card';
         weekCard.innerHTML = `
-            <div class="week-header" onclick="toggleWeek(this)">
+            <div class="week-header" onclick="toggleWeek(${index})">
                 <div class="week-info">
-                    <h3>${week.title}</h3>
-                    <p>${weekTasks.length} tasks</p>
+                    <h3>${escapeHtml(week.title)}</h3>
+                    <p>${weekTasks.length} Tasks</p>
                 </div>
                 <div class="week-progress">
-                    <p class="progress-count">${completedInWeek}/${progress}/${weekTasks.length}</p>
+                    <div class="progress-count">${weekCompleted}/${weekTasks.length} Completed</div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                        <div class="progress-fill" style="width: ${(weekCompleted / weekTasks.length) * 100}%"></div>
                     </div>
                 </div>
             </div>
-            <div class="tasksGrid-${week.week} id="tasks-grid" class="tasks-grid">
+            <div id="tasksGrid-${index}" class="tasks-grid">
                 ${weekTasks.map(task => `
-                    <div class="task ${completedTasks.includes(task.id) ? 'completed' : ''}" onclick="showTaskModal('${task.id}')">
+                    <div class="task ${completedTasks.includes(task.id) ? 'completed' : ''}" onclick="showTask('${task.id}')">
                         <div class="task-header">
-                            <input type="task-checkbox" type="checkbox" ${completedTasks.includes(task.id) ? 'checked' : ''} checked onclick="event.stopPropagation(); markComplete('${task.id}')">
+                            <input type="checkbox" class="task-checkbox" ${completedTasks.includes(task.id) ? 'checked' : ''} onchange="toggleTask('${task.id}', this.checked)">
                             <div>
-                                <div class="task-title">${task.title}</div>
-                                <div class="task-desc">${task.description}</div>
+                                <div class="task-title">${escapeHtml(task.title)}</div>
+                                <div class="task-desc">${escapeHtml(task.description)}</div>
                             </div>
                         </div>
                     </div>
@@ -295,41 +277,71 @@ function updateDashboard() {
     });
 }
 
-function toggleWeek(header) {
-    const tasksGrid = header.nextElementSibling;
-    tasksGrid.classList.toggle('show');
+function toggleWeek(index) {
+    document.getElementById(`tasksGrid-${index}`).classList.toggle('show');
 }
 
-// Admin Portal
-function showAdminPortal() {
-    toggleModal('adminPortalModal', true);
-    const leaderboardBody = document.getElementById('leaderboardContent');
-    // Mock leaderboard data
-    const leaderboard = [
-        { rank: 1, name: 'Alice', tasks: 42, medal: 'Gold' },
-        { rank: 2, name: 'Bob', tasks: 38, medal: 'Silver' },
-        { rank: 3, name: 'Charlie', tasks: 35, medal: 'Bronze' },
-        { rank: 4, name: 'Dave', tasks: 30 },
-        { rank: 5, name: 'Eve', tasks: 25 }
-    ];
+function showTask(taskId) {
+    const task = TASKS.tasks.flatMap(week => week.tasks).find(t => t.id === taskId);
+    if (!task) return;
+    document.getElementById('modalTitle').textContent = task.title;
+    document.getElementById('modalBody').innerHTML = `
+        <p>${escapeHtml(task.description)}</p>
+        <div class="subtask-container">
+            ${task.steps.map((step, i) => `
+                <div class="subtask-item">
+                    <input type="checkbox" class="subtask-checkbox" id="subtask-${task.id}-${i}" ${completedTasks.includes(task.id) ? 'checked' : ''}>
+                    <label for="subtask-${task.id}-${i}">${escapeHtml(step)}</label>
+                </div>
+            `).join('')}
+        </div>
+        <button class="btn btn-primary" style="width: 100%;" onclick="toggleTask('${task.id}', true)">Mark as ${completedTasks.includes(task.id) ? 'Incomplete' : 'Complete'}</button>
+    `;
+    toggleModal('taskModal', true);
+}
 
+function toggleTask(taskId, isChecked) {
+    if (isChecked && !completedTasks.includes(taskId)) {
+        completedTasks.push(taskId);
+        showNotification('Task completed!', 'success');
+    } else if (!isChecked && completedTasks.includes(taskId)) {
+        completedTasks = completedTasks.filter(id => id !== taskId);
+        showNotification('Task marked incomplete', 'success');
+    }
+    localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
+    updateDashboard();
+}
+
+function startNewLab() {
+    showNotification('Starting new lab environment... (mock action)', 'success');
+}
+
+function renderLeaderboard() {
+    const leaderboardBody = document.getElementById('leaderboardBody');
+    const leaderboard = [
+        { name: 'John Doe', tasks: 40, rank: 1 },
+        { name: 'Jane Smith', tasks: 35, rank: 2 },
+        { name: 'Admin User', tasks: 30, rank: 3 },
+    ];
     leaderboardBody.innerHTML = `
-        <table class="table leaderboard-table">
+        <table class="leaderboard-table">
             <thead>
                 <tr>
                     <th>Rank</th>
                     <th>Name</th>
                     <th>Tasks Completed</th>
-                    <th>Award</th>
                 </tr>
             </thead>
             <tbody>
                 ${leaderboard.map(user => `
                     <tr>
-                        <td>${user.rank}</td>
-                        <td>${user.name}</td>
+                        <td>
+                            <span class="medal ${user.rank === 1 ? 'gold' : user.rank === 2 ? 'silver' : 'bronze'}">
+                                <span class="medal-icon">${user.rank}</span>
+                            </span>
+                        </td>
+                        <td>${escapeHtml(user.name)}</td>
                         <td>${user.tasks}</td>
-                        <td>${user.medal ? `<span class="medal ${user.medal.toLowerCase()}"><span class="medal-icon">${user.medal[0]}</span> ${user.medal}</span>` : ''}</td>
                     </tr>
                 `).join('')}
             </tbody>
@@ -337,18 +349,11 @@ function showAdminPortal() {
     `;
 }
 
-// Start New Lab
-function startNewLab() {
-    showNotification('Starting a new Lab... Please wait!', 'success');
-    // Simulate lab setup
-    setTimeout(() => alert('New lab environment is ready!'), 2000);
-}
-
-// UI Update
+// Update UI
 function updateUI() {
     const authLinks = document.getElementById('authLinks');
     const userLinks = document.getElementById('userLinks');
-    const userNameEl = document.getElementById('userName');
+    const userName = document.getElementById('userName');
     const adminPortalBtn = document.getElementById('adminPortalBtn');
     const landingPage = document.getElementById('landingPage');
     const dashboardPage = document.getElementById('dashboardPage');
@@ -356,24 +361,20 @@ function updateUI() {
     if (currentUser) {
         authLinks.classList.add('hidden');
         userLinks.classList.remove('hidden');
-        userNameEl.textContent = `Hello, ${currentUser.name}`;
+        userName.textContent = currentUser.name;
         adminPortalBtn.classList.toggle('hidden', !currentUser.isAdmin);
         landingPage.classList.add('hidden');
         dashboardPage.classList.remove('hidden');
         updateDashboard();
     } else {
-        userLinks.classList.add('hidden');
         authLinks.classList.remove('hidden');
+        userLinks.classList.add('hidden');
         landingPage.classList.remove('hidden');
         dashboardPage.classList.add('hidden');
     }
 }
 
-// Event listeners
-document.getElementById('loginForm').addEventListener('submit', handleLogin);
-document.getElementById('registerForm').addEventListener('submit', handleRegister);
-
-// Initialize on load
+// Initialize
 document.addEventListener('DOMContentLoaded', () => {
     updateUI();
 });
