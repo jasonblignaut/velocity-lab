@@ -1,6 +1,6 @@
 // app.js
 
-// Task data
+// Task data (extended with sample problematic task)
 const TASKS = {
     tasks: [
         {
@@ -16,7 +16,9 @@ const TASKS = {
                         "Configure server hostname as 'DC01'.",
                         "Install Active Directory Domain Services role.",
                         "Promote server to domain controller with domain 'example.com'.",
-                        "Verify DNS settings and connectivity."
+                        "Verify DNS settings and connectivity.",
+                        "Create user accounts in Active Directory.",
+                        "After restart, login with domain account (VELOCITYLAB\\username)" // Problematic step
                     ]
                 },
                 {
@@ -138,7 +140,8 @@ function escapeHtml(unsafe) {
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(/'/g, "&#39;")
+        .replace(/\\/g, "\\\\"); // Escape backslashes
 }
 
 // Modal handlers
@@ -235,7 +238,7 @@ function updateDashboard() {
     TASKS.tasks.forEach(week => {
         const weekTasks = week.tasks.map(t => t.id);
         if (weekTasks.some(id => !completedTaskIds.has(id))) {
-            currentWeek = Math.min(currentWeek, week.week);
+            currentWeek = Math.max(currentWeek, week.week);
         }
     });
     currentWeekEl.textContent = `Week ${currentWeek}`;
@@ -290,8 +293,8 @@ function showTask(taskId) {
         <div class="subtask-container">
             ${task.steps.map((step, i) => `
                 <div class="subtask-item">
-                    <input type="checkbox" class="subtask-checkbox" id="subtask-${task.id}-${i}" ${completedTasks.includes(task.id) ? 'checked' : ''}>
-                    <label for="subtask-${task.id}-${i}">${escapeHtml(step)}</label>
+                    <input type="checkbox" class="subtask-checkbox" id="subtask-${task.id}-${i}" data-step="${i + 1}" ${completedTasks.includes(task.id) ? 'checked' : ''}>
+                    <label for="subtask-${task.id}-${i}">${i + 1}. ${escapeHtml(step)}</label>
                 </div>
             `).join('')}
         </div>
