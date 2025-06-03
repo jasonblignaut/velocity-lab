@@ -1,431 +1,501 @@
-// functions/api/[[route]].ts - Single API handler for all routes
-import {
-  jsonResponse,
-  errorResponse,
-  validateSession,
-  getUserById,
-  getUserByEmail,
-  createSession,
-  updateLastLogin,
-  validateEmail,
-  validatePassword,
-  sanitizeInput,
-  generateCSRFToken,
-  validateCSRFToken,
-  checkRateLimit,
-  logActivity,
-  getCurrentLabProgress,
-  calculateProgress,
-  calculateCompletedTasks,
-  startNewLab,
-  TASK_STRUCTURE,
-  TOTAL_TASKS,
-  type Env,
-  type User,
-  type Progress
-} from '../utils';
-
-// GET handler
-export const onRequestGet: PagesFunction<Env> = async (context) => {
-  const { env, request } = context;
-  const url = new URL(request.url);
-  const path = url.pathname;
-
-  try {
-    // CSRF token
-    if (path === '/api/csrf') {
-      const token = await generateCSRFToken(env);
-      return new Response(JSON.stringify({ 
-        token,
-        expiresIn: 3600 // 1 hour
-      }), {
-        status: 200,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache, no-store, must-revalidate'
-        },
-      });
-    }
-
-    // Profile
-    if (path === '/api/profile') {
-      const userId = await validateSession(env, request);
-      if (!userId) return errorResponse('Unauthorized', 401);
-
-      const user = await getUserById(env, userId);
-      if (!user) return errorResponse('User not found', 404);
-
-      const progress = await getCurrentLabProgress(env, userId);
-      const progressPercent = calculateProgress(progress);
-      const completedTasks = calculateCompletedTasks(progress);
-
-      return jsonResponse({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        progress: progressPercent,
-        completedTasks,
-        totalTasks: TOTAL_TASKS,
-        createdAt: user.createdAt,
-        lastLogin: user.lastLogin
-      });
-    }
-
-    // Progress
-    if (path === '/api/progress') {
-      const userId = await validateSession(env, request);
-      if (!userId) return errorResponse('Unauthorized', 401);
-
-      const progress = await getCurrentLabProgress(env, userId);
-      const completedTasks = calculateCompletedTasks(progress);
-      const progressPercentage = calculateProgress(progress);
-
-      return jsonResponse({
-        ...progress,
-        totalTasks: TOTAL_TASKS,
-        completedTasks,
-        progressPercentage
-      });
-    }
-
-    // Admin routes
-    if (path.startsWith('/api/admin/')) {
-      const userId = await validateSession(env, request);
-      if (!userId) return errorResponse('Unauthorized', 401);
-
-      const user = await getUserById(env, userId);
-      if (!user || user.role !== 'admin') return errorResponse('Admin access required', 403);
-
-      if (path === '/api/admin/stats') {
-        const users = await env.USERS.list({ prefix: 'user:' });
-        let totalUsers = 0;
-        let completedUsers = 0;
-        let totalProgress = 0;
-
-        for (const { name: userKey } of users.keys) {
-          const userData = await env.USERS.get(userKey);
-          if (!userData) continue;
-
-          totalUsers++;
-          const progressData = await env.PROGRESS.get(`progress:${JSON.parse(userData).id}`);
-          const progress = progressData ? JSON.parse(progressData) : {};
-          const progressPercent = calculateProgress(progress);
-          totalProgress += progressPercent;
-
-          if (progressPercent === 100) completedUsers++;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velocity Lab - Exchange Hybrid Migration Training</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f7;
+            --text-primary: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --accent: #0071e3;
+            --success: #34c759;
+            --error: #ff3b30;
+            --border: #d2d2d7;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
-        return jsonResponse({
-          totalUsers,
-          completedUsers,
-          averageProgress: totalUsers > 0 ? Math.round(totalProgress / totalUsers) : 0,
-          completionRate: totalUsers > 0 ? Math.round((completedUsers / totalUsers) * 100) : 0
-        });
-      }
-
-      if (path === '/api/admin/users-progress') {
-        const usersProgress = [];
-        const users = await env.USERS.list({ prefix: 'user:' });
-
-        for (const { name: userKey } of users.keys) {
-          const userData = await env.USERS.get(userKey);
-          if (!userData) continue;
-
-          const user = JSON.parse(userData) as User;
-          const progressData = await env.PROGRESS.get(`progress:${user.id}`);
-          const progress = progressData ? JSON.parse(progressData) : {};
-          const completedTasks = calculateCompletedTasks(progress);
-          const progressPercent = calculateProgress(progress);
-
-          usersProgress.push({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            progress: progressPercent,
-            completedTasks,
-            totalTasks: TOTAL_TASKS,
-            lastActivity: user.lastLogin || user.createdAt
-          });
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-family);
         }
 
-        return jsonResponse(usersProgress.sort((a, b) => b.progress - a.progress));
-      }
-    }
-
-    return errorResponse('Not found', 404);
-  } catch (error) {
-    console.error('API GET error:', error);
-    return errorResponse('Internal server error', 500);
-  }
-};
-
-// POST handler
-export const onRequestPost: PagesFunction<Env> = async (context) => {
-  const { env, request } = context;
-  const url = new URL(request.url);
-  const path = url.pathname;
-
-  try {
-    const ip = request.headers.get('cf-connecting-ip') || 'unknown';
-
-    // Rate limiting
-    if (!(await checkRateLimit(env, ip, 30))) {
-      return errorResponse('Too many requests', 429);
-    }
-
-    // Login
-    if (path === '/api/login') {
-      const formData = await request.formData();
-      const email = formData.get('email')?.toString().trim().toLowerCase() || '';
-      const password = formData.get('password')?.toString() || '';
-      const remember = formData.get('remember') === 'on';
-      const csrfToken = formData.get('csrf_token')?.toString() || '';
-
-      if (!email || !password || !csrfToken) {
-        return errorResponse('Missing required fields', 400);
-      }
-
-      if (!validateEmail(email)) {
-        return errorResponse('Invalid email address', 400);
-      }
-
-      if (!(await validateCSRFToken(env, csrfToken))) {
-        return errorResponse('Invalid CSRF token', 403);
-      }
-
-      const user = await getUserByEmail(env, email);
-      if (!user || user.password !== password) {
-        await logActivity(env, 'unknown', 'login_failed', { email, ip });
-        return errorResponse('Invalid email or password', 401);
-      }
-
-      await updateLastLogin(env, user);
-      
-      // Create session (longer session if remember me is checked)
-      const sessionDuration = remember ? 86400 * 30 : 86400; // 30 days or 1 day
-      const sessionToken = crypto.randomUUID();
-      await env.SESSIONS.put(`session:${sessionToken}`, user.id, { 
-        expirationTtl: sessionDuration
-      });
-
-      await logActivity(env, user.id, 'login_successful', { email, remember, ip });
-
-      return new Response(JSON.stringify({
-        success: true,
-        name: user.name,
-        role: user.role,
-        message: 'Login successful'
-      }), {
-        status: 200,
-        headers: {
-          'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=${sessionDuration}; SameSite=Strict; Secure`,
-          'Content-Type': 'application/json'
-        }
-      });
-    }
-
-    // Register
-    if (path === '/api/register') {
-      const formData = await request.formData();
-      const name = sanitizeInput(formData.get('name')?.toString().trim() || '');
-      const email = formData.get('email')?.toString().trim().toLowerCase() || '';
-      const password = formData.get('password')?.toString() || '';
-      const csrfToken = formData.get('csrf_token')?.toString() || '';
-
-      if (!name || !email || !password || !csrfToken) {
-        return errorResponse('Missing required fields', 400);
-      }
-
-      if (name.length < 2 || !validateEmail(email)) {
-        return errorResponse('Invalid name or email', 400);
-      }
-
-      const passwordValidation = validatePassword(password);
-      if (!passwordValidation.valid) {
-        return errorResponse(passwordValidation.message!, 400);
-      }
-
-      if (!(await validateCSRFToken(env, csrfToken))) {
-        return errorResponse('Invalid CSRF token', 403);
-      }
-
-      if (await getUserByEmail(env, email)) {
-        return errorResponse('Email already registered', 409);
-      }
-
-      const userId = crypto.randomUUID();
-      const userData: User = {
-        id: userId,
-        name,
-        email,
-        password,
-        role: 'user',
-        createdAt: new Date().toISOString()
-      };
-
-      await env.USERS.put(`user:${email}`, JSON.stringify(userData));
-      const sessionToken = await createSession(env, userId);
-
-      await logActivity(env, userId, 'user_registered', { email });
-
-      return new Response(JSON.stringify({
-        success: true,
-        name: userData.name,
-        role: userData.role,
-        message: 'Registration successful'
-      }), {
-        status: 201,
-        headers: {
-          'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict; Secure`,
-          'Content-Type': 'application/json'
-        }
-      });
-    }
-
-    // Logout
-    if (path === '/api/logout') {
-      const cookies = request.headers.get('Cookie');
-      const sessionToken = cookies?.match(/session=([^;]+)/)?.[1];
-
-      if (sessionToken) {
-        const userId = await validateSession(env, request);
-        if (userId) {
-          await logActivity(env, userId, 'logout', { ip });
-        }
-        await env.SESSIONS.delete(`session:${sessionToken}`);
-      }
-
-      return new Response(JSON.stringify({ success: true }), {
-        status: 200,
-        headers: {
-          'Set-Cookie': `session=; HttpOnly; Path=/; Max-Age=0; SameSite=Strict; Secure`,
-          'Content-Type': 'application/json'
-        }
-      });
-    }
-
-    // Progress update
-    if (path === '/api/progress') {
-      const userId = await validateSession(env, request);
-      if (!userId) return errorResponse('Unauthorized', 401);
-
-      const formData = await request.formData();
-      const task = formData.get('task') as string;
-      const week = formData.get('week') as string;
-      const checked = formData.get('checked') as string;
-      const subtask = formData.get('subtask') as string;
-      const subtask_checked = formData.get('subtask_checked') as string;
-
-      if (!task || !week) {
-        return errorResponse('Task and week required', 400);
-      }
-
-      let progress = await getCurrentLabProgress(env, userId);
-      if (!progress[week]) progress[week] = {};
-      if (!progress[week][task]) progress[week][task] = { completed: false, subtasks: {} };
-
-      const taskData = progress[week][task];
-
-      // Update subtask
-      if (subtask !== null && subtask !== undefined && subtask !== '') {
-        if (!taskData.subtasks) taskData.subtasks = {};
-        taskData.subtasks[subtask] = subtask_checked === 'true';
-      }
-
-      // Update main task
-      if (checked !== null && checked !== undefined && checked !== '') {
-        taskData.completed = checked === 'true';
-        if (taskData.completed) {
-          taskData.completedAt = new Date().toISOString();
-        }
-      }
-
-      await env.PROGRESS.put(`progress:${userId}`, JSON.stringify(progress));
-
-      const completedTasks = calculateCompletedTasks(progress);
-      const progressPercentage = calculateProgress(progress);
-
-      await logActivity(env, userId, 'progress_updated', {
-        task: `${week}-${task}`,
-        completed: taskData.completed,
-        completedTasks,
-        progressPercentage
-      });
-
-      return jsonResponse({
-        completedTasks,
-        totalTasks: TOTAL_TASKS,
-        progressPercentage
-      });
-    }
-
-    // Start new lab
-    if (path === '/api/lab/start-new') {
-      const userId = await validateSession(env, request);
-      if (!userId) return errorResponse('Unauthorized', 401);
-
-      const labId = await startNewLab(env, userId);
-      await logActivity(env, userId, 'lab_started', { labId });
-
-      return jsonResponse({ labId, totalTasks: TOTAL_TASKS });
-    }
-
-    // Admin actions
-    if (path.startsWith('/api/admin/')) {
-      const userId = await validateSession(env, request);
-      if (!userId) return errorResponse('Unauthorized', 401);
-
-      const user = await getUserById(env, userId);
-      if (!user || user.role !== 'admin') return errorResponse('Admin access required', 403);
-
-      if (path === '/api/admin/change-user-password') {
-        const formData = await request.formData();
-        const email = formData.get('email')?.toString().toLowerCase();
-        const newPassword = formData.get('newPassword')?.toString();
-
-        if (!email || !newPassword || newPassword.length < 8) {
-          return errorResponse('Invalid email or password', 400);
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            overflow-x: hidden;
         }
 
-        const targetUser = await getUserByEmail(env, email);
-        if (!targetUser) return errorResponse('User not found', 404);
-
-        targetUser.password = newPassword;
-        await env.USERS.put(`user:${email}`, JSON.stringify(targetUser));
-
-        await logActivity(env, userId, 'admin_password_changed', { target: email });
-        return jsonResponse({ message: 'Password updated' });
-      }
-
-      if (path === '/api/admin/change-user-role') {
-        const formData = await request.formData();
-        const email = formData.get('email')?.toString().toLowerCase();
-        const newRole = formData.get('role')?.toString();
-
-        if (!email || !newRole || !['admin', 'user'].includes(newRole)) {
-          return errorResponse('Invalid email or role', 400);
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
         }
 
-        if (email === user.email && newRole === 'user') {
-          return errorResponse('Cannot demote yourself', 400);
+        /* Header */
+        header {
+            background: var(--bg-primary);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
         }
 
-        const targetUser = await getUserByEmail(env, email);
-        if (!targetUser) return errorResponse('User not found', 404);
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-        targetUser.role = newRole as 'admin' | 'user';
-        await env.USERS.put(`user:${email}`, JSON.stringify(targetUser));
+        .logo img {
+            height: 40px;
+        }
 
-        await logActivity(env, userId, 'admin_role_changed', { target: email, newRole });
-        return jsonResponse({ message: 'Role updated' });
-      }
-    }
+        nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            margin-left: 24px;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
 
-    return errorResponse('Not found', 404);
-  } catch (error) {
-    console.error('API POST error:', error);
-    return errorResponse('Internal server error', 500);
-  }
-};
+        nav a:hover {
+            color: var(--accent);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Landing Page */
+        #landingPage {
+            text-align: center;
+            padding: 80px 0;
+        }
+
+        #landingPage h1 {
+            font-size: 48px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        #landingPage p {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 32px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--accent);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #005bb5;
+        }
+
+        /* Dashboard */
+        #dashboardPage {
+            padding: 40px 0;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-header h2 {
+            font-size: 32px;
+            font-weight: 600;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .progress-ring {
+            width: 120px;
+            height: 120px;
+        }
+
+        .progress-ring circle {
+            fill: none;
+            stroke: var(--border);
+            stroke-width: 8;
+        }
+
+        .progress-ring .progress {
+            stroke: var(--accent);
+            stroke-dasharray: 326.56;
+            stroke-dashoffset: 326.56;
+            transition: stroke-dashoffset 0.5s;
+        }
+
+        .progress-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .progress-info div {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .progress-info #progressText {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Week Cards */
+        .week-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .week-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .week-header:hover {
+            background: #ececee;
+        }
+
+        .week-info h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .week-info p {
+            color: var(--text-secondary);
+        }
+
+        .week-progress {
+            text-align: right;
+        }
+
+        .progress-count {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            width: 100px;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.5s;
+        }
+
+        .tasks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            padding: 24px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .tasks-grid.show {
+            max-height: 1000px;
+        }
+
+        .task {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            transition: transform 0.2s;
+        }
+
+        .task:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .task.completed {
+            background: #e8f4ff;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+        }
+
+        .task-title {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .task-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .modal form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal input {
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .modal input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .modal .btn {
+            width: 100%;
+        }
+
+        .modal .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            opacity: 0;
+            transform: translateY(100px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notification.success {
+            background: var(--success);
+        }
+
+        .notification.error {
+            background: var(--error);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            #landingPage h1 {
+                font-size: 32px;
+            }
+
+            #landingPage p {
+                font-size: 16px;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                gap: 24px;
+            }
+
+            .progress-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">
+                <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo">
+            </div>
+            <div>
+                <span id="authLinks">
+                    <a href="#" onclick="showLogin()">Login</a>
+                    <a href="#" onclick="showRegister()">Register</a>
+                </span>
+                <span id="userLinks" class="hidden">
+                    <span id="userName"></span>
+                    <a href="#" onclick="logout()">Logout</a>
+                </span>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <!-- Landing Page -->
+        <section id="landingPage">
+            <h1>Velocity Lab</h1>
+            <p>Master Exchange Hybrid Migration with hands-on training designed for IT professionals.</p>
+            <a href="#" class="btn" onclick="showRegister()">Get Started</a>
+        </section>
+
+        <!-- Dashboard -->
+        <section id="dashboardPage" class="hidden">
+            <div class="dashboard-header">
+                <h2>Training Dashboard</h2>
+                <div class="progress-container">
+                    <svg class="progress-ring">
+                        <circle cx="60" cy="60" r="52" />
+                        <circle class="progress" cx="60" cy="60" r="52" id="progressRing" />
+                    </svg>
+                    <div class="progress-info">
+                        <div>Progress: <span id="progressText">0%</span></div>
+                        <div>Completed Tasks: <span id="completedTasks">0</span>/42</div>
+                        <div>Current Week: <span id="currentWeek">Week 1</span></div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <button class="btn" onclick="continueTraining()">Continue Training</button>
+                <button class="btn" onclick="startNewLab()">Start New Lab</button>
+            </div>
+            <div id="weeksContainer"></div>
+        </section>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Login</h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <form id="loginForm">
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <div class="checkbox-group">
+                    <input type="checkbox" name="remember" id="remember">
+                    <label for="remember">Remember me</label>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <p>Don't have an account? <a href="#" onclick="showRegister()">Register</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Register</h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <form id="registerForm">
+                <input type="text" name="name" placeholder="Full Name" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit" class="btn">Register</button>
+                <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script src="/app.js"></script>
+</body>
+</html>
