@@ -10,17 +10,13 @@ import {
   updateLastLogin,
   validateEmail,
   logActivity,
-  checkRateLimit,
-  initializeDefaultAdmin
+  checkRateLimit
 } from '../utils';
 import type { Env } from '../utils';
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     const { env, request } = context;
-    
-    // Initialize default admin user if it doesn't exist
-    await initializeDefaultAdmin(env);
     
     // Rate limiting
     const ip = request.headers.get('cf-connecting-ip') || 'unknown';
