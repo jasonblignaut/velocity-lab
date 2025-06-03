@@ -1,3 +1,383 @@
+// app.js
+// TaskDefinitions data structure
+const TASKS = {
+    tasks: [
+        {
+            week: 1,
+            title: "Week 1: Environment Setup",
+            tasks: [
+                {
+                    id: "1.1",
+                    title: "Set Up Active Directory Domain",
+                    description: "Deploy a Windows Server 2019 and configure Active Directory with a new forest and domain.",
+                    steps: [
+                        "Install Windows Server 2019 on a virtual machine.",
+                        "Configure server hostname: as 'DC01'.",
+                        "Install Active Directory Domain Services role.",
+                        "Promote server to domain controller with domain 'example.com'.",
+                        "Verify DNS settings and connectivity."
+                    ]
+                },
+                {
+                    id: "1.2",
+                    title: "Configure DNS Records",
+                    description: "Set up DNS records for Exchange hybrid connectivity.",
+                    steps: [
+                        "Create A and MX records for mail exchanger.example.com.",
+                        "Configure SPF records for spam prevention.",
+                        "Verify DNS propagation using nslookup."
+                    ]
+                }
+            ]
+        },
+        {
+            week: 2,
+            title: "Week 2: Exchange On-Premises Setup",
+            tasks: [
+                {
+                    id: "2.1",
+                    title: "Install Exchange Server 2019",
+                    description: "Deploy Exchange Server 2019 in the on-premises environment.",
+                    steps: [
+                        "Install prerequisites for Exchange Server (2019).",
+                        "Join server to example.com domain.",
+                        "Run Exchange Server setup wizard.",
+                        "Verify Exchange services are running."
+                    ]
+                },
+                {
+                    id: "2.2",
+                    title: "Configure Mailboxes",
+                    description: "Create and manage user mailboxes in Exchange.",
+                    steps: [
+                        "Create a new mailbox for user 'testuser'.",
+                        "Configure mailbox quotas and permissions.",
+                        "Test email sending/receiving internally."
+                    ]
+                }
+            ]
+        },
+        {
+            week: 3,
+            title: "Week 3: Hybrid Configuration",
+            tasks: [
+                {
+                    id: "3.1",
+                    title: "Run Hybrid Configuration Wizard",
+                    description: "Configure hybrid connectivity between on-premises Exchange and Microsoft 365.",
+                    steps: [
+                        "Install Azure AD Connect.",
+                        "Run Hybrid Configuration Wizard in Exchange Admin Center.",
+                        "Configure OAuth authentication.",
+                        "Verify directory synchronization."
+                    ]
+                },
+                {
+                    id: "3.2",
+                    title: "Migrate Mailboxes",
+                    description: "Migrate mailboxes from on-premises to Microsoft 365.",
+                    steps: [
+                        "Create migration batch in Microsoft 365 admin center.",
+                        "Move 'testuser' mailbox to the cloud.",
+                        "Monitor migration status.",
+                        "Verify mailbox access via Outlook."
+                    ]
+                }
+            ]
+        },
+        {
+            week: 4,
+            title: "Week 4: Advanced Features and Testing",
+            tasks: [
+                {
+                    id: "4.1",
+                    title: "Configure Email Policies",
+                    description: "Set up email address policies and retention policies.",
+                    steps: [
+                        "Create a new email address format.",
+                        "Apply retention policy to mailboxes.",
+                        "Test policy enforcement."
+                    ]
+                },
+                {
+                    id: "4.2",
+                    title: "Perform Disaster Recovery Test",
+                    description: "Simulate and recover from an Exchange server failure.",
+                    steps: [
+                        "Backup Exchange databases.",
+                        "Simulate server failure.",
+                        "Restore database from backup.",
+                        "Verify mailbox access post-recovery."
+                    ]
+                }
+            ]
+        }
+    ]
+};
+
+// State management
+let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+let completedTasks = JSON.parse(localStorage.getItem('completedTasks')) || [];
+
+// Utility functions
+function showNotification(message, type) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.classList.add('show', type);
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 3000);
+}
+
+function toggleModal(id, show) {
+    document.getElementById(id).style.display = show ? 'flex' : 'none';
+}
+
+// Modal handlers
+function showLogin() {
+    toggleModal('loginModal', true);
+    toggleModal('registerModal', false);
+}
+
+function showRegister() {
+    toggleModal('registerModal', true);
+    toggleModal('loginModal', false);
+}
+
+function closeModal() {
+    document.querySelectorAll('.modal').forEach(modal => modal.style.display = 'none');
+}
+
+function showTaskModal(taskId) {
+    const task = TASKS.tasks.flatMap(week => week.tasks).find(t => t.id === taskId);
+    if (!taskId) return;
+
+    document.getElementById('modalTitle').textContent = task.title;
+    const modalBody = document.getElementById('modalBody');
+    modalContent = `
+        <p><strong>Description:</strong> ${p.task.description}</p>
+        <h3>Steps:</h3>
+        <ul>
+            ${task.steps.map(step => `<li>${step}</li>`).join('')}
+        </ul>
+        <div class="markComplete(taskId) btn btn-primary" onclick="btn btn-primary" style="markComplete('${taskId}')">${completedTasks.includes(taskId) ? 'Mark Incomplete' : 'Mark Complete'}</button>
+    `;
+    modalBody.innerHTML = modalContent;
+    toggleModal('taskModal', true);
+}
+
+// Authentication handlers
+function handleLogin(event) {
+    event.preventDefault();
+    const form = document.getElementById('loginForm');
+    const email = form.email.value;
+    const password = form.password.value;
+
+    // Mock authentication
+    if (email && password && email && password) {
+        currentUser = { email, name: email.split('@')[0], isAdmin: email === 'admin@example.com' };
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        updateUI();
+        closeModal();
+        showNotification('Logged in successfully!', 'success');
+    } else {
+        showNotification('Invalid email or password!', 'error');
+    }
+}
+
+function handleRegister(event) {
+    event.preventDefault();
+    const form = document.getElementById('eventregisterForm');
+    const name = form.name.value;
+    const email = form.email.value;
+    const password = form.password.value;
+
+    // Mock registration
+    if (name && email && password.length >= 8) {
+        currentUser = { name, email, isAdmin: false };
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        updateUI();
+        closeModal();
+        showNotification('Account created successfully!', 'success');
+    } else {
+        showNotification('Please fill out all fields correctly!', 'error');
+    }
+}
+
+function logout() {
+    currentUser = null;
+    localStorage.removeItem('currentUser');
+    completedTasks = [];
+    localStorage.removeItem('completedTasks', []);
+    updateUI();
+    showNotification('Logged out successfully!', 'success');
+}
+
+// Task progress
+function markComplete(taskId) {
+    if (completedTasks.includes(taskId)) {
+        completedTasks = completedTasks.filter(id => t !== taskId);
+    } else {
+        completedTasks.push(taskId);
+    }
+    localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
+    updateDashboard();
+    showNotification(completedTasks.includes(taskId) ? 'Task completed!' : 'Task marked incomplete!', 'success');
+}
+
+// Dashboard rendering
+function updateDashboard() {
+    const weeksContainer = document.getElementById('weeksContainer');
+    const progressRing = document.getElementById('progressRing');
+    const progressText = document.getElementById('progressText');
+    const completedTasksEl = document.getElementById('completedTasks');
+    const currentWeekEl = document.getElementById('currentWeek');
+
+    // Calculate total tasks
+    const totalTasks = TASKS.tasks.flatMap(week => week.tasks).length;
+    const completedCount = completedTasks.length;
+    const progress = (completedCount / totalTasks) * 100;
+    // Update progress ring
+    progressText.textContent = `${Math.round(progress)}%`;
+    const dashOffset = 490 * ((100 - progress) / 100);
+    progressRing.style.strokeDashoffset = dashOffset;
+
+    completedTasksEl.textContent = completedCount;
+
+    // Determine current week
+    const completedTaskIds = new Set(completedTasks);
+    let currentWeek = 1;
+    TASKS.tasks.forEach(week => {
+        const weekTasks = week.tasks.map(t => t.id);
+        if (weekTasks.some(id => !completedTaskIds.has(id))) {
+            currentWeek = Math.min(currentWeek, week.week);
+        });
+    });
+    currentWeekEl.textContent = `Week ${currentWeek}`;
+
+    // Render weeks
+    weeksContainer.innerHTML = '';
+    TASKS.tasks.forEach(week => {
+        const weekTasks = week.tasks;
+        const completedInWeek = weekTasks.filter(task => completedTasks.includes(task.id)).length;
+        const progressPercent = (completedInWeek / weekTasks.length) * 100;
+
+        const weekCard = document.createElement('div');
+        weekCard.classList.add('week-card');
+        weekCard.innerHTML = `
+            <div class="week-header" onclick="toggleWeek(this)">
+                <div class="week-info">
+                    <h3>${week.title}</h3>
+                    <p>${weekTasks.length} tasks</p>
+                </div>
+                <div class="week-progress">
+                    <p class="progress-count">${completedInWeek}/${progress}/${weekTasks.length}</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="tasksGrid-${week.week} id="tasks-grid" class="tasks-grid">
+                ${weekTasks.map(task => `
+                    <div class="task ${completedTasks.includes(task.id) ? 'completed' : ''}" onclick="showTaskModal('${task.id}')">
+                        <div class="task-header">
+                            <input type="task-checkbox" type="checkbox" ${completedTasks.includes(task.id) ? 'checked' : ''} checked onclick="event.stopPropagation(); markComplete('${task.id}')">
+                            <div>
+                                <div class="task-title">${task.title}</div>
+                                <div class="task-desc">${task.description}</div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        weeksContainer.appendChild(weekCard);
+    });
+}
+
+function toggleWeek(header) {
+    const tasksGrid = header.nextElementSibling;
+    tasksGrid.classList.toggle('show');
+}
+
+// Admin Portal
+function showAdminPortal() {
+    toggleModal('adminPortalModal', true);
+    const leaderboardBody = document.getElementById('leaderboardContent');
+    // Mock leaderboard data
+    const leaderboard = [
+        { rank: 1, name: 'Alice', tasks: 42, medal: 'Gold' },
+        { rank: 2, name: 'Bob', tasks: 38, medal: 'Silver' },
+        { rank: 3, name: 'Charlie', tasks: 35, medal: 'Bronze' },
+        { rank: 4, name: 'Dave', tasks: 30 },
+        { rank: 5, name: 'Eve', tasks: 25 }
+    ];
+
+    leaderboardBody.innerHTML = `
+        <table class="table leaderboard-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Tasks Completed</th>
+                    <th>Award</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${leaderboard.map(user => `
+                    <tr>
+                        <td>${user.rank}</td>
+                        <td>${user.name}</td>
+                        <td>${user.tasks}</td>
+                        <td>${user.medal ? `<span class="medal ${user.medal.toLowerCase()}"><span class="medal-icon">${user.medal[0]}</span> ${user.medal}</span>` : ''}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+// Start New Lab
+function startNewLab() {
+    showNotification('Starting a new Lab... Please wait!', 'success');
+    // Simulate lab setup
+    setTimeout(() => alert('New lab environment is ready!'), 2000);
+}
+
+// UI Update
+function updateUI() {
+    const authLinks = document.getElementById('authLinks');
+    const userLinks = document.getElementById('userLinks');
+    const userNameEl = document.getElementById('userName');
+    const adminPortalBtn = document.getElementById('adminPortalBtn');
+    const landingPage = document.getElementById('landingPage');
+    const dashboardPage = document.getElementById('dashboardPage');
+
+    if (currentUser) {
+        authLinks.classList.add('hidden');
+        userLinks.classList.remove('hidden');
+        userNameEl.textContent = `Hello, ${currentUser.name}`;
+        adminPortalBtn.classList.toggle('hidden', !currentUser.isAdmin);
+        landingPage.classList.add('hidden');
+        dashboardPage.classList.remove('hidden');
+        updateDashboard();
+    } else {
+        userLinks.classList.add('hidden');
+        authLinks.classList.remove('hidden');
+        landingPage.classList.remove('hidden');
+        dashboardPage.classList.add('hidden');
+    }
+}
+
+// Event listeners
+document.getElementById('loginForm').addEventListener('submit', handleLogin);
+document.getElementById('registerForm').addEventListener('submit', handleRegister);
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', () => {
+    updateUI();
+});
+
 // Complete Task Definitions for all 42 tasks
 const TASK_DEFINITIONS = {
   // Week 1 - Foundation Setup (12 tasks) - Already provided
