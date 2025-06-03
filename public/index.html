@@ -1,1210 +1,629 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Velocity Lab - Exchange Hybrid Migration Training</title>
-    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
-    <style>
-        :root {
-            /* Premium Apple-inspired color palette */
-            --primary: #0071e3;
-            --primary-hover: #0077ed;
-            --primary-light: rgba(0, 113, 227, 0.08);
-            --primary-glow: rgba(0, 113, 227, 0.3);
-            
-            --success: #34c759;
-            --success-light: rgba(52, 199, 89, 0.08);
-            --warning: #ff9500;
-            --error: #ff3b30;
-            
-            /* Refined grays */
-            --gray-50: #fbfbfd;
-            --gray-100: #f5f5f7;
-            --gray-200: #e8e8ed;
-            --gray-300: #d2d2d7;
-            --gray-400: #acacb4;
-            --gray-500: #8e8e93;
-            --gray-600: #636366;
-            --gray-700: #48484a;
-            --gray-800: #363639;
-            --gray-900: #1d1d1f;
-            
-            /* Surfaces */
-            --bg-primary: #ffffff;
-            --bg-secondary: #f5f5f7;
-            --bg-tertiary: #fbfbfd;
-            --surface: rgba(255, 255, 255, 0.8);
-            --surface-elevated: rgba(255, 255, 255, 0.9);
-            
-            /* Borders & Shadows */
-            --border: rgba(0, 0, 0, 0.08);
-            --border-light: rgba(0, 0, 0, 0.04);
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
-            --shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
-            --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.12);
-            
-            /* Awards */
-            --gold: #FFD700;
-            --gold-light: rgba(255, 215, 0, 0.1);
-            --silver: #C0C0C0;
-            --silver-light: rgba(192, 192, 192, 0.1);
-            --bronze: #CD7F32;
-            --bronze-light: rgba(205, 127, 50, 0.1);
-            
-            /* Typography */
-            --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif;
-            
-            /* Effects */
-            --blur: 20px;
-            --radius: 10px;
-            --radius-lg: 16px;
-            --radius-xl: 20px;
-            --transition: 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: var(--font-family);
-            background: var(--bg-primary);
-            color: var(--gray-900);
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            overflow-x: hidden;
-        }
-
-        ::selection {
-            background: var(--primary-light);
-            color: var(--primary);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        /* Premium Navigation */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.72);
-            backdrop-filter: blur(var(--blur));
-            -webkit-backdrop-filter: blur(var(--blur));
-            border-bottom: 1px solid var(--border-light);
-            z-index: 1000;
-            transition: all var(--transition);
-        }
-
-        header.scrolled {
-            box-shadow: var(--shadow);
-        }
-
-        nav {
-            height: 60px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-
-        .logo img {
-            height: 36px;
-            width: auto;
-        }
-
-        .logo span {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-        }
-
-        nav a, nav button {
-            color: var(--gray-900);
-            text-decoration: none;
-            font-size: 15px;
-            font-weight: 500;
-            transition: all var(--transition);
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 6px;
-        }
-
-        nav a:hover, nav button:hover {
-            color: var(--primary);
-            background: var(--primary-light);
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* Premium Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 24px;
-            font-size: 15px;
-            font-weight: 600;
-            border-radius: 100px;
-            text-decoration: none;
-            transition: all var(--transition);
-            cursor: pointer;
-            border: none;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity var(--transition);
-        }
-
-        .btn:hover::before {
-            opacity: 1;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 16px var(--primary-glow);
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px var(--primary-glow);
-        }
-
-        .btn-secondary {
-            background: var(--gray-100);
-            color: var(--gray-900);
-            border: 1px solid var(--border-light);
-        }
-
-        .btn-secondary:hover {
-            background: var(--bg-primary);
-            border-color: var(--border);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow);
-        }
-
-        .btn-admin {
-            background: linear-gradient(135deg, var(--gold) 0%, var(--warning) 100%);
-            color: white;
-        }
-
-        /* Hero Section */
-        #landingPage {
-            padding-top: 120px;
-            padding-bottom: 80px;
-            text-align: center;
-            background: linear-gradient(180deg, var(--bg-tertiary) 0%, var(--bg-primary) 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-        }
-
-        #landingPage h1 {
-            font-size: clamp(48px, 8vw, 72px);
-            font-weight: 700;
-            margin-bottom: 24px;
-            background: linear-gradient(180deg, var(--gray-900) 0%, var(--gray-600) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1.1;
-        }
-
-        #landingPage p {
-            font-size: 20px;
-            color: var(--gray-600);
-            max-width: 600px;
-            margin: 0 auto 40px;
-            line-height: 1.6;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        /* Dashboard */
-        #dashboardPage {
-            padding-top: 100px;
-            padding-bottom: 60px;
-            background: var(--bg-secondary);
-            min-height: 100vh;
-        }
-
-        .dashboard-header {
-            background: var(--bg-primary);
-            border-radius: var(--radius-xl);
-            padding: 40px;
-            margin-bottom: 32px;
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-
-        .dashboard-header h2 {
-            font-size: 36px;
-            font-weight: 700;
-            margin-bottom: 32px;
-            color: var(--gray-900);
-        }
-
-        /* Progress Ring */
-        .progress-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 32px;
-            margin: 40px 0;
-        }
-
-        .progress-ring-wrapper {
-            position: relative;
-            width: 180px;
-            height: 180px;
-        }
-
-        .progress-ring {
-            width: 100%;
-            height: 100%;
-            transform: rotate(-90deg);
-        }
-
-        .progress-ring circle {
-            fill: none;
-            stroke-width: 12;
-            r: 78;
-            cx: 90;
-            cy: 90;
-            stroke-linecap: round;
-        }
-
-        .progress-ring .bg {
-            stroke: var(--gray-200);
-        }
-
-        .progress-ring .progress {
-            stroke: url(#gradient);
-            stroke-dasharray: 490;
-            stroke-dashoffset: 490;
-            transition: stroke-dashoffset 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        .progress-text-wrapper {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-        }
-
-        #progressText {
-            font-size: 48px;
-            font-weight: 700;
-            color: var(--gray-900);
-            line-height: 1;
-        }
-
-        .progress-label {
-            font-size: 14px;
-            color: var(--gray-600);
-            font-weight: 500;
-            margin-top: 4px;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-
-        .stat-card {
-            background: var(--bg-primary);
-            padding: 24px;
-            border-radius: var(--radius-lg);
-            text-align: center;
-            border: 1px solid var(--border-light);
-            transition: all var(--transition);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--primary);
-        }
-
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 8px;
-        }
-
-        .stat-label {
-            font-size: 14px;
-            color: var(--gray-600);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* Week Cards */
-        .week-card {
-            background: var(--bg-primary);
-            border-radius: var(--radius-xl);
-            margin-bottom: 20px;
-            overflow: hidden;
-            border: 1px solid var(--border-light);
-            transition: all var(--transition);
-        }
-
-        .week-card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-2px);
-        }
-
-        .week-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 32px;
-            cursor: pointer;
-            transition: background var(--transition);
-            position: relative;
-        }
-
-        .week-header:hover {
-            background: var(--bg-tertiary);
-        }
-
-        .week-header::after {
-            content: '';
-            position: absolute;
-            right: 32px;
-            top: 50%;
-            width: 24px;
-            height: 24px;
-            transform: translateY(-50%);
-            background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 10l4 4 4-4' stroke='%238e8e93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-            transition: transform var(--transition);
-        }
-
-        .tasks-grid.show ~ .week-header::after {
-            transform: translateY(-50%) rotate(180deg);
-        }
-
-        .week-info h3 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--gray-900);
-        }
-
-        .week-info p {
-            color: var(--gray-600);
-            font-size: 16px;
-        }
-
-        .week-progress {
-            text-align: right;
-            margin-right: 40px;
-        }
-
-        .progress-count {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 12px;
-        }
-
-        .progress-bar {
-            width: 120px;
-            height: 8px;
-            background: var(--gray-200);
-            border-radius: 4px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-hover) 100%);
-            transition: width var(--transition);
-            position: relative;
-        }
-
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            width: 20px;
-            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 100%);
-        }
-
-        /* Tasks Grid */
-        .tasks-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 16px;
-            padding: 0 32px 32px;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-
-        .tasks-grid.show {
-            max-height: 1500px;
-        }
-
-        .task {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius);
-            padding: 20px;
-            cursor: pointer;
-            transition: all var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .task::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--primary);
-            transform: translateX(-4px);
-            transition: transform var(--transition);
-        }
-
-        .task:hover {
-            background: var(--bg-primary);
-            border-color: var(--primary);
-            transform: translateX(4px);
-            box-shadow: var(--shadow);
-        }
-
-        .task:hover::before {
-            transform: translateX(0);
-        }
-
-        .task.completed {
-            background: var(--success-light);
-            border-color: var(--success);
-        }
-
-        .task.completed::before {
-            background: var(--success);
-            transform: translateX(0);
-        }
-
-        .task-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 16px;
-        }
-
-        .task-checkbox {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 22px;
-            height: 22px;
-            border: 2px solid var(--gray-300);
-            border-radius: 6px;
-            cursor: pointer;
-            flex-shrink: 0;
-            margin-top: 2px;
-            transition: all var(--transition);
-            position: relative;
-        }
-
-        .task-checkbox:checked {
-            background: var(--success);
-            border-color: var(--success);
-        }
-
-        .task-checkbox:checked::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 6px;
-            height: 10px;
-            border: 2px solid white;
-            border-top: none;
-            border-left: none;
-            transform: translate(-50%, -60%) rotate(45deg);
-        }
-
-        .task-checkbox:hover:not(:checked) {
-            border-color: var(--primary);
-        }
-
-        .task-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 4px;
-            color: var(--gray-900);
-        }
-
-        .task-desc {
-            font-size: 14px;
-            color: var(--gray-600);
-        }
-
-        /* Modals */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            padding: 24px;
-        }
-
-        .modal-content {
-            background: var(--surface-elevated);
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
-            border-radius: var(--radius-xl);
-            padding: 32px;
-            max-width: 600px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-xl);
-            border: 1px solid var(--border-light);
-            animation: slideUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .modal-header h2 {
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-
-        .modal-close {
-            background: var(--gray-100);
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: var(--gray-600);
-            transition: all var(--transition);
-        }
-
-        .modal-close:hover {
-            background: var(--gray-200);
-            color: var(--gray-900);
-        }
-
-        /* Forms */
-        .modal form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-
-        .modal input {
-            padding: 12px 16px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            font-size: 16px;
-            background: var(--bg-primary);
-            transition: all var(--transition);
-            font-family: inherit;
-        }
-
-        .modal input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .checkbox-group label {
-            font-size: 14px;
-            color: var(--gray-600);
-            cursor: pointer;
-        }
-
-        .form-footer {
-            text-align: center;
-            margin-top: 16px;
-            font-size: 14px;
-            color: var(--gray-600);
-        }
-
-        .form-footer a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .form-footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Leaderboard */
-        .leaderboard-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 24px;
-        }
-
-        .leaderboard-table th {
-            text-align: left;
-            padding: 16px;
-            font-weight: 600;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--gray-600);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .leaderboard-table td {
-            padding: 16px;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .leaderboard-table tr {
-            transition: background var(--transition);
-        }
-
-        .leaderboard-table tr:hover {
-            background: var(--bg-secondary);
-        }
-
-        /* Medal styles */
-        .medal {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-        }
-
-        .medal-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        .gold .medal-icon {
-            background: var(--gold);
-            color: white;
-            box-shadow: 0 2px 8px var(--gold-light);
-        }
-
-        .silver .medal-icon {
-            background: var(--silver);
-            color: white;
-            box-shadow: 0 2px 8px var(--silver-light);
-        }
-
-        .bronze .medal-icon {
-            background: var(--bronze);
-            color: white;
-            box-shadow: 0 2px 8px var(--bronze-light);
-        }
-
-        /* Notifications */
-        .notification {
-            position: fixed;
-            top: 80px;
-            right: 24px;
-            padding: 16px 24px;
-            border-radius: var(--radius);
-            color: white;
-            font-size: 15px;
-            font-weight: 500;
-            opacity: 0;
-            transform: translateX(400px);
-            transition: all var(--transition);
-            box-shadow: var(--shadow-lg);
-            max-width: 400px;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-        }
-
-        .notification.show {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .notification.success {
-            background: var(--success);
-        }
-
-        .notification.error {
-            background: var(--error);
-        }
-
-        /* Subtasks */
-        .subtask-container {
-            margin: 20px 0;
-        }
-
-        .subtask-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 0;
-            transition: all var(--transition);
-        }
-
-        .subtask-item:hover {
-            background: var(--bg-tertiary);
-            margin: 0 -16px;
-            padding: 8px 16px;
-            border-radius: var(--radius);
-        }
-
-        .subtask-checkbox {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .subtask-item label {
-            font-size: 14px;
-            color: var(--gray-700);
-            cursor: pointer;
-            flex: 1;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                padding: 0 16px;
-            }
-
-            nav {
-                height: 56px;
-            }
-
-            .logo img {
-                height: 32px;
-            }
-
-            .logo span {
-                display: none;
-            }
-
-            #landingPage {
-                padding-top: 80px;
-            }
-
-            #landingPage h1 {
-                font-size: 36px;
-            }
-
-            #landingPage p {
-                font-size: 18px;
-            }
-
-            .hero-buttons {
-                flex-direction: column;
-                width: 100%;
-                max-width: 300px;
-                margin: 0 auto;
-            }
-
-            .btn {
-                width: 100%;
-            }
-
-            .dashboard-header {
-                padding: 24px;
-            }
-
-            .dashboard-header h2 {
-                font-size: 28px;
-            }
-
-            .progress-ring-wrapper {
-                width: 140px;
-                height: 140px;
-            }
-
-            #progressText {
-                font-size: 36px;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .week-header {
-                flex-direction: column;
-                gap: 16px;
-                align-items: flex-start;
-            }
-
-            .week-progress {
-                margin-right: 0;
-                text-align: left;
-            }
-
-            .tasks-grid {
-                grid-template-columns: 1fr;
-                padding: 0 16px 16px;
-            }
-
-            .modal-content {
-                padding: 24px;
-            }
-
-            .leaderboard-table {
-                font-size: 14px;
-            }
-
-            .leaderboard-table th,
-            .leaderboard-table td {
-                padding: 12px 8px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stat-value {
-                font-size: 28px;
-            }
-        }
-
-        /* Loading states */
-        .skeleton {
-            background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        /* Scroll behavior */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--gray-100);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--gray-400);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--gray-500);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Velocity Lab - Exchange Hybrid Migration Training</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --bg-primary: #1f2937;
+      --bg-secondary: #2d3748;
+      --border-light: #4b5563;
+      --gray-600: #4b5563;
+      --gray-400: #9ca3af;
+      --gray-200: #e5e7eb;
+      --text-primary: #f3f4f6;
+      --radius: 8px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    header {
+      background: var(--bg-secondary);
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: var(--shadow);
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo img {
+      height: 40px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .nav-links a {
+      color: var(--gray-200);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .btn {
+      background: var(--primary);
+      color: white;
+      padding: 10px 20px;
+      border-radius: var(--radius);
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .hero {
+      text-align: center;
+      padding: 80px 0;
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .hero p {
+      font-size: 20px;
+      color: var(--gray-400);
+      margin-bottom: 32px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      margin: 40px 0;
+    }
+
+    .stat-card {
+      background: var(--bg-secondary);
+      padding: 24px;
+      border-radius: var(--radius);
+      text-align: center;
+    }
+
+    .stat-card h3 {
+      font-size: 36px;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .stat-card p {
+      color: var(--gray-400);
+    }
+
+    .week-card {
+      background: var(--bg-secondary);
+      border-radius: var(--radius);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .week-header {
+      display: flex;
+      justify-content: space-between;
+      padding: 24px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .week-header:hover {
+      background: #374151;
+    }
+
+    .week-info h3 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .week-info p {
+      color: var(--gray-400);
+    }
+
+    .week-progress {
+      text-align: right;
+    }
+
+    .progress-count {
+      color: var(--gray-400);
+      margin-bottom: 8px;
+    }
+
+    .progress-bar {
+      width: 100px;
+      height: 8px;
+      background: #4b5563;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.3s;
+    }
+
+    .tasks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+      padding: 24px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s;
+    }
+
+    .tasks-grid.show {
+      max-height: 1000px;
+    }
+
+    .task {
+      background: #374151;
+      padding: 16px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .task:hover {
+      transform: translateY(-4px);
+    }
+
+    .task.completed {
+      background: #1e3a8a;
+    }
+
+    .task-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .task-checkbox {
+      width: 20px;
+      height: 20px;
+    }
+
+    .task-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .task-desc {
+      font-size: 14px;
+      color: var(--gray-400);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--bg-primary);
+      border-radius: var(--radius);
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 24px;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--gray-400);
+    }
+
+    .modal-content h2 {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      background: #374151;
+      color: var(--text-primary);
+    }
+
+    .subtask-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .subtask-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .subtask-checkbox {
+      width: 18px;
+      height: 18px;
+    }
+
+    .progress-circle {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      margin: 0 auto;
+    }
+
+    .progress-circle svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .progress-circle circle {
+      fill: none;
+      stroke-width: 8;
+    }
+
+    .progress-circle .bg {
+      stroke: #4b5563;
+    }
+
+    .progress-circle .fg {
+      stroke: var(--primary);
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.3s;
+    }
+
+    .progress-circle span {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .leaderboard-table th,
+    .leaderboard-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .leaderboard-table th {
+      font-weight: 600;
+      color: var(--gray-200);
+    }
+
+    .medal {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .medal-icon {
+      font-size: 20px;
+    }
+
+    .gold {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .silver {
+      background: #e5e7eb;
+      color: #4b5563;
+    }
+
+    .bronze {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 16px 24px;
+      border-radius: var(--radius);
+      display: none;
+      z-index: 1000;
+      font-weight: 500;
+    }
+
+    .notification.show {
+      display: block;
+      animation: slideIn 0.3s, slideOut 0.3s 3.7s;
+    }
+
+    .notification.success {
+      background: #10b981;
+      color: white;
+    }
+
+    .notification.error {
+      background: #ef4444;
+      color: white;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+
+    @keyframes slideOut {
+      from { transform: translateX(0); }
+      to { transform: translateX(100%); }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 32px;
+      }
+
+      .hero p {
+        font-size: 16px;
+      }
+
+      .nav-links {
+        gap: 16px;
+      }
+
+      .week-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .week-progress {
+        text-align: left;
+        margin-top: 16px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- SVG Definitions -->
-    <svg width="0" height="0" style="position: absolute;">
-        <defs>
-            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:#0071e3;stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#0077ed;stop-opacity:1" />
-            </linearGradient>
-        </defs>
-    </svg>
+  <!-- Notification -->
+  <div id="notification" class="notification"></div>
 
-    <!-- Header -->
-    <header id="header">
-        <nav class="container">
-            <a href="/" class="logo">
-                <img src="/assets/Velocity-Logo.png" alt="Velocity Lab">
-            </a>
-            <div class="nav-links">
-                <span id="authLinks">
-                    <a href="#" onclick="showLogin()">Sign In</a>
-                    <a href="#" onclick="showRegister()" class="btn btn-primary">Get Started</a>
-                </span>
-                <span id="userLinks" class="hidden">
-                    <span id="userName"></span>
-                    <button id="adminPortalBtn" class="btn btn-admin hidden" onclick="showAdminPortal()">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M8 1l2.5 5 5.5 1-4 4 1 5.5L8 12l-4.5 2.5 1-5.5-4-4 5.5-1z" fill="currentColor"/>
-                        </svg>
-                        Admin Portal
-                    </button>
-                    <button onclick="logout()" class="btn btn-secondary">Sign Out</button>
-                </span>
-            </div>
-        </nav>
-    </header>
-
-    <main>
-        <!-- Landing Page -->
-        <section id="landingPage">
-            <div class="container">
-                <h1>Master Exchange<br>Hybrid Migration</h1>
-                <p>Complete 42 hands-on tasks to become proficient in Exchange hybrid deployments. From Active Directory setup to Microsoft 365 integration.</p>
-                <div class="hero-buttons">
-                    <a href="#" class="btn btn-primary" onclick="showRegister()">Get Started</a>
-                    <a href="#" class="btn btn-secondary" onclick="showLogin()">Sign In</a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Dashboard -->
-        <section id="dashboardPage" class="hidden">
-            <div class="container">
-                <div class="dashboard-header">
-                    <h2>Training Dashboard</h2>
-                    
-                    <!-- Progress Ring -->
-                    <div class="progress-container">
-                        <div class="progress-ring-wrapper">
-                            <svg class="progress-ring">
-                                <circle cx="90" cy="90" r="78" class="bg" />
-                                <circle cx="90" cy="90" r="78" class="progress" id="progressRing" />
-                            </svg>
-                            <div class="progress-text-wrapper">
-                                <div id="progressText">0%</div>
-                                <div class="progress-label">Complete</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Stats -->
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-value" id="completedTasks">0</div>
-                                <div class="stat-label">Tasks Done</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">42</div>
-                                <div class="stat-label">Total Tasks</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value" id="currentWeek">Week 1</div>
-                                <div class="stat-label">Current</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">4</div>
-                                <div class="stat-label">Weeks</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-primary" onclick="startNewLab()">Start New Lab</button>
-                </div>
-                
-                <!-- Week Cards Container -->
-                <div id="weeksContainer"></div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Login Modal -->
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Welcome Back</h2>
-                <button class="modal-close" onclick="closeModal()">×</button>
-            </div>
-            <form id="loginForm">
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="email" placeholder="you@example.com" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" name="password" placeholder="••••••••" required>
-                </div>
-                <div class="checkbox-group">
-                    <input type="checkbox" name="remember" id="remember">
-                    <label for="remember">Remember me for 30 days</label>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
-                <div class="form-footer">
-                    Don't have an account? <a href="#" onclick="showRegister()">Create one</a>
-                </div>
-            </form>
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <nav>
+        <div class="logo">
+          <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo">
         </div>
-    </div>
-
-    <!-- Register Modal -->
-    <div id="registerModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Get Started</h2>
-                <button class="modal-close" onclick="closeModal()">×</button>
-            </div>
-            <form id="registerForm">
-                <div class="form-group">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" name="name" placeholder="John Doe" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="email" placeholder="you@example.com" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" name="password" placeholder="••••••••" required minlength="8">
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
-                <div class="form-footer">
-                    Already have an account? <a href="#" onclick="showLogin()">Sign in</a>
-                </div>
-            </form>
+        <div class="nav-links">
+          <div id="authLinks">
+            <a href="#" id="signInLink">Sign In</a>
+            <a href="#" id="getStartedLink" class="btn">Get Started</a>
+          </div>
+          <div id="userLinks" class="hidden">
+            <span id="userName"></span>
+            <a href="#" onclick="logout()">Sign Out</a>
+            <a href="#" id="adminPortalBtn" class="hidden" onclick="showAdminPortal()">Admin Portal</a>
+          </div>
         </div>
+      </nav>
     </div>
+  </header>
 
-    <!-- Task Modal -->
-    <div id="taskModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle"></h2>
-                <button class="modal-close" onclick="closeModal()">×</button>
-            </div>
-            <div id="modalBody"></div>
+  <!-- Landing Page -->
+  <main id="landingPage">
+    <section class="hero">
+      <div class="container">
+        <h1>Velocity Lab</h1>
+        <p>Master Exchange Hybrid Migration with Hands-On Training</p>
+        <a href="#" id="getStartedHero" class="btn">Get Started</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Dashboard Page -->
+  <main id="dashboardPage" class="hidden">
+    <div class="container">
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3 id="completedTasks">0</h3>
+          <p>Tasks Completed</p>
         </div>
-    </div>
-
-    <!-- Admin Portal Modal -->
-    <div id="adminPortalModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Admin Portal - Leaderboard</h2>
-                <button class="modal-close" onclick="closeModal()">×</button>
-            </div>
-            <div id="leaderboardBody"></div>
+        <div class="stat-card">
+          <h3 id="currentWeek">Week 1</h3>
+          <p>Current Week</p>
         </div>
+        <div class="stat-card">
+          <div class="progress-circle">
+            <svg>
+              <circle class="bg" cx="100" cy="100" r="78"></circle>
+              <circle id="progressRing" class="fg" cx="100" cy="100" r="78"></circle>
+            </svg>
+            <span id="progressText">0%</span>
+          </div>
+          <p>Overall Progress</p>
+        </div>
+      </div>
+
+      <!-- Weeks -->
+      <div id="weeksContainer"></div>
+
+      <!-- Start New Lab -->
+      <div style="text-align: center; margin: 40px 0;">
+        <a href="#" onclick="startNewLab()" class="btn">Start New Lab</a>
+      </div>
     </div>
+  </main>
 
-    <!-- Notification -->
-    <div id="notification" class="notification"></div>
+  <!-- Task Modal -->
+  <div id="taskModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+      <h2 id="modalTitle"></h2>
+      <div id="modalBody"></div>
+    </div>
+  </div>
 
-    <!-- Load task definitions first -->
-    <script src="/task-definitions.js"></script>
-    <!-- Then load the main app -->
-    <script src="/app.js"></script>
-    <script>
-        // Add scroll effect to header
-        window.addEventListener('scroll', () => {
-            const header = document.getElementById('header');
-            if (window.scrollY > 10) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
-    </script>
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+      <h2>Sign In</h2>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" name="password" required>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" name="remember"> Remember me
+          </label>
+        </div>
+        <button type="submit" class="btn">Sign In</button>
+        <p style="margin-top: 16px;">
+          Don't have an account? <a href="#" id="toRegisterLink">Sign up</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div id="registerModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+      <h2>Sign Up</h2>
+      <form id="registerForm">
+        <div class="form-group">
+          <label for="registerName">Name</label>
+          <input type="text" id="registerName" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="registerEmail">Email</label>
+          <input type="email" id="registerEmail" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="registerPassword">Password</label>
+          <input type="password" id="registerPassword" name="password" required>
+        </div>
+        <button type="submit" class="btn">Sign Up</button>
+        <p style="margin-top: 16px;">
+          Already have an account? <a href="#" id="toLoginLink">Sign in</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Portal Modal -->
+  <div id="adminPortalModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+      <h2>Admin Portal</h2>
+      <div id="leaderboardBody"></div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/task-definitions.js"></script>
+  <script src="/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Sign In links
+      const signInLinks = [document.getElementById('signInLink'), document.getElementById('toLoginLink')];
+      signInLinks.forEach(link => {
+        if (link) {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (window.showLogin) window.showLogin();
+          });
+        }
+      });
+
+      // Get Started / Sign Up links
+      const registerLinks = [document.getElementById('getStartedLink'), document.getElementById('getStartedHero'), document.getElementById('toRegisterLink')];
+      registerLinks.forEach(link => {
+        if (link) {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (window.showRegister) window.showRegister();
+          });
+        }
+      });
+    });
+  </script>
 </body>
 </html>
