@@ -18,6 +18,7 @@ import {
   calculateProgress,
   calculateCompletedTasks,
   startNewLab,
+  initializeDefaultAdmin,
   TASK_STRUCTURE,
   TOTAL_TASKS,
   type Env,
@@ -35,7 +36,16 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     // CSRF token
     if (path === '/api/csrf') {
       const token = await generateCSRFToken(env);
-      return jsonResponse({ token });
+      return new Response(JSON.stringify({ 
+        token,
+        expiresIn: 3600 // 1 hour
+      }), {
+        status: 200,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        },
+      });
     }
 
     // Profile
@@ -168,6 +178,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     // Login
     if (path === '/api/login') {
+      // Initialize default admin user if it doesn't exist
+      await initializeDefaultAdmin(env);
+      
       const formData = await request.formData();
       const email = formData.get('email')?.toString().trim().toLowerCase() || '';
       const password = formData.get('password')?.toString() || '';
@@ -193,15 +206,21 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       }
 
       await updateLastLogin(env, user);
-      const sessionToken = await createSession(env, user.id);
-      const sessionDuration = remember ? 86400 * 30 : 86400;
+      
+      // Create session (longer session if remember me is checked)
+      const sessionDuration = remember ? 86400 * 30 : 86400; // 30 days or 1 day
+      const sessionToken = crypto.randomUUID();
+      await env.SESSIONS.put(`session:${sessionToken}`, user.id, { 
+        expirationTtl: sessionDuration
+      });
 
       await logActivity(env, user.id, 'login_successful', { email, remember, ip });
 
       return new Response(JSON.stringify({
         success: true,
-        name: user.name,
-        role: user.role
+        name: result.name,
+        role: result.role,
+        message: 'Login successful'
       }), {
         status: 200,
         headers: {
@@ -258,7 +277,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return new Response(JSON.stringify({
         success: true,
         name: userData.name,
-        role: userData.role
+        role: userData.role,
+        message: 'Registration successful'
       }), {
         status: 201,
         headers: {
