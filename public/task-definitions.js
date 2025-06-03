@@ -2333,3 +2333,5 @@ Get-ADSyncScheduler
     `
   }
 };
+
+window.TASK_DEFINITIONS = TASK_DEFINITIONS;

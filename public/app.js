@@ -92,13 +92,16 @@ const toggle = el => el?.classList.toggle('hidden');
 
 // Cookie management
 const cookie = {
-  get: name => document.cookie.match(`${name}=([^;]+)`)?.[1],
+  get: name => {
+    const match = document.cookie.match(`${name}=([^;]+)`);
+    return match ? decodeURIComponent(match[1]) : null;
+  },
   set: (name, value, days = 7) => {
     const date = new Date();
     date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-    document.cookie = `${name}=${encodeURIComponent(value)};expires=${date.toUTCString()};path=/;SameSite=Strict;Secure`;
+    document.cookie = `${name}=${encodeURIComponent(value)};expires=${date.toUTCString()};path=/;SameSite=Strict${window.location.protocol === 'https:' ? ';Secure' : ''}`;
   },
-  delete: name => document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`
+  delete: name => document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Strict`
 };
 
 // Notifications
@@ -115,15 +118,19 @@ const notify = (message, type = 'success', duration = 4000) => {
 // API calls with CSRF protection
 const api = async (endpoint, options = {}) => {
   try {
-    const csrfResponse = await fetch('/api/csrf', { credentials: 'same-origin' });
+    const csrfResponse = await fetch('/api/csrf', { credentials: 'include' });
+    if (!csrfResponse.ok) throw new Error('Failed to fetch CSRF token');
     const { token } = await csrfResponse.json();
 
     if (options.body instanceof FormData) {
       options.body.append('csrf_token', token);
+    } else if (options.method === 'POST' && !options.body) {
+      options.body = JSON.stringify({ csrf_token: token });
+      options.headers = { ...options.headers, 'Content-Type': 'application/json' };
     }
 
     const response = await fetch(endpoint, {
-      credentials: 'same-origin',
+      credentials: 'include',
       ...options
     });
 
@@ -141,22 +148,26 @@ const api = async (endpoint, options = {}) => {
 
 // Authentication
 const auth = {
-  check() {
-    const userCookie = cookie.get('user');
-    if (userCookie) {
-      try {
-        App.user = JSON.parse(decodeURIComponent(userCookie));
-        App.authenticated = true;
-        if (App.user.role === 'admin') {
-          show($('adminPortalBtn'));
-        }
-        ui.update();
-        dashboard.load();
-      } catch (e) {
-        auth.logout();
-      }
-    } else {
+  async check() {
+    const sessionCookie = cookie.get('session');
+    if (!sessionCookie) {
       ui.showLanding();
+      return;
+    }
+
+    try {
+      const result = await api('/api/profile');
+      App.user = { name: result.data.name, role: result.data.role };
+      App.authenticated = true;
+      if (App.user.role === 'admin') {
+        show($('adminPortalBtn'));
+      }
+      cookie.set('user', JSON.stringify(App.user));
+      ui.update();
+      dashboard.load();
+    } catch (error) {
+      console.error('Session check failed:', error);
+      auth.logout();
     }
   },
 
@@ -167,10 +178,9 @@ const auth = {
         body: formData
       });
 
-      const userData = { name: result.name, role: result.role };
-      cookie.set('user', JSON.stringify(userData));
-      App.user = userData;
+      App.user = { name: result.name, role: result.role };
       App.authenticated = true;
+      cookie.set('user', JSON.stringify(App.user));
       if (App.user.role === 'admin') {
         show($('adminPortalBtn'));
       }
@@ -190,10 +200,9 @@ const auth = {
         body: formData
       });
 
-      const userData = { name: result.name, role: result.role };
-      cookie.set('user', JSON.stringify(userData));
-      App.user = userData;
+      App.user = { name: result.name, role: result.role };
       App.authenticated = true;
+      cookie.set('user', JSON.stringify(App.user));
       if (App.user.role === 'admin') {
         show($('adminPortalBtn'));
       }
@@ -209,11 +218,12 @@ const auth = {
   async logout() {
     try {
       await api('/api/logout', { method: 'POST' });
-    } catch (e) {
-      // Continue with logout
+    } catch (error) {
+      console.error('Logout error:', error);
     }
 
     cookie.delete('user');
+    cookie.delete('session');
     App.user = null;
     App.authenticated = false;
     App.progress = {};
@@ -293,7 +303,10 @@ const modal = {
 // Dashboard Functions
 const dashboard = {
   async load() {
-    if (!App.authenticated) return;
+    if (!App.authenticated) {
+      ui.showLanding();
+      return;
+    }
 
     try {
       const result = await api('/api/progress');
@@ -301,7 +314,8 @@ const dashboard = {
       dashboard.updateProgress(result.data);
       dashboard.renderWeeks();
     } catch (error) {
-      notify('Failed to load progress', 'error');
+      notify('Failed to load progress. Please try signing in again.', 'error');
+      auth.logout();
     }
   },
 
@@ -477,7 +491,6 @@ const tasks = {
       }
     } catch (error) {
       notify('Failed to update progress', 'error');
-      // Revert checkbox state
       const checkbox = event.target;
       if (checkbox) checkbox.checked = !checked;
     }
@@ -545,7 +558,6 @@ const tasks = {
         </div>
       `;
 
-      // Attach event listeners to subtasks
       setTimeout(() => {
         const checkboxes = modalBody.querySelectorAll('.subtask-checkbox');
         checkboxes.forEach(checkbox => {
@@ -606,7 +618,6 @@ window.showAdminPortal = dashboard.loadLeaderboard;
 
 // Form Handlers
 document.addEventListener('DOMContentLoaded', () => {
-  // Check if TASK_DEFINITIONS loaded
   if (!window.TASK_DEFINITIONS) {
     console.warn('⚠️ TASK_DEFINITIONS not loaded. Using fallback task titles.');
   } else {
@@ -619,15 +630,18 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       auth.login(new FormData(e.target));
     });
-  }
+  const registerForm = () => {
+    modal.hide('loginModal');
+    modal.show('registerModal');
+  };
 
   const registerForm = $('registerForm');
   if (registerForm) {
-    registerForm.addEventListener('submit', (e) => {
-      e.preventDefault();
+    registerForm.addEventListener('submit', e => {
+      e.preventDefault;
       auth.register(new FormData(e.target));
     });
-  }
+  };
 
   // Click outside modal to close
   document.addEventListener('click', (e) => {
@@ -646,5 +660,5 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize authentication
   auth.check();
 
-  console.log('🚀 Velocity Lab - Premium Exchange Hybrid Migration Training Ready!');
+  console.log('🚀 Application completed application!');
 });

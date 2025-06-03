@@ -1,4 +1,4 @@
-// functions/api/[[route]].ts - Single API handler for all routes
+// functions/api/[[route]].ts
 import {
   jsonResponse,
   errorResponse,
@@ -32,12 +32,11 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const path = url.pathname;
 
   try {
-    // CSRF token
     if (path === '/api/csrf') {
       const token = await generateCSRFToken(env);
       return new Response(JSON.stringify({ 
         token,
-        expiresIn: 3600 // 1 hour
+        expiresIn: 3600
       }), {
         status: 200,
         headers: { 
@@ -47,7 +46,6 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       });
     }
 
-    // Profile
     if (path === '/api/profile') {
       const userId = await validateSession(env, request);
       if (!userId) return errorResponse('Unauthorized', 401);
@@ -72,10 +70,12 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       });
     }
 
-    // Progress
     if (path === '/api/progress') {
       const userId = await validateSession(env, request);
-      if (!userId) return errorResponse('Unauthorized', 401);
+      if (!userId) {
+        console.error('Progress request failed: No valid session', { cookies: request.headers.get('Cookie') });
+        return errorResponse('Unauthorized', 401);
+      }
 
       const progress = await getCurrentLabProgress(env, userId);
       const completedTasks = calculateCompletedTasks(progress);
@@ -89,7 +89,6 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       });
     }
 
-    // Admin routes
     if (path.startsWith('/api/admin/')) {
       const userId = await validateSession(env, request);
       if (!userId) return errorResponse('Unauthorized', 401);
@@ -166,16 +165,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { env, request } = context;
   const url = new URL(request.url);
   const path = url.pathname;
+  const isLocal = request.url.includes('localhost');
 
   try {
     const ip = request.headers.get('cf-connecting-ip') || 'unknown';
-
-    // Rate limiting
     if (!(await checkRateLimit(env, ip, 30))) {
       return errorResponse('Too many requests', 429);
     }
 
-    // Login
     if (path === '/api/login') {
       const formData = await request.formData();
       const email = formData.get('email')?.toString().trim().toLowerCase() || '';
@@ -202,13 +199,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       }
 
       await updateLastLogin(env, user);
-      
-      // Create session (longer session if remember me is checked)
-      const sessionDuration = remember ? 86400 * 30 : 86400; // 30 days or 1 day
+      const sessionDuration = remember ? 86400 * 30 : 86400;
       const sessionToken = crypto.randomUUID();
-      await env.SESSIONS.put(`session:${sessionToken}`, user.id, { 
-        expirationTtl: sessionDuration
-      });
+      await env.SESSIONS.put(`session:${sessionToken}`, user.id, { expirationTtl: sessionDuration });
 
       await logActivity(env, user.id, 'login_successful', { email, remember, ip });
 
@@ -220,13 +213,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       }), {
         status: 200,
         headers: {
-          'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=${sessionDuration}; SameSite=Strict; Secure`,
+          'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=${sessionDuration}; SameSite=Strict${isLocal ? '' : '; Secure'}`,
           'Content-Type': 'application/json'
         }
       });
     }
 
-    // Register
     if (path === '/api/register') {
       const formData = await request.formData();
       const name = sanitizeInput(formData.get('name')?.toString().trim() || '');
@@ -278,13 +270,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       }), {
         status: 201,
         headers: {
-          'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict; Secure`,
+          'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict${isLocal ? '' : '; Secure'}`,
           'Content-Type': 'application/json'
         }
       });
     }
 
-    // Logout
     if (path === '/api/logout') {
       const cookies = request.headers.get('Cookie');
       const sessionToken = cookies?.match(/session=([^;]+)/)?.[1];
@@ -300,13 +291,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return new Response(JSON.stringify({ success: true }), {
         status: 200,
         headers: {
-          'Set-Cookie': `session=; HttpOnly; Path=/; Max-Age=0; SameSite=Strict; Secure`,
+          'Set-Cookie': `session=; HttpOnly; Path=/; Max-Age=0; SameSite=Strict${isLocal ? '' : '; Secure'}`,
           'Content-Type': 'application/json'
         }
       });
     }
 
-    // Progress update
     if (path === '/api/progress') {
       const userId = await validateSession(env, request);
       if (!userId) return errorResponse('Unauthorized', 401);
@@ -328,13 +318,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
       const taskData = progress[week][task];
 
-      // Update subtask
       if (subtask !== null && subtask !== undefined && subtask !== '') {
         if (!taskData.subtasks) taskData.subtasks = {};
         taskData.subtasks[subtask] = subtask_checked === 'true';
       }
 
-      // Update main task
       if (checked !== null && checked !== undefined && checked !== '') {
         taskData.completed = checked === 'true';
         if (taskData.completed) {
@@ -361,7 +349,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       });
     }
 
-    // Start new lab
     if (path === '/api/lab/start-new') {
       const userId = await validateSession(env, request);
       if (!userId) return errorResponse('Unauthorized', 401);
@@ -372,7 +359,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return jsonResponse({ labId, totalTasks: TOTAL_TASKS });
     }
 
-    // Admin actions
     if (path.startsWith('/api/admin/')) {
       const userId = await validateSession(env, request);
       if (!userId) return errorResponse('Unauthorized', 401);
