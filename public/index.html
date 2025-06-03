@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Velocity Lab - Exchange Hybrid Migration Training</title>
+  <meta name="description" content="Professional Exchange hybrid migration training for MSPs">
+  <link rel="icon" href="/assets/favicon.ico">
+  <style>
+    /* Modern Apple/Unifi Inspired Design System */
+    :root {
+      --primary: #007aff;
+      --primary-hover: #0056b3;
+      --primary-light: rgba(0, 122, 255, 0.1);
+      --success: #34c759;
+      --success-light: rgba(52, 199, 89, 0.1);
+      --warning: #ff9500;
+      --error: #ff3b30;
+      
+      --gray-50: #fafafa;
+      --gray-100: #f5f5f5;
+      --gray-200: #e5e5e5;
+      --gray-600: #525252;
+      --gray-900: #171717;
+      
+      --bg: #ffffff;
+      --bg-secondary: var(--gray-50);
+      --surface: rgba(255, 255, 255, 0.8);
+      --surface-elevated: rgba(255, 255, 255, 0.95);
+      --border: var(--gray-200);
+      
+      --text-primary: var(--gray-900);
+      --text-secondary: var(--gray-600);
+      --text-tertiary: #98989d;
+      
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --transition: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, var(--bg) 0%, var(--bg-secondary) 100%);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .justify-center { justify-content: center; }
+    .gap-4 { gap: 16px; }
+    .hidden { display: none; }
+    .text-center { text-align: center; }
+
+    /* Navigation */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+    }
+    
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 18px;
+    }
+    
+    .nav-logo { height: 32px; width: auto; }
+    
+    .nav-links { display: flex; align-items: center; gap: 24px; }
+    
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all var(--transition);
+    }
+    
+    .nav-link:hover { color: var(--primary); background: var(--primary-light); }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 80px 0;
+      position: relative;
+    }
+    
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 50%, var(--primary-light) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, var(--success-light) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    
+    .hero-content { position: relative; z-index: 1; }
+    
+    .hero-badge {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 24px;
+      border: 1px solid rgba(0, 122, 255, 0.2);
+    }
+    
+    .hero-title {
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 700;
+      margin-bottom: 24px;
+      letter-spacing: -0.02em;
+    }
+    
+    .hero-subtitle {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 32px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all var(--transition);
+      font-size: 14px;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: var(--shadow);
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+    
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--bg-secondary);
+      border-color: var(--primary);
+    }
+
+    /* Progress */
+    .progress-ring {
+      width: 120px;
+      height: 120px;
+      position: relative;
+      margin: 0 auto 16px;
+    }
+    
+    .progress-ring svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+    
+    .progress-ring circle {
+      fill: none;
+      stroke-width: 8;
+      r: 52;
+      cx: 60;
+      cy: 60;
+    }
+    
+    .progress-ring .bg { stroke: var(--gray-200); }
+    
+    .progress-ring .progress {
+      stroke: var(--primary);
+      stroke-linecap: round;
+      stroke-dasharray: 327;
+      stroke-dashoffset: 327;
+      transition: stroke-dashoffset 1s ease;
+    }
+    
+    .progress-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* Stats Grid */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      margin: 48px 0;
+    }
+    
+    .stat {
+      text-align: center;
+      padding: 24px;
+      background: var(--surface-elevated);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      transition: all var(--transition);
+    }
+    
+    .stat:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .stat-number {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--primary);
+      display: block;
+      margin-bottom: 8px;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* Tasks */
+    .weeks-grid {
+      display: grid;
+      gap: 24px;
+      margin: 48px 0;
+    }
+    
+    .week-card {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: all var(--transition);
+      backdrop-filter: blur(20px);
+    }
+    
+    .week-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .week-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    
+    .week-info h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .week-info p {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    .week-progress {
+      text-align: right;
+    }
+    
+    .progress-count {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+    
+    .progress-bar {
+      width: 120px;
+      height: 6px;
+      background: var(--gray-200);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      transition: width var(--transition);
+    }
+    
+    .tasks-grid {
+      display: none;
+      padding: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+    
+    .tasks-grid.show { display: grid; }
+    
+    .task {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    
+    .task:hover {
+      background: var(--bg-secondary);
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+    
+    .task.completed {
+      background: var(--success-light);
+      border-color: var(--success);
+    }
+    
+    .task-header {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    
+    .task-checkbox {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-top: 2px;
+      position: relative;
+    }
+    
+    .task-checkbox:checked {
+      background: var(--success);
+      border-color: var(--success);
+    }
+    
+    .task-checkbox:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .task-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .task-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* Forms */
+    .auth-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    
+    .auth-card {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 400px;
+      backdrop-filter: blur(20px);
+    }
+    
+    .auth-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    
+    .auth-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    .form-group { margin-bottom: 20px; }
+    
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      background: var(--surface);
+      transition: all var(--transition);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    
+    .modal-content {
+      background: var(--surface-elevated);
+      border-radius: var(--radius-lg);
+      max-width: 600px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(20px);
+    }
+    
+    .modal-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      padding: 4px;
+      border-radius: 4px;
+      transition: all var(--transition);
+    }
+    
+    .modal-close:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+    
+    .modal-body { padding: 24px; }
+
+    /* Notifications */
+    .notification {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      max-width: 400px;
+      padding: 16px 20px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      z-index: 1100;
+      transform: translateX(100%);
+      opacity: 0;
+      transition: all var(--transition);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    
+    .notification.success {
+      background: var(--success-light);
+      color: var(--success);
+      border-color: var(--success);
+    }
+    
+    .notification.error {
+      background: rgba(255, 59, 48, 0.1);
+      color: var(--error);
+      border-color: var(--error);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container { padding: 0 16px; }
+      .nav-links { gap: 16px; }
+      .hero { padding: 48px 0; }
+      .stats { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .tasks-grid { grid-template-columns: 1fr; }
+      .week-header { flex-direction: column; gap: 16px; align-items: flex-start; }
+      .modal-content { margin: 16px; }
+      .nav-brand { font-size: 16px; }
+      .nav-logo { height: 28px; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-title { font-size: 28px; }
+      .stats { grid-template-columns: 1fr; }
+      .stat { padding: 16px; }
+      .week-card { margin: 0 -8px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container flex items-center justify-between">
+      <a href="/" class="nav-brand">
+        <img src="/assets/Velocity-Logo.png" alt="Velocity Lab" class="nav-logo">
+        <span>Velocity Lab</span>
+      </a>
+      <div class="nav-links">
+        <div id="authLinks">
+          <a href="#" onclick="showLogin()" class="nav-link">Sign In</a>
+          <a href="#" onclick="showRegister()" class="btn btn-primary">Get Started</a>
+        </div>
+        <div id="userLinks" class="hidden">
+          <span id="userName" class="nav-link"></span>
+          <button onclick="logout()" class="btn btn-secondary">Sign Out</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Landing Page -->
+    <div id="landingPage">
+      <section class="hero">
+        <div class="container">
+          <div class="hero-content">
+            <div class="hero-badge">🚀 Exchange Hybrid Migration Training</div>
+            <h1 class="hero-title">Master Exchange Hybrid Deployments</h1>
+            <p class="hero-subtitle">
+              Complete 42 hands-on tasks to become proficient in Exchange hybrid migrations. 
+              From Active Directory setup to Microsoft 365 integration.
+            </p>
+            <div class="flex gap-4 justify-center" style="margin-bottom: 48px;">
+              <button onclick="showRegister()" class="btn btn-primary">Start Training</button>
+              <button onclick="showLogin()" class="btn btn-secondary">Continue Learning</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboardPage" class="hidden">
+      <section class="hero">
+        <div class="container">
+          <div class="hero-content">
+            <div class="hero-badge">📊 Training Dashboard</div>
+            <h1 class="hero-title">Your Progress</h1>
+            
+            <!-- Progress Ring -->
+            <div class="progress-ring">
+              <svg>
+                <circle class="bg"></circle>
+                <circle class="progress" id="progressRing"></circle>
+              </svg>
+              <div class="progress-text" id="progressText">0%</div>
+            </div>
+            
+            <!-- Stats -->
+            <div class="stats">
+              <div class="stat">
+                <span class="stat-number" id="completedTasks">0</span>
+                <span class="stat-label">Tasks Completed</span>
+              </div>
+              <div class="stat">
+                <span class="stat-number">42</span>
+                <span class="stat-label">Total Tasks</span>
+              </div>
+              <div class="stat">
+                <span class="stat-number" id="currentWeek">Week 1</span>
+                <span class="stat-label">Current Focus</span>
+              </div>
+              <div class="stat">
+                <span class="stat-number" id="timeRemaining">4 weeks</span>
+                <span class="stat-label">Training Path</span>
+              </div>
+            </div>
+            
+            <div class="flex gap-4 justify-center">
+              <button onclick="continueTraining()" class="btn btn-primary">Continue Training</button>
+              <button onclick="startNewLab()" class="btn btn-secondary">Start New Lab</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Weeks -->
+      <section class="container">
+        <div class="weeks-grid" id="weeksContainer">
+          <!-- Week cards will be populated by JavaScript -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Task Modal -->
+  <div class="modal" id="taskModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">Task Details</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Task details will be populated -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth Modals -->
+  <div class="modal" id="loginModal">
+    <div class="auth-container">
+      <div class="auth-card">
+        <h2 class="auth-title">Welcome Back</h2>
+        <p class="auth-subtitle">Sign in to continue your training</p>
+        <form id="loginForm">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-input" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 16px;">Sign In</button>
+          <div class="text-center">
+            <a href="#" onclick="showRegister()" style="color: var(--primary); text-decoration: none;">Create account</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="registerModal">
+    <div class="auth-container">
+      <div class="auth-card">
+        <h2 class="auth-title">Get Started</h2>
+        <p class="auth-subtitle">Create your account to begin training</p>
+        <form id="registerForm">
+          <div class="form-group">
+            <label class="form-label">Name</label>
+            <input type="text" name="name" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-input" required minlength="8">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 16px;">Create Account</button>
+          <div class="text-center">
+            <a href="#" onclick="showLogin()" style="color: var(--primary); text-decoration: none;">Already have an account?</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification"></div>
+
+  <!-- Load JavaScript -->
+  <script src="/app.js"></script>
+</body>
+</html>
