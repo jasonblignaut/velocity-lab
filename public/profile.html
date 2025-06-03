@@ -1,49 +1,187 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - Velocity Lab</title>
-    <meta name="description" content="Manage your profile and view your training progress">
-    
-    <!-- Preload critical resources -->
-    <link rel="preload" href="/styles.css" as="style">
-    <link rel="preload" href="/app.js" as="script">
-    
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="/styles.css">
-    
-    <!-- Favicon -->
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-</head>
-<body>
-    <!-- Skip to main content for accessibility -->
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-    
-    <!-- Navigation -->
-    <nav class="nav-glass">
-        <div class="container">
-            <div class="nav-content">
-                <a href="/dashboard.html" class="nav-brand">
-                    <svg class="nav-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="40" height="40" rx="12" fill="url(#logoGradient)"/>
-                        <path d="M12 20l6 6 10-10" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                        <defs>
-                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#007aff"/>
-                                <stop offset="100%" style="stop-color:#5ac8fa"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <span class="font-semibold text-xl">Velocity Lab</span>
-                </a>
-                
-                <div class="nav-links">
-                    <a href="/dashboard.html" class="nav-link">Dashboard</a>
-                    <a href="/profile.html" class="nav-link" style="color: var(--primary);">Profile</a>
+<a href="/profile.html" class="nav-link" style="color: var(--primary);">Profile</a>
                     <a href="/admin.html" class="nav-link" id="adminLink" style="display: none;">Admin</a>
                     <span class="text-sm text-secondary" id="userInfo">Loading...</span>
                     <button class="btn btn-secondary btn-sm" id="logout">Sign Out</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        
+        <!-- Profile Header -->
+        <section class="container" style="margin-top: 2rem;">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <div class="avatar-circle" id="avatarCircle">
+                        <!-- User initials will be populated -->
+                    </div>
+                </div>
+                <div>
+                    <h1 id="profileName" class="text-3xl font-semibold">Loading...</h1>
+                    <p id="profileEmail" class="text-lg text-secondary">Loading...</p>
+                    <div class="flex items-center gap-4 mt-2">
+                        <span id="profileRole" class="badge badge-info">Loading...</span>
+                        <span class="text-sm text-tertiary">Member since <span id="memberSince">Loading...</span></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Navigation -->
+        <section class="container">
+            <div class="profile-nav">
+                <button class="profile-nav-item active" data-tab="overview">Overview</button>
+                <button class="profile-nav-item" data-tab="progress">Progress Details</button>
+                <button class="profile-nav-item" data-tab="security">Security</button>
+                <button class="profile-nav-item" data-tab="data">Data & Privacy</button>
+            </div>
+        </section>
+
+        <!-- Profile Content -->
+        <section class="container">
+            
+            <!-- Overview Tab -->
+            <div class="profile-tab active" id="overview-tab">
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--primary-light); color: var(--primary);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22,4 12,14.01 9,11.01"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Overall Progress</h4>
+                            <div class="stat-value" id="overallProgress">-</div>
+                            <div class="stat-detail">Lab completion</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--success-light); color: var(--success);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9,11 12,14 22,4"></polyline>
+                                <path d="M21,12v7a2,2,0,0,1-2,2H5a2,2,0,0,1-2-2V5a2,2,0,0,1,2-2h11"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Tasks Completed</h4>
+                            <div class="stat-value" id="completedTasks">-</div>
+                            <div class="stat-detail">Out of 42 total</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--warning-light); color: var(--warning);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 20V10"></path>
+                                <path d="M12 20V4"></path>
+                                <path d="M6 20v-6"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Global Rank</h4>
+                            <div class="stat-value" id="globalRank">-</div>
+                            <div class="stat-detail">Among all users</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--info-light); color: var(--info);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12,6 12,12 16,14"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Last Activity</h4>
+                            <div class="stat-value" id="lastActivity">-</div>
+                            <div class="stat-detail">Training session</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Week Progress Breakdown -->
+                <div class="card" style="margin-top: 2rem;">
+                    <h3 style="margin-bottom: 1.5rem;">Weekly Progress</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        
+                        <div class="week-progress-card">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-2xl">🏗️</span>
+                                    <div>
+                                        <h4 class="font-semibold">Week 1</h4>
+                                        <p class="text-sm text-secondary">Foundation Setup</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="progress-bar mb-2">
+                                <div class="progress-fill" id="week1Progress" style="width: 0%"></div>
+                            </div>
+                            <div class="text-sm text-tertiary">
+                                <span id="week1Count">0/12</span> tasks completed
+                            </div>
+                        </div>
+                        
+                        <div class="week-progress-card">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-2xl">🏢</span>
+                                    <div>
+                                        <h4 class="font-semibold">Week 2</h4>
+                                        <p class="text-sm text-secondary">Infrastructure</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="progress-bar mb-2">
+                                <div class="progress-fill" id="week2Progress" style="width: 0%"></div>
+                            </div>
+                            <div class="text-sm text-tertiary">
+                                <span id="week2Count">0/8</span> tasks completed
+                            </div>
+                        </div>
+                        
+                        <div class="week-progress-card">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-2xl">📧</span>
+                                    <div>
+                                        <h4 class="font-semibold">Week 3</h4>
+                                        <p class="text-sm text-secondary">Email & Messaging</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="progress-bar mb-2">
+                                <div class="progress-fill" id="week3Progress" style="width: 0%"></div>
+                            </div>
+                            <div class="text-sm text-tertiary">
+                                <span id="week3Count">0/12</span> tasks completed
+                            </div>
+                        </div>
+                        
+                        <div class="week-progress-card">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-2xl">☁️</span>
+                                    <div>
+                                        <h4 class="font-semibold">Week 4</h4>
+                                        <p class="text-sm text-secondary">Cloud Integration</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="progress-bar mb-2">
+                                <div class="progress-fill" id="week4Progress" style="width: 0%"></div>
+                            </div>
+                            <div class="text-sm text-tertiary">
+                                <span id="week4Count">0/10</span> tasks completed
+                            </div>
+                        </div>
+                        
+                    </div>
                 </div>
                 
                 <!-- Quick Actions -->
@@ -258,11 +396,16 @@
     </div>
 
     <!-- Scripts -->
+    <script src="/js/constants.js"></script>
+    <script src="/js/utils.js"></script>
     <script src="/app.js"></script>
     
     <!-- Profile Page JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            window.VelocitySharedUtils.redirectIfNotAuthenticated();
+            
             // Initialize profile page
             initProfilePage();
             
@@ -284,13 +427,6 @@
             if (profileLink) {
                 profileLink.style.color = 'var(--primary)';
                 profileLink.style.fontWeight = 'var(--font-weight-semibold)';
-            }
-            
-            // Check authentication
-            const userCookie = getCookie('user');
-            if (!userCookie) {
-                window.location.href = '/login.html';
-                return;
             }
         }
         
@@ -327,15 +463,13 @@
         
         async function loadProfileData() {
             try {
-                const response = await fetch('/api/profile', {
-                    credentials: 'same-origin'
-                });
+                const response = await window.VelocitySharedUtils.apiCall('/api/profile');
                 
-                if (!response.ok) {
+                if (!response || !response.success) {
                     throw new Error('Failed to load profile data');
                 }
                 
-                const profile = await response.json();
+                const profile = response.data || response;
                 
                 // Update profile header
                 document.getElementById('profileName').textContent = profile.name;
@@ -353,16 +487,16 @@
                 document.getElementById('memberSince').textContent = memberSince;
                 
                 // Update statistics
-                document.getElementById('overallProgress').textContent = Math.round(profile.progress) + '%';
-                document.getElementById('completedTasks').textContent = profile.completedTasks;
-                document.getElementById('globalRank').textContent = `#${profile.rank}`;
+                document.getElementById('overallProgress').textContent = Math.round(profile.progress || 0) + '%';
+                document.getElementById('completedTasks').textContent = profile.completedTasks || 0;
+                document.getElementById('globalRank').textContent = `#${profile.rank || 'N/A'}`;
                 
                 // Update last activity
-                const lastActivity = profile.lastLogin ? formatRelativeTime(profile.lastLogin) : 'Never';
+                const lastActivity = profile.lastLogin ? window.VelocitySharedUtils.formatDate(profile.lastLogin) : 'Never';
                 document.getElementById('lastActivity').textContent = lastActivity;
                 
                 // Update week progress
-                updateWeekProgress(profile.tasksByWeek);
+                updateWeekProgress(profile.tasksByWeek || {});
                 
                 // Update security info
                 const passwordChanged = profile.passwordChangedAt ? 
@@ -372,7 +506,7 @@
                 
             } catch (error) {
                 console.error('Error loading profile data:', error);
-                window.VelocityLab.showNotification('Failed to load profile data', 'error');
+                window.VelocitySharedUtils.showNotification('Failed to load profile data', 'error');
             }
         }
         
@@ -414,51 +548,49 @@
                     
                     // Validate passwords match
                     if (newPassword !== confirmPassword) {
-                        window.VelocityLab.showNotification('New passwords do not match', 'error');
+                        window.VelocitySharedUtils.showNotification('New passwords do not match', 'error');
                         return;
                     }
                     
                     // Validate password strength
-                    if (newPassword.length < 8) {
-                        window.VelocityLab.showNotification('Password must be at least 8 characters long', 'error');
+                    const validation = window.VelocitySharedUtils.validatePassword(newPassword);
+                    if (!validation.valid) {
+                        window.VelocitySharedUtils.showNotification(validation.message, 'error');
                         return;
                     }
                     
                     // Validate not same as current
                     if (currentPassword === newPassword) {
-                        window.VelocityLab.showNotification('New password must be different from current password', 'error');
+                        window.VelocitySharedUtils.showNotification('New password must be different from current password', 'error');
                         return;
                     }
                     
                     try {
                         const formData = new FormData(this);
                         
-                        const response = await fetch('/api/profile/change-password', {
+                        const response = await window.VelocitySharedUtils.apiCall('/api/profile/change-password', {
                             method: 'POST',
-                            body: formData,
-                            credentials: 'same-origin'
+                            body: formData
                         });
                         
-                        const result = await response.json();
-                        
-                        if (!response.ok) {
-                            throw new Error(result.error || 'Failed to change password');
+                        if (!response || !response.success) {
+                            throw new Error(response?.error || 'Failed to change password');
                         }
                         
-                        window.VelocityLab.showNotification('Password updated successfully', 'success');
+                        window.VelocitySharedUtils.showNotification('Password updated successfully', 'success');
                         
                         // Reset form
                         passwordForm.reset();
                         
                         // Update password changed date
-                        if (result.passwordChangedAt) {
-                            const changedDate = new Date(result.passwordChangedAt).toLocaleDateString();
+                        if (response.passwordChangedAt) {
+                            const changedDate = new Date(response.passwordChangedAt).toLocaleDateString();
                             document.getElementById('passwordChangedAt').textContent = changedDate;
                         }
                         
                     } catch (error) {
                         console.error('Error changing password:', error);
-                        window.VelocityLab.showNotification(error.message, 'error');
+                        window.VelocitySharedUtils.showNotification(error.message, 'error');
                     }
                 });
             }
@@ -466,30 +598,29 @@
         
         // Action Functions
         function refreshProgress() {
-            window.VelocityLab.showNotification('Refreshing progress data...', 'info');
+            window.VelocitySharedUtils.showNotification('Refreshing progress data...', 'info');
             loadProfileData();
         }
         
         function exportData() {
-            window.VelocityLab.showNotification('Preparing data export...', 'info');
+            window.VelocitySharedUtils.showNotification('Preparing data export...', 'info');
             exportPersonalData();
         }
         
         async function exportPersonalData() {
             try {
-                const response = await fetch('/api/profile/export-data', {
-                    method: 'POST',
-                    credentials: 'same-origin'
+                const response = await window.VelocitySharedUtils.apiCall('/api/profile/export-data', {
+                    method: 'POST'
                 });
                 
-                if (!response.ok) {
+                if (!response || !response.success) {
                     throw new Error('Failed to export data');
                 }
                 
-                // Download the file
-                const blob = await response.blob();
+                // Create download link for the exported data
+                const dataStr = JSON.stringify(response.data, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
                 const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
                 a.href = url;
                 a.download = `velocity-lab-data-${new Date().toISOString().split('T')[0]}.json`;
                 document.body.appendChild(a);
@@ -497,45 +628,142 @@
                 document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
                 
-                window.VelocityLab.showNotification('Data export downloaded successfully', 'success');
+                window.VelocitySharedUtils.showNotification('Data export downloaded successfully', 'success');
                 
             } catch (error) {
                 console.error('Error exporting data:', error);
-                window.VelocityLab.showNotification('Failed to export data', 'error');
+                window.VelocitySharedUtils.showNotification('Failed to export data', 'error');
             }
-        }
-        
-        // Utility Functions
-        function formatRelativeTime(dateString) {
-            if (!dateString) return 'Never';
-            
-            const date = new Date(dateString);
-            const now = new Date();
-            const diffTime = now.getTime() - date.getTime();
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
-            const diffMinutes = Math.floor(diffTime / (1000 * 60));
-            
-            if (diffMinutes < 5) return 'Just now';
-            if (diffMinutes < 60) return `${diffMinutes} minutes ago`;
-            if (diffHours < 24) return `${diffHours} hours ago`;
-            if (diffDays < 7) return `${diffDays} days ago`;
-            if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
-            
-            return date.toLocaleDateString();
-        }
-        
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            return parts.length === 2 ? decodeURIComponent(parts.pop().split(';').shift()) : null;
         }
         
         console.log('👤 Profile page enhanced features loaded successfully!');
     </script>
     
-    <!-- Additional CSS for week progress cards -->
+    <!-- Additional CSS for profile page -->
     <style>
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            padding: 2rem;
+            background: var(--surface-card);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .profile-avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .avatar-circle {
+            width: 5rem;
+            height: 5rem;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .profile-nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            padding: 0.5rem;
+            background: var(--surface-light);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+        }
+        
+        .profile-nav-item {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+        
+        .profile-nav-item:hover {
+            background: var(--surface);
+            color: var(--text-primary);
+        }
+        
+        .profile-nav-item.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+        
+        .profile-tab {
+            display: none;
+        }
+        
+        .profile-tab.active {
+            display: block;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: var(--surface-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            transition: all var(--transition-base);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .stat-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stat-content h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-detail {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+        }
+        
         .week-progress-card {
             padding: 1.5rem;
             background: var(--surface-elevated);
@@ -549,8 +777,162 @@
             box-shadow: var(--shadow-md);
         }
         
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--gray-200);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .card {
+            background: var(--surface-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            color: var(--text-tertiary);
+            z-index: 1;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: all var(--transition-base);
+            background: var(--surface);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: var(--radius);
+            transition: all var(--transition-base);
+        }
+        
+        .toggle-password:hover {
+            color: var(--text-primary);
+            background: var(--surface-light);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--surface-light);
+            transform: translateY(-1px);
+        }
+        
         .space-y-2 > * + * {
             margin-top: 0.5rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge-info {
+            background: var(--info-light);
+            color: var(--info);
+        }
+        
+        .badge-warning {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-nav {
+                flex-wrap: wrap;
+            }
+            
+            .profile-nav-item {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
         }
         
         /* Dark mode adjustments */
@@ -562,183 +944,39 @@
     </style>
 </body>
 </html>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main id="main-content">
-        
-        <!-- Profile Header -->
-        <section class="container" style="margin-top: 2rem;">
-            <div class="profile-header">
-                <div class="profile-avatar">
-                    <div class="avatar-circle" id="avatarCircle">
-                        <!-- User initials will be populated -->
-                    </div>
-                </div>
-                <div>
-                    <h1 id="profileName" class="text-3xl font-semibold">Loading...</h1>
-                    <p id="profileEmail" class="text-lg text-secondary">Loading...</p>
-                    <div class="flex items-center gap-4 mt-2">
-                        <span id="profileRole" class="badge badge-info">Loading...</span>
-                        <span class="text-sm text-tertiary">Member since <span id="memberSince">Loading...</span></span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Profile Navigation -->
-        <section class="container">
-            <div class="profile-nav">
-                <button class="profile-nav-item active" data-tab="overview">Overview</button>
-                <button class="profile-nav-item" data-tab="progress">Progress Details</button>
-                <button class="profile-nav-item" data-tab="security">Security</button>
-                <button class="profile-nav-item" data-tab="data">Data & Privacy</button>
-            </div>
-        </section>
-
-        <!-- Profile Content -->
-        <section class="container">
-            
-            <!-- Overview Tab -->
-            <div class="profile-tab active" id="overview-tab">
-                <!-- Statistics Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: var(--primary-light); color: var(--primary);">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22,4 12,14.01 9,11.01"></polyline>
-                            </svg>
-                        </div>
-                        <div class="stat-content">
-                            <h4>Overall Progress</h4>
-                            <div class="stat-value" id="overallProgress">-</div>
-                            <div class="stat-detail">Lab completion</div>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: var(--success-light); color: var(--success);">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="9,11 12,14 22,4"></polyline>
-                                <path d="M21,12v7a2,2,0,0,1-2,2H5a2,2,0,0,1-2-2V5a2,2,0,0,1,2-2h11"></path>
-                            </svg>
-                        </div>
-                        <div class="stat-content">
-                            <h4>Tasks Completed</h4>
-                            <div class="stat-value" id="completedTasks">-</div>
-                            <div class="stat-detail">Out of 42 total</div>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: var(--warning-light); color: var(--warning);">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M18 20V10"></path>
-                                <path d="M12 20V4"></path>
-                                <path d="M6 20v-6"></path>
-                            </svg>
-                        </div>
-                        <div class="stat-content">
-                            <h4>Global Rank</h4>
-                            <div class="stat-value" id="globalRank">-</div>
-                            <div class="stat-detail">Among all users</div>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: var(--info-light); color: var(--info);">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polyline points="12,6 12,12 16,14"></polyline>
-                            </svg>
-                        </div>
-                        <div class="stat-content">
-                            <h4>Last Activity</h4>
-                            <div class="stat-value" id="lastActivity">-</div>
-                            <div class="stat-detail">Training session</div>
-                        </div>
-                    </div>
-                </div>
+                <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Velocity Lab</title>
+    <meta name="description" content="Manage your profile and view your training progress">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/css/styles.css" as="style">
+    <link rel="preload" href="/js/constants.js" as="script">
+    <link rel="preload" href="/js/utils.js" as="script">
+    <link rel="preload" href="/app.js" as="script">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/css/styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Navigation -->
+    <nav class="nav-glass">
+        <div class="container">
+            <div class="nav-content">
+                <a href="/dashboard.html" class="nav-brand">
+                    <img src="/assets/velocity-logo.png" alt="Velocity Logo" class="nav-logo">
+                    <span class="font-semibold text-xl">Velocity Lab</span>
+                </a>
                 
-                <!-- Week Progress Breakdown -->
-                <div class="card" style="margin-top: 2rem;">
-                    <h3 style="margin-bottom: 1.5rem;">Weekly Progress</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        
-                        <div class="week-progress-card">
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-2xl">🏗️</span>
-                                    <div>
-                                        <h4 class="font-semibold">Week 1</h4>
-                                        <p class="text-sm text-secondary">Foundation Setup</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="progress-bar mb-2">
-                                <div class="progress-fill" id="week1Progress" style="width: 0%"></div>
-                            </div>
-                            <div class="text-sm text-tertiary">
-                                <span id="week1Count">0/12</span> tasks completed
-                            </div>
-                        </div>
-                        
-                        <div class="week-progress-card">
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-2xl">🏢</span>
-                                    <div>
-                                        <h4 class="font-semibold">Week 2</h4>
-                                        <p class="text-sm text-secondary">Infrastructure</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="progress-bar mb-2">
-                                <div class="progress-fill" id="week2Progress" style="width: 0%"></div>
-                            </div>
-                            <div class="text-sm text-tertiary">
-                                <span id="week2Count">0/8</span> tasks completed
-                            </div>
-                        </div>
-                        
-                        <div class="week-progress-card">
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-2xl">📧</span>
-                                    <div>
-                                        <h4 class="font-semibold">Week 3</h4>
-                                        <p class="text-sm text-secondary">Email & Messaging</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="progress-bar mb-2">
-                                <div class="progress-fill" id="week3Progress" style="width: 0%"></div>
-                            </div>
-                            <div class="text-sm text-tertiary">
-                                <span id="week3Count">0/12</span> tasks completed
-                            </div>
-                        </div>
-                        
-                        <div class="week-progress-card">
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-2xl">☁️</span>
-                                    <div>
-                                        <h4 class="font-semibold">Week 4</h4>
-                                        <p class="text-sm text-secondary">Cloud Integration</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="progress-bar mb-2">
-                                <div class="progress-fill" id="week4Progress" style="width: 0%"></div>
-                            </div>
-                            <div class="text-sm text-tertiary">
-                                <span id="week4Count">0/10</span> tasks completed
-                            </div>
-                        </div>
-                        
-                    </div>
-                </div>
+                <div class="nav-links">
+                    <a href="/dashboard.html" class="nav-link">Dashboard</a>
+                    <a href="/profile.html" class="nav
