@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Velocity Lab: Hands-on training for Exchange Hybrid Migration with Microsoft 365 integration.">
-  <title>Velocity Lab - Exchange Hybrid Migration Training
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;500;700&display=swap" rel="stylesheet">
-  <link href="/assets/favicon.ico" type="image/icon" rel="icon">
+  <title>Velocity Lab - Exchange Hybrid Migration Training</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     /* Root Variables */
     :root {
-      --primary: #0078D4; /* Azure-inspired blue */
-      --primary-dark: #005BB5; /* Darker blue for hover */
-      --background-primary: #FFFFFF; /* Pure white background */
-      --background-secondary: #F5F5F7; /* Off-white for cards */
-      --text-primary: #333333; /* Dark gray for readability */
-      --text-secondary: #6666666; /* Lighter gray for secondary text
-      --border-light: #E0E0E0; /* Light gray for borders */
-      --shadow: 0 2px 8px rgba(0, 0,0 0, 0.1); /* Subtle shadow */
+      --primary: #0078D4; /* Azure blue */
+      --primary-dark: #005BB5; /* --primary-dark: #005BB5; /* Darker blue for hover */
+      --background-primary: #FFFFFF; /* White */
+      --background-secondary: #F5F5F7; /* Off-white */
+      --text-primary: #333333; /* Dark gray */
+      --text-secondary: #666666; /* Lighter gray */
+      --border-light: #E0E0E0E0; /* Light gray */
+      --shadow: 0 2px 8px rgba(0, 0,0, 0.1); /* Subtle shadow */
       --radius: 8px; /* Rounded corners */
     }
 
@@ -32,7 +33,6 @@
       background: var(--background-primary);
       color: var(--text-primary);
       line-height: 1.5;
-      overflow-x: hidden;
     }
 
     .container {
@@ -55,15 +55,25 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .logo {
+      height: 40px;
+      display: flex;
+      align-items: center;
     }
 
     .logo img {
-      height: 40px;
+      max-height: 40px;
+      vertical-align: middle;
     }
 
     .nav-links {
       display: flex;
-      gap: 24px;
+      gap: 16px;
       align-items: center;
     }
 
@@ -71,7 +81,7 @@
       color: var(--text-primary);
       text-decoration: none;
       font-weight: 500;
-      transition: color 0.2s;
+      transition: color 0.3s;
     }
 
     .nav-links a:hover {
@@ -95,19 +105,22 @@
     /* Hero Section */
     .hero {
       text-align: center;
-      padding: 80px 0;
+      padding: 80px 16px;
     }
 
     .hero h1 {
-      font-size: 48px;
+      font-size: 36px;
       font-weight: 600;
       margin-bottom: 16px;
     }
 
     .hero p {
-      font-size: 20px;
+      font-size: 18px;
       color: var(--text-secondary);
       margin-bottom: 32px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     /* Stats Grid */
@@ -115,16 +128,18 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 24px;
-      margin: 40px 0;
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 16px;
     }
 
     .stat-card {
       background: var(--background-secondary);
-      padding: 24px;
+      padding: 20px;
       border-radius: var(--radius);
-      text-align: center;
       box-shadow: var(--shadow);
-      transition: transform 0.2s;
+      text-align: center;
+      transition: transform 0.3s;
     }
 
     .stat-card:hover {
@@ -132,29 +147,33 @@
     }
 
     .stat-card h3 {
-      font-size: 36px;
+      font-size: 32px;
       color: var(--primary);
-      margin-bottom: 8px;
       font-weight: 600;
+      margin-bottom: 8px;
+      }
     }
 
     .stat-card p {
       color: var(--text-secondary);
+      font-size: 14px;
     }
 
     /* Week Card */
     .week-card {
       background: var(--background-secondary);
       border-radius: var(--radius);
-      margin-bottom: 24px;
-      overflow: hidden;
+      margin-bottom: 20px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
       box-shadow: var(--shadow);
     }
 
     .week-header {
       display: flex;
       justify-content: space-between;
-      padding: 24px;
+      padding: 20px;
       cursor: pointer;
       transition: background 0.2s;
     }
@@ -164,13 +183,14 @@
     }
 
     .week-info h3 {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 600;
       margin-bottom: 8px;
     }
 
     .week-info p {
       color: var(--text-secondary);
+      font-size: 14px;
     }
 
     .week-progress {
@@ -179,6 +199,7 @@
 
     .progress-count {
       color: var(--text-secondary);
+      font-size: 14px;
       margin-bottom: 8px;
     }
 
@@ -200,14 +221,12 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 16px;
-      padding: 24px;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
+      padding: 20px;
+      /* Removed max-height: 0 to prevent hiding content */
     }
 
     .tasks-grid.show {
-      max-height: 1000px;
+      /* Toggle class for animation if needed */
     }
 
     .task {
@@ -216,7 +235,7 @@
       border-radius: var(--radius);
       cursor: pointer;
       box-shadow: var(--shadow);
-      transition: transform 0.2s;
+      transition: transform 0.3s;
     }
 
     .task:hover {
@@ -234,13 +253,14 @@
     }
 
     .task-checkbox {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       accent-color: var(--primary);
     }
 
     .task-title {
       font-weight: 600;
+      font-size: 16px;
       margin-bottom: 4px;
     }
 
@@ -275,8 +295,8 @@
       max-height: 80vh;
       overflow-y: auto;
       padding: 24px;
-      position: relative;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      position: relative;
     }
 
     .modal-close {
@@ -307,6 +327,7 @@
       display: block;
       font-weight: 500;
       margin-bottom: 8px;
+      font-size: 14px;
     }
 
     .form-group input {
@@ -341,8 +362,8 @@
     /* Progress Circle */
     .progress-circle {
       position: relative;
-      width: 200px;
-      height: 200px;
+      width: 160px;
+      height: 160px;
       margin: 0 auto;
     }
 
@@ -393,6 +414,7 @@
     .leaderboard-table th {
       font-weight: 600;
       color: var(--text-primary);
+      font-size: 14px;
     }
 
     .medal {
@@ -402,22 +424,28 @@
     }
 
     .medal-icon {
-      font-size: 20px;
+      font-size: 18px;
     }
 
     .gold {
       background: #FEF3C7;
       color: #B45309;
+      padding: 4px 8px;
+      border-radius: 4px;
     }
 
     .silver {
       background: #E5E7EB;
       color: #4B5563;
+      padding: 4px 8px;
+      border-radius: 4px;
     }
 
     .bronze {
       background: #F4E8D8;
       color: #8D5524;
+      padding: 4px 8px;
+      border-radius: 4px;
     }
 
     /* Notification */
@@ -427,14 +455,15 @@
       right: 20px;
       padding: 16px 24px;
       border-radius: var(--radius);
-      display: none;
       z-index: 1000;
       font-weight: 500;
+      box-shadow: var(--shadow);
+      display: none;
     }
 
     .notification.show {
       display: block;
-      animation: slideIn 0.3s, slideOut 0.3s 3.7s;
+      animation: slideIn 0.3s, slideOut 0.3s 3.7s forwards;
     }
 
     .notification.success {
@@ -448,13 +477,24 @@
     }
 
     @keyframes slideIn {
-      from { transform: translateX(100%); }
-      to { transform: translateX(0); }
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
     }
 
     @keyframes slideOut {
-      from { transform: translateX(0); }
-      to { transform: translateX(100%); }
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+
+    /* Fallback Content */
+    .fallback {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #FFF5F5;
+      border: 1px solid #EF4444;
+      border-radius: var(--radius);
+      color: #B91C1C;
     }
 
     /* Hidden Class */
@@ -462,20 +502,20 @@
       display: none;
     }
 
-    /* Animations */
+    /* Fade-in Animation */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .stat-card, .week-card, .task, .btn {
+    .hero, .stat-card, .week-card, .task, .btn {
       animation: fadeIn 0.5s ease-out;
     }
 
     /* Responsive Design */
     @media (max-width: 768px) {
       .hero h1 {
-        font-size: 32px;
+        font-size: 28px;
       }
 
       .hero p {
@@ -483,21 +523,31 @@
       }
 
       .nav-links {
-        gap: 16px;
+        gap: 12px;
       }
 
       .week-header {
         flex-direction: column;
         align-items: flex-start;
+        padding: 16px;
       }
 
       .week-progress {
         text-align: left;
-        margin-top: 16px;
+        margin-top: 12px;
       }
 
-      .container {
-        padding: 0 16px;
+      .stats-grid {
+        padding: 0 12px;
+      }
+
+      .progress-circle {
+        width: 120px;
+        height: 120px;
+      }
+
+      .progress-circle span {
+        font-size: 20px;
       }
     }
   </style>
@@ -508,69 +558,68 @@
 
   <!-- Header -->
   <header>
-    <div class="container">
-      <nav>
-        <div class="logo">
-          <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo">
+    <nav>
+      <div class="logo">
+        <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22 viewBox=%220 0 40 40%22%3E%3Crect width=%2240%22 height=%2240%22 fill=%22%23666666%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2216%22 fill=%22%23FFFFFF%22 text-anchor=%22middle%22 dy=%22.3em%22%3EVL%3C/text%3E%3C/svg%3E';">
+      </div>
+      <div class="nav-links">
+        <div id="authLinks">
+          <a href="#" id="signInLink" aria-label="Sign In">Sign In</a>
+          <a href="#" id="getStartedLink" class="btn" aria-label="Get Started">Get Started</a>
         </div>
-        <div class="nav-links">
-          <div id="authLinks">
-            <a href="#" id="signInLink" aria-label="Sign In">Sign In</a>
-            <a href="#" id="getStartedLink" class="btn">Get Started</a>
-          </div>
-          <div id="userLinks" class="hidden">
-            <span id="userName" aria-live="polite"></span>
-            <a href="#" onclick="logout()" aria-label="Sign Out">Sign Out</a>
-            <a href="#" id="adminPortalBtn" class="hidden" onclick="showAdminPortal()">Admin Portal</a>
-          </div>
+        <div id="userLinks" class="hidden">
+          <span id="userName" aria-live="polite"></span>
+          <a href="#" onclick="logout()" aria-label="Sign Out">Sign Out</a>
+          <a href="#" id="adminPortalBtn" class="hidden" onclick="showAdminPortal()" aria-label="Admin Portal">Admin Portal</a>
         </div>
-      </nav>
-    </div>
+      </div>
+    </nav>
   </header>
 
   <!-- Landing Page -->
   <main id="landingPage" aria-label="Landing Page">
     <section class="hero">
-      <div class="container">
-        <h1>Velocity Lab</h1>
-        <p>Master Exchange Hybrid Migration with Hands-On Training</p>
-        <a href="#" id="getStartedHero" class="btn" aria-label="Get Started">Get Started</a>
-      </div>
+      <h1>Velocity Lab</h1>
+      <p>Master Exchange Hybrid Migration with Hands-On Training</p>
+      <a href="#" id="getStartedHero" class="btn" aria-label="Get Started">Get Started</a>
     </section>
   </main>
 
   <!-- Dashboard Page -->
   <main id="dashboardPage" class="hidden" aria-label="Dashboard">
-    <div class="container">
-      <!-- Stats -->
-      <div class="stats-grid">
-        <div class="stat-card" role="region" aria-label="Tasks Completed">
-          <h3 id="completedTasks">0</h3>
-          <p>Tasks Completed</p>
-        </div>
-        <div class="stat-card" role="region" aria-label="Current Week">
-          <h3 id="currentWeek">Week 1</h3>
-          <p>Current Week</p>
-        </div>
-        <div class="stat-card" role="region" aria-label="Overall Progress">
-          <div class="progress-circle">
-            <svg>
-              <circle class="bg" cx="100" cy="100" r="78"></circle>
-              <circle id="progressRing" class="fg" cx="100" cy="100" r="78"></circle>
-            </svg>
-            <span id="progressText">0%</span>
-          </div>
-          <p>Overall Progress</p>
-        </div>
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card" role="region" aria-label="Tasks Completed">
+        <h3 id="completedTasks">0</h3>
+        <p>Tasks Completed</p>
       </div>
-
-      <!-- Weeks -->
-      <div id="weeksContainer" aria-live="polite"></div>
-
-      <!-- Start New Lab -->
-      <div style="text-align: center; margin: 40px 0;">
-        <a href="#" onclick="startNewLab()" class="btn" aria-label="Start New Lab">Start New Lab</a>
+      <div class="stat-card" role="region" aria-label="Current Week">
+        <h3 id="currentWeek">Week 1</h3>
+        <p>Current Week</p>
       </div>
+      <div class="stat-card" role="region" aria-label="Overall Progress">
+        <div class="progress-circle">
+          <svg>
+            <circle class="bg" cx="80" cy="80" r="72"></circle>
+            <circle id="progressRing" class="fg" cx="80" cy="80" r="72"></circle>
+          </svg>
+          <span id="progressText">0%</span>
+        </div>
+        <p>Overall Progress</p>
+      </div>
+    </div>
+
+    <!-- Weeks -->
+    <div id="weeksContainer" aria-live="polite">
+      <!-- Fallback content if JavaScript fails -->
+      <div class="fallback">
+        <p><strong>Error:</strong> Unable to load tasks. Please ensure <code>task-definitions.js</code> and <code>app.js</code> are correctly loaded. Check the browser console for details.</p>
+      </div>
+    </div>
+
+    <!-- Start New Lab -->
+    <div style="text-align: center; margin: 40px 0; max-width: 1200px; margin-left: auto; margin-right: auto;">
+      <a href="#" onclick="startNewLab()" class="btn" aria-label="Start New Lab">Start New Lab</a>
     </div>
   </main>
 
@@ -578,7 +627,7 @@
   <div id="taskModal" class="modal" role="dialog" aria-labelledby="modalTitle">
     <div class="modal-content">
       <span class="modal-close" onclick="closeModal()" aria-label="Close Modal">×</span>
-      <h2 id="modalTitle"></h2>
+      <h2 id="modalTitle">Task Details</h2>
       <div id="modalBody"></div>
     </div>
   </div>
@@ -591,11 +640,11 @@
       <form id="loginForm">
         <div class="form-group">
           <label for="loginEmail">Email</label>
-          <input type="email" id="loginEmail" name="email" required aria-required="true">
+          <input type="email" id="loginEmail" name="email" required aria-required="true" placeholder="Enter your email">
         </div>
         <div class="form-group">
           <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" name="password" required aria-required="true">
+          <input type="password" id="loginPassword" name="password" required aria-required="true" placeholder="Enter your password">
         </div>
         <div class="form-group">
           <label>
@@ -603,7 +652,7 @@
           </label>
         </div>
         <button type="submit" class="btn">Sign In</button>
-        <p style="margin-top: 16px;">
+        <p style="margin-top: 16px; font-size: 14px;">
           Don't have an account? <a href="#" id="toRegisterLink">Sign up</a>
         </p>
       </form>
@@ -618,18 +667,18 @@
       <form id="registerForm">
         <div class="form-group">
           <label for="registerName">Name</label>
-          <input type="text" id="registerName" name="name" required aria-required="true">
+          <input type="text" id="registerName" name="name" required aria-required="true" placeholder="Enter your name">
         </div>
         <div class="form-group">
           <label for="registerEmail">Email</label>
-          <input type="email" id="registerEmail" name="email" required aria-required="true">
+          <input type="email" id="registerEmail" name="email" required aria-required="true" placeholder="Enter your email">
         </div>
         <div class="form-group">
           <label for="registerPassword">Password</label>
-          <input type="password" id="registerPassword" name="password" required aria-required="true">
+          <input type="password" id="registerPassword" name="password" required aria-required="true" placeholder="Enter your password">
         </div>
         <button type="submit" class="btn">Sign Up</button>
-        <p style="margin-top: 16px;">
+        <p style="margin-top: 16px; font-size: 14px;">
           Already have an account? <a href="#" id="toLoginLink">Sign in</a>
         </p>
       </form>
@@ -646,19 +695,30 @@
   </div>
 
   <!-- Scripts -->
-  <script src="/task-definitions.js"></script>
-  <script src="/app.js"></script>
   <script>
+    // Immediate debug to diagnose blank screen
+    console.log('index.html loaded at', new Date().toISOString());
+
+    // Fallback if scripts fail to load
     document.addEventListener('DOMContentLoaded', () => {
-      // Fallback if scripts fail to load
-      if (typeof window.TASK_DEFINITIONS === 'undefined' || typeof window.renderTasks === 'undefined') {
-        const weeksContainer = document.getElementById('weeksContainer');
-        if (weeksContainer) {
-          weeksContainer.innerHTML = `
-            <div class="notification error show">
-              Error loading tasks. Please ensure task-definitions.js is correctly loaded. Check console for details.
-            </div>
-          `;
+      console.log('DOM fully loaded');
+      const notification = document.getElementById('notification');
+      const weeksContainer = document.getElementById('weeksContainer');
+
+      if (!window.TASK_DEFINITIONS) {
+        console.error('TASK_DEFINITIONS is undefined. Check task-definitions.js for syntax errors (line 390, column 74).');
+        if (notification && weeksContainer) {
+          notification.classList.add('error', 'show');
+          notification.textContent = 'Error: task-definitions.js failed to load. Check console.';
+          weeksContainer.querySelector('.fallback').style.display = 'block';
+        }
+      }
+
+      if (!window.renderTasks) {
+        console.error('renderTasks is undefined. Check app.js.');
+        if (notification) {
+          notification.classList.add('error', 'show');
+          notification.textContent = 'Error: app.js failed to load. Check console.';
         }
       }
 
@@ -668,7 +728,13 @@
         if (link) {
           link.addEventListener('click', (e) => {
             e.preventDefault();
-            if (window.showLogin) window.showLogin();
+            console.log('Sign In clicked');
+            if (window.showLogin) {
+              window.showLogin();
+            } else {
+              notification.classList.add('error', 'show');
+              notification.textContent = 'Sign In functionality not available.';
+            }
           });
         }
       });
@@ -679,11 +745,19 @@
         if (link) {
           link.addEventListener('click', (e) => {
             e.preventDefault();
-            if (window.showRegister) window.showRegister();
+            console.log('Get Started/Sign Up clicked');
+            if (window.showRegister) {
+              window.showRegister();
+            } else {
+              notification.classList.add('error', 'show');
+              notification.textContent = 'Sign Up functionality not available.';
+            }
           });
         }
       });
     });
   </script>
+  <script src="/task-definitions.js"></script>
+  <script src="/app.js"></script>
 </body>
 </html>
