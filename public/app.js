@@ -1,4 +1,4 @@
-// app.js - Premium application logic for Velocity Lab
+// app.js - Client-side logic for Velocity Lab
 'use strict';
 
 // Task Structure - Matching backend exactly
@@ -9,7 +9,7 @@ const TASK_STRUCTURE = {
     taskCount: 12,
     tasks: [
       'install-server2012',
-      'configure-static-ip', 
+      'configure-static-ip',
       'install-adds-role',
       'promote-to-dc',
       'configure-dns-server',
@@ -24,7 +24,7 @@ const TASK_STRUCTURE = {
   },
   week2: {
     title: "Infrastructure Expansion",
-    description: "Second DC, WSUS, and time synchronization", 
+    description: "Second DC, WSUS, and time synchronization",
     taskCount: 8,
     tasks: [
       'install-second-server',
@@ -44,7 +44,7 @@ const TASK_STRUCTURE = {
     tasks: [
       'backup-servers',
       'upgrade-dc1-2016',
-      'upgrade-dc2-2016', 
+      'upgrade-dc2-2016',
       'raise-functional-levels',
       'prepare-exchange-server',
       'install-exchange-prereqs',
@@ -57,7 +57,7 @@ const TASK_STRUCTURE = {
     ]
   },
   week4: {
-    title: "Cloud Integration", 
+    title: "Cloud Integration",
     description: "External mail publishing and Microsoft 365 hybrid setup",
     taskCount: 10,
     tasks: [
@@ -105,10 +105,10 @@ const cookie = {
 const notify = (message, type = 'success', duration = 4000) => {
   const notification = $('notification');
   if (!notification) return;
-  
+
   notification.textContent = message;
   notification.className = `notification ${type} show`;
-  
+
   setTimeout(() => notification.classList.remove('show'), duration);
 };
 
@@ -117,21 +117,21 @@ const api = async (endpoint, options = {}) => {
   try {
     const csrfResponse = await fetch('/api/csrf', { credentials: 'same-origin' });
     const { token } = await csrfResponse.json();
-    
+
     if (options.body instanceof FormData) {
       options.body.append('csrf_token', token);
     }
-    
+
     const response = await fetch(endpoint, {
       credentials: 'same-origin',
       ...options
     });
-    
+
     const result = await response.json();
     if (!result.success) {
       throw new Error(result.error || 'Request failed');
     }
-    
+
     return result;
   } catch (error) {
     console.error('API Error:', error);
@@ -166,7 +166,7 @@ const auth = {
         method: 'POST',
         body: formData
       });
-      
+
       const userData = { name: result.name, role: result.role };
       cookie.set('user', JSON.stringify(userData));
       App.user = userData;
@@ -189,7 +189,7 @@ const auth = {
         method: 'POST',
         body: formData
       });
-      
+
       const userData = { name: result.name, role: result.role };
       cookie.set('user', JSON.stringify(userData));
       App.user = userData;
@@ -212,7 +212,7 @@ const auth = {
     } catch (e) {
       // Continue with logout
     }
-    
+
     cookie.delete('user');
     App.user = null;
     App.authenticated = false;
@@ -294,7 +294,7 @@ const modal = {
 const dashboard = {
   async load() {
     if (!App.authenticated) return;
-    
+
     try {
       const result = await api('/api/progress');
       App.progress = result.data;
@@ -308,23 +308,23 @@ const dashboard = {
   updateProgress(data) {
     const completed = data.completedTasks || 0;
     const percentage = data.progressPercentage || 0;
-    
+
     const ring = $('progressRing');
     if (ring) {
       const circumference = 2 * Math.PI * 78;
       const offset = circumference - (percentage / 100) * circumference;
       ring.style.strokeDashoffset = offset;
     }
-    
+
     const progressText = $('progressText');
     const completedTasks = $('completedTasks');
     const currentWeek = $('currentWeek');
-    
+
     if (progressText) progressText.textContent = `${Math.round(percentage)}%`;
-    if (completedTasks) completedTasks.textContent = completed;
-    
+    if (completedTasks) completedTasks.textContent = completed.toString();
+
     if (currentWeek) {
-      if (completed === 42) currentWeek.textContent = 'Complete!';
+      if (completed === TOTAL_TASKS) currentWeek.textContent = 'Complete!';
       else if (completed >= 32) currentWeek.textContent = 'Week 4';
       else if (completed >= 20) currentWeek.textContent = 'Week 3';
       else if (completed >= 12) currentWeek.textContent = 'Week 2';
@@ -335,14 +335,14 @@ const dashboard = {
   renderWeeks() {
     const container = $('weeksContainer');
     if (!container) return;
-    
+
     container.innerHTML = '';
-    
+
     Object.entries(TASK_STRUCTURE).forEach(([weekKey, week]) => {
       const weekProgress = App.progress[weekKey] || {};
       const completed = week.tasks.filter(task => weekProgress[task]?.completed).length;
       const percentage = Math.round((completed / week.taskCount) * 100);
-      
+
       const weekCard = document.createElement('div');
       weekCard.className = 'week-card';
       weekCard.innerHTML = `
@@ -361,7 +361,8 @@ const dashboard = {
         <div class="tasks-grid" id="tasks-${weekKey}">
           ${week.tasks.map(task => {
             const isCompleted = weekProgress[task]?.completed || false;
-            const taskTitle = task.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            const taskTitle = window.TASK_DEFINITIONS?.[`${weekKey}-${task}`]?.title ||
+                             task.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
             return `
               <div class="task ${isCompleted ? 'completed' : ''}" onclick="tasks.open('${weekKey}', '${task}')">
                 <div class="task-header">
@@ -377,7 +378,7 @@ const dashboard = {
           }).join('')}
         </div>
       `;
-      
+
       container.appendChild(weekCard);
     });
   },
@@ -404,7 +405,7 @@ const dashboard = {
             ${users.map((user, index) => {
               let medalClass = '';
               let medalIcon = '';
-              
+
               if (index === 0) {
                 medalClass = 'gold';
                 medalIcon = '🥇';
@@ -415,7 +416,7 @@ const dashboard = {
                 medalClass = 'bronze';
                 medalIcon = '🥉';
               }
-              
+
               return `
                 <tr class="${medalClass}">
                   <td>
@@ -456,21 +457,21 @@ const tasks = {
     const formData = new FormData();
     formData.append('week', week);
     formData.append('task', task);
-    formData.append('checked', checked);
-    
+    formData.append('checked', checked.toString());
+
     try {
       const result = await api('/api/progress', {
         method: 'POST',
         body: formData
       });
-      
+
       if (!App.progress[week]) App.progress[week] = {};
       if (!App.progress[week][task]) App.progress[week][task] = {};
       App.progress[week][task].completed = checked;
-      
+
       dashboard.updateProgress(result.data);
       dashboard.renderWeeks();
-      
+
       if (checked) {
         notify('✅ Task completed! Great progress!');
       }
@@ -487,21 +488,21 @@ const tasks = {
     formData.append('week', week);
     formData.append('task', task);
     formData.append('subtask', `step${step}`);
-    formData.append('subtask_checked', checked);
-    
+    formData.append('subtask_checked', checked.toString());
+
     try {
       const result = await api('/api/progress', {
         method: 'POST',
         body: formData
       });
-      
+
       if (!App.progress[week]) App.progress[week] = {};
       if (!App.progress[week][task]) App.progress[week][task] = { subtasks: {} };
       if (!App.progress[week][task].subtasks) App.progress[week][task].subtasks = {};
       App.progress[week][task].subtasks[`step${step}`] = checked;
-      
+
       dashboard.updateProgress(result.data);
-      
+
       if (checked) {
         notify('✅ Step completed!');
       }
@@ -512,17 +513,16 @@ const tasks = {
 
   open(week, task) {
     const taskKey = `${week}-${task}`;
-    // Get task definition from the global TASK_DEFINITIONS loaded from task-definitions.js
-    const taskData = window.TASK_DEFINITIONS?.[taskKey] || { 
-      title: task.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()), 
-      description: '<p>Task details coming soon...</p>' 
+    const taskData = window.TASK_DEFINITIONS?.[taskKey] || {
+      title: task.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      description: '<p>Task details coming soon...</p>'
     };
     const weekData = TASK_STRUCTURE[week];
     const progress = App.progress[week]?.[task]?.subtasks || {};
-    
+
     const modalTitle = $('modalTitle');
     const modalBody = $('modalBody');
-    
+
     if (modalTitle) modalTitle.textContent = taskData.title;
     if (modalBody) {
       modalBody.innerHTML = `
@@ -544,7 +544,7 @@ const tasks = {
           </div>
         </div>
       `;
-      
+
       // Attach event listeners to subtasks
       setTimeout(() => {
         const checkboxes = modalBody.querySelectorAll('.subtask-checkbox');
@@ -555,14 +555,14 @@ const tasks = {
         });
       }, 100);
     }
-    
+
     modal.show('taskModal');
   },
 
   getCategory(week) {
     const categories = {
       week1: 'Foundation Setup',
-      week2: 'Infrastructure Expansion', 
+      week2: 'Infrastructure Expansion',
       week3: 'Email & Messaging',
       week4: 'Cloud Integration'
     };
@@ -583,7 +583,7 @@ const lab = {
     if (!confirm('Start a new lab? This will reset your progress and save current progress to history.')) {
       return;
     }
-    
+
     try {
       const result = await api('/api/lab/start-new', { method: 'POST' });
       if (result.success) {
@@ -608,7 +608,7 @@ window.showAdminPortal = dashboard.loadLeaderboard;
 document.addEventListener('DOMContentLoaded', () => {
   // Check if TASK_DEFINITIONS loaded
   if (!window.TASK_DEFINITIONS) {
-    console.error('⚠️ TASK_DEFINITIONS not loaded! Make sure task-definitions.js is included before app.js');
+    console.warn('⚠️ TASK_DEFINITIONS not loaded. Using fallback task titles.');
   } else {
     console.log('✅ Loaded', Object.keys(window.TASK_DEFINITIONS).length, 'task definitions');
   }
@@ -645,6 +645,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize authentication
   auth.check();
-  
+
   console.log('🚀 Velocity Lab - Premium Exchange Hybrid Migration Training Ready!');
 });
