@@ -31,6 +31,7 @@
     }
     .btn-p { background: var(--p); color: #fff; }
     .btn-p:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,113,227,0.3); }
+    .btn-s { background: #fff; border: 1px solid rgba(0,0,0,0.1); }
     .btn-a { background: linear-gradient(135deg, #ffd700, #ff9500); color: #fff; }
     .h { display: none !important; }
     #land { min-height: 100vh; display: flex; align-items: center; text-align: center; padding-top: 60px; }
@@ -327,17 +328,22 @@
 
     const api = async (ep, opt = {}) => {
       try {
-        // Fetch CSRF token if not already stored
-        if (!A.csrfToken) {
-          const r = await fetch('/api/csrf', { credentials: 'same-origin' });
-          if (!r.ok) throw new Error(`CSRF fetch failed: ${r.status}`);
-          const { token } = await r.json();
-          A.csrfToken = token;
+        const r = await fetch('/api/csrf', { credentials: 'same-origin' });
+        if (!r.ok) throw new Error(`CSRF fetch failed: ${r.status}`);
+        const { token } = await r.json();
+        if (opt.body instanceof FormData) {
+          opt.body.append('csrf_token', token);
+        } else if (opt.body) {
+          opt.body = new FormData();
+          for (const [key, value] of Object.entries(opt.body)) {
+            opt.body.append(key, value);
+          }
+          opt.body.append('csrf_token', token);
         }
         const headers = new Headers(opt.headers || {});
-        headers.set('Content-Type', 'application/json');
+        if (!(opt.body instanceof FormData)) headers.set('Content-Type', 'application/x-www-form-urlencoded');
         if (A.sessionToken) headers.set('Authorization', `Bearer ${A.sessionToken}`);
-        const body = opt.body ? JSON.stringify({ ...opt.body, csrf_token: A.csrfToken }) : undefined;
+        const body = opt.body instanceof FormData ? opt.body : new URLSearchParams(opt.body).toString();
         const res = await fetch(ep, {
           credentials: 'same-origin',
           headers,
@@ -347,6 +353,7 @@
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         const d = await res.json();
         if (!d.success) throw new Error(d.error || 'Request failed');
+        A.csrfToken = null; // Reset CSRF token after use
         return d;
       } catch (e) {
         console.error(`API error for ${ep}:`, e);
@@ -373,18 +380,14 @@
           ui.land();
         }
       },
-      async login({ email, password, remember }) {
+      async login(fd) {
         try {
-          const r = await api('/api/login', {
-            method: 'POST',
-            body: { email, password, remember }
-          });
+          const r = await api('/api/login', { method: 'POST', body: fd });
           ck.set('user', JSON.stringify({ name: r.name, role: r.role }));
           ck.set('session', r.sessionToken);
           A.u = { name: r.name, role: r.role };
           A.auth = true;
           A.sessionToken = r.sessionToken;
-          A.csrfToken = null; // Reset CSRF token after use
           if (A.u.role === 'admin') show($('adminBtn'));
           ui.dash();
           dash.load();
@@ -395,18 +398,14 @@
           msg(e.message || 'Login failed', 'e');
         }
       },
-      async register({ name, email, password }) {
+      async register(fd) {
         try {
-          const r = await api('/api/register', {
-            method: 'POST',
-            body: { name, email, password }
-          });
+          const r = await api('/api/register', { method: 'POST', body: fd });
           ck.set('user', JSON.stringify({ name: r.name, role: r.role }));
           ck.set('session', r.sessionToken);
           A.u = { name: r.name, role: r.role };
           A.auth = true;
           A.sessionToken = r.sessionToken;
-          A.csrfToken = null; // Reset CSRF token after use
           ui.dash();
           dash.load();
           closeModal();
@@ -486,16 +485,16 @@
 
     const toggleTask = async (w, t, c) => {
       try {
-        const r = await api('/api/progress', {
-          method: 'POST',
-          body: { week: w, task: t, checked: c }
-        });
+        const fd = new FormData();
+        fd.append('week', w);
+        fd.append('task', t);
+        fd.append('checked', c.toString());
+        const r = await api('/api/progress', { method: 'POST', body: fd });
         if (!A.p[w]) A.p[w] = {};
         if (!A.p[w][t]) A.p[w][t] = {};
         A.p[w][t].completed = c;
         dash.update();
         if (c) msg('✅ Task completed!');
-        A.csrfToken = null; // Reset CSRF token after use
       } catch (e) {
         console.error('Toggle task error:', e);
         msg('Failed to update task', 'e');
@@ -505,16 +504,17 @@
 
     const toggleSub = async (w, t, s, c) => {
       try {
-        const r = await api('/api/progress', {
-          method: 'POST',
-          body: { week: w, task: t, subtask: `step${s}`, subtask_checked: c }
-        });
+        const fd = new FormData();
+        fd.append('week', w);
+        fd.append('task', t);
+        fd.append('subtask', `step${s}`);
+        fd.append('subtask_checked', c.toString());
+        await api('/api/progress', { method: 'POST', body: fd });
         if (!A.p[w]) A.p[w] = {};
         if (!A.p[w][t]) A.p[w][t] = { subtasks: {} };
         if (!A.p[w][t].subtasks) A.p[w][t].subtasks = {};
         A.p[w][t].subtasks[`step${s}`] = c;
         if (c) msg('✅ Step done!');
-        A.csrfToken = null; // Reset CSRF token after use
       } catch (e) {
         console.error('Toggle subtask error:', e);
         msg('Failed to update subtask', 'e');
@@ -545,7 +545,6 @@
         await api('/api/lab/start-new', { method: 'POST' });
         msg('🚀 New lab started!');
         dash.load();
-        A.csrfToken = null; // Reset CSRF token after use
       } catch (e) {
         console.error('New lab error:', e);
         msg('Failed to start new lab', 'e');
@@ -571,7 +570,6 @@
           </table>
         `;
         $('adminModal').style.display = 'flex';
-        A.csrfToken = null; // Reset CSRF token after use
       } catch (e) {
         console.error('Admin load error:', e);
         msg('Failed to load leaderboard', 'e');
@@ -591,21 +589,11 @@
     document.addEventListener('DOMContentLoaded', () => {
       $('loginForm').onsubmit = e => {
         e.preventDefault();
-        const fd = new FormData(e.target);
-        auth.login({
-          email: fd.get('email')?.toString().trim().toLowerCase(),
-          password: fd.get('password')?.toString(),
-          remember: fd.get('remember') === 'on'
-        });
+        auth.login(new FormData(e.target));
       };
       $('registerForm').onsubmit = e => {
         e.preventDefault();
-        const fd = new FormData(e.target);
-        auth.register({
-          name: fd.get('name')?.toString().trim(),
-          email: fd.get('email')?.toString().trim().toLowerCase(),
-          password: fd.get('password')?.toString()
-        });
+        auth.register(new FormData(e.target));
       };
       document.onclick = e => {
         if (e.target.classList.contains('modal')) closeModal();

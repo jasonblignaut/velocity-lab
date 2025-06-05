@@ -1,4 +1,3 @@
-// functions/utils.ts
 export interface Env {
   USERS: KVNamespace;
   PROGRESS: KVNamespace;
@@ -16,11 +15,10 @@ export interface User {
 }
 
 export interface Progress {
-  [weekKey: string]: {
-    [taskId: string]: {
+  [week: string]: {
+    [task: string]: {
       completed: boolean;
-      subtasks?: { [key: string]: boolean };
-      completedAt?: string;
+      subtasks?: { [subtask: string]: boolean };
     };
   };
 }
@@ -34,28 +32,46 @@ export const TASK_STRUCTURE = {
 
 export const TOTAL_TASKS = 42;
 
-export const jsonResponse = (data: any, status = 200) =>
-  new Response(JSON.stringify({ success: true, data }), {
-    status,
-    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' }
-  });
+export const validateEmail = (email: string): boolean => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.toLowerCase());
+};
 
-export const errorResponse = (error: string, status = 400) =>
-  new Response(JSON.stringify({ success: false, error }), {
-    status,
-    headers: { 'Content-Type': 'application/json' }
-  });
+export const validatePassword = (password: string): { valid: boolean; error?: string } => {
+  if (password.length < 8) {
+    return { valid: false, error: 'Password must be at least 8 characters' };
+  }
+  return { valid: true };
+};
 
-export const validateEmail = (email: string) =>
-  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+export const sanitizeInput = (input: string): string => {
+  return input.replace(/[<>"'&]/g, '');
+};
 
-export const validatePassword = (password: string) => ({
-  valid: password.length >= 8,
-  message: password.length >= 8 ? null : 'Password must be at least 8 characters'
-});
+export const generateCSRFToken = async (env: Env): Promise<string> => {
+  const token = crypto.randomUUID();
+  const expires = Date.now() + 3600 * 1000; // 1 hour
+  await env.SESSIONS.put(`csrf:${token}`, JSON.stringify({ expires }), { expirationTtl: 3600 });
+  return token;
+};
 
-export const sanitizeInput = (input: string) =>
-  input.trim().replace(/[<>\"'&]/g, '');
+export const validateCSRFToken = async (env: Env, token: string): Promise<boolean> => {
+  const data = await env.SESSIONS.get(`csrf:${token}`);
+  if (!data) return false;
+  const { expires } = JSON.parse(data);
+  if (Date.now() > expires) {
+    await env.SESSIONS.delete(`csrf:${token}`);
+    return false;
+  }
+  await env.SESSIONS.delete(`csrf:${token}`); // One-time use
+  return true;
+};
+
+export const createSession = async (env: Env, userId: string, remember: boolean = false): Promise<string> => {
+  const sessionToken = crypto.randomUUID();
+  const expires = remember ? Date.now() + 30 * 86400 * 1000 : Date.now() + 86400 * 1000;
+  await env.SESSIONS.put(`session:${sessionToken}`, JSON.stringify({ userId, expires }), { expirationTtl: remember ? 30 * 86400 : 86400 });
+  return sessionToken;
+};
 
 export const validateSession = async (env: Env, request: Request): Promise<string | null> => {
   const authHeader = request.headers.get('Authorization');
@@ -67,57 +83,30 @@ export const validateSession = async (env: Env, request: Request): Promise<strin
     sessionToken = cookies?.match(/session=([^;]+)/)?.[1];
   }
   if (!sessionToken) return null;
-  const userId = await env.SESSIONS.get(`session:${sessionToken}`);
-  return userId || null;
-};
-
-export const createSession = async (env: Env, userId: string, remember: boolean = false): Promise<string> => {
-  const sessionToken = crypto.randomUUID();
-  const expirationTtl = remember ? 86400 * 30 : 86400; // 30 days or 1 day
-  await env.SESSIONS.put(`session:${sessionToken}`, userId, { expirationTtl });
-  return sessionToken;
-};
-
-export const deleteSession = async (env: Env, sessionToken: string) => {
-  await env.SESSIONS.delete(`session:${sessionToken}`);
+  const sessionData = await env.SESSIONS.get(`session:${sessionToken}`);
+  if (!sessionData) return null;
+  const { userId, expires } = JSON.parse(sessionData);
+  if (Date.now() > expires) {
+    await env.SESSIONS.delete(`session:${sessionToken}`);
+    return null;
+  }
+  return userId;
 };
 
 export const getUserByEmail = async (env: Env, email: string): Promise<User | null> => {
-  const userData = await env.USERS.get(`user:${email}`);
+  const userData = await env.USERS.get(`user:${email.toLowerCase()}`);
   return userData ? JSON.parse(userData) : null;
 };
 
-export const getUserById = async (env: Env, userId: string): Promise<User | null> => {
-  const users = await env.USERS.list({ prefix: 'user:' });
-  for (const { name: userKey } of users.keys) {
-    const userData = await env.USERS.get(userKey);
-    if (userData) {
-      const user = JSON.parse(userData) as User;
-      if (user.id === userId) return user;
-    }
-  }
-  return null;
+export const updateLastLogin = async (env: Env, user: User): Promise<void> => {
+  const updatedUser = { ...user, lastLogin: new Date().toISOString() };
+  await env.USERS.put(`user:${user.email}`, JSON.stringify(updatedUser));
 };
 
-export const updateLastLogin = async (env: Env, user: User) => {
-  user.lastLogin = new Date().toISOString();
-  await env.USERS.put(`user:${user.email}`, JSON.stringify(user));
-};
-
-export const getCurrentLabProgress = async (env: Env, userId: string): Promise<Progress> => {
-  const progressData = await env.PROGRESS.get(`progress:${userId}`);
-  if (!progressData) {
-    const emptyProgress: Progress = {};
-    Object.keys(TASK_STRUCTURE).forEach(weekKey => {
-      emptyProgress[weekKey] = {};
-      TASK_STRUCTURE[weekKey as keyof typeof TASK_STRUCTURE].tasks.forEach(taskId => {
-        emptyProgress[weekKey][taskId] = { completed: false, subtasks: {} };
-      });
-    });
-    await env.PROGRESS.put(`progress:${userId}`, JSON.stringify(emptyProgress));
-    return emptyProgress;
-  }
-  return JSON.parse(progressData);
+export const logActivity = async (env: Env, userId: string, action: string, details?: any): Promise<void> => {
+  const logKey = `log:${crypto.randomUUID()}`;
+  const logData = { userId, action, details, timestamp: new Date().toISOString() };
+  await env.SESSIONS.put(logKey, JSON.stringify(logData), { expirationTtl: 86400 * 30 });
 };
 
 export const calculateProgress = (progress: Progress): number => {
@@ -136,66 +125,9 @@ export const calculateCompletedTasks = (progress: Progress): number => {
   let completed = 0;
   Object.keys(TASK_STRUCTURE).forEach(weekKey => {
     const week = TASK_STRUCTURE[weekKey as keyof typeof TASK_STRUCTURE];
-    const weekProgress = progress[weekKey] || {};
     week.tasks.forEach(taskId => {
-      if (weekProgress[taskId]?.completed) completed++;
+      if (progress[weekKey]?.[taskId]?.completed) completed++;
     });
   });
   return completed;
-};
-
-export const generateCSRFToken = async (env: Env): Promise<string> => {
-  const token = crypto.randomUUID();
-  await env.SESSIONS.put(`csrf:${token}`, 'valid', { expirationTtl: 3600 });
-  return token;
-};
-
-export const validateCSRFToken = async (env: Env, token: string): Promise<boolean> => {
-  const isValid = await env.SESSIONS.get(`csrf:${token}`);
-  if (isValid) {
-    await env.SESSIONS.delete(`csrf:${token}`);
-    return true;
-  }
-  return false;
-};
-
-export const checkRateLimit = async (env: Env, key: string, limit: number): Promise<boolean> => {
-  const current = await env.SESSIONS.get(`rate:${key}`);
-  const count = current ? parseInt(current) : 0;
-  if (count >= limit) return false;
-  await env.SESSIONS.put(`rate:${key}`, (count + 1).toString(), { expirationTtl: 60 });
-  return true;
-};
-
-export const logActivity = async (env: Env, userId: string, action: string, details?: any) => {
-  const logKey = `log:${new Date().toISOString()}:${userId}`;
-  const logData = {
-    userId,
-    action,
-    details,
-    timestamp: new Date().toISOString()
-  };
-  await env.SESSIONS.put(logKey, JSON.stringify(logData), { expirationTtl: 86400 * 30 });
-};
-
-export const startNewLab = async (env: Env, userId: string): Promise<string> => {
-  const labId = crypto.randomUUID();
-  const currentProgress = await getCurrentLabProgress(env, userId);
-  const historyKey = `history:${userId}:${new Date().toISOString()}`;
-  await env.PROGRESS.put(historyKey, JSON.stringify(currentProgress));
-  const emptyProgress: Progress = {};
-  Object.keys(TASK_STRUCTURE).forEach(weekKey => {
-    emptyProgress[weekKey] = {};
-    TASK_STRUCTURE[weekKey as keyof typeof TASK_STRUCTURE].tasks.forEach(taskId => {
-      emptyProgress[weekKey][taskId] = { completed: false, subtasks: {} };
-    });
-  });
-  await env.PROGRESS.put(`progress:${userId}`, JSON.stringify(emptyProgress));
-  return labId;
-};
-
-export const completeLab = async (env: Env, userId: string) => {
-  const progress = await getCurrentLabProgress(env, userId);
-  const completedKey = `completed:${userId}:${new Date().toISOString()}`;
-  await env.PROGRESS.put(completedKey, JSON.stringify(progress));
 };
