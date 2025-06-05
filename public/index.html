@@ -1,278 +1,581 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Velocity Lab - Exchange Hybrid Training</title>
-<link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--p:#0071e3;--s:#34c759;--e:#ff3b30;--g1:#f5f5f7;--g5:#8e8e93;--g9:#1d1d1f;--r:12px}
-body{font:-apple-system,system-ui,sans-serif;background:var(--g1);color:var(--g9);line-height:1.5}
-.c{max-width:1200px;margin:0 auto;padding:0 24px}
-header{position:fixed;top:0;width:100%;background:rgba(255,255,255,.8);backdrop-filter:blur(20px);z-index:99;border-bottom:1px solid rgba(0,0,0,.1)}
-nav{height:60px;display:flex;justify-content:space-between;align-items:center}
-.logo{display:flex;align-items:center;gap:12px;font-weight:600}
-.logo img{height:32px}
-.btn{padding:10px 20px;border-radius:20px;border:none;font-weight:600;cursor:pointer;transition:all .2s}
-.btn-p{background:var(--p);color:#fff}
-.btn-p:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,113,227,.3)}
-.btn-s{background:#fff;border:1px solid rgba(0,0,0,.1)}
-.btn-a{background:linear-gradient(135deg,#ffd700,#ff9500);color:#fff}
-.h{display:none!important}
-#land{min-height:100vh;display:flex;align-items:center;text-align:center;padding-top:60px}
-#land h1{font-size:clamp(48px,8vw,80px);font-weight:700;margin-bottom:20px;background:linear-gradient(180deg,var(--g9),var(--g5));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-#land p{font-size:20px;color:var(--g5);max-width:600px;margin:0 auto 40px}
-#dash{padding:100px 0 60px;min-height:100vh}
-.card{background:#fff;border-radius:20px;padding:40px;margin-bottom:24px;box-shadow:0 2px 20px rgba(0,0,0,.04)}
-.ring{width:160px;height:160px;margin:0 auto 32px}
-.ring svg{transform:rotate(-90deg)}
-.ring circle{fill:none;stroke-width:12;stroke-linecap:round}
-.ring .bg{stroke:#e8e8ed}
-.ring .fg{stroke:var(--p);stroke-dasharray:440;stroke-dashoffset:440;transition:stroke-dashoffset 1s}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:20px;margin:32px 0}
-.stat{text-align:center}
-.stat-v{font-size:32px;font-weight:700;color:var(--p)}
-.stat-l{font-size:12px;color:var(--g5);text-transform:uppercase}
-.week{background:#fff;border-radius:16px;margin-bottom:16px;overflow:hidden;transition:all .2s}
-.week:hover{box-shadow:0 4px 20px rgba(0,0,0,.08)}
-.wh{padding:24px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
-.wh h3{font-size:20px;margin-bottom:4px}
-.wh p{color:var(--g5);font-size:14px}
-.wp{text-align:right}
-.bar{width:100px;height:6px;background:#e8e8ed;border-radius:3px;overflow:hidden;margin-top:8px}
-.fill{height:100%;background:var(--p);transition:width .3s}
-.tasks{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;padding:0 24px 24px;max-height:0;overflow:hidden;transition:max-height .3s}
-.tasks.show{max-height:2000px}
-.task{background:var(--g1);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .2s;display:flex;gap:12px}
-.task:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
-.task.done{background:rgba(52,199,89,.08);border:1px solid var(--s)}
-.task input{width:20px;height:20px;cursor:pointer}
-.task-t{font-weight:600;margin-bottom:4px}
-.task-d{font-size:13px;color:var(--g5)}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(10px);justify-content:center;align-items:center;z-index:999;padding:20px}
-.modal-c{background:#fff;border-radius:20px;padding:32px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto}
-.modal-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
-.modal-h h2{font-size:24px}
-.close{width:32px;height:32px;border-radius:50%;border:none;background:var(--g1);cursor:pointer;font-size:20px}
-.modal input{width:100%;padding:12px;border:1px solid rgba(0,0,0,.1);border-radius:8px;margin-bottom:16px;font-size:16px}
-.modal input:focus{outline:none;border-color:var(--p)}
-.subtask{margin:16px 0}
-.sub-item{display:flex;align-items:center;gap:12px;padding:8px 0}
-.sub-item input{width:18px;height:18px}
-.sub-item label{font-size:14px}
-.notif{position:fixed;top:80px;right:20px;padding:16px 24px;border-radius:12px;color:#fff;transform:translateX(400px);transition:all .3s}
-.notif.show{transform:translateX(0)}
-.notif.s{background:var(--s)}
-.notif.e{background:var(--e)}
-table{width:100%;border-collapse:collapse}
-th,td{text-align:left;padding:12px;border-bottom:1px solid rgba(0,0,0,.05)}
-th{font-size:12px;color:var(--g5);text-transform:uppercase}
-@media(max-width:768px){.stats{grid-template-columns:repeat(2,1fr)}.tasks{grid-template-columns:1fr}.logo span{display:none}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Velocity Lab - Exchange Hybrid Training</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --p: #0071e3; /* Primary: Apple Blue */
+      --s: #34c759; /* Success: Unifi Green */
+      --e: #ff3b30; /* Error: Apple Red */
+      --g1: #f5f5f7; /* Background: Light Gray */
+      --g5: #8e8e93; /* Secondary Text: Gray */
+      --g9: #1d1d1f; /* Primary Text: Dark Gray */
+      --r: 12px; /* Border Radius */
+    }
+    body { font: -apple-system, system-ui, sans-serif; background: var(--g1); color: var(--g9); line-height: 1.5; }
+    .c { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    header {
+      position: fixed; top: 0; width: 100%; background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(20px); z-index: 99; border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    nav { height: 60px; display: flex; justify-content: space-between; align-items: center; }
+    .logo { display: flex; align-items: center; gap: 12px; font-weight: 600; }
+    .logo img { height: 32px; }
+    .btn {
+      padding: 10px 20px; border-radius: 20px; border: none; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; background: #fff; border: 1px solid rgba(0,0,0,0.1);
+    }
+    .btn-p { background: var(--p); color: #fff; }
+    .btn-p:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,113,227,0.3); }
+    .btn-a { background: linear-gradient(135deg, #ffd700, #ff9500); color: #fff; }
+    .h { display: none !important; }
+    #land { min-height: 100vh; display: flex; align-items: center; text-align: center; padding-top: 60px; }
+    #land h1 {
+      font-size: clamp(48px, 8vw, 80px); font-weight: 700; margin-bottom: 20px;
+      background: linear-gradient(180deg, var(--g9), var(--g5)); -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    #land p { font-size: 20px; color: var(--g5); max-width: 600px; margin: 0 auto 40px; }
+    #dash { padding: 100px 0 60px; min-height: 100vh; }
+    .card {
+      background: #fff; border-radius: 20px; padding: 40px; margin-bottom: 24px;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+    }
+    .ring { width: 160px; height: 160px; margin: 0 auto 32px; }
+    .ring svg { transform: rotate(-90deg); }
+    .ring circle { fill: none; stroke-width: 12; stroke-linecap: round; }
+    .ring .bg { stroke: #e8e8ed; }
+    .ring .fg { stroke: var(--p); stroke-dasharray: 440; stroke-dashoffset: 440; transition: stroke-dashoffset 1s; }
+    .stats {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 20px; margin: 32px 0;
+    }
+    .stat { text-align: center; }
+    .stat-v { font-size: 32px; font-weight: 700; color: var(--p); }
+    .stat-l { font-size: 12px; color: var(--g5); text-transform: uppercase; }
+    .week {
+      background: #fff; border-radius: 16px; margin-bottom: 16px; overflow: hidden;
+      transition: all 0.2s; cursor: pointer;
+    }
+    .week:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .wh { padding: 24px; display: flex; justify-content: space-between; align-items: center; }
+    .wh h3 { font-size: 20px; margin-bottom: 4px; }
+    .wh p { color: var(--g5); font-size: 14px; }
+    .wp { text-align: right; }
+    .bar { width: 100px; height: 6px; background: #e8e8ed; border-radius: 3px; overflow: hidden; margin-top: 8px; }
+    .fill { height: 100%; background: var(--p); transition: width 0.3s; }
+    .tasks {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px; padding: 0 24px 24px; max-height: 0; overflow: hidden; transition: max-height 0.3s;
+    }
+    .tasks.show { max-height: 2000px; }
+    .task {
+      background: var(--g1); border-radius: var(--r); padding: 16px; cursor: pointer;
+      transition: all 0.2s; display: flex; gap: 12px;
+    }
+    .task:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .task.done { background: rgba(52,199,89,0.08); border: 1px solid var(--s); }
+    .task input { width: 20px; height: 20px; cursor: pointer; }
+    .task-t { font-weight: 600; margin-bottom: 4px; }
+    .task-d { font-size: 13px; color: var(--g5); }
+    .modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(10px); justify-content: center; align-items: center; z-index: 999; padding: 20px;
+    }
+    .modal-c {
+      background: #fff; border-radius: 20px; padding: 32px; max-width: 600px; width: 100%;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .modal-h h2 { font-size: 24px; }
+    .close {
+      width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--g1);
+      cursor: pointer; font-size: 20px;
+    }
+    .modal input {
+      width: 100%; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px;
+      margin-bottom: 16px; font-size: 16px;
+    }
+    .modal input:focus { outline: none; border-color: var(--p); }
+    .subtask { margin: 16px 0; }
+    .sub-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; }
+    .sub-item input { width: 18px; height: 18px; }
+    .sub-item label { font-size: 14px; }
+    .notif {
+      position: fixed; top: 80px; right: 20px; padding: 16px 24px; border-radius: 12px;
+      color: #fff; transform: translateX(400px); transition: all 0.3s;
+    }
+    .notif.show { transform: translateX(0); }
+    .notif.s { background: var(--s); }
+    .notif.e { background: var(--e); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 12px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+    th { font-size: 12px; color: var(--g5); text-transform: uppercase; }
+    @media (max-width: 768px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .tasks { grid-template-columns: 1fr; }
+      .logo span { display: none; }
+    }
+  </style>
 </head>
 <body>
-<header>
-<nav class="c">
-<div class="logo">
-<img src="/assets/Velocity-Logo.png" alt="VL">
-<span>Velocity Lab</span>
-</div>
-<div>
-<span id="auth">
-<button onclick="showLogin()" class="btn btn-s">Sign In</button>
-<button onclick="showRegister()" class="btn btn-p">Get Started</button>
-</span>
-<span id="user" class="h">
-<span id="userName"></span>
-<button id="adminBtn" class="btn btn-a h" onclick="showAdmin()">Admin</button>
-<button onclick="logout()" class="btn btn-s">Sign Out</button>
-</span>
-</div>
-</nav>
-</header>
+  <header>
+    <nav class="c">
+      <div class="logo">
+        <img src="/assets/Velocity-Logo.png" alt="VL">
+        <span>Velocity Lab</span>
+      </div>
+      <div>
+        <span id="auth">
+          <button onclick="showLogin()" class="btn btn-s">Sign In</button>
+          <button onclick="showRegister()" class="btn btn-p">Get Started</button>
+        </span>
+        <span id="user" class="h">
+          <span id="userName"></span>
+          <button id="adminBtn" class="btn btn-a h" onclick="showAdmin()">Admin</button>
+          <button onclick="logout()" class="btn btn-s">Sign Out</button>
+        </span>
+      </div>
+    </nav>
+  </header>
 
-<main>
-<section id="land">
-<div class="c">
-<h1>Master Exchange<br>Hybrid Migration</h1>
-<p>Complete 42 hands-on tasks across 4 weeks. Build your own lab with DC, Exchange, and workstation VMs.</p>
-<div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
-<button class="btn btn-p" onclick="showRegister()">Start Training</button>
-<button class="btn btn-s" onclick="showLogin()">Sign In</button>
-</div>
-</div>
-</section>
+  <main>
+    <section id="land">
+      <div class="c">
+        <h1>Master Exchange<br>Hybrid Migration</h1>
+        <p>Complete 42 hands-on tasks across 4 weeks. Build your own lab with DC, Exchange, and workstation VMs.</p>
+        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap">
+          <button class="btn btn-p" onclick="showRegister()">Start Training</button>
+          <button class="btn btn-s" onclick="showLogin()">Sign In</button>
+        </div>
+      </div>
+    </section>
 
-<section id="dash" class="h">
-<div class="c">
-<div class="card" style="text-align:center">
-<h2 style="margin-bottom:32px">Training Progress</h2>
-<div class="ring">
-<svg viewBox="0 0 160 160">
-<circle cx="80" cy="80" r="70" class="bg"/>
-<circle cx="80" cy="80" r="70" class="fg" id="ring"/>
-</svg>
-<div style="margin-top:-100px;font-size:36px;font-weight:700" id="pct">0%</div>
-</div>
-<div class="stats">
-<div class="stat"><div class="stat-v" id="done">0</div><div class="stat-l">Tasks Done</div></div>
-<div class="stat"><div class="stat-v">42</div><div class="stat-l">Total Tasks</div></div>
-<div class="stat"><div class="stat-v" id="curWeek">Week 1</div><div class="stat-l">Current</div></div>
-<div class="stat"><div class="stat-v">3</div><div class="stat-l">VMs Required</div></div>
-</div>
-<button class="btn btn-p" onclick="newLab()">Start New Lab</button>
-</div>
+    <section id="dash" class="h">
+      <div class="c">
+        <div class="card" style="text-align: center">
+          <h2 style="margin-bottom: 32px">Training Progress</h2>
+          <div class="ring">
+            <svg viewBox="0 0 160 160">
+              <circle cx="80" cy="80" r="70" class="bg"/>
+              <circle cx="80" cy="80" r="70" class="fg" id="ring"/>
+            </svg>
+            <div style="margin-top: -100px; font-size: 36px; font-weight: 700" id="pct">0%</div>
+          </div>
+          <div class="stats">
+            <div class="stat"><div class="stat-v" id="done">0</div><div class="stat-l">Tasks Done</div></div>
+            <div class="stat"><div class="stat-v">42</div><div class="stat-l">Total Tasks</div></div>
+            <div class="stat"><div class="stat-v" id="curWeek">Week 1</div><div class="stat-l">Current</div></div>
+            <div class="stat"><div class="stat-v">3</div><div class="stat-l">VMs Required</div></div>
+          </div>
+          <button class="btn btn-p" onclick="newLab()">Start New Lab</button>
+        </div>
 
-<div id="weeks">
-<!-- Week 1 -->
-<div class="week">
-<div class="wh" onclick="toggleWeek(this)">
-<div>
-<h3>Week 1: Foundation Setup</h3>
-<p>DC setup, domain join, network shares & GPO drives</p>
-</div>
-<div class="wp">
-<div><span id="w1-done">0</span>/12 tasks</div>
-<div class="bar"><div class="fill" id="w1-bar" style="width:0%"></div></div>
-</div>
-</div>
-<div class="tasks" id="w1-tasks"></div>
-</div>
+        <div id="weeks">
+          <!-- Week 1 -->
+          <div class="week">
+            <div class="wh" onclick="toggleWeek(this)">
+              <div>
+                <h3>Week 1: Foundation Setup</h3>
+                <p>DC setup, domain join, network shares & GPO drives</p>
+              </div>
+              <div class="wp">
+                <div><span id="w1-done">0</span>/12 tasks</div>
+                <div class="bar"><div class="fill" id="w1-bar" style="width: 0%"></div></div>
+              </div>
+            </div>
+            <div class="tasks" id="w1-tasks"></div>
+          </div>
 
-<!-- Week 2 -->
-<div class="week">
-<div class="wh" onclick="toggleWeek(this)">
-<div>
-<h3>Week 2: Infrastructure</h3>
-<p>Second DC, WSUS, time servers</p>
-</div>
-<div class="wp">
-<div><span id="w2-done">0</span>/8 tasks</div>
-<div class="bar"><div class="fill" id="w2-bar" style="width:0%"></div></div>
-</div>
-</div>
-<div class="tasks" id="w2-tasks"></div>
-</div>
+          <!-- Week 2 -->
+          <div class="week">
+            <div class="wh" onclick="toggleWeek(this)">
+              <div>
+                <h3>Week 2: Infrastructure</h3>
+                <p>Second DC, WSUS, time servers</p>
+              </div>
+              <div class="wp">
+                <div><span id="w2-done">0</span>/8 tasks</div>
+                <div class="bar"><div class="fill" id="w2-bar" style="width: 0%"></div></div>
+              </div>
+            </div>
+            <div class="tasks" id="w2-tasks"></div>
+          </div>
 
-<!-- Week 3 -->
-<div class="week">
-<div class="wh" onclick="toggleWeek(this)">
-<div>
-<h3>Week 3: Exchange 2019</h3>
-<p>Upgrade to 2016, install Exchange, mailboxes</p>
-</div>
-<div class="wp">
-<div><span id="w3-done">0</span>/12 tasks</div>
-<div class="bar"><div class="fill" id="w3-bar" style="width:0%"></div></div>
-</div>
-</div>
-<div class="tasks" id="w3-tasks"></div>
-</div>
+          <!-- Week 3 -->
+          <div class="week">
+            <div class="wh" onclick="toggleWeek(this)">
+              <div>
+                <h3>Week 3: Exchange 2019</h3>
+                <p>Upgrade to 2016, install Exchange, mailboxes</p>
+              </div>
+              <div class="wp">
+                <div><span id="w3-done">0</span>/12 tasks</div>
+                <div class="bar"><div class="fill" id="w3-bar" style="width: 0%"></div></div>
+              </div>
+            </div>
+            <div class="tasks" id="w3-tasks"></div>
+          </div>
 
-<!-- Week 4 -->
-<div class="week">
-<div class="wh" onclick="toggleWeek(this)">
-<div>
-<h3>Week 4: Hybrid Cloud</h3>
-<p>External publishing, M365 hybrid setup</p>
-</div>
-<div class="wp">
-<div><span id="w4-done">0</span>/10 tasks</div>
-<div class="bar"><div class="fill" id="w4-bar" style="width:0%"></div></div>
-</div>
-</div>
-<div class="tasks" id="w4-tasks"></div>
-</div>
-</div>
-</div>
-</section>
-</main>
+          <!-- Week 4 -->
+          <div class="week">
+            <div class="wh" onclick="toggleWeek(this)">
+              <div>
+                <h3>Week 4: Hybrid Cloud</h3>
+                <p>External publishing, M365 hybrid setup</p>
+              </div>
+              <div class="wp">
+                <div><span id="w4-done">0</span>/10 tasks</div>
+                <div class="bar"><div class="fill" id="w4-bar" style="width: 0%"></div></div>
+              </div>
+            </div>
+            <div class="tasks" id="w4-tasks"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-<!-- Modals -->
-<div id="loginModal" class="modal">
-<div class="modal-c">
-<div class="modal-h">
-<h2>Welcome Back</h2>
-<button class="close" onclick="closeModal()">×</button>
-</div>
-<form id="loginForm">
-<input type="email" name="email" placeholder="Email" required>
-<input type="password" name="password" placeholder="Password" required>
-<label style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
-<input type="checkbox" name="remember" style="width:auto;margin:0"> Remember me
-</label>
-<button type="submit" class="btn btn-p" style="width:100%">Sign In</button>
-<p style="text-align:center;margin-top:16px">New? <a href="#" onclick="showRegister()">Create account</a></p>
-</form>
-</div>
-</div>
+  <!-- Modals -->
+  <div id="loginModal" class="modal">
+    <div class="modal-c">
+      <div class="modal-h">
+        <h2>Welcome Back</h2>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
+      <form id="loginForm">
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px">
+          <input type="checkbox" name="remember" style="width: auto; margin: 0"> Remember me
+        </label>
+        <button type="submit" class="btn btn-p" style="width: 100%">Sign In</button>
+        <p style="text-align: center; margin-top: 16px">New? <a href="#" onclick="showRegister()">Create account</a></p>
+      </form>
+    </div>
+  </div>
 
-<div id="registerModal" class="modal">
-<div class="modal-c">
-<div class="modal-h">
-<h2>Get Started</h2>
-<button class="close" onclick="closeModal()">×</button>
-</div>
-<form id="registerForm">
-<input type="text" name="name" placeholder="Full Name" required>
-<input type="email" name="email" placeholder="Email" required>
-<input type="password" name="password" placeholder="Password (8+ chars)" required minlength="8">
-<button type="submit" class="btn btn-p" style="width:100%">Create Account</button>
-<p style="text-align:center;margin-top:16px">Have account? <a href="#" onclick="showLogin()">Sign in</a></p>
-</form>
-</div>
-</div>
+  <div id="registerModal" class="modal">
+    <div class="modal-c">
+      <div class="modal-h">
+        <h2>Get Started</h2>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
+      <form id="registerForm">
+        <input type="text" name="name" placeholder="Full Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password (8+ chars)" required minlength="8">
+        <button type="submit" class="btn btn-p" style="width: 100%">Create Account</button>
+        <p style="text-align: center; margin-top: 16px">Have account? <a href="#" onclick="showLogin()">Sign in</a></p>
+      </form>
+    </div>
+  </div>
 
-<div id="taskModal" class="modal">
-<div class="modal-c">
-<div class="modal-h">
-<h2 id="taskTitle"></h2>
-<button class="close" onclick="closeModal()">×</button>
-</div>
-<div id="taskBody"></div>
-</div>
-</div>
+  <div id="taskModal" class="modal">
+    <div class="modal-c">
+      <div class="modal-h">
+        <h2 id="taskTitle"></h2>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
+      <div id="taskBody"></div>
+    </div>
+  </div>
 
-<div id="adminModal" class="modal">
-<div class="modal-c">
-<div class="modal-h">
-<h2>Leaderboard</h2>
-<button class="close" onclick="closeModal()">×</button>
-</div>
-<div id="leaderboard"></div>
-</div>
-</div>
+  <div id="adminModal" class="modal">
+    <div class="modal-c">
+      <div class="modal-h">
+        <h2>Leaderboard</h2>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
+      <div id="leaderboard"></div>
+    </div>
+  </div>
 
-<div id="notif" class="notif"></div>
+  <div id="notif" class="notif"></div>
 
-<script src="/task-definitions.js"></script>
-<script>
-const TASKS={week1:{t:['install-server2012','configure-static-ip','install-adds-role','promote-to-dc','configure-dns-server','create-domain-users','setup-vm-dns','join-vm-domain','create-hidden-share','map-drive-gpo','map-drive-script','create-security-group']},week2:{t:['install-second-server','promote-additional-dc','install-wsus-role','configure-wsus-settings','setup-wsus-gpo','configure-primary-time','configure-secondary-time','test-infrastructure']},week3:{t:['backup-servers','upgrade-dc1-2016','upgrade-dc2-2016','raise-functional-levels','prepare-exchange-server','install-exchange-prereqs','extend-ad-schema','install-exchange-2019','configure-exchange-basic','create-mailboxes','test-mailbox-access','configure-internal-mailflow']},week4:{t:['configure-external-dns','setup-firewall-rules','install-ssl-certificates','configure-external-mailflow','setup-modern-auth','prepare-m365-tenant','install-aad-connect','run-hybrid-wizard','configure-hybrid-mailflow','verify-hybrid-functionality']}};
-let A={u:null,p:{},auth:false};
-const $=id=>document.getElementById(id),show=e=>e?.classList.remove('h'),hide=e=>e?.classList.add('h');
-const ck={get:n=>document.cookie.match(`${n}=([^;]+)`)?.[1],set:(n,v)=>{document.cookie=`${n}=${v};path=/;max-age=604800`},del:n=>{document.cookie=`${n}=;path=/;max-age=0`}};
-const msg=(m,t='s')=>{const n=$('notif');n.textContent=m;n.className=`notif ${t} show`;setTimeout(()=>n.classList.remove('show'),3000)};
-const api=async(ep,opt={})=>{try{const r=await fetch('/api/csrf');const{token}=await r.json();if(opt.body instanceof FormData)opt.body.append('csrf_token',token);const res=await fetch(ep,{credentials:'same-origin',...opt});const d=await res.json();if(!d.success)throw new Error(d.error);return d}catch(e){throw e}};
-const auth={async check(){const u=ck.get('user');if(u){try{A.u=JSON.parse(decodeURIComponent(u));A.auth=true;if(A.u.role==='admin')show($('adminBtn'));ui.dash();dash.load()}catch{auth.logout()}}else ui.land()},async login(fd){try{const r=await api('/api/login',{method:'POST',body:fd});ck.set('user',JSON.stringify({name:r.name,role:r.role}));A.u={name:r.name,role:r.role};A.auth=true;if(A.u.role==='admin')show($('adminBtn'));ui.dash();dash.load();closeModal();msg(`Welcome, ${r.name}!`)}catch(e){msg(e.message||'Login failed','e')}},async register(fd){try{const r=await api('/api/register',{method:'POST',body:fd});ck.set('user',JSON.stringify({name:r.name,role:r.role}));A.u={name:r.name,role:r.role};A.auth=true;ui.dash();dash.load();closeModal();msg(`Welcome, ${r.name}!`)}catch(e){msg(e.message||'Registration failed','e')}},logout(){api('/api/logout',{method:'POST'}).catch(()=>{});ck.del('user');A={u:null,p:{},auth:false};hide($('adminBtn'));ui.land();msg('Logged out')}};
-const ui={land(){hide($('dash'));show($('land'));hide($('user'));show($('auth'))},dash(){hide($('land'));show($('dash'));show($('user'));hide($('auth'));$('userName').textContent=`Hi, ${A.u.name}`}};
-const dash={async load(){if(!A.auth)return;try{const r=await api('/api/progress');A.p=r.data;dash.update()}catch{msg('Failed to load','e')}},update(){let done=0;Object.entries(TASKS).forEach(([w,d])=>{const wp=A.p[w]||{};const wd=d.t.filter(t=>wp[t]?.completed).length;done+=wd;$(`${w}-done`).textContent=wd;$(`${w}-bar`).style.width=`${(wd/d.t.length)*100}%`;const c=$(`${w}-tasks`);c.innerHTML=d.t.map(t=>`<div class="task ${wp[t]?.completed?'done':''}" onclick="openTask('${w}','${t}')"><input type="checkbox" ${wp[t]?.completed?'checked':''} onchange="toggleTask('${w}','${t}',this.checked)" onclick="event.stopPropagation()"><div><div class="task-t">${t.replace(/-/g,' ').replace(/\b\w/g,l=>l.toUpperCase())}</div><div class="task-d">Click for details</div></div></div>`).join('')});const pct=Math.round((done/42)*100);$('pct').textContent=`${pct}%`;$('done').textContent=done;$('curWeek').textContent=done>=32?'Week 4':done>=20?'Week 3':done>=12?'Week 2':'Week 1';$('ring').style.strokeDashoffset=440-(pct/100)*440}};
-const toggleWeek=h=>h.nextElementSibling.classList.toggle('show');
-const toggleTask=async(w,t,c)=>{try{const fd=new FormData();fd.append('week',w);fd.append('task',t);fd.append('checked',c);const r=await api('/api/progress',{method:'POST',body:fd});if(!A.p[w])A.p[w]={};if(!A.p[w][t])A.p[w][t]={};A.p[w][t].completed=c;dash.update();if(c)msg('✅ Task completed!')}catch{msg('Failed to update','e');event.target.checked=!c}};
-const toggleSub=async(w,t,s,c)=>{try{const fd=new FormData();fd.append('week',w);fd.append('task',t);fd.append('subtask',`step${s}`);fd.append('subtask_checked',c);await api('/api/progress',{method:'POST',body:fd});if(!A.p[w])A.p[w]={};if(!A.p[w][t])A.p[w][t]={subtasks:{}};if(!A.p[w][t].subtasks)A.p[w][t].subtasks={};A.p[w][t].subtasks[`step${s}`]=c;if(c)msg('✅ Step done!')}catch{msg('Failed','e')}};
-const openTask=(w,t)=>{const k=`${w}-${t}`;const td=window.TASK_DEFINITIONS?.[k]||{title:t.replace(/-/g,' ').replace(/\b\w/g,l=>l.toUpperCase()),description:'<p>Coming soon...</p>'};const p=A.p[w]?.[t]?.subtasks||{};$('taskTitle').textContent=td.title;$('taskBody').innerHTML=td.description;setTimeout(()=>{document.querySelectorAll('.subtask input').forEach(cb=>{const s=cb.dataset.step;cb.checked=p[`step${s}`]||false;cb.onchange=()=>toggleSub(w,t,s,cb.checked)})},100);$('taskModal').style.display='flex'};
-const newLab=async()=>{if(!confirm('Start new lab? This resets progress.'))return;try{await api('/api/lab/start-new',{method:'POST'});msg('🚀 New lab started!');dash.load()}catch{msg('Failed','e')}};
-const showAdmin=async()=>{try{const r=await api('/api/admin/users-progress');$('leaderboard').innerHTML=`<table><thead><tr><th>Rank</th><th>Name</th><th>Progress</th><th>Tasks</th></tr></thead><tbody>${r.data.map((u,i)=>`<tr><td>${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td><td>${u.name}</td><td>${u.progress}%</td><td>${u.completedTasks}/42</td></tr>`).join('')}</tbody></table>`;$('adminModal').style.display='flex'}catch{msg('Failed','e')}};
-window.showLogin=()=>{hide($('registerModal'));$('loginModal').style.display='flex'};
-window.showRegister=()=>{hide($('loginModal'));$('registerModal').style.display='flex'};
-window.closeModal=()=>document.querySelectorAll('.modal').forEach(m=>m.style.display='none');
-window.logout=auth.logout;
-window.newLab=newLab;
-window.showAdmin=showAdmin;
-window.openTask=openTask;
-window.toggleTask=toggleTask;
-window.toggleWeek=toggleWeek;
-document.addEventListener('DOMContentLoaded',()=>{$('loginForm').onsubmit=e=>{e.preventDefault();auth.login(new FormData(e.target))};$('registerForm').onsubmit=e=>{e.preventDefault();auth.register(new FormData(e.target))};document.onclick=e=>{if(e.target.classList.contains('modal'))closeModal()};auth.check()});
-</script>
+  <script src="/task-definitions.js"></script>
+  <script>
+    const TASKS = {
+      week1: { t: ['install-server2012', 'configure-static-ip', 'install-adds-role', 'promote-to-dc', 'configure-dns-server', 'create-domain-users', 'setup-vm-dns', 'join-vm-domain', 'create-hidden-share', 'map-drive-gpo', 'map-drive-script', 'create-security-group'] },
+      week2: { t: ['install-second-server', 'promote-additional-dc', 'install-wsus-role', 'configure-wsus-settings', 'setup-wsus-gpo', 'configure-primary-time', 'configure-secondary-time', 'test-infrastructure'] },
+      week3: { t: ['backup-servers', 'upgrade-dc1-2016', 'upgrade-dc2-2016', 'raise-functional-levels', 'prepare-exchange-server', 'install-exchange-prereqs', 'extend-ad-schema', 'install-exchange-2019', 'configure-exchange-basic', 'create-mailboxes', 'test-mailbox-access', 'configure-internal-mailflow'] },
+      week4: { t: ['configure-external-dns', 'setup-firewall-rules', 'install-ssl-certificates', 'configure-external-mailflow', 'setup-modern-auth', 'prepare-m365-tenant', 'install-aad-connect', 'run-hybrid-wizard', 'configure-hybrid-mailflow', 'verify-hybrid-functionality'] }
+    };
+    let A = { u: null, p: {}, auth: false, sessionToken: null };
+    const $ = id => document.getElementById(id);
+    const show = e => e?.classList.remove('h');
+    const hide = e => e?.classList.add('h');
+
+    const ck = {
+      get: n => document.cookie.match(`${n}=([^;]+)`)?.[1],
+      set: (n, v) => { document.cookie = `${n}=${v};path=/;max-age=604800`; },
+      del: n => { document.cookie = `${n}=;path=/;max-age=0`; }
+    };
+
+    const msg = (m, t = 's') => {
+      const n = $('notif');
+      n.textContent = m;
+      n.className = `notif ${t} show`;
+      setTimeout(() => n.classList.remove('show'), 3000);
+    };
+
+    const api = async (ep, opt = {}) => {
+      try {
+        const r = await fetch('/api/csrf');
+        const { token } = await r.json();
+        const headers = new Headers(opt.headers || {});
+        if (A.sessionToken) headers.set('Authorization', `Bearer ${A.sessionToken}`);
+        if (opt.body instanceof FormData) opt.body.append('csrf_token', token);
+        const res = await fetch(ep, {
+          credentials: 'same-origin',
+          headers,
+          ...opt
+        });
+        const d = await res.json();
+        if (!d.success) throw new Error(d.error);
+        return d;
+      } catch (e) {
+        throw e;
+      }
+    };
+
+    const auth = {
+      async check() {
+        const u = ck.get('user');
+        A.sessionToken = ck.get('session');
+        if (u && A.sessionToken) {
+          try {
+            A.u = JSON.parse(decodeURIComponent(u));
+            A.auth = true;
+            if (A.u.role === 'admin') show($('adminBtn'));
+            ui.dash();
+            dash.load();
+          } catch {
+            auth.logout();
+          }
+        } else {
+          ui.land();
+        }
+      },
+      async login(fd) {
+        try {
+          const r = await api('/api/login', { method: 'POST', body: fd });
+          ck.set('user', JSON.stringify({ name: r.name, role: r.role }));
+          ck.set('session', r.sessionToken);
+          A.u = { name: r.name, role: r.role };
+          A.auth = true;
+          A.sessionToken = r.sessionToken;
+          if (A.u.role === 'admin') show($('adminBtn'));
+          ui.dash();
+          dash.load();
+          closeModal();
+          msg(`Welcome, ${r.name}!`);
+        } catch (e) {
+          msg(e.message || 'Login failed', 'e');
+        }
+      },
+      async register(fd) {
+        try {
+          const r = await api('/api/register', { method: 'POST', body: fd });
+          ck.set('user', JSON.stringify({ name: r.name, role: r.role }));
+          ck.set('session', r.sessionToken);
+          A.u = { name: r.name, role: r.role };
+          A.auth = true;
+          A.sessionToken = r.sessionToken;
+          ui.dash();
+          dash.load();
+          closeModal();
+          msg(`Welcome, ${r.name}!`);
+        } catch (e) {
+          msg(e.message || 'Registration failed', 'e');
+        }
+      },
+      logout() {
+        api('/api/logout', { method: 'POST' }).catch(() => {});
+        ck.del('user');
+        ck.del('session');
+        A = { u: null, p: {}, auth: false, sessionToken: null };
+        hide($('adminBtn'));
+        ui.land();
+        msg('Logged out');
+      }
+    };
+
+    const ui = {
+      land() {
+        hide($('dash'));
+        show($('land'));
+        hide($('user'));
+        show($('auth'));
+      },
+      dash() {
+        hide($('land'));
+        show($('dash'));
+        show($('user'));
+        hide($('auth'));
+        $('userName').textContent = `Hi, ${A.u.name}`;
+      }
+    };
+
+    const dash = {
+      async load() {
+        if (!A.auth) return;
+        try {
+          const r = await api('/api/progress');
+          A.p = r.data;
+          dash.update();
+        } catch (e) {
+          console.error('Progress load error:', e);
+          msg('Failed to load progress', 'e');
+        }
+      },
+      update() {
+        let done = 0;
+        Object.entries(TASKS).forEach(([w, d]) => {
+          const wp = A.p[w] || {};
+          const wd = d.t.filter(t => wp[t]?.completed).length;
+          done += wd;
+          $(`${w}-done`).textContent = wd;
+          $(`${w}-bar`).style.width = `${(wd / d.t.length) * 100}%`;
+          const c = $(`${w}-tasks`);
+          c.innerHTML = d.t.map(t => `
+            <div class="task ${wp[t]?.completed ? 'done' : ''}" onclick="openTask('${w}', '${t}')">
+              <input type="checkbox" ${wp[t]?.completed ? 'checked' : ''} onchange="toggleTask('${w}', '${t}', this.checked)" onclick="event.stopPropagation()">
+              <div>
+                <div class="task-t">${t.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>
+                <div class="task-d">Click for details</div>
+              </div>
+            </div>
+          `).join('');
+        });
+        const pct = Math.round((done / 42) * 100);
+        $('pct').textContent = `${pct}%`;
+        $('done').textContent = done;
+        $('curWeek').textContent = done >= 32 ? 'Week 4' : done >= 20 ? 'Week 3' : done >= 12 ? 'Week 2' : 'Week 1';
+        $('ring').style.strokeDashoffset = 440 - (pct / 100) * 440;
+      }
+    };
+
+    const toggleWeek = h => h.nextElementSibling.classList.toggle('show');
+
+    const toggleTask = async (w, t, c) => {
+      try {
+        const fd = new FormData();
+        fd.append('week', w);
+        fd.append('task', t);
+        fd.append('checked', c);
+        const r = await api('/api/progress', { method: 'POST', body: fd });
+        if (!A.p[w]) A.p[w] = {};
+        if (!A.p[w][t]) A.p[w][t] = {};
+        A.p[w][t].completed = c;
+        dash.update();
+        if (c) msg('✅ Task completed!');
+      } catch (e) {
+        msg('Failed to update task', 'e');
+        event.target.checked = !c;
+      }
+    };
+
+    const toggleSub = async (w, t, s, c) => {
+      try {
+        const fd = new FormData();
+        fd.append('week', w);
+        fd.append('task', t);
+        fd.append('subtask', `step${s}`);
+        fd.append('subtask_checked', c);
+        await api('/api/progress', { method: 'POST', body: fd });
+        if (!A.p[w]) A.p[w] = {};
+        if (!A.p[w][t]) A.p[w][t] = { subtasks: {} };
+        if (!A.p[w][t].subtasks) A.p[w][t].subtasks = {};
+        A.p[w][t].subtasks[`step${s}`] = c;
+        if (c) msg('✅ Step done!');
+      } catch (e) {
+        msg('Failed to update subtask', 'e');
+      }
+    };
+
+    const openTask = (w, t) => {
+      const k = `${w}-${t}`;
+      const td = window.TASK_DEFINITIONS?.[k] || {
+        title: t.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        description: '<p>Coming soon...</p>'
+      };
+      const p = A.p[w]?.[t]?.subtasks || {};
+      $('taskTitle').textContent = td.title;
+      $('taskBody').innerHTML = td.description;
+      setTimeout(() => {
+        document.querySelectorAll('.subtask input').forEach(cb => {
+          const s = cb.dataset.step;
+          cb.checked = p[`step${s}`] || false;
+          cb.onchange = () => toggleSub(w, t, s, cb.checked);
+        });
+      }, 100);
+      $('taskModal').style.display = 'flex';
+    };
+
+    const newLab = async () => {
+      if (!confirm('Start new lab? This resets progress.')) return;
+      try {
+        await api('/api/lab/start-new', { method: 'POST' });
+        msg('🚀 New lab started!');
+        dash.load();
+      } catch (e) {
+        msg('Failed to start new lab', 'e');
+      }
+    };
+
+    const showAdmin = async () => {
+      try {
+        const r = await api('/api/admin/users-progress');
+        $('leaderboard').innerHTML = `
+          <table>
+            <thead><tr><th>Rank</th><th>Name</th><th>Progress</th><th>Tasks</th></tr></thead>
+            <tbody>
+              ${r.data.map((u, i) => `
+                <tr>
+                  <td>${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</td>
+                  <td>${u.name}</td>
+                  <td>${u.progress}%</td>
+                  <td>${u.completedTasks}/42</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+        $('adminModal').style.display = 'flex';
+      } catch (e) {
+        msg('Failed to load leaderboard', 'e');
+      }
+    };
+
+    window.showLogin = () => { hide($('registerModal')); $('loginModal').style.display = 'flex'; };
+    window.showRegister = () => { hide($('loginModal')); $('registerModal').style.display = 'flex'; };
+    window.closeModal = () => document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    window.logout = auth.logout;
+    window.newLab = newLab;
+    window.showAdmin = showAdmin;
+    window.openTask = openTask;
+    window.toggleTask = toggleTask;
+    window.toggleWeek = toggleWeek;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      $('loginForm').onsubmit = e => {
+        e.preventDefault();
+        auth.login(new FormData(e.target));
+      };
+      $('registerForm').onsubmit = e => {
+        e.preventDefault();
+        auth.register(new FormData(e.target));
+      };
+      document.onclick = e => {
+        if (e.target.classList.contains('modal')) closeModal();
+      };
+      auth.check();
+    });
+  </script>
 </body>
 </html>
