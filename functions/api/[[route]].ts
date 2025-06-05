@@ -48,7 +48,6 @@ export const onRequest: PagesFunction<{
   const path = url.pathname;
   const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
 
-  // Handle CORS preflight
   if (request.method === 'OPTIONS') {
     return new Response(null, {
       headers: {
@@ -60,19 +59,14 @@ export const onRequest: PagesFunction<{
     });
   }
 
-  // CSRF Token Generation
   if (path === '/api/csrf' && request.method === 'GET') {
     const token = await generateCSRFToken(env);
     return new Response(JSON.stringify({ success: true, token, expiresIn: 3600 }), {
       status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   }
 
-  // Login
   if (path === '/api/login' && request.method === 'POST') {
     let email, password, remember, csrf_token;
     const contentType = request.headers.get('Content-Type') || '';
@@ -101,7 +95,7 @@ export const onRequest: PagesFunction<{
 
     await updateLastLogin(env, user);
     const sessionToken = await createSession(env, user.id, remember);
-    await logActivity(env, user.id, 'login_successful', { email, remember, ip });
+    await logActivity(env, user.id, 'login_successful', { email, ip });
 
     return new Response(JSON.stringify({
       success: true,
@@ -118,7 +112,6 @@ export const onRequest: PagesFunction<{
     });
   }
 
-  // Register
   if (path === '/api/register' && request.method === 'POST') {
     let name, email, password, csrf_token;
     const contentType = request.headers.get('Content-Type') || '';
@@ -171,7 +164,6 @@ export const onRequest: PagesFunction<{
     });
   }
 
-  // Logout
   if (path === '/api/logout' && request.method === 'POST') {
     const sessionToken = request.headers.get('Authorization')?.replace('Bearer ', '') || request.headers.get('Cookie')?.match(/session=([^;]+)/)?.[1];
     if (sessionToken) {
@@ -187,7 +179,6 @@ export const onRequest: PagesFunction<{
     });
   }
 
-  // Progress (GET)
   if (path === '/api/progress' && request.method === 'GET') {
     const sessionToken = request.headers.get('Authorization')?.replace('Bearer ', '') || request.headers.get('Cookie')?.match(/session=([^;]+)/)?.[1];
     if (!sessionToken) return errorResponse('Unauthorized', 401);
@@ -200,14 +191,10 @@ export const onRequest: PagesFunction<{
 
     return new Response(JSON.stringify({ success: true, data }), {
       status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   }
 
-  // Progress (POST)
   if (path === '/api/progress' && request.method === 'POST') {
     const sessionToken = request.headers.get('Authorization')?.replace('Bearer ', '') || request.headers.get('Cookie')?.match(/session=([^;]+)/)?.[1];
     if (!sessionToken) return errorResponse('Unauthorized', 401);
@@ -256,14 +243,10 @@ export const onRequest: PagesFunction<{
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   }
 
-  // Start New Lab
   if (path === '/api/lab/start-new' && request.method === 'POST') {
     const sessionToken = request.headers.get('Authorization')?.replace('Bearer ', '') || request.headers.get('Cookie')?.match(/session=([^;]+)/)?.[1];
     if (!sessionToken) return errorResponse('Unauthorized', 401);
@@ -304,14 +287,10 @@ export const onRequest: PagesFunction<{
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   }
 
-  // Admin: Users Progress
   if (path === '/api/admin/users-progress' && request.method === 'GET') {
     const sessionToken = request.headers.get('Authorization')?.replace('Bearer ', '') || request.headers.get('Cookie')?.match(/session=([^;]+)/)?.[1];
     if (!sessionToken) return errorResponse('Unauthorized', 401);
@@ -319,11 +298,26 @@ export const onRequest: PagesFunction<{
     const userId = await validateSession(env, request);
     if (!userId) return errorResponse('Invalid session', 401);
 
-    const user = await getUserByEmail(env, (await env.USERS.list()).keys.find(k => env.USERS.get(k.name).then(u => u && JSON.parse(u).id === userId))?.name.replace('user:', '') || '');
-    if (!user || user.role !== 'admin') return errorResponse('Forbidden', 403);
+    // Simplified user lookup
+    let currentUser: User | null = null;
+    const userKeys = await env.USERS.list();
+    for (const key of userKeys.keys) {
+      const userData = await env.USERS.get(key.name);
+      if (userData) {
+        const user: User = JSON.parse(userData);
+        if (user.id === userId) {
+          currentUser = user;
+          break;
+        }
+      }
+    }
+
+    if (!currentUser || currentUser.role !== 'admin') {
+      await logActivity(env, userId, 'admin_access_denied', { ip });
+      return errorResponse('Forbidden', 403);
+    }
 
     const users = [];
-    const userKeys = await env.USERS.list();
     for (const key of userKeys.keys) {
       const userData = await env.USERS.get(key.name);
       if (userData) {
@@ -339,13 +333,9 @@ export const onRequest: PagesFunction<{
     }
 
     users.sort((a, b) => b.progress - a.progress);
-
     return new Response(JSON.stringify({ success: true, data: users }), {
       status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
     });
   }
 
