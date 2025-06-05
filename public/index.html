@@ -328,28 +328,40 @@
 
     const api = async (ep, opt = {}) => {
       try {
-        const r = await fetch('/api/csrf', { credentials: 'same-origin' });
-        if (!r.ok) throw new Error(`CSRF fetch failed: ${r.status}`);
-        const { token } = await r.json();
-        if (opt.body instanceof FormData) {
-          opt.body.append('csrf_token', token);
-        } else if (opt.body) {
-          opt.body = new FormData();
-          for (const [key, value] of Object.entries(opt.body)) {
-            opt.body.append(key, value);
-          }
-          opt.body.append('csrf_token', token);
-        }
-        const headers = new Headers(opt.headers || {});
-        if (!(opt.body instanceof FormData)) headers.set('Content-Type', 'application/x-www-form-urlencoded');
+        let headers = new Headers(opt.headers || {});
         if (A.sessionToken) headers.set('Authorization', `Bearer ${A.sessionToken}`);
-        const body = opt.body instanceof FormData ? opt.body : new URLSearchParams(opt.body).toString();
+        
+        // Skip CSRF for GET requests
+        if (opt.method && ['POST', 'PUT', 'DELETE'].includes(opt.method.toUpperCase())) {
+          const r = await fetch('/api/csrf', { credentials: 'same-origin' });
+          if (!r.ok) throw new Error(`CSRF fetch failed: ${r.status}`);
+          const { token } = await r.json();
+          
+          if (opt.body instanceof FormData) {
+            opt.body.append('csrf_token', token);
+          } else if (opt.body) {
+            opt.body = new FormData();
+            for (const [key, value] of Object.entries(opt.body)) {
+              opt.body.append(key, value);
+            }
+            opt.body.append('csrf_token', token);
+          } else {
+            opt.body = new FormData();
+            opt.body.append('csrf_token', token);
+          }
+          
+          if (!(opt.body instanceof FormData)) headers.set('Content-Type', 'application/x-www-form-urlencoded');
+        }
+        
+        const body = opt.body instanceof FormData ? opt.body : opt.body ? new URLSearchParams(opt.body).toString() : undefined;
+        
         const res = await fetch(ep, {
           credentials: 'same-origin',
           headers,
           ...opt,
           body
         });
+        
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         const d = await res.json();
         if (!d.success) throw new Error(d.error || 'Request failed');
@@ -446,7 +458,7 @@
       async load() {
         if (!A.auth) return;
         try {
-          const r = await api('/api/progress');
+          const r = await api('/api/progress', { method: 'GET' });
           A.p = r.data;
           dash.update();
         } catch (e) {
@@ -553,7 +565,7 @@
 
     const showAdmin = async () => {
       try {
-        const r = await api('/api/admin/users-progress');
+        const r = await api('/api/admin/users-progress', { method: 'GET' });
         $('leaderboard').innerHTML = `
           <table>
             <thead><tr><th>Rank</th><th>Name</th><th>Progress</th><th>Tasks</th></tr></thead>
@@ -598,12 +610,10 @@
       document.onclick = e => {
         if (e.target.classList.contains('modal')) closeModal();
       };
-      // Log loaded scripts to debug injected.js
       console.log('Loaded scripts:', Array.from(document.scripts).map(s => s.src));
       auth.check();
     });
 
-    // Intercept and log custom events to debug injected.js
     window.addEventListener('message', e => {
       if (e.data?.type === 'hide-notification') {
         console.error('Caught hide-notification message:', e);
