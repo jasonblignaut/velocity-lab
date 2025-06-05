@@ -305,15 +305,17 @@
       week3: { t: ['backup-servers', 'upgrade-dc1-2016', 'upgrade-dc2-2016', 'raise-functional-levels', 'prepare-exchange-server', 'install-exchange-prereqs', 'extend-ad-schema', 'install-exchange-2019', 'configure-exchange-basic', 'create-mailboxes', 'test-mailbox-access', 'configure-internal-mailflow'] },
       week4: { t: ['configure-external-dns', 'setup-firewall-rules', 'install-ssl-certificates', 'configure-external-mailflow', 'setup-modern-auth', 'prepare-m365-tenant', 'install-aad-connect', 'run-hybrid-wizard', 'configure-hybrid-mailflow', 'verify-hybrid-functionality'] }
     };
-    let A = { u: null, p: {}, auth: false, sessionToken: null };
+    let A = { u: null, p: {}, auth: false, sessionToken: null, csrfToken: null };
     const $ = id => document.getElementById(id);
     const show = e => e?.classList.remove('h');
     const hide = e => e?.classList.add('h');
 
     const ck = {
       get: n => document.cookie.match(`${n}=([^;]+)`)?.[1],
-      set: (n, v) => { document.cookie = `${n}=${v};path=/;max-age=604800`; },
-      del: n => { document.cookie = `${n}=;path=/;max-age=0`; }
+      set: (n, v, secure = true) => {
+        document.cookie = `${n}=${v};path=/;max-age=604800;SameSite=Strict${secure ? ';Secure' : ''}`;
+      },
+      del: n => { document.cookie = `${n}=;path=/;max-age=0;SameSite=Strict;Secure`; }
     };
 
     const msg = (m, t = 's') => {
@@ -325,20 +327,29 @@
 
     const api = async (ep, opt = {}) => {
       try {
-        const r = await fetch('/api/csrf');
-        const { token } = await r.json();
+        // Fetch CSRF token if not already stored
+        if (!A.csrfToken) {
+          const r = await fetch('/api/csrf', { credentials: 'same-origin' });
+          if (!r.ok) throw new Error(`CSRF fetch failed: ${r.status}`);
+          const { token } = await r.json();
+          A.csrfToken = token;
+        }
         const headers = new Headers(opt.headers || {});
+        headers.set('Content-Type', 'application/json');
         if (A.sessionToken) headers.set('Authorization', `Bearer ${A.sessionToken}`);
-        if (opt.body instanceof FormData) opt.body.append('csrf_token', token);
+        const body = opt.body ? JSON.stringify({ ...opt.body, csrf_token: A.csrfToken }) : undefined;
         const res = await fetch(ep, {
           credentials: 'same-origin',
           headers,
-          ...opt
+          ...opt,
+          body
         });
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         const d = await res.json();
-        if (!d.success) throw new Error(d.error);
+        if (!d.success) throw new Error(d.error || 'Request failed');
         return d;
       } catch (e) {
+        console.error(`API error for ${ep}:`, e);
         throw e;
       }
     };
@@ -354,51 +365,62 @@
             if (A.u.role === 'admin') show($('adminBtn'));
             ui.dash();
             dash.load();
-          } catch {
+          } catch (e) {
+            console.error('Auth check error:', e);
             auth.logout();
           }
         } else {
           ui.land();
         }
       },
-      async login(fd) {
+      async login({ email, password, remember }) {
         try {
-          const r = await api('/api/login', { method: 'POST', body: fd });
+          const r = await api('/api/login', {
+            method: 'POST',
+            body: { email, password, remember }
+          });
           ck.set('user', JSON.stringify({ name: r.name, role: r.role }));
           ck.set('session', r.sessionToken);
           A.u = { name: r.name, role: r.role };
           A.auth = true;
           A.sessionToken = r.sessionToken;
+          A.csrfToken = null; // Reset CSRF token after use
           if (A.u.role === 'admin') show($('adminBtn'));
           ui.dash();
           dash.load();
           closeModal();
           msg(`Welcome, ${r.name}!`);
         } catch (e) {
+          console.error('Login error:', e);
           msg(e.message || 'Login failed', 'e');
         }
       },
-      async register(fd) {
+      async register({ name, email, password }) {
         try {
-          const r = await api('/api/register', { method: 'POST', body: fd });
+          const r = await api('/api/register', {
+            method: 'POST',
+            body: { name, email, password }
+          });
           ck.set('user', JSON.stringify({ name: r.name, role: r.role }));
           ck.set('session', r.sessionToken);
           A.u = { name: r.name, role: r.role };
           A.auth = true;
           A.sessionToken = r.sessionToken;
+          A.csrfToken = null; // Reset CSRF token after use
           ui.dash();
           dash.load();
           closeModal();
           msg(`Welcome, ${r.name}!`);
         } catch (e) {
+          console.error('Register error:', e);
           msg(e.message || 'Registration failed', 'e');
         }
       },
       logout() {
-        api('/api/logout', { method: 'POST' }).catch(() => {});
+        api('/api/logout', { method: 'POST' }).catch(e => console.error('Logout error:', e));
         ck.del('user');
         ck.del('session');
-        A = { u: null, p: {}, auth: false, sessionToken: null };
+        A = { u: null, p: {}, auth: false, sessionToken: null, csrfToken: null };
         hide($('adminBtn'));
         ui.land();
         msg('Logged out');
@@ -464,17 +486,18 @@
 
     const toggleTask = async (w, t, c) => {
       try {
-        const fd = new FormData();
-        fd.append('week', w);
-        fd.append('task', t);
-        fd.append('checked', c);
-        const r = await api('/api/progress', { method: 'POST', body: fd });
+        const r = await api('/api/progress', {
+          method: 'POST',
+          body: { week: w, task: t, checked: c }
+        });
         if (!A.p[w]) A.p[w] = {};
         if (!A.p[w][t]) A.p[w][t] = {};
         A.p[w][t].completed = c;
         dash.update();
         if (c) msg('✅ Task completed!');
+        A.csrfToken = null; // Reset CSRF token after use
       } catch (e) {
+        console.error('Toggle task error:', e);
         msg('Failed to update task', 'e');
         event.target.checked = !c;
       }
@@ -482,18 +505,18 @@
 
     const toggleSub = async (w, t, s, c) => {
       try {
-        const fd = new FormData();
-        fd.append('week', w);
-        fd.append('task', t);
-        fd.append('subtask', `step${s}`);
-        fd.append('subtask_checked', c);
-        await api('/api/progress', { method: 'POST', body: fd });
+        const r = await api('/api/progress', {
+          method: 'POST',
+          body: { week: w, task: t, subtask: `step${s}`, subtask_checked: c }
+        });
         if (!A.p[w]) A.p[w] = {};
         if (!A.p[w][t]) A.p[w][t] = { subtasks: {} };
         if (!A.p[w][t].subtasks) A.p[w][t].subtasks = {};
         A.p[w][t].subtasks[`step${s}`] = c;
         if (c) msg('✅ Step done!');
+        A.csrfToken = null; // Reset CSRF token after use
       } catch (e) {
+        console.error('Toggle subtask error:', e);
         msg('Failed to update subtask', 'e');
       }
     };
@@ -504,13 +527,12 @@
         title: t.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
         description: '<p>Coming soon...</p>'
       };
-      const p = A.p[w]?.[t]?.subtasks || {};
       $('taskTitle').textContent = td.title;
       $('taskBody').innerHTML = td.description;
       setTimeout(() => {
         document.querySelectorAll('.subtask input').forEach(cb => {
           const s = cb.dataset.step;
-          cb.checked = p[`step${s}`] || false;
+          cb.checked = A.p[w]?.[t]?.subtasks?.[`step${s}`] || false;
           cb.onchange = () => toggleSub(w, t, s, cb.checked);
         });
       }, 100);
@@ -523,7 +545,9 @@
         await api('/api/lab/start-new', { method: 'POST' });
         msg('🚀 New lab started!');
         dash.load();
+        A.csrfToken = null; // Reset CSRF token after use
       } catch (e) {
+        console.error('New lab error:', e);
         msg('Failed to start new lab', 'e');
       }
     };
@@ -547,7 +571,9 @@
           </table>
         `;
         $('adminModal').style.display = 'flex';
+        A.csrfToken = null; // Reset CSRF token after use
       } catch (e) {
+        console.error('Admin load error:', e);
         msg('Failed to load leaderboard', 'e');
       }
     };
@@ -565,17 +591,36 @@
     document.addEventListener('DOMContentLoaded', () => {
       $('loginForm').onsubmit = e => {
         e.preventDefault();
-        auth.login(new FormData(e.target));
+        const fd = new FormData(e.target);
+        auth.login({
+          email: fd.get('email')?.toString().trim().toLowerCase(),
+          password: fd.get('password')?.toString(),
+          remember: fd.get('remember') === 'on'
+        });
       };
       $('registerForm').onsubmit = e => {
         e.preventDefault();
-        auth.register(new FormData(e.target));
+        const fd = new FormData(e.target);
+        auth.register({
+          name: fd.get('name')?.toString().trim(),
+          email: fd.get('email')?.toString().trim().toLowerCase(),
+          password: fd.get('password')?.toString()
+        });
       };
       document.onclick = e => {
         if (e.target.classList.contains('modal')) closeModal();
       };
+      // Log loaded scripts to debug injected.js
+      console.log('Loaded scripts:', Array.from(document.scripts).map(s => s.src));
       auth.check();
     });
+
+    // Intercept and log custom events to debug injected.js
+    window.addEventListener('message', e => {
+      if (e.data?.type === 'hide-notification') {
+        console.error('Caught hide-notification message:', e);
+      }
+    }, true);
   </script>
 </body>
 </html>

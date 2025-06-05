@@ -132,20 +132,19 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   try {
     const ip = request.headers.get('cf-connecting-ip') || 'unknown';
-    if (!(await checkRateLimit(env, ip, 30))) {
+    if (!(await checkRateLimit(env, ip, 50))) { // Increased limit to 50
       return errorResponse('Too many requests', 429);
     }
 
     if (path === '/api/login') {
-      const formData = await request.formData();
-      const email = formData.get('email')?.toString().trim().toLowerCase() || '';
-      const password = formData.get('password')?.toString() || '';
-      const remember = formData.get('remember') === 'on';
-      const csrfToken = formData.get('csrf_token')?.toString() || '';
-
-      if (!email || !password || !csrfToken) return errorResponse('Missing required fields', 400);
+      const data = await request.json();
+      const { email, password, remember, csrf_token } = data;
+      if (!email || !password || !csrf_token) return errorResponse('Missing required fields', 400);
       if (!validateEmail(email)) return errorResponse('Invalid email address', 400);
-      if (!(await validateCSRFToken(env, csrfToken))) return errorResponse('Invalid CSRF token', 403);
+      if (!(await validateCSRFToken(env, csrf_token))) {
+        await logActivity(env, 'unknown', 'login_failed_csrf', { email, ip });
+        return errorResponse('Invalid CSRF token', 403);
+      }
 
       const user = await getUserByEmail(env, email);
       if (!user || user.password !== password) {
@@ -172,24 +171,23 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     if (path === '/api/register') {
-      const formData = await request.formData();
-      const name = sanitizeInput(formData.get('name')?.toString().trim() || '');
-      const email = formData.get('email')?.toString().trim().toLowerCase() || '';
-      const password = formData.get('password')?.toString() || '';
-      const csrfToken = formData.get('csrf_token')?.toString() || '';
-
-      if (!name || !email || !password || !csrfToken) return errorResponse('Missing required fields', 400);
+      const data = await request.json();
+      const { name, email, password, csrf_token } = data;
+      if (!name || !email || !password || !csrf_token) return errorResponse('Missing required fields', 400);
       if (name.length < 2 || !validateEmail(email)) return errorResponse('Invalid name or email', 400);
       if (!validatePassword(password).valid) return errorResponse('Password must be at least 8 characters', 400);
-      if (!(await validateCSRFToken(env, csrfToken))) return errorResponse('Invalid CSRF token', 403);
+      if (!(await validateCSRFToken(env, csrf_token))) {
+        await logActivity(env, 'unknown', 'register_failed_csrf', { email, ip });
+        return errorResponse('Invalid CSRF token', 403);
+      }
 
       if (await getUserByEmail(env, email)) return errorResponse('Email already registered', 409);
 
       const userId = crypto.randomUUID();
       const userData: User = {
         id: userId,
-        name,
-        email,
+        name: sanitizeInput(name),
+        email: email.toLowerCase(),
         password,
         role: 'user',
         createdAt: new Date().toISOString()
@@ -218,7 +216,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       if (sessionToken) {
         const userId = await validateSession(env, request);
         if (userId) await logActivity(env, userId, 'logout', { ip });
-        await deleteSession(env, sessionToken);
+        await env.SESSIONS.delete(`session:${sessionToken}`);
       }
       return new Response(JSON.stringify({ success: true }), {
         status: 200,
@@ -232,15 +230,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (path === '/api/progress') {
       const userId = await validateSession(env, request);
       if (!userId) return errorResponse('Unauthorized', 401);
-
-      const formData = await request.formData();
-      const task = formData.get('task') as string;
-      const week = formData.get('week') as string;
-      const checked = formData.get('checked') as string;
-      const subtask = formData.get('subtask') as string;
-      const subtask_checked = formData.get('subtask_checked') as string;
-
-      if (!task || !week) return errorResponse('Task and week required', 400);
+      const { task, week, checked, subtask, subtask_checked, csrf_token } = await request.json();
+      if (!task || !week || !csrf_token) return errorResponse('Task, week, and CSRF token required', 400);
+      if (!(await validateCSRFToken(env, csrf_token))) return errorResponse('Invalid CSRF token', 403);
 
       let progress = await getCurrentLabProgress(env, userId);
       if (!progress[week]) progress[week] = {};
@@ -249,10 +241,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       const taskData = progress[week][task];
       if (subtask) {
         if (!taskData.subtasks) taskData.subtasks = {};
-        taskData.subtasks[subtask] = subtask_checked === 'true';
+        taskData.subtasks[subtask] = subtask_checked === true;
       }
-      if (checked) {
-        taskData.completed = checked === 'true';
+      if (checked !== undefined) {
+        taskData.completed = checked === true;
         if (taskData.completed) taskData.completedAt = new Date().toISOString();
       }
 
@@ -274,6 +266,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (path === '/api/lab/start-new') {
       const userId = await validateSession(env, request);
       if (!userId) return errorResponse('Unauthorized', 401);
+      const { csrf_token } = await request.json();
+      if (!csrf_token) return errorResponse('CSRF token required', 400);
+      if (!(await validateCSRFToken(env, csrf_token))) return errorResponse('Invalid CSRF token', 403);
       const labId = await startNewLab(env, userId);
       await logActivity(env, userId, 'lab_started', { labId });
       return jsonResponse({ labId, totalTasks: TOTAL_TASKS });
@@ -286,10 +281,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       if (!user || user.role !== 'admin') return errorResponse('Admin access required', 403);
 
       if (path === '/api/admin/change-user-password') {
-        const formData = await request.formData();
-        const email = formData.get('email')?.toString().toLowerCase();
-        const newPassword = formData.get('newPassword')?.toString();
-        if (!email || !newPassword || newPassword.length < 8) return errorResponse('Invalid email or password', 400);
+        const { email, newPassword, csrf_token } = await request.json();
+        if (!email || !newPassword || newPassword.length < 8 || !csrf_token) return errorResponse('Invalid email, password, or CSRF token', 400);
+        if (!(await validateCSRFToken(env, csrf_token))) return errorResponse('Invalid CSRF token', 403);
         const targetUser = await getUserByEmail(env, email);
         if (!targetUser) return errorResponse('User not found', 404);
         targetUser.password = newPassword;
@@ -299,16 +293,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       }
 
       if (path === '/api/admin/change-user-role') {
-        const formData = await request.formData();
-        const email = formData.get('email')?.toString().toLowerCase();
-        const newRole = formData.get('role')?.toString();
-        if (!email || !newRole || !['admin', 'user'].includes(newRole)) return errorResponse('Invalid email or role', 400);
-        if (email === user.email && newRole === 'user') return errorResponse('Cannot demote yourself', 400);
+        const { email, role, csrf_token } = await request.json();
+        if (!email || !role || !['admin', 'user'].includes(role) || !csrf_token) return errorResponse('Invalid email, role, or CSRF token', 400);
+        if (!(await validateCSRFToken(env, csrf_token))) return errorResponse('Invalid CSRF token', 403);
+        if (email === user.email && role === 'user') return errorResponse('Cannot demote yourself', 400);
         const targetUser = await getUserByEmail(env, email);
         if (!targetUser) return errorResponse('User not found', 404);
-        targetUser.role = newRole as 'admin' | 'user';
+        targetUser.role = role as 'admin' | 'user';
         await env.USERS.put(`user:${email}`, JSON.stringify(targetUser));
-        await logActivity(env, userId, 'admin_role_changed', { target: email, newRole });
+        await logActivity(env, userId, 'admin_role_changed', { target: email, newRole: role });
         return jsonResponse({ message: 'Role updated' });
       }
     }
