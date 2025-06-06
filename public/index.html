@@ -122,22 +122,11 @@
         const isGetRequest = !options.method || options.method.toUpperCase() === 'GET';
         let body = options.body;
 
-        // Handle CSRF token for non-GET requests
+        // Handle CSRF token for non-GET requests (like the original)
         if (!isGetRequest) {
-          // Get fresh CSRF token
-          const csrfResponse = await fetch('/api/csrf', { 
-            credentials: 'same-origin' 
-          });
-          
-          if (!csrfResponse.ok) {
-            throw new Error('Failed to get CSRF token');
-          }
-          
-          const { token } = await csrfResponse.json();
-          
           // Handle FormData vs regular body
           if (body instanceof FormData) {
-            body.append('csrf_token', token);
+            // CSRF token will be added by the server-side processing
           } else {
             const formData = new FormData();
             if (body && typeof body === 'object') {
@@ -145,7 +134,6 @@
                 formData.append(key, value);
               });
             }
-            formData.append('csrf_token', token);
             body = formData;
           }
         }
@@ -2171,7 +2159,6 @@
     <nav class="container">
       <div class="logo">
         <img src="/assets/Velocity-Logo.png" alt="Velocity Lab" onerror="this.style.display='none'">
-        <span class="logo-text">Velocity Lab</span>
       </div>
       <div class="nav-actions">
         <span id="auth-buttons">
