@@ -63,6 +63,140 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       });
     } catch (e) {
+      await logActivity(env, 'unknown', 'csrf_failed', { ip, error: (e as Error).message });
+      return errorResponse('Server error', 500);
+    }
+  }
+
+  // Login Endpoint
+  if (path === '/api/login' && request.method === 'POST') {
+    try {
+      let email, password, remember, csrf_token;
+      const contentType = request.headers.get('Content-Type') || '';
+      
+      if (contentType.includes('form-data')) {
+        const formData = await request.formData();
+        email = formData.get('email')?.toString();
+        password = formData.get('password')?.toString();
+        remember = formData.get('remember') === 'on';
+        csrf_token = formData.get('csrf_token')?.toString();
+      } else {
+        const data = await request.json();
+        ({ email, password, remember, csrf_token } = data);
+      }
+
+      if (!email || !password || !csrf_token) {
+        return errorResponse('Missing required fields', 400);
+      }
+      
+      if (!validateEmail(email)) {
+        return errorResponse('Invalid email address', 400);
+      }
+      
+      if (!(await validateCSRFToken(env, csrf_token))) {
+        await logActivity(env, 'unknown', 'login_failed_csrf', { email, ip });
+        return errorResponse('Invalid CSRF token', 403);
+      }
+
+      const user = await getUserByEmail(env, email);
+      if (!user || user.password !== password) {
+        await logActivity(env, 'unknown', 'login_failed', { email, ip });
+        return errorResponse('Invalid credentials or session expired', 401);
+      }
+
+      await updateLastLogin(env, user);
+      const sessionToken = await createSession(env, user.id, remember);
+      await logActivity(env, user.id, 'login_successful', { email, ip });
+
+      return new Response(JSON.stringify({
+        success: true,
+        name: user.name,
+        role: user.role,
+        email: user.email,
+        sessionToken
+      }), {
+        status: 200,
+        headers: {
+          'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=${remember ? 86400 * 30 : 86400}; SameSite=Strict; Secure`,
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
+    } catch (e) {
+      await logActivity(env, 'unknown', 'login_error', { ip, error: (e as Error).message });
+      return errorResponse('Server error', 500);
+    }
+  }
+
+  // Register Endpoint
+  if (path === '/api/register' && request.method === 'POST') {
+    try {
+      let name, email, password, csrf_token;
+      const contentType = request.headers.get('Content-Type') || '';
+      
+      if (contentType.includes('form-data')) {
+        const formData = await request.formData();
+        name = formData.get('name')?.toString();
+        email = formData.get('email')?.toString();
+        password = formData.get('password')?.toString();
+        csrf_token = formData.get('csrf_token')?.toString();
+      } else {
+        const data = await request.json();
+        ({ name, email, password, csrf_token } = data);
+      }
+
+      if (!name || !email || !password || !csrf_token) {
+        return errorResponse('Missing required fields', 400);
+      }
+      
+      if (name.length < 2 || !validateEmail(email)) {
+        return errorResponse('Invalid name or email', 400);
+      }
+      
+      const pwdValidation = validatePassword(password);
+      if (!pwdValidation.valid) {
+        return errorResponse(pwdValidation.errors?.join(', ') || 'Invalid password', 400);
+      }
+      
+      if (!(await validateCSRFToken(env, csrf_token))) {
+        await logActivity(env, 'unknown', 'register_failed_csrf', { email, ip });
+        return errorResponse('Invalid CSRF token', 403);
+      }
+
+      if (await getUserByEmail(env, email)) {
+        return errorResponse('Email already registered', 409);
+      }
+
+      const userId = crypto.randomUUID();
+      const userData: User = {
+        id: userId,
+        name: sanitizeInput(name),
+        email: email.toLowerCase(),
+        password, // Note: In production, hash passwords with bcrypt
+        role: 'user',
+        createdAt: new Date().toISOString(),
+        labHistory: []
+      };
+
+      await env.USERS.put(`user:${email}`, JSON.stringify(userData));
+      await env.PROGRESS.put(`progress:${userId}`, JSON.stringify({})); // Initialize empty progress
+      const sessionToken = await createSession(env, userId);
+      await logActivity(env, userId, 'user_created', { email, ip });
+
+      return new Response(JSON.stringify({
+        success: true,
+        name: userData.name,
+        role: userData.role,
+        email: userData.email,
+        sessionToken
+      }), {
+        status: 201,
+        headers: {
+          'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict; Secure`,
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
     } catch (e) {
       await logActivity(env, 'unknown', 'register_error', { ip, error: (e as Error).message });
       return errorResponse('Registration failed', 500);
@@ -554,139 +688,4 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
 
   // 404 - Route not found
   return errorResponse('Not found', 404);
-};'csrf_failed', { ip, error: e.message });
-      return errorResponse('Server error', 500);
-    }
-  }
-
-  // Login Endpoint
-  if (path === '/api/login' && request.method === 'POST') {
-    try {
-      let email, password, remember, csrf_token;
-      const contentType = request.headers.get('Content-Type') || '';
-      
-      if (contentType.includes('form-data')) {
-        const formData = await request.formData();
-        email = formData.get('email')?.toString();
-        password = formData.get('password')?.toString();
-        remember = formData.get('remember') === 'on';
-        csrf_token = formData.get('csrf_token')?.toString();
-      } else {
-        const data = await request.json();
-        ({ email, password, remember, csrf_token } = data);
-      }
-
-      if (!email || !password || !csrf_token) {
-        return errorResponse('Missing required fields', 400);
-      }
-      
-      if (!validateEmail(email)) {
-        return errorResponse('Invalid email address', 400);
-      }
-      
-      if (!(await validateCSRFToken(env, csrf_token))) {
-        await logActivity(env, 'unknown', 'login_failed_csrf', { email, ip });
-        return errorResponse('Invalid CSRF token', 403);
-      }
-
-      const user = await getUserByEmail(env, email);
-      if (!user || user.password !== password) {
-        await logActivity(env, 'unknown', 'login_failed', { email, ip });
-        return errorResponse('Invalid credentials or session expired', 401);
-      }
-
-      await updateLastLogin(env, user);
-      const sessionToken = await createSession(env, user.id, remember);
-      await logActivity(env, user.id, 'login_successful', { email, ip });
-
-      return new Response(JSON.stringify({
-        success: true,
-        name: user.name,
-        role: user.role,
-        email: user.email,
-        sessionToken
-      }), {
-        status: 200,
-        headers: {
-          'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=${remember ? 86400 * 30 : 86400}; SameSite=Strict; Secure`,
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
-    } catch (e) {
-      await logActivity(env, 'unknown', 'login_error', { ip, error: (e as Error).message });
-      return errorResponse('Server error', 500);
-    }
-  }
-
-  // Register Endpoint
-  if (path === '/api/register' && request.method === 'POST') {
-    try {
-      let name, email, password, csrf_token;
-      const contentType = request.headers.get('Content-Type') || '';
-      
-      if (contentType.includes('form-data')) {
-        const formData = await request.formData();
-        name = formData.get('name')?.toString();
-        email = formData.get('email')?.toString();
-        password = formData.get('password')?.toString();
-        csrf_token = formData.get('csrf_token')?.toString();
-      } else {
-        const data = await request.json();
-        ({ name, email, password, csrf_token } = data);
-      }
-
-      if (!name || !email || !password || !csrf_token) {
-        return errorResponse('Missing required fields', 400);
-      }
-      
-      if (name.length < 2 || !validateEmail(email)) {
-        return errorResponse('Invalid name or email', 400);
-      }
-      
-      const pwdValidation = validatePassword(password);
-      if (!pwdValidation.valid) {
-        return errorResponse(pwdValidation.errors?.join(', ') || 'Invalid password', 400);
-      }
-      
-      if (!(await validateCSRFToken(env, csrf_token))) {
-        await logActivity(env, 'unknown', 'register_failed_csrf', { email, ip });
-        return errorResponse('Invalid CSRF token', 403);
-      }
-
-      if (await getUserByEmail(env, email)) {
-        return errorResponse('Email already registered', 409);
-      }
-
-      const userId = crypto.randomUUID();
-      const userData: User = {
-        id: userId,
-        name: sanitizeInput(name),
-        email: email.toLowerCase(),
-        password, // Note: In production, hash passwords with bcrypt
-        role: 'user',
-        createdAt: new Date().toISOString(),
-        labHistory: []
-      };
-
-      await env.USERS.put(`user:${email}`, JSON.stringify(userData));
-      await env.PROGRESS.put(`progress:${userId}`, JSON.stringify({})); // Initialize empty progress
-      const sessionToken = await createSession(env, userId);
-      await logActivity(env, userId, 'user_created', { email, ip });
-
-      return new Response(JSON.stringify({
-        success: true,
-        name: userData.name,
-        role: userData.role,
-        email: userData.email,
-        sessionToken
-      }), {
-        status: 201,
-        headers: {
-          'Set-Cookie': `session=${sessionToken}; HttpOnly; Path=/; Max-Age=86400; SameSite=Strict; Secure`,
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
-    } catch (e) {
-      await logActivity(env, 'unknown',
+};
