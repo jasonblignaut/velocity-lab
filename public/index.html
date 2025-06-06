@@ -1317,6 +1317,38 @@
     const show = element => element?.classList.remove('hidden');
     const hide = element => element?.classList.add('hidden');
 
+    // Define global functions immediately to avoid "not defined" errors
+    window.showLogin = () => {
+      closeModal();
+      $('login-modal').style.display = 'flex';
+    };
+
+    window.showRegister = () => {
+      closeModal();
+      $('register-modal').style.display = 'flex';
+    };
+
+    window.closeModal = () => {
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.style.display = 'none';
+      });
+    };
+
+    window.logout = () => auth.logout();
+    window.startNewLab = () => lab.startNew();
+    window.showAdmin = () => admin.showPortal();
+    window.toggleWeek = (week) => ui.toggleWeek(week);
+    window.toggleLabDropdown = () => ui.toggleLabDropdown();
+    window.closeLabDropdown = () => ui.closeLabDropdown();
+    window.showLabHistory = () => ui.showLabHistory();
+    window.switchAdminTab = (tab) => admin.switchTab(tab);
+    window.refreshLeaderboard = () => admin.refreshLeaderboard();
+    window.exportProgress = () => admin.exportProgress();
+    window.importProgress = (files) => admin.importProgress(files);
+    window.changeTheme = (theme) => ui.changeTheme(theme);
+    window.openTaskModal = (week, task) => tasks.openModal(week, task);
+    window.toggleTask = (week, task, checked) => tasks.toggle(week, task, checked);
+
     // Cookie management
     const cookies = {
       get: name => document.cookie.match(`${name}=([^;]+)`)?.[1],
@@ -1545,6 +1577,92 @@
         show($('user-menu'));
         hide($('auth-buttons'));
         $('user-name').textContent = appState.user?.name || '';
+      },
+
+      toggleWeek(week) {
+        const weekCard = $(`${week}-card`);
+        const isExpanded = weekCard.classList.contains('expanded');
+        
+        // Close all other weeks first
+        document.querySelectorAll('.week-card').forEach(card => {
+          card.classList.remove('expanded');
+        });
+        
+        // Toggle current week
+        if (!isExpanded) {
+          weekCard.classList.add('expanded');
+        }
+      },
+
+      toggleLabDropdown() {
+        const dropdown = $('lab-dropdown');
+        dropdown.classList.toggle('show');
+        
+        // Close dropdown when clicking outside
+        setTimeout(() => {
+          document.addEventListener('click', this.closeLabDropdownOnOutsideClick, { once: true });
+        }, 0);
+      },
+
+      closeLabDropdown() {
+        $('lab-dropdown').classList.remove('show');
+      },
+
+      closeLabDropdownOnOutsideClick(e) {
+        const dropdown = $('lab-dropdown');
+        const container = document.querySelector('.lab-button-container');
+        if (!container.contains(e.target)) {
+          ui.closeLabDropdown();
+        }
+      },
+
+      showLabHistory() {
+        // For now, show a placeholder. This can be extended with actual history data
+        const historyContent = $('lab-history-content');
+        
+        // Get completion dates from localStorage (simple implementation)
+        const labHistory = JSON.parse(localStorage.getItem('labHistory') || '[]');
+        
+        if (labHistory.length === 0) {
+          historyContent.innerHTML = `
+            <p style="color: var(--text-secondary); text-align: center; padding: 40px;">
+              No lab history available yet. Complete your first lab to see history here.
+            </p>
+          `;
+        } else {
+          historyContent.innerHTML = `
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              ${labHistory.map((lab, index) => `
+                <div style="background: var(--surface-secondary); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
+                  <h4 style="margin-bottom: 8px;">Lab #${index + 1}</h4>
+                  <p style="color: var(--text-secondary); font-size: 14px;">
+                    Started: ${new Date(lab.startDate).toLocaleDateString()}<br>
+                    ${lab.endDate ? `Completed: ${new Date(lab.endDate).toLocaleDateString()}` : 'In Progress'}<br>
+                    Progress: ${lab.progress || 0}% (${lab.completedTasks || 0}/42 tasks)
+                  </p>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+        
+        $('lab-history-modal').style.display = 'flex';
+      },
+
+      changeTheme(theme) {
+        localStorage.setItem('theme', theme);
+        
+        if (theme === 'dark') {
+          document.body.classList.add('dark');
+        } else if (theme === 'light') {
+          document.body.classList.remove('dark');
+        } else if (theme === 'auto') {
+          if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add('dark');
+          } else {
+            document.body.classList.remove('dark');
+          }
+        }
       }
     };
 
@@ -1593,7 +1711,7 @@
               const taskTitle = task.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
               
               return `
-                <div class="task-item ${isCompleted ? 'completed' : ''}" onclick="openTaskModal('${week}', '${task}')">
+                <div class="task-item ${isCompleted ? 'completed' : ''}" onclick="window.openTaskModal('${week}', '${task}')">
                   <input type="checkbox" class="task-checkbox" ${isCompleted ? 'checked' : ''} 
                          onchange="toggleTask('${week}', '${task}', this.checked)" 
                          onclick="event.stopPropagation()">
