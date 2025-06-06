@@ -1,13 +1,40 @@
 {
   "name": "velocity-lab",
   "version": "1.0.0",
+  "description": "Exchange Hybrid Lab Tracking System - 42 tasks over 4 weeks covering Windows Server, Active Directory, Exchange Server 2019, and Microsoft 365 integration",
+  "main": "index.html",
+  "scripts": {
+    "dev": "wrangler pages dev public --compatibility-date=2025-05-31",
+    "deploy": "wrangler pages deploy public",
+    "build": "echo 'Static site - no build process required'",
+    "preview": "wrangler pages dev public --local",
+    "test": "echo 'No tests configured'",
+    "lint": "echo 'No linting configured'"
+  },
   "dependencies": {
     "@cloudflare/workers-types": "^4.20241022.0"
   },
   "devDependencies": {
     "wrangler": "^3.60.3"
   },
-  "scripts": {
-    "deploy": "wrangler pages deploy public"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/velocity-lab.git"
+  },
+  "keywords": [
+    "exchange",
+    "hybrid",
+    "lab",
+    "training",
+    "active-directory",
+    "microsoft-365",
+    "cloudflare-pages",
+    "workers",
+    "kv-storage"
+  ],
+  "author": "Velocity Lab Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

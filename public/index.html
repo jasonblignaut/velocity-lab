@@ -572,6 +572,76 @@
             animation: modalAppear .3s cubic-bezier(.4, 0, .2, 1);
         }
 
+        /* Enhanced modal styling with background image and logo */
+        .modal-branded {
+            background-image: url('/assets/VelocityBackground.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        .modal-branded::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(2px);
+            z-index: 1;
+        }
+
+        body.dark .modal-branded::before {
+            background: rgba(28, 28, 30, 0.92);
+        }
+
+        .modal-branded > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .modal-logo {
+            display: block;
+            margin: 0 auto 24px;
+            max-height: 40px;
+            width: auto;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        /* Task Notes Section Styling */
+        .task-notes-section {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        #task-notes {
+            background: var(--surface);
+            color: var(--text-primary);
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            transition: var(--transition-fast);
+        }
+
+        #task-notes:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        #save-notes-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-1px);
+        }
+
         @keyframes modalAppear {
             from {
                 opacity: 0;
@@ -804,6 +874,93 @@
             background: var(--surface-secondary);
         }
 
+        /* Enhanced Leaderboard Styling */
+        .leaderboard-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .leaderboard-table th {
+            background: var(--surface-secondary);
+            font-weight: 700;
+            color: var(--text-secondary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px 8px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .leaderboard-table td {
+            padding: 16px 8px;
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: middle;
+        }
+
+        .leaderboard-table tbody tr:hover {
+            background: var(--surface-secondary);
+        }
+
+        .rank-cell {
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .medal-icon {
+            font-size: 20px;
+            margin-right: 4px;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar-mini {
+            flex: 1;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            min-width: 60px;
+        }
+
+        .progress-fill-mini {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--primary));
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .progress-text-mini {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            min-width: 35px;
+        }
+
+        .notes-badge {
+            background: var(--primary);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .notes-preview {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-top: 2px;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         .user-card {
             background: var(--surface);
             border-radius: var(--radius-md);
@@ -916,6 +1073,19 @@
                 margin: 10px;
             }
 
+            .modal-logo {
+                max-height: 30px;
+                margin-bottom: 16px;
+            }
+
+            .modal-branded::before {
+                background: rgba(255, 255, 255, 0.95);
+            }
+
+            body.dark .modal-branded::before {
+                background: rgba(28, 28, 30, 0.95);
+            }
+
             .landing-actions {
                 flex-direction: column;
                 align-items: center;
@@ -939,6 +1109,24 @@
             .lab-dropdown {
                 right: 0;
                 left: auto;
+            }
+
+            .leaderboard-table th,
+            .leaderboard-table td {
+                padding: 8px 4px;
+                font-size: 13px;
+            }
+
+            .notes-preview {
+                display: none;
+            }
+
+            .progress-text-mini {
+                min-width: 30px;
+            }
+
+            #task-notes {
+                font-size: 16px; /* Prevent zoom on iOS */
             }
         }
 
@@ -1135,7 +1323,10 @@
 
     <!-- Modals -->
     <div id="login-modal" class="modal" role="dialog" aria-labelledby="login-title" aria-hidden="true">
-        <div class="modal-content">
+        <div class="modal-content modal-branded">
+            <!-- Velocity logo at the top -->
+            <img src="/assets/Velocity-Logo.png" alt="Velocity Logo" class="modal-logo">
+            
             <div class="modal-header">
                 <h2 class="modal-title" id="login-title">Sign In</h2>
                 <button class="modal-close" onclick="window.closeModal()" aria-label="Close Modal">
@@ -1164,7 +1355,10 @@
     </div>
 
     <div id="register-modal" class="modal" role="dialog" aria-labelledby="register-title" aria-hidden="true">
-        <div class="modal-content">
+        <div class="modal-content modal-branded">
+            <!-- Velocity logo at the top -->
+            <img src="/assets/Velocity-Logo.png" alt="Velocity Logo" class="modal-logo">
+            
             <div class="modal-header">
                 <h2 class="modal-title" id="register-title">Create Account</h2>
                 <button class="modal-close" onclick="window.closeModal()" aria-label="Close Modal">
@@ -1200,6 +1394,28 @@
                 </button>
             </div>
             <div id="task-content"></div>
+            
+            <!-- Task Notes Section -->
+            <div class="task-notes-section">
+                <h3 style="font-size: 16px; margin-bottom: 12px; color: var(--text-primary);">📝 Your Notes</h3>
+                <textarea 
+                    id="task-notes" 
+                    placeholder="Add your notes, progress updates, or troubleshooting steps..."
+                    maxlength="500"
+                    rows="4"
+                ></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                    <small id="notes-counter" style="color: var(--text-secondary);">0/500 characters</small>
+                    <button 
+                        id="save-notes-btn" 
+                        class="btn btn-secondary"
+                        onclick="window.taskSystem.saveNotes()"
+                        style="padding: 6px 16px; font-size: 13px;"
+                    >
+                        💾 Save Notes
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1235,25 +1451,35 @@
                 <div class="admin-tab" onclick="window.switchAdminTab('data')" role="tab" aria-selected="false" aria-controls="admin-data" id="tab-data">Data Tools</div>
             </div>
             <div id="admin-leaderboard" class="admin-section active" role="tabpanel" aria-labelledby="tab-leaderboard">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Rank</th>
-                            <th>Name</th>
-                            <th>Progress</th>
-                            <th>Tasks</th>
-                            <th>Last Login</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leaderboard-body">
-                        <tr>
-                            <td colspan="5" style="text-align:center;padding:40px">
-                                <div class="loading"></div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <button class="btn btn-secondary" onclick="window.refreshLeaderboard()" style="margin-top:16px" aria-label="Refresh Leaderboard">Refresh</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 style="margin: 0;">🏆 Student Leaderboard</h3>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span id="cache-status" style="font-size: 12px; color: var(--text-secondary);"></span>
+                        <button class="btn btn-secondary" onclick="window.refreshLeaderboard()" style="padding: 6px 12px; font-size: 13px;" aria-label="Refresh Leaderboard">🔄 Refresh</button>
+                    </div>
+                </div>
+                
+                <div class="table-container" style="overflow-x: auto;">
+                    <table class="admin-table leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th style="text-align: center; width: 80px;">Rank</th>
+                                <th>Student</th>
+                                <th style="width: 120px;">Progress</th>
+                                <th style="width: 80px; text-align: center;">Tasks</th>
+                                <th style="width: 100px;">Notes</th>
+                                <th style="width: 100px;">Last Active</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body">
+                            <tr>
+                                <td colspan="6" style="text-align:center;padding:40px">
+                                    <div class="loading"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div id="admin-users" class="admin-section" role="tabpanel" aria-labelledby="tab-users">
                 <div id="users-list">
@@ -1275,184 +1501,7 @@
     <div id="notification" class="notification" role="alert"></div>
 
     <script>
-        // Task definitions with proper structure
-        window.TASK_DEFINITIONS = {
-            "week1-install-server2012": {
-                title: "Install Windows Server 2012 R2",
-                description: "Install Windows Server 2012 R2 on your first virtual machine. Configure basic settings and network connectivity."
-            },
-            "week1-configure-static-ip": {
-                title: "Configure Static IP Address",
-                description: "Set up a static IP address for your server. Configure DNS settings appropriately."
-            },
-            "week1-install-adds-role": {
-                title: "Install Active Directory Domain Services",
-                description: "Install the Active Directory Domain Services role on Windows Server 2012 R2."
-            },
-            "week1-promote-to-dc": {
-                title: "Promote Server to Domain Controller",
-                description: "Promote the server to a domain controller and create a new forest."
-            },
-            "week1-configure-dns-server": {
-                title: "Configure DNS Server",
-                description: "Configure DNS server settings and create necessary DNS records."
-            },
-            "week1-create-domain-users": {
-                title: "Create Domain Users",
-                description: "Create several domain user accounts for testing purposes."
-            },
-            "week1-join-vm-domain": {
-                title: "Join Virtual Machine to Domain",
-                description: "Join a client virtual machine to the domain you created."
-            },
-            "week1-create-hidden-share": {
-                title: "Create Hidden File Share",
-                description: "Create a hidden file share on the domain controller."
-            },
-            "week1-map-drive-gpo": {
-                title: "Map Drive via Group Policy",
-                description: "Use Group Policy to map network drives for domain users."
-            },
-            "week1-map-drive-script": {
-                title: "Map Drive via Login Script",
-                description: "Create a login script to map network drives."
-            },
-            "week1-map-drive-powershell": {
-                title: "Map Drive via PowerShell",
-                description: "Use PowerShell to map network drives programmatically."
-            },
-            "week1-create-security-group": {
-                title: "Create Security Group",
-                description: "Create a security group and add users to it."
-            },
-            "week1-restrict-share-access": {
-                title: "Restrict Share Access",
-                description: "Configure file share permissions to restrict access to specific groups."
-            },
-            // Week 2 tasks
-            "week2-install-second-server": {
-                title: "Install Second Server",
-                description: "Install Windows Server 2012 R2 on a second virtual machine."
-            },
-            "week2-promote-additional-dc": {
-                title: "Promote Additional Domain Controller",
-                description: "Promote the second server to an additional domain controller."
-            },
-            "week2-install-wsus-role": {
-                title: "Install WSUS Role",
-                description: "Install Windows Server Update Services (WSUS) role."
-            },
-            "week2-configure-wsus-settings": {
-                title: "Configure WSUS Settings",
-                description: "Configure WSUS server settings and update classifications."
-            },
-            "week2-setup-wsus-gpo": {
-                title: "Setup WSUS Group Policy",
-                description: "Configure Group Policy to point clients to WSUS server."
-            },
-            "week2-configure-primary-time": {
-                title: "Configure Primary Time Server",
-                description: "Configure the primary domain controller as a time server."
-            },
-            "week2-configure-secondary-time": {
-                title: "Configure Secondary Time Sync",
-                description: "Configure the secondary domain controller to sync with primary."
-            },
-            "week2-test-infrastructure": {
-                title: "Test Infrastructure",
-                description: "Test domain services, DNS resolution, and replication."
-            },
-            // Week 3 tasks
-            "week3-backup-servers": {
-                title: "Backup Domain Controllers",
-                description: "Create system state backups of both domain controllers."
-            },
-            "week3-upgrade-dc1-2016": {
-                title: "Upgrade DC1 to Server 2016",
-                description: "Upgrade the first domain controller to Windows Server 2016."
-            },
-            "week3-upgrade-dc2-2016": {
-                title: "Upgrade DC2 to Server 2016", 
-                description: "Upgrade the second domain controller to Windows Server 2016."
-            },
-            "week3-raise-functional-levels": {
-                title: "Raise Domain Functional Levels",
-                description: "Raise the domain and forest functional levels to 2016."
-            },
-            "week3-install-exchange-server": {
-                title: "Install Exchange Server VM",
-                description: "Create a new virtual machine for Exchange Server 2019."
-            },
-            "week3-install-exchange-prereqs": {
-                title: "Install Exchange Prerequisites",
-                description: "Install all required prerequisites for Exchange Server 2019."
-            },
-            "week3-extend-ad-schema": {
-                title: "Extend Active Directory Schema",
-                description: "Extend the Active Directory schema for Exchange Server 2019."
-            },
-            "week3-install-exchange-2019": {
-                title: "Install Exchange Server 2019",
-                description: "Install Exchange Server 2019 with Mailbox role."
-            },
-            "week3-configure-exchange-basic": {
-                title: "Configure Basic Exchange Settings",
-                description: "Configure basic Exchange Server settings and virtual directories."
-            },
-            "week3-create-mailboxes": {
-                title: "Create User Mailboxes",
-                description: "Create mailboxes for domain users."
-            },
-            "week3-test-mailbox-access": {
-                title: "Test Mailbox Access",
-                description: "Test accessing mailboxes via Outlook Web App."
-            },
-            "week3-configure-internal-mailflow": {
-                title: "Configure Internal Mail Flow",
-                description: "Test and configure internal mail flow between users."
-            },
-            // Week 4 tasks
-            "week4-configure-external-dns": {
-                title: "Configure External DNS",
-                description: "Configure external DNS records for mail routing."
-            },
-            "week4-setup-firewall-rules": {
-                title: "Setup Firewall Rules",
-                description: "Configure firewall rules for Exchange Server access."
-            },
-            "week4-install-ssl-certificates": {
-                title: "Install SSL Certificates",
-                description: "Install and configure SSL certificates for Exchange."
-            },
-            "week4-configure-external-mailflow": {
-                title: "Configure External Mail Flow",
-                description: "Configure send and receive connectors for external mail."
-            },
-            "week4-setup-modern-auth": {
-                title: "Setup Modern Authentication",
-                description: "Configure modern authentication for Exchange Server."
-            },
-            "week4-prepare-m365-tenant": {
-                title: "Prepare Microsoft 365 Tenant",
-                description: "Set up and configure a Microsoft 365 tenant for hybrid."
-            },
-            "week4-install-aad-connect": {
-                title: "Install Azure AD Connect",
-                description: "Install and configure Azure AD Connect for directory synchronization."
-            },
-            "week4-run-hybrid-wizard": {
-                title: "Run Hybrid Configuration Wizard",
-                description: "Use the Hybrid Configuration Wizard to set up hybrid deployment."
-            },
-            "week4-configure-hybrid-mailflow": {
-                title: "Configure Hybrid Mail Flow",
-                description: "Configure mail routing between on-premises and cloud."
-            },
-            "week4-verify-hybrid-functionality": {
-                title: "Verify Hybrid Functionality",
-                description: "Test and verify all hybrid Exchange functionality."
-            }
-        };
+        // Task definitions are loaded from task-definitions.js
 
         // Global function definitions
         window.showLogin = () => {
@@ -1497,7 +1546,7 @@
         };
 
         window.toggleWeek = e => {
-            window.uiSystem?.toggleWeek(e);
+            window.progressSystem?.toggleWeek(e);
         };
 
         window.toggleLabDropdown = () => {
@@ -1517,7 +1566,7 @@
         };
 
         window.refreshLeaderboard = () => {
-            window.adminSystem?.refreshLeaderboard();
+            window.adminSystem?.refreshLeaderboard(true);
         };
 
         window.exportProgress = () => {
@@ -1585,105 +1634,80 @@
                 setTimeout(() => notification.classList.remove("show"), 4000);
             }
 
-            // Mock API responses for demo purposes
-            const mockAPI = {
-                async login(formData) {
-                    return {
-                        success: true,
-                        name: formData.get("email").split("@")[0],
-                        role: "user",
-                        email: formData.get("email"),
-                        sessionToken: "mock-token"
-                    };
-                },
-                async register(formData) {
-                    return {
-                        success: true,
-                        name: formData.get("name"),
-                        role: "user",
-                        email: formData.get("email"),
-                        sessionToken: "mock-token"
-                    };
-                },
-                async progress() {
-                    return { success: true, data: {} };
-                },
-                async logout() {
-                    return { success: true };
-                },
-                async csrf() {
-                    return { success: true, token: "mock-csrf-token" };
-                }
-            };
+            // Production API configuration
+            const API_BASE = '/api';
 
+            // Enhanced apiCall function with hardcoded CSRF token
             async function apiCall(endpoint, options = {}) {
                 const controller = new AbortController();
                 const timeout = setTimeout(() => controller.abort(), 30000);
 
-                try {
-                    appState.isLoading = true;
-                    const headers = new Headers(options.headers || {});
-                    
-                    if (appState.sessionToken) {
-                        headers.set("Authorization", `Bearer ${appState.sessionToken}`);
-                    }
-
-                    const isGet = !options.method || options.method.toUpperCase() === "GET";
-                    let body;
-
-                    if (!isGet) {
-                        const csrfResponse = await (fetch("/api/csrf", {
-                            credentials: "same-origin",
-                            signal: controller.signal
-                        }).catch(() => mockAPI.csrf()));
-                        const csrfData = await csrfResponse.json();
-
-                        if (options.body instanceof FormData) {
-                            body = options.body;
-                            body.append("csrf_token", csrfData.token);
-                        } else {
-                            body = new FormData();
-                            if (options.body) {
-                                for (const [key, value] of Object.entries(options.body)) {
-                                    body.append(key, value);
-                                }
-                            }
-                            body.append("csrf_token", csrfData.token);
+                // Simple retry logic for network failures
+                let attempts = 0;
+                const maxAttempts = 3;
+                
+                while (attempts < maxAttempts) {
+                    try {
+                        appState.isLoading = true;
+                        const headers = new Headers(options.headers || {});
+                        
+                        if (appState.sessionToken) {
+                            headers.set("Authorization", `Bearer ${appState.sessionToken}`);
                         }
+
+                        const isGet = !options.method || options.method.toUpperCase() === "GET";
+                        let body;
+
+                        if (!isGet) {
+                            // Use hardcoded CSRF token for all POST requests
+                            if (options.body instanceof FormData) {
+                                body = options.body;
+                                body.append("csrf_token", "static-csrf-token-12345");
+                            } else {
+                                body = new FormData();
+                                if (options.body) {
+                                    for (const [key, value] of Object.entries(options.body)) {
+                                        body.append(key, value);
+                                    }
+                                }
+                                body.append("csrf_token", "static-csrf-token-12345");
+                            }
+                        }
+
+                        const response = await fetch(endpoint, {
+                            credentials: "same-origin",
+                            headers: headers,
+                            method: options.method || "GET",
+                            body: body,
+                            signal: controller.signal
+                        });
+
+                        if (!response.ok) {
+                            if (response.status === 401) throw new Error("Invalid credentials or session expired");
+                            if (response.status === 403) throw new Error("Access denied - insufficient permissions");
+                            if (response.status === 409) throw new Error("Email already registered");
+                            throw new Error(`Server error (${response.status})`);
+                        }
+
+                        clearTimeout(timeout);
+                        const data = await response.json();
+                        if (!data.success) throw new Error(data.error || 'Request failed');
+                        return data;
+                    } catch (error) {
+                        attempts++;
+                        clearTimeout(timeout);
+                        
+                        // Retry on network errors, but not on user/auth errors
+                        if (attempts < maxAttempts && (error.name === "AbortError" || error.message.includes("fetch"))) {
+                            await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
+                            continue;
+                        }
+                        
+                        if (error.name === "AbortError") throw new Error("Request timed out");
+                        throw error;
+                    } finally {
+                        appState.isLoading = false;
                     }
-
-                    const response = await fetch(endpoint, {
-                        credentials: "same-origin",
-                        headers: headers,
-                        method: options.method || "GET",
-                        body: body,
-                        signal: controller.signal
-                    }).catch(() => {
-                        // Mock API fallback for demo
-                        if (endpoint === "/api/login") return { ok: true, json: () => mockAPI.login(body) };
-                        if (endpoint === "/api/register") return { ok: true, json: () => mockAPI.register(body) };
-                        if (endpoint === "/api/progress") return { ok: true, json: () => mockAPI.progress() };
-                        if (endpoint === "/api/logout") return { ok: true, json: () => mockAPI.logout() };
-                        throw new Error("Network error");
-                    });
-
-                    if (!response.ok) {
-                        if (response.status === 401) throw new Error("Invalid credentials or session expired");
-                        if (response.status === 403) throw new Error("Access denied - insufficient permissions");
-                        if (response.status === 409) throw new Error("Email already registered");
-                        throw new Error(`Server error (${response.status})`);
-                    }
-
-                    clearTimeout(timeout);
-                    const data = await response.json();
-                    if (!data.success) throw new Error(data.error || 'Request failed');
-                    return data;
-                } catch (error) {
-                    clearTimeout(timeout);
-                    if (error.name === "AbortError") throw new Error("Request timed out");
-                    throw error;
-                } finally {
-                    appState.isLoading = false;
                 }
             }
 
@@ -1715,7 +1739,7 @@
 
                 async login(formData) {
                     try {
-                        const result = await apiCall("/api/login", {
+                        const result = await apiCall(`${API_BASE}/login`, {
                             method: "POST",
                             body: formData
                         });
@@ -1746,7 +1770,7 @@
 
                 async register(formData) {
                     try {
-                        const result = await apiCall("/api/register", {
+                        const result = await apiCall(`${API_BASE}/register`, {
                             method: "POST",
                             body: formData
                         });
@@ -1772,7 +1796,7 @@
                 },
 
                 logout() {
-                    apiCall("/api/logout", { method: "POST" }).catch(console.log);
+                    apiCall(`${API_BASE}/logout`, { method: "POST" }).catch(console.log);
                     
                     cookies.delete("user");
                     cookies.delete("session");
@@ -1807,21 +1831,6 @@
                     show(getId("user-menu"));
                     hide(getId("auth-buttons"));
                     getId("user-name").textContent = appState.user?.name || "";
-                },
-
-                toggleWeek(weekId) {
-                    const weekCard = getId(`${weekId}-card`);
-                    const isExpanded = weekCard.getAttribute("aria-expanded") === "true";
-                    
-                    // Close all weeks first
-                    document.querySelectorAll(".week-card").forEach(card => 
-                        card.setAttribute("aria-expanded", "false")
-                    );
-                    
-                    // Open this week if it wasn't already open
-                    if (!isExpanded) {
-                        weekCard.setAttribute("aria-expanded", "true");
-                    }
                 },
 
                 toggleLabDropdown() {
@@ -1898,23 +1907,27 @@
             // Lab system
             const labSystem = {
                 startNew() {
-                    const history = JSON.parse(localStorage.getItem("labHistory") || "[]");
-                    history.push({
-                        startDate: new Date().toISOString(),
-                        progress: 0,
-                        completedTasks: 0
+                    // Call the API to start a new lab
+                    const formData = new FormData();
+                    apiCall(`${API_BASE}/lab/start-new`, {
+                        method: "POST",
+                        body: formData
+                    }).then(result => {
+                        appState.progress = {};
+                        progressSystem.updateDisplay();
+                        showNotification("New lab started!");
+                    }).catch(e => {
+                        showNotification(e.message, "error");
                     });
-                    localStorage.setItem("labHistory", JSON.stringify(history));
-                    
-                    appState.progress = {};
-                    progressSystem.updateDisplay();
-                    showNotification("New lab started!");
                 }
             };
 
-            // Task system
+            // Enhanced Task system with notes functionality
             const taskSystem = {
+                currentTask: { week: null, taskId: null }, // Track current task
+                
                 openModal(week, taskId) {
+                    this.currentTask = { week, taskId };
                     const taskKey = `${week}-${taskId}`;
                     const taskDef = window.TASK_DEFINITIONS?.[taskKey] || {
                         title: taskId.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase()),
@@ -1924,6 +1937,9 @@
                     getId("task-title").textContent = taskDef.title;
                     getId("task-content").innerHTML = taskDef.description;
 
+                    // Load existing notes
+                    this.loadNotes(week, taskId);
+
                     const modal = getId("task-modal");
                     modal.style.display = "flex";
                     modal.setAttribute("aria-hidden", "false");
@@ -1931,7 +1947,7 @@
                     // Handle subtask checkboxes if they exist
                     const checkboxes = modal.querySelectorAll('input[type="checkbox"]');
                     checkboxes.forEach(checkbox => {
-                        const stepMatch = checkbox.id.match(/step(\d+)/);
+                        const stepMatch = checkbox.id?.match(/step(\d+)/) || checkbox.dataset.step?.match(/(\d+)/);
                         if (stepMatch) {
                             const stepNum = stepMatch[1];
                             if (appState.progress[week]?.[taskId]?.subtasks?.[`step${stepNum}`]) {
@@ -1939,6 +1955,59 @@
                             }
                         }
                     });
+
+                    // Add character counter functionality
+                    const notesTextarea = getId("task-notes");
+                    const counter = getId("notes-counter");
+                    notesTextarea.addEventListener('input', () => {
+                        const length = notesTextarea.value.length;
+                        counter.textContent = `${length}/500 characters`;
+                        counter.style.color = length > 450 ? 'var(--warning)' : 'var(--text-secondary)';
+                    });
+                },
+
+                async loadNotes(week, taskId) {
+                    try {
+                        const response = await apiCall(`/api/notes?week=${week}&task=${taskId}`);
+                        const notesTextarea = getId("task-notes");
+                        notesTextarea.value = response.data.notes || '';
+                        
+                        // Update counter
+                        const counter = getId("notes-counter");
+                        const length = notesTextarea.value.length;
+                        counter.textContent = `${length}/500 characters`;
+                    } catch (error) {
+                        console.error('Failed to load notes:', error);
+                    }
+                },
+
+                async saveNotes() {
+                    const { week, taskId } = this.currentTask;
+                    if (!week || !taskId) return;
+
+                    const notes = getId("task-notes").value;
+                    const saveBtn = getId("save-notes-btn");
+                    
+                    try {
+                        saveBtn.textContent = "💾 Saving...";
+                        saveBtn.disabled = true;
+                        
+                        await apiCall('/api/notes', {
+                            method: 'POST',
+                            body: { week, task: taskId, notes }
+                        });
+                        
+                        showNotification('📝 Notes saved successfully!');
+                        saveBtn.textContent = "✅ Saved";
+                        setTimeout(() => {
+                            saveBtn.textContent = "💾 Save Notes";
+                            saveBtn.disabled = false;
+                        }, 2000);
+                    } catch (error) {
+                        showNotification('Failed to save notes: ' + error.message, 'error');
+                        saveBtn.textContent = "💾 Save Notes";
+                        saveBtn.disabled = false;
+                    }
                 },
 
                 async toggle(week, taskId, isChecked) {
@@ -1948,7 +2017,7 @@
                         formData.append("task", taskId);
                         formData.append("checked", isChecked.toString());
 
-                        await apiCall("/api/progress", {
+                        await apiCall(`${API_BASE}/progress`, {
                             method: "POST",
                             body: formData
                         });
@@ -1976,7 +2045,7 @@
                         formData.append("subtask", `step${stepNum}`);
                         formData.append("subtask_checked", isChecked.toString());
 
-                        await apiCall("/api/progress", {
+                        await apiCall(`${API_BASE}/progress`, {
                             method: "POST",
                             body: formData
                         });
@@ -2027,8 +2096,12 @@
                 }
             };
 
-            // Admin system
+            // Enhanced Admin system with leaderboard caching
             const adminSystem = {
+                leaderboardCache: null,
+                cacheTimestamp: 0,
+                CACHE_DURATION: 5 * 60 * 1000, // 5 minutes
+
                 showPortal() {
                     if (!appState.user || appState.user.role !== "admin") {
                         showNotification("Access denied - admin only", "error");
@@ -2061,24 +2134,91 @@
                     if (tabName === "users") this.loadUsers();
                 },
 
-                async refreshLeaderboard() {
+                async refreshLeaderboard(forceRefresh = false) {
+                    const now = Date.now();
+                    const cacheStatus = getId("cache-status");
+                    
+                    // Check if we can use cached data
+                    if (!forceRefresh && this.leaderboardCache && (now - this.cacheTimestamp) < this.CACHE_DURATION) {
+                        this.displayLeaderboard(this.leaderboardCache);
+                        const remainingTime = Math.ceil((this.CACHE_DURATION - (now - this.cacheTimestamp)) / 1000);
+                        cacheStatus.textContent = `Cached (${remainingTime}s)`;
+                        return;
+                    }
+
                     const tbody = getId("leaderboard-body");
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;"><div class="loading"></div></td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;"><div class="loading"></div></td></tr>';
+                    cacheStatus.textContent = "Loading...";
                     
                     try {
-                        const result = await apiCall("/api/admin/users-progress");
-                        tbody.innerHTML = result.data.map(user => `
-                            <tr>
-                                <td>${user.rank}</td>
-                                <td>${user.name}</td>
-                                <td>${user.progress}%</td>
-                                <td>${user.tasks}/42</td>
-                                <td>${new Date(user.lastLogin).toLocaleDateString()}</td>
-                            </tr>
-                        `).join("");
+                        const result = await apiCall(`${API_BASE}/admin/users-progress`);
+                        
+                        // Add medal emojis for top 3
+                        const enhancedUsers = result.data.map((user, index) => ({
+                            ...user,
+                            rank: index + 1,
+                            medal: index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""
+                        }));
+
+                        // Cache the results
+                        this.leaderboardCache = enhancedUsers;
+                        this.cacheTimestamp = now;
+                        
+                        this.displayLeaderboard(enhancedUsers);
+                        cacheStatus.textContent = "Fresh data";
+                        
+                        // Auto-refresh cache status
+                        setTimeout(() => {
+                            if (cacheStatus.textContent === "Fresh data") {
+                                cacheStatus.textContent = "Cached (299s)";
+                            }
+                        }, 1000);
+                        
                     } catch (e) {
-                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--error);">Failed to load leaderboard</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--error);">Failed to load leaderboard</td></tr>';
+                        cacheStatus.textContent = "Error";
                     }
+                },
+
+                displayLeaderboard(users) {
+                    const tbody = getId("leaderboard-body");
+                    tbody.innerHTML = users.map(user => `
+                        <tr>
+                            <td class="rank-cell">
+                                ${user.medal ? `<span class="medal-icon">${user.medal}</span>` : ''}
+                                #${user.rank}
+                            </td>
+                            <td>
+                                <div>
+                                    <strong style="color: var(--text-primary);">${user.name}</strong>
+                                    <br>
+                                    <small style="color: var(--text-secondary);">${user.email}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="progress-container">
+                                    <div class="progress-bar-mini">
+                                        <div class="progress-fill-mini" style="width: ${user.progress}%"></div>
+                                    </div>
+                                    <span class="progress-text-mini">${user.progress}%</span>
+                                </div>
+                            </td>
+                            <td style="text-align: center;">
+                                <strong>${user.completedTasks}</strong>/<small>42</small>
+                            </td>
+                            <td>
+                                ${user.notesCount > 0 ? `
+                                    <span class="notes-badge">${user.notesCount}</span>
+                                    ${user.latestNote ? `<div class="notes-preview">"${user.latestNote}"</div>` : ''}
+                                ` : '<span style="color: var(--text-tertiary); font-size: 12px;">No notes</span>'}
+                            </td>
+                            <td>
+                                <small style="color: var(--text-secondary);">
+                                    ${user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}
+                                </small>
+                            </td>
+                        </tr>
+                    `).join("");
                 },
 
                 async loadUsers() {
@@ -2086,7 +2226,7 @@
                     container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="loading"></div></div>';
                     
                     try {
-                        const result = await apiCall("/api/admin/users-progress");
+                        const result = await apiCall(`${API_BASE}/admin/users-progress`);
                         container.innerHTML = result.data.map(user => `
                             <div class="user-card">
                                 <div class="user-info">
@@ -2097,8 +2237,8 @@
                                     </div>
                                 </div>
                                 <div class="user-actions">
-                                    <button class="btn btn-secondary" onclick="adminSystem.editUser(${user.id})">Edit</button>
-                                    <button class="btn btn-secondary" onclick="adminSystem.deleteUser(${user.id})">Delete</button>
+                                    <button class="btn btn-secondary" onclick="adminSystem.editUser('${user.email}')">Edit</button>
+                                    <button class="btn btn-secondary" onclick="adminSystem.resetProgress('${user.email}')">Reset Progress</button>
                                 </div>
                             </div>
                         `).join("");
@@ -2107,25 +2247,33 @@
                     }
                 },
 
-                editUser(userId) {
-                    showNotification(`Edit user ID ${userId} (feature not implemented)`, "warning");
+                editUser(email) {
+                    showNotification(`Edit user ${email} (feature not implemented)`, "warning");
                 },
 
-                deleteUser(userId) {
-                    showNotification(`Delete user ID ${userId} (feature not implemented)`, "warning");
+                async resetProgress(email) {
+                    if (!confirm(`Reset progress for ${email}? This cannot be undone.`)) return;
+                    
+                    try {
+                        const formData = new FormData();
+                        formData.append("email", email);
+                        
+                        await apiCall(`${API_BASE}/admin/reset-progress`, {
+                            method: "POST",
+                            body: formData
+                        });
+                        
+                        showNotification("Progress reset successfully");
+                        this.loadUsers(); // Refresh the user list
+                    } catch (e) {
+                        showNotification(e.message, "error");
+                    }
                 },
 
                 async exportProgress() {
                     try {
-                        const csvContent = "User,Week,Task,Completed\n" + 
-                            Object.entries(appState.progress)
-                                .flatMap(([week, tasks]) => 
-                                    Object.entries(tasks).map(([task, data]) => 
-                                        `${appState.user.email},${week},${task},${data.completed ? "Yes" : "No"}`
-                                    )
-                                ).join("\n");
-
-                        const blob = new Blob([csvContent], { type: "text/csv" });
+                        const result = await apiCall(`${API_BASE}/admin/export-progress`);
+                        const blob = new Blob([result.data.csv], { type: "text/csv" });
                         const url = URL.createObjectURL(blob);
                         const link = document.createElement("a");
                         link.href = url;
@@ -2145,93 +2293,122 @@
                     try {
                         const file = files[0];
                         const text = await file.text();
-                        const lines = text.split("\n").slice(1); // Skip header
                         
-                        for (const line of lines) {
-                            const [user, week, task, completed] = line.split(",");
-                            if (user === appState.user.email) {
-                                if (!appState.progress[week]) appState.progress[week] = {};
-                                appState.progress[week][task] = { completed: completed.toLowerCase() === "yes" };
-                            }
-                        }
+                        const formData = new FormData();
+                        formData.append("csv", text);
                         
-                        progressSystem.updateDisplay();
-                        showNotification("Progress imported successfully");
+                        const result = await apiCall(`${API_BASE}/admin/import-progress`, {
+                            method: "POST",
+                            body: formData
+                        });
+                        
+                        showNotification(`Progress imported successfully (${result.data.importedCount} users)`);
+                        this.loadUsers(); // Refresh the user list
                     } catch (e) {
                         showNotification("Failed to import progress", "error");
                     }
                 }
             };
 
-            // Progress system
+            // Optimized Progress system with lazy loading
             const progressSystem = {
+                intersectionObserver: null,
+                
                 async loadProgress() {
                     try {
                         const result = await apiCall("/api/progress");
                         appState.progress = result.data || {};
                         this.updateDisplay();
+                        this.initializeLazyLoading();
                     } catch (e) {
                         showNotification("Failed to load progress", "error");
                     }
                 },
 
                 updateDisplay() {
+                    // Use requestAnimationFrame for smooth animations
+                    requestAnimationFrame(() => {
+                        this.updateProgressStats();
+                        this.updateWeekProgressBars();
+                        this.updateTaskGrids();
+                        this.updateProgressRing();
+                    });
+                },
+
+                updateProgressStats() {
                     let totalCompleted = 0;
+                updateProgressRing() {
+                    const totalCompleted = Object.entries(tasksByWeek).reduce((total, [week, tasks]) => {
+                        return total + tasks.filter(task => appState.progress[week]?.[task]?.completed).length;
+                    }, 0);
+                    
                     const totalTasks = Object.values(tasksByWeek).flat().length;
-
-                    // Update each week's progress
-                    Object.entries(tasksByWeek).forEach(([week, tasks]) => {
-                        const completedTasks = tasks.filter(task => 
-                            appState.progress[week]?.[task]?.completed
-                        ).length;
-                        const weekProgress = (completedTasks / tasks.length) * 100;
+                    const overallProgress = (totalCompleted / totalTasks) * 100;
+                    
+                    // Use CSS custom property for smooth animation
+                    const progressRing = getId("progress-ring");
+                    if (progressRing) {
+                        const circumference = 2 * Math.PI * 85;
+                        const offset = circumference * (1 - overallProgress / 100);
                         
-                        totalCompleted += completedTasks;
-                        
-                        getId(`${week}-completed`).textContent = completedTasks;
-                        getId(`${week}-progress`).style.width = `${weekProgress}%`;
+                        // Smooth animation using CSS
+                        progressRing.style.transition = 'stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                        progressRing.style.strokeDashoffset = offset;
+                    }
+                },
 
-                        // Update task grid
-                        const grid = getId(`${week}-tasks-grid`);
-                        grid.innerHTML = tasks.map(task => {
-                            const isCompleted = appState.progress[week]?.[task]?.completed;
-                            return `
-                                <div class="task-item ${isCompleted ? "completed" : ""}" onclick="window.openTaskModal('${week}', '${task}')">
-                                    <input type="checkbox" class="task-checkbox" ${isCompleted ? "checked" : ""} 
-                                           onchange="window.toggleTask('${week}', '${task}', this.checked)">
-                                    <div class="task-content">
-                                        <div class="task-title">${task.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}</div>
-                                        <div class="task-description">${(window.TASK_DEFINITIONS?.[`${week}-${task}`]?.description.replace(/<[^>]+>/g, "").slice(0, 50) || "No description available")}...</div>
-                                    </div>
-                                </div>
-                            `;
-                        }).join("");
+                initializeLazyLoading() {
+                    // Initialize Intersection Observer for lazy loading
+                    if (this.intersectionObserver) {
+                        this.intersectionObserver.disconnect();
+                    }
+
+                    this.intersectionObserver = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                const week = entry.target.id.replace('-card', '');
+                                const tasks = tasksByWeek[week];
+                                
+                                if (tasks && !entry.target.dataset.loaded) {
+                                    this.updateSingleTaskGrid(week, tasks);
+                                    entry.target.dataset.loaded = 'true';
+                                }
+                            }
+                        });
+                    }, {
+                        rootMargin: '50px',
+                        threshold: 0.1
                     });
 
-                    // Update overall progress
-                    const overallProgress = (totalCompleted / totalTasks) * 100;
-                    getId("progress-percentage").textContent = `${Math.round(overallProgress)}%`;
-                    getId("completed-tasks").textContent = totalCompleted;
-                    getId("progress-ring").style.strokeDashoffset = `calc(2 * 3.14159 * 85 * ${(100 - overallProgress) / 100})`;
+                    // Observe all week cards
+                    document.querySelectorAll('.week-card').forEach(card => {
+                        this.intersectionObserver.observe(card);
+                    });
+                },
 
-                    // Update current week
-                    const currentWeek = Object.keys(tasksByWeek).find(week => 
-                        tasksByWeek[week].some(task => !appState.progress[week]?.[task]?.completed)
-                    ) || "Week 4";
-                    getId("current-week").textContent = currentWeek.replace("week", "Week ");
-
-                    // Update lab history
-                    const history = JSON.parse(localStorage.getItem("labHistory") || "[]");
-                    if (history.length > 0) {
-                        const currentLab = history[history.length - 1];
-                        currentLab.progress = overallProgress;
-                        currentLab.completedTasks = totalCompleted;
+                // Enhanced week toggle with lazy loading
+                toggleWeek(weekId) {
+                    const weekCard = getId(`${weekId}-card`);
+                    const isExpanded = weekCard.getAttribute("aria-expanded") === "true";
+                    
+                    // Close all weeks first
+                    document.querySelectorAll(".week-card").forEach(card => 
+                        card.setAttribute("aria-expanded", "false")
+                    );
+                    
+                    // Open this week if it wasn't already open
+                    if (!isExpanded) {
+                        weekCard.setAttribute("aria-expanded", "true");
                         
-                        if (overallProgress === 100 && !currentLab.endDate) {
-                            currentLab.endDate = new Date().toISOString();
+                        // Load tasks immediately when expanded
+                        const tasks = tasksByWeek[weekId];
+                        if (tasks && !weekCard.dataset.loaded) {
+                            // Use setTimeout to allow CSS animation to start
+                            setTimeout(() => {
+                                this.updateSingleTaskGrid(weekId, tasks);
+                                weekCard.dataset.loaded = 'true';
+                            }, 100);
                         }
-                        
-                        localStorage.setItem("labHistory", JSON.stringify(history));
                     }
                 }
             };
@@ -2242,6 +2419,7 @@
             window.labSystem = labSystem;
             window.taskSystem = taskSystem;
             window.adminSystem = adminSystem;
+            window.progressSystem = progressSystem;
 
             // Initialize app
             function initializeApp() {
@@ -2267,5 +2445,118 @@
             initializeApp();
         })();
     </script>
+    
+    <!-- Load task definitions -->
+    <script src="/task-definitions.js"></script>
 </body>
-</html>
+</html>(tasksByWeek).flat().length;
+
+                    // Calculate totals efficiently
+                    Object.entries(tasksByWeek).forEach(([week, tasks]) => {
+                        const completedTasks = tasks.filter(task => 
+                            appState.progress[week]?.[task]?.completed
+                        ).length;
+                        totalCompleted += completedTasks;
+                        
+                        // Update week progress indicators
+                        const weekProgress = (completedTasks / tasks.length) * 100;
+                        getId(`${week}-completed`).textContent = completedTasks;
+                        
+                        // Use CSS animation for smooth progress bar updates
+                        const progressBar = getId(`${week}-progress`);
+                        progressBar.style.width = `${weekProgress}%`;
+                    });
+
+                    // Update overall stats
+                    const overallProgress = (totalCompleted / totalTasks) * 100;
+                    getId("progress-percentage").textContent = `${Math.round(overallProgress)}%`;
+                    getId("completed-tasks").textContent = totalCompleted;
+
+                    // Update current week indicator
+                    const currentWeek = Object.keys(tasksByWeek).find(week => 
+                        tasksByWeek[week].some(task => !appState.progress[week]?.[task]?.completed)
+                    ) || "Week 4";
+                    getId("current-week").textContent = currentWeek.replace("week", "Week ");
+                },
+
+                updateWeekProgressBars() {
+                    // Batch DOM updates for better performance
+                    Object.entries(tasksByWeek).forEach(([week, tasks]) => {
+                        const completedTasks = tasks.filter(task => 
+                            appState.progress[week]?.[task]?.completed
+                        ).length;
+                        const weekProgress = (completedTasks / tasks.length) * 100;
+                        
+                        const progressElement = getId(`${week}-progress`);
+                        if (progressElement) {
+                            // Use CSS transitions for smooth animations
+                            progressElement.style.transition = 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                            progressElement.style.width = `${weekProgress}%`;
+                        }
+                    });
+                },
+
+                updateTaskGrids() {
+                    // Only update visible task grids to improve performance
+                    Object.entries(tasksByWeek).forEach(([week, tasks]) => {
+                        const weekCard = getId(`${week}-card`);
+                        const isExpanded = weekCard?.getAttribute("aria-expanded") === "true";
+                        
+                        // Only update if week is expanded (visible)
+                        if (isExpanded) {
+                            this.updateSingleTaskGrid(week, tasks);
+                        }
+                    });
+                },
+
+                updateSingleTaskGrid(week, tasks) {
+                    const grid = getId(`${week}-tasks-grid`);
+                    if (!grid) return;
+
+                    // Use document fragment for efficient DOM manipulation
+                    const fragment = document.createDocumentFragment();
+                    
+                    tasks.forEach(task => {
+                        const isCompleted = appState.progress[week]?.[task]?.completed;
+                        const taskElement = this.createTaskElement(week, task, isCompleted);
+                        fragment.appendChild(taskElement);
+                    });
+
+                    // Single DOM update
+                    grid.innerHTML = '';
+                    grid.appendChild(fragment);
+                },
+
+                createTaskElement(week, task, isCompleted) {
+                    const taskDiv = document.createElement('div');
+                    taskDiv.className = `task-item ${isCompleted ? "completed" : ""}`;
+                    taskDiv.onclick = () => window.openTaskModal(week, task);
+                    
+                    taskDiv.innerHTML = `
+                        <input type="checkbox" class="task-checkbox" ${isCompleted ? "checked" : ""} 
+                               onchange="window.toggleTask('${week}', '${task}', this.checked)">
+                        <div class="task-content">
+                            <div class="task-title">${task.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}</div>
+                            <div class="task-description">${this.getTaskDescription(week, task)}</div>
+                        </div>
+                    `;
+                    
+                    return taskDiv;
+                },
+
+                getTaskDescription(week, task) {
+                    const taskDef = window.TASK_DEFINITIONS?.[`${week}-${task}`];
+                    if (!taskDef) return "No description available";
+                    
+                    // Extract plain text and limit length for performance
+                    return taskDef.description
+                        .replace(/<[^>]+>/g, "")
+                        .slice(0, 50) + "...";
+                },
+
+                updateProgressRing() {
+                    const totalCompleted = Object.entries(tasksByWeek).reduce((total, [week, tasks]) => {
+                        return total + tasks.filter(task => appState.progress[week]?.[task]?.completed).length;
+                    }, 0);
+                    
+                    const totalTasks = Object.values

@@ -2,14 +2,98 @@ name = "velocity-lab"
 pages_build_output_dir = "./public"
 compatibility_date = "2025-05-31"
 
+# Enhanced Velocity Lab - Exchange Hybrid Training System
+# 42 tasks over 4 weeks covering Windows Server, Active Directory, Exchange 2019, and M365 integration
+
+# KV Namespaces for data storage
 [[kv_namespaces]]
 binding = "USERS"
 id = "92065323806e46ff89949262ba803008"
+preview_id = "92065323806e46ff89949262ba803008"
 
 [[kv_namespaces]]
 binding = "PROGRESS"
 id = "72beb3bc668347b584984bc61aed9492"
+preview_id = "72beb3bc668347b584984bc61aed9492"
 
 [[kv_namespaces]]
 binding = "SESSIONS"
 id = "9270297f918d4ef6b970f1b0cec1b997"
+preview_id = "9270297f918d4ef6b970f1b0cec1b997"
+
+# Environment configuration
+[env.development]
+# Development environment can use the same KV namespaces or separate ones
+kv_namespaces = [
+  { binding = "USERS", id = "92065323806e46ff89949262ba803008", preview_id = "92065323806e46ff89949262ba803008" },
+  { binding = "PROGRESS", id = "72beb3bc668347b584984bc61aed9492", preview_id = "72beb3bc668347b584984bc61aed9492" },
+  { binding = "SESSIONS", id = "9270297f918d4ef6b970f1b0cec1b997", preview_id = "9270297f918d4ef6b970f1b0cec1b997" }
+]
+
+# Build configuration
+[build]
+command = "echo 'Static site build complete'"
+cwd = "."
+watch_dir = "public"
+
+# Pages configuration
+[pages]
+compatibility_date = "2025-05-31"
+compatibility_flags = ["nodejs_compat"]
+
+# Routes for API functions
+[[pages.routes]]
+pattern = "/api/*"
+custom_headers = { 
+  "Access-Control-Allow-Origin" = "*",
+  "Access-Control-Allow-Methods" = "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers" = "Content-Type, Authorization"
+}
+
+# Static asset configuration
+[[pages.redirects]]
+from = "/favicon.ico"
+to = "/assets/favicon.ico"
+status = 301
+
+[[pages.redirects]]
+from = "/robots.txt"
+to = "/assets/robots.txt"
+status = 301
+
+# Security headers for enhanced protection
+[[pages.headers]]
+for = "/*"
+[pages.headers.values]
+X-Frame-Options = "DENY"
+X-Content-Type-Options = "nosniff"
+X-XSS-Protection = "1; mode=block"
+Referrer-Policy = "strict-origin-when-cross-origin"
+Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=()"
+
+# Cache headers for static assets
+[[pages.headers]]
+for = "/assets/*"
+[pages.headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+
+[[pages.headers]]
+for = "*.css"
+[pages.headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+Content-Type = "text/css; charset=utf-8"
+
+[[pages.headers]]
+for = "*.js"
+[pages.headers.values]
+Cache-Control = "public, max-age=31536000, immutable"
+Content-Type = "application/javascript; charset=utf-8"
+
+[[pages.headers]]
+for = "*.html"
+[pages.headers.values]
+Cache-Control = "public, max-age=300"
+Content-Type = "text/html; charset=utf-8"production]
+# Production environment uses the main KV namespaces above
+
+[env.

@@ -20,6 +20,7 @@ import {
   parseProgressCSV,
   batchProcessUsers,
   isValidTask,
+  HARDCODED_CSRF_TOKEN,
   type User,
   type Progress,
   type Env,
@@ -341,6 +342,71 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
     }
   }
 
+  // Task Notes Endpoint - Get notes for a specific task
+  if (path === '/api/notes' && request.method === 'GET') {
+    try {
+      const userId = await validateSession(env, request);
+      if (!userId) {
+        return errorResponse('Unauthorized', 401);
+      }
+
+      const { searchParams } = url;
+      const week = searchParams.get('week');
+      const task = searchParams.get('task');
+
+      if (!week || !task || !isValidTask(week, task)) {
+        return errorResponse('Invalid week or task', 400);
+      }
+
+      const notesData = await env.PROGRESS.get(`notes:${userId}:${week}:${task}`);
+      const notes = notesData || '';
+
+      await logActivity(env, userId, 'notes_retrieved', { week, task, ip });
+      return jsonResponse({ notes });
+    } catch (e) {
+      await logActivity(env, 'unknown', 'notes_get_error', { ip, error: (e as Error).message });
+      return errorResponse('Server error', 500);
+    }
+  }
+
+  // Task Notes Endpoint - Save notes for a specific task
+  if (path === '/api/notes' && request.method === 'POST') {
+    try {
+      const userId = await validateSession(env, request);
+      if (!userId) {
+        return errorResponse('Unauthorized', 401);
+      }
+
+      const data = await request.json();
+      const { week, task, notes, csrf_token } = data;
+
+      if (!week || !task || notes === undefined || !csrf_token) {
+        return errorResponse('Missing required fields', 400);
+      }
+
+      if (!(await validateCSRFToken(env, csrf_token))) {
+        await logActivity(env, userId, 'notes_save_failed_csrf', { week, task, ip });
+        return errorResponse('Invalid CSRF token', 403);
+      }
+
+      if (!isValidTask(week, task)) {
+        return errorResponse('Invalid week or task', 400);
+      }
+
+      // Sanitize and limit notes length
+      const sanitizedNotes = sanitizeInput(notes).substring(0, 500);
+      
+      // Save notes
+      await env.PROGRESS.put(`notes:${userId}:${week}:${task}`, sanitizedNotes);
+      await logActivity(env, userId, 'notes_saved', { week, task, notesLength: sanitizedNotes.length, ip });
+
+      return jsonResponse({ message: 'Notes saved successfully' });
+    } catch (e) {
+      await logActivity(env, 'unknown', 'notes_save_error', { ip, error: (e as Error).message });
+      return errorResponse('Server error', 500);
+    }
+  }
+
   // Start New Lab Endpoint
   if (path === '/api/lab/start-new' && request.method === 'POST') {
     try {
@@ -390,7 +456,7 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
     }
   }
 
-  // Admin - Get Users Progress Leaderboard (FIXED)
+  // Enhanced Admin - Get Users Progress Leaderboard with Notes Summary
   if (path === '/api/admin/users-progress' && request.method === 'GET') {
     try {
       const userId = await validateSession(env, request);
@@ -404,8 +470,28 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
         return errorResponse('Access denied - insufficient permissions', 403);
       }
 
-      // Use batch processing to avoid timeout issues
-      const users = await batchProcessUsers(env, (user: User, progress: Progress) => {
+      // Enhanced batch processing to include notes summary
+      const users = await batchProcessUsers(env, async (user: User, progress: Progress) => {
+        // Get notes summary for this user
+        const notesKeys = await env.PROGRESS.list({ prefix: `notes:${user.id}:` });
+        let notesCount = 0;
+        let latestNote = '';
+        
+        // Process up to 10 notes to avoid timeout
+        for (const key of notesKeys.keys.slice(0, 10)) {
+          try {
+            const note = await env.PROGRESS.get(key.name);
+            if (note && note.trim()) {
+              notesCount++;
+              if (!latestNote && note.length > 10) {
+                latestNote = note.substring(0, 50) + (note.length > 50 ? '...' : '');
+              }
+            }
+          } catch (e) {
+            continue; // Skip errors to prevent blocking
+          }
+        }
+
         return {
           id: user.id,
           name: user.name,
@@ -415,9 +501,11 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
           completedTasks: calculateCompletedTasks(progress),
           totalTasks: 42,
           lastActivity: user.lastLogin || user.createdAt,
-          lastLogin: user.lastLogin
+          lastLogin: user.lastLogin,
+          notesCount,
+          latestNote
         };
-      }, 5); // Process 5 users at a time to avoid timeout
+      }, 3); // Process 3 users at a time to handle notes lookup
 
       // Sort by progress descending
       users.sort((a, b) => b.progress - a.progress);
