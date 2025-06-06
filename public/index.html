@@ -995,14 +995,14 @@
       </div>
       <div class="nav-right">
         <span id="auth-buttons">
-          <button onclick="showLogin()" class="btn btn-secondary">Sign In</button>
-          <button onclick="showRegister()" class="btn btn-primary">Register</button>
+          <button onclick="window.showLogin()" class="btn btn-secondary">Sign In</button>
+          <button onclick="window.showRegister()" class="btn btn-primary">Register</button>
         </span>
         <span id="user-menu" class="hidden">
           <span id="user-name" style="margin-right: 12px; font-weight: 600;"></span>
-          <button id="admin-button" class="btn btn-admin hidden" onclick="showAdmin()">Admin Portal</button>
-          <button onclick="logout()" class="btn btn-secondary">Sign Out</button>
-          <select class="theme-selector" onchange="changeTheme(this.value)">
+          <button id="admin-button" class="btn btn-admin hidden" onclick="window.showAdmin()">Admin Portal</button>
+          <button onclick="window.logout()" class="btn btn-secondary">Sign Out</button>
+          <select class="theme-selector" onchange="window.changeTheme(this.value)">
             <option value="auto">Force Balance (Auto)</option>
             <option value="light">Jedi (Light)</option>
             <option value="dark">Sith (Dark)</option>
@@ -1018,8 +1018,8 @@
         <h1>Master Exchange Hybrid</h1>
         <p>42 hands-on tasks over 4 weeks. Build a comprehensive lab with Domain Controllers, Exchange Server, and workstation VMs in a production-ready environment.</p>
         <div class="landing-actions">
-          <button class="btn btn-primary" onclick="showRegister()">Get Started</button>
-          <button class="btn btn-secondary" onclick="showLogin()">Sign In</button>
+          <button class="btn btn-primary" onclick="window.showRegister()">Get Started</button>
+          <button class="btn btn-secondary" onclick="window.showLogin()">Sign In</button>
         </div>
       </div>
     </section>
@@ -1053,13 +1053,13 @@
             </div>
           </div>
           <div class="lab-button-container">
-            <button class="btn btn-primary" onclick="toggleLabDropdown()">Start New Lab ▼</button>
+            <button class="btn btn-primary" onclick="window.toggleLabDropdown()">Start New Lab ▼</button>
             <div class="lab-dropdown" id="lab-dropdown">
               <div class="lab-dropdown-header">Lab Options</div>
-              <div class="lab-dropdown-item" onclick="startNewLab(); closeLabDropdown();">
+              <div class="lab-dropdown-item" onclick="window.startNewLab(); window.closeLabDropdown();">
                 🚀 Start Fresh Lab
               </div>
-              <div class="lab-dropdown-item" onclick="showLabHistory(); closeLabDropdown();">
+              <div class="lab-dropdown-item" onclick="window.showLabHistory(); window.closeLabDropdown();">
                 📅 Lab History
               </div>
             </div>
@@ -1068,7 +1068,7 @@
 
         <div class="weeks-container" id="weeks-container">
           <div class="week-card" id="week1-card">
-            <div class="week-header" onclick="toggleWeek('week1')">
+            <div class="week-header" onclick="window.toggleWeek('week1')">
               <div class="week-info">
                 <h3>Week 1: Foundation Setup</h3>
                 <p>Domain Controller setup, domain join, and file shares</p>
@@ -1089,7 +1089,7 @@
           </div>
 
           <div class="week-card" id="week2-card">
-            <div class="week-header" onclick="toggleWeek('week2')">
+            <div class="week-header" onclick="window.toggleWeek('week2')">
               <div class="week-info">
                 <h3>Week 2: Infrastructure Services</h3>
                 <p>Second DC, WSUS server, and time synchronization</p>
@@ -1110,7 +1110,7 @@
           </div>
 
           <div class="week-card" id="week3-card">
-            <div class="week-header" onclick="toggleWeek('week3')">
+            <div class="week-header" onclick="window.toggleWeek('week3')">
               <div class="week-info">
                 <h3>Week 3: Exchange Server</h3>
                 <p>DC upgrades, Exchange 2019 installation and configuration</p>
@@ -1131,7 +1131,7 @@
           </div>
 
           <div class="week-card" id="week4-card">
-            <div class="week-header" onclick="toggleWeek('week4')">
+            <div class="week-header" onclick="window.toggleWeek('week4')">
               <div class="week-info">
                 <h3>Week 4: Hybrid Configuration</h3>
                 <p>Microsoft 365 integration and hybrid mail flow</p>
@@ -1160,7 +1160,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2 class="modal-title">Sign In</h2>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <button class="modal-close" onclick="window.closeModal()">&times;</button>
       </div>
       <form id="login-form">
         <div class="form-group">
@@ -1176,7 +1176,7 @@
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 16px;">Sign In</button>
         <p style="text-align: center; color: var(--text-secondary);">
-          New to Velocity Lab? <a href="#" onclick="showRegister()" style="color: var(--primary);">Create account</a>
+          New to Velocity Lab? <a href="#" onclick="window.showRegister()" style="color: var(--primary);">Create account</a>
         </p>
       </form>
     </div>
@@ -1187,7 +1187,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2 class="modal-title">Create Account</h2>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <button class="modal-close" onclick="window.closeModal()">&times;</button>
       </div>
       <form id="register-form">
         <div class="form-group">
@@ -1201,7 +1201,7 @@
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 16px;">Create Account</button>
         <p style="text-align: center; color: var(--text-secondary);">
-          Already have an account? <a href="#" onclick="showLogin()" style="color: var(--primary);">Sign in</a>
+          Already have an account? <a href="#" onclick="window.showLogin()" style="color: var(--primary);">Sign in</a>
         </p>
       </form>
     </div>
@@ -1212,7 +1212,7 @@
     <div class="modal-content" style="max-width: 800px;">
       <div class="modal-header">
         <h2 class="modal-title" id="task-title"></h2>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <button class="modal-close" onclick="window.closeModal()">&times;</button>
       </div>
       <div id="task-content"></div>
     </div>
@@ -1223,7 +1223,7 @@
     <div class="modal-content" style="max-width: 600px;">
       <div class="modal-header">
         <h2 class="modal-title">Lab History</h2>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <button class="modal-close" onclick="window.closeModal()">&times;</button>
       </div>
       <div id="lab-history-content">
         <p style="color: var(--text-secondary); text-align: center; padding: 40px;">
@@ -1238,13 +1238,13 @@
     <div class="admin-content modal-content">
       <div class="modal-header">
         <h2 class="modal-title">Admin Portal</h2>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <button class="modal-close" onclick="window.closeModal()">&times;</button>
       </div>
       
       <div class="admin-tabs">
-        <div class="admin-tab active" onclick="switchAdminTab('leaderboard')">Leaderboard</div>
-        <div class="admin-tab" onclick="switchAdminTab('users')">Users</div>
-        <div class="admin-tab" onclick="switchAdminTab('data')">Data Tools</div>
+        <div class="admin-tab active" onclick="window.switchAdminTab('leaderboard')">Leaderboard</div>
+        <div class="admin-tab" onclick="window.switchAdminTab('users')">Users</div>
+        <div class="admin-tab" onclick="window.switchAdminTab('data')">Data Tools</div>
       </div>
 
       <div id="admin-leaderboard" class="admin-section active">
@@ -1266,7 +1266,7 @@
             </tr>
           </tbody>
         </table>
-        <button class="btn btn-secondary" onclick="refreshLeaderboard()" style="margin-top: 16px;">
+        <button class="btn btn-secondary" onclick="window.refreshLeaderboard()" style="margin-top: 16px;">
           Refresh Data
         </button>
       </div>
@@ -1281,8 +1281,8 @@
 
       <div id="admin-data" class="admin-section">
         <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-          <button class="btn btn-primary" onclick="exportProgress()">Export Progress (CSV)</button>
-          <input type="file" accept=".csv" id="import-file" onchange="importProgress(this.files)" style="display: none;">
+          <button class="btn btn-primary" onclick="window.exportProgress()">Export Progress (CSV)</button>
+          <input type="file" accept=".csv" id="import-file" onchange="window.importProgress(this.files)" style="display: none;">
           <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">Import Progress</button>
         </div>
       </div>
