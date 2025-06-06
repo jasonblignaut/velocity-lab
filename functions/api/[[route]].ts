@@ -63,7 +63,8 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
       });
     } catch (e) {
-      await logActivity(env, 'unknown', 'register_error', { ip, error: e.message });
+    } catch (e) {
+      await logActivity(env, 'unknown', 'register_error', { ip, error: (e as Error).message });
       return errorResponse('Registration failed', 500);
     }
   }
@@ -89,7 +90,7 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
         },
       });
     } catch (e) {
-      await logActivity(env, 'unknown', 'logout_error', { ip, error: e.message });
+      await logActivity(env, 'unknown', 'logout_error', { ip, error: (e as Error).message });
       return errorResponse('Server error', 500);
     }
   }
@@ -107,7 +108,7 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
       
       return jsonResponse(data);
     } catch (e) {
-      await logActivity(env, 'unknown', 'progress_get_error', { ip, error: e.message });
+      await logActivity(env, 'unknown', 'progress_get_error', { ip, error: (e as Error).message });
       return errorResponse('Server error', 500);
     }
   }
@@ -201,7 +202,7 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
         progressPercentage
       });
     } catch (e) {
-      await logActivity(env, 'unknown', 'progress_post_error', { ip, error: e.message });
+      await logActivity(env, 'unknown', 'progress_post_error', { ip, error: (e as Error).message });
       return errorResponse('Server error', 500);
     }
   }
@@ -232,7 +233,7 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
       
       return jsonResponse({ labId, totalTasks: 42 });
     } catch (e) {
-      await logActivity(env, 'unknown', 'lab_start_error', { ip, error: e.message });
+      await logActivity(env, 'unknown', 'lab_start_error', { ip, error: (e as Error).message });
       return errorResponse('Server error', 500);
     }
   }
@@ -250,7 +251,7 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
       
       return jsonResponse(history);
     } catch (e) {
-      await logActivity(env, 'unknown', 'lab_history_error', { ip, error: e.message });
+      await logActivity(env, 'unknown', 'lab_history_error', { ip, error: (e as Error).message });
       return errorResponse('Server error', 500);
     }
   }
@@ -295,7 +296,7 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
       return jsonResponse(users);
     } catch (e) {
       console.error('Admin users progress error:', e);
-      await logActivity(env, 'unknown', 'admin_users_progress_error', { ip, error: e.message });
+      await logActivity(env, 'unknown', 'admin_users_progress_error', { ip, error: (e as Error).message });
       return errorResponse('Server error', 500);
     }
   }
@@ -337,7 +338,7 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
         completionRate
       });
     } catch (e) {
-      await logActivity(env, 'unknown', 'admin_stats_error', { ip, error: e.message });
+      await logActivity(env, 'unknown', 'admin_stats_error', { ip, error: (e as Error).message });
       return errorResponse('Server error', 500);
     }
   }
@@ -385,7 +386,7 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
 
       return jsonResponse({ message: 'Role updated successfully' });
     } catch (e) {
-      await logActivity(env, 'unknown', 'role_update_error', { ip, error: e.message });
+      await logActivity(env, 'unknown', 'role_update_error', { ip, error: (e as Error).message });
       return errorResponse('Server error', 500);
     }
   }
@@ -428,7 +429,7 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
 
       return jsonResponse({ message: 'Progress reset successfully' });
     } catch (e) {
-      await logActivity(env, 'unknown', 'reset_progress_error', { ip, error: e.message });
+      await logActivity(env, 'unknown', 'reset_progress_error', { ip, error: (e as Error).message });
       return errorResponse('Server error', 500);
     }
   }
@@ -463,7 +464,7 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
 
       return jsonResponse({ csv });
     } catch (e) {
-      await logActivity(env, 'unknown', 'export_error', { ip, error: e.message });
+      await logActivity(env, 'unknown', 'export_error', { ip, error: (e as Error).message });
       return errorResponse('Server error', 500);
     }
   }
@@ -510,7 +511,7 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
       
       return jsonResponse({ importedCount });
     } catch (e) {
-      await logActivity(env, 'unknown', 'import_error', { ip, error: e.message });
+      await logActivity(env, 'unknown', 'import_error', { ip, error: (e as Error).message });
       return errorResponse('Server error', 500);
     }
   }
@@ -546,7 +547,7 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
         labHistory: user.labHistory || []
       });
     } catch (e) {
-      await logActivity(env, 'unknown', 'profile_error', { ip, error: e.message });
+      await logActivity(env, 'unknown', 'profile_error', { ip, error: (e as Error).message });
       return errorResponse('Server error', 500);
     }
   }
@@ -613,7 +614,7 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
         },
       });
     } catch (e) {
-      await logActivity(env, 'unknown', 'login_error', { ip, error: e.message });
+      await logActivity(env, 'unknown', 'login_error', { ip, error: (e as Error).message });
       return errorResponse('Server error', 500);
     }
   }
