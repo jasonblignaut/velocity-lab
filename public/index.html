@@ -1,1 +1,2271 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Velocity Lab</title><link rel="icon" type="image/x-icon" href="/assets/favicon.ico"><style>*{margin:0;padding:0;box-sizing:border-box}:root{--primary:#007AFF;--primary-hover:#0056CC;--success:#34C759;--warning:#FF9500;--error:#FF3B30;--text-primary:#1D1D1F;--text-secondary:#6B7280;--text-tertiary:#9CA3AF;--background:#F2F2F7;--surface:#FFF;--surface-secondary:#F9F9F9;--border:#D1D1D6;--border-light:#E5E5EA;--shadow-color:rgba(0,0,0,.05);--shadow-light:0 1px 3px var(--shadow-color);--shadow-medium:0 4px 12px var(--shadow-color);--shadow-heavy:0 8px 25px var(--shadow-color);--radius-sm:6px;--radius-md:8px;--radius-lg:12px;--radius-xl:16px;--transition:background-color .3s cubic-bezier(.2,0,0,1),transform .3s cubic-bezier(.2,0,0,1),box-shadow .3s cubic-bezier(.2,0,0,1);--transition-fast:background-color .2s cubic-bezier(.2,0,0,1),transform .2s cubic-bezier(.2,0,0,1);--dark-primary:#0A84FF;--dark-text-primary:#FFF;--dark-text-secondary:#9CA3AF;--dark-text-tertiary:#6B7280;--dark-background:#000;--dark-surface:#1C1C1E;--dark-surface-secondary:#2C2C2E;--dark-border:#38383A;--dark-border-light:#48484A;--dark-shadow-color:rgba(0,0,0,.3)}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--background);color:var(--text-primary);line-height:1.5;font-size:16px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden;transition:var(--transition)}body.dark{background:var(--dark-background);color:var(--dark-text-primary);--text-primary:var(--dark-text-primary);--text-secondary:var(--dark-text-secondary);--text-tertiary:var(--dark-text-tertiary);--surface:var(--dark-surface);--surface-secondary:var(--dark-surface-secondary);--border:var(--dark-border);--border-light:var(--dark-border-light);--primary:var(--dark-primary);--shadow-color:var(--dark-shadow-color)}.container{max-width:1200px;margin:0 auto;padding:0 20px}header{position:fixed;top:0;width:100%;background:rgba(255,255,255,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border-light);z-index:1000;transition:var(--transition)}body.dark header{background:rgba(28,28,30,.85)}nav{height:64px;display:flex;justify-content:space-between;align-items:center}.logo img{height:32px;transition:var(--transition-fast)}.logo img:hover{transform:scale(1.05)}.logo img:not([src]){content:'Velocity Lab';font-size:18px;font-weight:600;color:var(--text-primary)}.nav-right{display:flex;align-items:center;gap:12px}.btn{display:inline-flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:var(--radius-lg);border:none;font-size:14px;font-weight:600;cursor:pointer;transition:var(--transition-fast);text-decoration:none;min-height:36px;white-space:nowrap}.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-hover);transform:translateY(-1px);box-shadow:var(--shadow-medium)}.btn-secondary{background:var(--surface);color:var(--text-primary);border:1px solid var(--border)}.btn-secondary:hover{background:var(--surface-secondary);transform:translateY(-1px);box-shadow:var(--shadow-light)}.btn-admin{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}.btn-admin:hover{transform:translateY(-1px);box-shadow:var(--shadow-medium)}.lab-button-container{position:relative;display:inline-block}.lab-dropdown{position:absolute;top:100%;left:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-medium);min-width:200px;z-index:1001;display:none;overflow:hidden}.lab-dropdown.show{display:block}.lab-dropdown-item{padding:12px 16px;cursor:pointer;transition:var(--transition-fast);border-bottom:1px solid var(--border-light)}.lab-dropdown-item:last-child{border-bottom:none}.lab-dropdown-item:hover{background:var(--surface-secondary)}.lab-header{font-weight:700;color:background:var(--surface-secondary);border-bottom:1px solid var(--border);padding:12px 16px}.theme-selector{padding:8px;border:1px solid var(--border);border-radius:var(--radius-md);background: var(--secondary);color: var(--text-primary);font-size:14px;font-weight:600;cursor:cursor;transition:var(--transition-fast);min-width:100px}.theme-selector:focus{outline:2px solid var(--primary);outline-offset:2px}.theme-selector:hover{border-color: var(--primary)}.hidden{display:none !important}#landing{min-height:100vh;display:flex;align-items: center;justify-content: center;text-align: center;padding-top: 64px;background: linear-gradient(135deg, #667eea 0%,#764ba2 100%);color: #fff}#landing h1{font-size:clamp(48px,8vw,72px);font-weight:700;margin-bottom:24px;letter-spacing:-.02em}#landing p{font-size:20px;opacity:.9;max-width:600px;margin:0 auto 40px;line-height:1.6}.landing-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}.landing-actions .btn{min-width:120px;padding:12px 24px;font-size:16px}#dashboard{padding:100px 0 60px;min-height:100vh}.progress-card{background:var(--surface);border-radius:var(--radius-xl);padding:40px;margin-bottom:32px;box-shadow:var(--shadow-light);text-align:center;transition:var(--transition);border:1px solid var(--border-light)}.progress-card:hover{box-shadow:var(--shadow-medium)}.progress-card h2{font-size:28px;font-weight:700;margin-bottom:32px;color:var(--text-primary)}.progress-ring{width:180px;height:180px;margin:0 auto 32px;position:relative}.progress-ring svg{transform:rotate(-90deg);width:100%;height:100%}.progress-ring circle{fill:none;stroke-width:8;stroke-linecap:round}.progress-ring .background{stroke:var(--border)}.progress-ring .foreground{stroke:var(--primary);stroke-dasharray:calc(2*3.14159*85);stroke-dashoffset:calc(2*3.14159*85);transition:stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1)}.progress-percentage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:36px;font-weight:700;color:var(--primary)}.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:24px;margin:32px 0}.stat{text-align:center}.stat-value{font-size:32px;font-weight:700;color:var(--primary);margin-bottom:4px}.stat-label{font-size:13px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px;font-weight:600}.weeks-container{display:flex;flex-direction:column;gap:16px}.week-card{background:var(--surface);border-radius:var(--radius-xl);overflow:hidden;transition:var(--transition);border:1px solid var(--border-light);box-shadow:var(--shadow-light)}.week-card:hover{box-shadow:var(--shadow-medium);transform:translateY(-2px)}.week-card[aria-expanded="true"] .expand-icon{transform:rotate(90deg)}.week-header{padding:24px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:var(--transition-fast);border-bottom:1px solid transparent}.week-header:hover{background:var(--surface-secondary)}.week-info h3{font-size:20px;font-weight:600;margin-bottom:4px;color:var(--text-primary)}.week-info p{color:var(--text-secondary);font-size:14px}.week-progress{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:8px}.progress-text{font-size:14px;font-weight:600;color:var(--text-primary)}.progress-bar{width:120px;height:6px;background:var(--border);border-radius:3px;overflow:hidden}.progress-fill{height:100%;background:var(--primary);transition:width var(--transition);border-radius:3px}.expand-icon{width:20px;height:20px;color:var(--text-secondary);transition:var(--transition-fast);margin-left:16px}.tasks-container{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1)}.week-card[aria-expanded="true"] .tasks-container{max-height:2000px}.tasks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;padding:24px}.task-item{background:var(--surface-secondary);border-radius:var(--radius-md);padding:16px;cursor:pointer;transition:var(--transition-fast);border:1px solid var(--border-light);display:flex;align-items:center;gap:12px}.task-item:hover{background:var(--surface);transform:translateY(-1px);box-shadow:var(--shadow-light)}.task-item.completed{background:rgba(52,199,89,.1);border-color:var(--success)}.task-checkbox{width:20px;height:20px;border:2px solid var(--border);border-radius:4px;cursor:pointer;position:relative;flex-shrink:0;transition:var(--transition-fast);appearance:none;-webkit-appearance:none}.task-checkbox:checked{background:var(--success);border-color:var(--success)}.task-checkbox:checked::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:12px;font-weight:700}.task-content{flex:1}.task-title{font-weight:600;font-size:15px;color:var(--text-primary);margin-bottom:2px}.task-description{font-size:13px;color:var(--text-secondary)}.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);z-index:2000;padding:20px;justify-content:center;align-items:center}.modal[aria-hidden="false"]{display:flex}.modal-content{background:var(--surface);border-radius:var(--radius-xl);padding:32px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-heavy);position:relative;animation:modalAppear .3s cubic-bezier(.4,0,.2,1)}@keyframes modalAppear{from{opacity:0;transform:scale(.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.modal-title{font-size:24px;font-weight:700;color:var(--text-primary)}.modal-close{width:32px;height:32px;border-radius:50%;border:none;background:var(--surface-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);transition:var(--transition-fast)}.modal-close:hover{background:var(--border);color:var(--text-primary)}.modal-close svg{width:20px;height:20px}.form-group{margin-bottom:20px}.form-input{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:var(--radius-md);font-size:16px;transition:var(--transition-fast);background:var(--surface);color:var(--text-primary)}.form-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(0,122,255,.1)}.form-checkbox{margin-right:8px}.form-label{display:flex;align-items:center;gap:8px;color:var(--text-primary);margin-bottom:16px;cursor:pointer}.subtask-container{margin:16px 0}.subtask-item{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;padding:8px;border-radius:var(--radius-sm);transition:var(--transition-fast)}.subtask-item:hover{background:var(--surface-secondary)}.subtask input[type="checkbox"]{width:18px;height:18px;border:2px solid var(--border);border-radius:3px;cursor:pointer;position:relative;flex-shrink:0;margin-top:2px;transition:var(--transition-fast);appearance:none;-webkit-appearance:none}.subtask input[type="checkbox"]:checked{background:var(--success);border-color:var(--success)}.subtask input[type="checkbox"]:checked::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:11px;font-weight:700}.subtask label{font-size:14px;line-height:1.4;color:var(--text-primary);cursor:pointer;flex:1}.notification{position:fixed;top:84px;right:20px;padding:16px 24px;border-radius:var(--radius-md);color:#fff;font-weight:600;transform:translateX(320px);transition:var(--transition);box-shadow:var(--shadow-medium);z-index:3000}.notification.show{transform:translateX(0)}.notification.success{background:var(--success)}.notification.error{background:var(--error)}.admin-content{max-width:1000px;width:100%}.admin-tabs{display:flex;gap:4px;margin-bottom:32px;background:var(--surface-secondary);padding:4px;border-radius:var(--radius-md)}.admin-tab{flex:1;padding:12px 20px;text-align:center;border-radius:var(--radius-sm);cursor:pointer;transition:var(--transition-fast);font-weight:600;color:var(--text-secondary)}.admin-tab.active{background:var(--surface);color:var(--primary);box-shadow:var(--shadow-light)}.admin-section{display:none}.admin-section.active{display:block}.admin-table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-light)}.admin-table th,.admin-table td{padding:16px;text-align:left;border-bottom:1px solid var(--border-light)}.admin-table th{background:var(--surface-secondary);font-weight:700;color:var(--text-secondary);font-size:13px;text-transform:uppercase;letter-spacing:.5px}.admin-table tbody tr:hover{background:var(--surface-secondary)}.user-card{background:var(--surface);border-radius:var(--radius-md);padding:14px;margin-bottom:16px;border:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center;transition:var(--transition-fast)}.user-card:hover{box-shadow:var(--shadow-light);transform:translateY(-1px)}.user-info h4{font-size:16px;font-weight:600;margin-bottom:4px}.user-info p{font-size:14px;color:var(--text-secondary)}.user-actions{display:flex;gap:12px}.user-progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin:8px 0;width:100px}.user-progress-fill{height:100%;background:var(--primary);transition:width var(--transition)}.loading{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-radius:50%;border-top-color:var(--primary);animation:spin 1s ease-in-out infinite}@keyframes spin{to{transform:rotate(360deg)}}@media (max-width:768px){.container{padding:0 16px}nav{height:56px}.nav-right{gap:8px}#dashboard{padding:80px 0 40px}.progress-card{padding:24px}.stats-grid{grid-template-columns:repeat(2,1fr);gap:16px}.tasks-grid{grid-template-columns:1fr;padding:16px}.week-header{padding:16px}.week-progress{align-items:center}.progress-bar{width:80px}.modal-content{padding:24px;margin:10px}.landing-actions{flex-direction:column;align-items:center}.admin-tabs{flex-direction:column}.user-card{flex-direction:column;align-items:flex-start;gap:16px}.user-actions{width:100%;justify-content:flex-end}.lab-dropdown{right:0;left:auto}}@media (max-width:480px){#landing h1{font-size:36px}#landing p{font-size:18px}.progress-ring{width:140px;height:140px}.progress-percentage{font-size:28px}.stats-grid{grid-template-columns:1fr}}</style></head><body><header><nav class="container"><div class="logo"><img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" aria-label="Velocity Lab"></div><div class="nav-right"><span id="auth-buttons"><button onclick="window.showLogin()" class="btn btn-secondary" aria-label="Sign In">Sign In</button><button onclick="window.showRegister()" class="btn btn-primary" aria-label="Register">Register</button></span><span id="user-menu" class="hidden"><span id="user-name" style="margin-right:12px;font-weight:600"></span><button id="admin-button" class="btn btn-admin hidden" onclick="window.showAdmin()" aria-label="Admin Portal">Admin Portal</button><button onclick="window.logout()" class="btn btn-secondary" aria-label="Sign Out">Sign Out</button><label for="theme-selector" class="hidden">Theme Selector</label><select id="theme-selector" class="theme-selector" onchange="window.changeTheme(this.value)" aria-label="Select Theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select></span></div></nav></header><main><section id="landing" aria-labelledby="landing-title"><div class="container"><h1 id="landing-title">Master Exchange Hybrid</h1><p>42 tasks over 4 weeks. Build a lab with DCs, Exchange Server, and VMs.</p><div class="landing-actions"><button class="btn btn-primary" onclick="window.showRegister()" aria-label="Get Started">Get Started</button><button class="btn btn-secondary" onclick="window.showLogin()" aria-label="Sign In">Sign In</button></div></div></section><section id="dashboard" class="hidden" aria-labelledby="dashboard-title"><div class="container"><div class="progress-card"><h2 id="dashboard-title">Training Progress</h2><div class="progress-ring"><svg viewBox="0 0 180 180" aria-label="Overall Progress"><circle cx="90" cy="90" r="85" class="background"/><circle cx="90" cy="90" r="85" class="foreground" id="progress-ring"/></svg><div class="progress-percentage" id="progress-percentage">0%</div></div><div class="stats-grid"><div class="stat"><div class="stat-value" id="completed-tasks">0</div><div class="stat-label">Tasks Done</div></div><div class="stat"><div class="stat-value">42</div><div class="stat-label">Total Tasks</div></div><div class="stat"><div class="stat-value" id="current-week">Week 1</div><div class="stat-label">Current</div></div><div class="stat"><div class="stat-value">3</div><div class="stat-label">VMs</div></div></div><div class="lab-button-container"><button class="btn btn-primary" onclick="window.toggleLabDropdown()" aria-haspopup="true" aria-expanded="false">Start New Lab ▼</button><div class="lab-dropdown" id="lab-dropdown" role="menu"><div class="lab-header" role="presentation">Lab Options</div><div class="lab-dropdown-item" onclick="window.startNewLab();window.closeLabDropdown()" role="menuitem" tabindex="0">🚀 Start Fresh Lab</div><div class="lab-dropdown-item" onclick="window.showLabHistory();window.closeLabDropdown()" role="menuitem" tabindex="0">📅 Lab History</div></div></div></div><div class="weeks-container" id="weeks-container"><div class="week-card" id="week1-card" role="region" aria-expanded="false" aria-labelledby="week1-title"><div class="week-header" onclick="window.toggleWeek('week1')" role="button" tabindex="0" aria-controls="week1-tasks"><div class="week-info"><h3 id="week1-title">Week 1: Foundation</h3><p>DC setup, domain join, file shares</p></div><div class="week-progress"><div class="progress-text"><span id="week1-completed">0</span>/13 tasks</div><div class="progress-bar"><div class="progress-fill" id="week1-progress" style="width:0%"></div></div></div><svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9,18 15,12 9,6"></polyline></svg></div><div class="tasks-container" id="week1-tasks"><div class="tasks-grid" id="week1-tasks-grid"></div></div></div><div class="week-card" id="week2-card" role="region" aria-expanded="false" aria-labelledby="week2-title"><div class="week-header" onclick="window.toggleWeek('week2')" role="button" tabindex="0" aria-controls="week2-tasks"><div class="week-info"><h3 id="week2-title">Week 2: Infrastructure</h3><p>Second DC, WSUS, time sync</p></div><div class="week-progress"><div class="progress-text"><span id="week2-completed">0</span>/8 tasks</div><div class="progress-bar"><div class="progress-fill" id="week2-progress" style="width:0%"></div></div></div><svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9,18 15,12 9,6"></polyline></svg></div><div class="tasks-container" id="week2-tasks"><div class="tasks-grid" id="week2-tasks-grid"></div></div></div><div class="week-card" id="week3-card" role="region" aria-expanded="false" aria-labelledby="week3-title"><div class="week-header" onclick="window.toggleWeek('week3')" role="button" tabindex="0" aria-controls="week3-tasks"><div class="week-info"><h3 id="week3-title">Week 3: Exchange</h3><p>DC upgrades, Exchange 2019 setup</p></div><div class="week-progress"><div class="progress-text"><span id="week3-completed">0</span>/12 tasks</div><div class="progress-bar"><div class="progress-fill" id="week3-progress" style="width:0%"></div></div></div><svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9,18 15,12 9,6"></polyline></svg></div><div class="tasks-container" id="week3-tasks"><div class="tasks-grid" id="week3-tasks-grid"></div></div></div><div class="week-card" id="week4-card" role="region" aria-expanded="false" aria-labelledby="week4-title"><div class="week-header" onclick="window.toggleWeek('week4')" role="button" tabindex="0" aria-controls="week4-tasks"><div class="week-info"><h3 id="week4-title">Week 4: Hybrid</h3><p>M365 integration, hybrid mail</p></div><div class="week-progress"><div class="progress-text"><span id="week4-completed">0</span>/10 tasks</div><div class="progress-bar"><div class="progress-fill" id="week4-progress" style="width:0%"></div></div></div><svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9,18 15,12 9,6"></polyline></svg></div><div class="tasks-container" id="week4-tasks"><div class="tasks-grid" id="week4-tasks-grid"></div></div></div></div></div></section></main><div id="login-modal" class="modal" role="dialog" aria-labelledby="login-title" aria-hidden="true"><div class="modal-content"><div class="modal-header"><h2 class="modal-title" id="login-title">Sign In</h2><button class="modal-close" onclick="window.closeModal()" aria-label="Close Modal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div><form id="login-form"><div class="form-group"><input type="email" name="email" placeholder="Email" required class="form-input" aria-label="Email"></div><div class="form-group"><input type="password" name="password" placeholder="Password" required class="form-input" aria-label="Password"></div><div class="form-group"><label class="form-label"><input type="checkbox" name="remember" class="form-checkbox" aria-label="Remember me">Remember me</label></div><button type="submit" class="btn btn-primary" style="width:100%;margin-bottom:16px" aria-label="Sign In">Sign In</button><p style="text-align:center;color:var(--text-secondary)">New? <a href="#" onclick="window.showRegister()" style="color:var(--primary)">Create account</a></p></form></div></div><div id="register-modal" class="modal" role="dialog" aria-labelledby="register-title" aria-hidden="true"><div class="modal-content"><div class="modal-header"><h2 class="modal-title" id="register-title">Create Account</h2><button class="modal-close" onclick="window.closeModal()" aria-label="Close Modal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div><form id="register-form"><div class="form-group"><input type="text" name="name" placeholder="Full name" required class="form-input" aria-label="Full name"></div><div class="form-group"><input type="email" name="email" placeholder="Email" required class="form-input" aria-label="Email"></div><div class="form-group"><input type="password" name="password" placeholder="Password (8+ chars)" required minlength="8" class="form-input" aria-label="Password"></div><button type="submit" class="btn btn-primary" style="width:100%;margin-bottom:16px" aria-label="Create Account">Create Account</button><p style="text-align:center;color:var(--text-secondary)">Have account? <a href="#" onclick="window.showLogin()" style="color:var(--primary)">Sign in</a></p></form></div></div><div id="task-modal" class="modal" role="dialog" aria-labelledby="task-title" aria-hidden="true"><div class="modal-content" style="max-width:800px"><div class="modal-header"><h2 class="modal-title" id="task-title"></h2><button class="modal-close" onclick="window.closeModal()" aria-label="Close Modal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div><div id="task-content"></div></div></div><div id="lab-history-modal" class="modal" role="dialog" aria-labelledby="lab-history-title" aria-hidden="true"><div class="modal-content" style="max-width:600px"><div class="modal-header"><h2 class="modal-title" id="lab-history-title">Lab History</h2><button class="modal-close" onclick="window.closeModal()" aria-label="Close Modal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div><div id="lab-history-content"><p style="color:var(--text-secondary);text-align:center;padding:40px">No lab history yet. Complete your first lab.</p></div></div></div><div id="admin-modal" class="modal" role="dialog" aria-labelledby="admin-title" aria-hidden="true"><div class="admin-content modal-content"><div class="modal-header"><h2 class="modal-title" id="admin-title">Admin Portal</h2><button class="modal-close" onclick="window.closeModal()" aria-label="Close Modal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div><div class="admin-tabs" role="tablist"><div class="admin-tab active" onclick="window.switchAdminTab('leaderboard')" role="tab" aria-selected="true" aria-controls="admin-leaderboard" id="tab-leaderboard">Leaderboard</div><div class="admin-tab" onclick="window.switchAdminTab('users')" role="tab" aria-selected="false" aria-controls="admin-users" id="tab-users">Users</div><div class="admin-tab" onclick="window.switchAdminTab('data')" role="tab" aria-selected="false" aria-controls="admin-data" id="tab-data">Data Tools</div></div><div id="admin-leaderboard" class="admin-section active" role="tabpanel" aria-labelledby="tab-leaderboard"><table class="admin-table"><thead><tr><th>Rank</th><th>Name</th><th>Progress</th><th>Tasks</th><th>Last Login</th></tr></thead><tbody id="leaderboard-body"><tr><td colspan="5" style="text-align:center;padding:40px"><div class="loading"></div></td></tr></tbody></table><button class="btn btn-secondary" onclick="window.refreshLeaderboard()" style="margin-top:16px" aria-label="Refresh Leaderboard">Refresh</button></div><div id="admin-users" class="admin-section" role="tabpanel" aria-labelledby="tab-users"><div id="users-list"><div style="text-align:center;padding:40px"><div class="loading"></div></div></div></div><div id="admin-data" class="admin-section" role="tabpanel" aria-labelledby="tab-data"><div style="display:flex;gap:16px;flex-wrap:wrap"><button class="btn btn-primary" onclick="window.exportProgress()" aria-label="Export Progress as CSV">Export CSV</button><input type="file" accept=".csv" id="import-file" onchange="window.importProgress(this.files)" style="display:none" aria-label="Import Progress CSV"><button class="btn btn-secondary" onclick="document.getElementById('import-file').click()" aria-label="Import Progress">Import</button></div></div></div></div><div id="notification" class="notification" role="alert"></div><script>window.TASK_DEFINITIONS={...};window.showLogin=()=>{document.querySelectorAll(".modal").forEach(e=>{e.style.display="none";e.setAttribute("aria-hidden","true")});let e=document.getElementById("login-modal");e.style.display="flex";e.setAttribute("aria-hidden","false");e.querySelector('input[name="email"]').focus()};window.showRegister=()=>{document.querySelectorAll(".modal").forEach(e=>{e.style.display="none";e.setAttribute("aria-hidden","true")});let e=document.getElementById("register-modal");e.style.display="flex";e.setAttribute("aria-hidden","false");e.querySelector('input[name="name"]').focus()};window.closeModal=()=>{document.querySelectorAll(".modal").forEach(e=>{e.style.display="none";e.setAttribute("aria-hidden","true")})};window.logout=()=>{window.authSystem?.logout()};window.startNewLab=()=>{window.labSystem?.startNew()};window.showAdmin=()=>{window.adminSystem?.showPortal()};window.toggleWeek=e=>{window.uiSystem?.toggleWeek(e)};window.toggleLabDropdown=()=>{window.uiSystem?.toggleLabDropdown()};window.closeLabDropdown=()=>{window.uiSystem?.closeLabDropdown()};window.showLabHistory=()=>{window.uiSystem?.showLabHistory()};window.switchAdminTab=e=>{window.adminSystem?.switchTab(e)};window.refreshLeaderboard=()=>{window.adminSystem?.refreshLeaderboard()};window.exportProgress=()=>{window.adminSystem?.exportProgress()};window.importProgress=e=>{window.adminSystem?.importProgress(e)};window.changeTheme=e=>{window.uiSystem?.changeTheme(e)};window.openTaskModal=(e,t)=>{window.taskSystem?.openModal(e,t)};window.toggleTask=(e,t,a)=>{window.taskSystem?.toggle(e,t,a)};window.toggleSubtask=(e,t,a,i)=>{window.taskSystem?.toggleSubtask(e,t,a,i)};(function(){const e={week1:["install-server2012","configure-static-ip","install-adds-role","promote-to-dc","configure-dns-server","create-domain-users","join-vm-domain","create-hidden-share","map-drive-gpo","map-drive-script","map-drive-powershell","create-security-group","restrict-share-access"],week2:["install-second-server","promote-additional-dc","install-wsus-role","configure-wsus-settings","setup-wsus-gpo","configure-primary-time","configure-secondary-time","test-infrastructure"],week3:["backup-servers","upgrade-dc1-2016","upgrade-dc2-2016","raise-functional-levels","install-exchange-server","install-exchange-prereqs","extend-ad-schema","install-exchange-2019","configure-exchange-basic","create-mailboxes","test-mailbox-access","configure-internal-mailflow"],week4:["configure-external-dns","setup-firewall-rules","install-ssl-certificates","configure-external-mailflow","setup-modern-auth","prepare-m365-tenant","install-aad-connect","run-hybrid-wizard","configure-hybrid-mailflow","verify-hybrid-functionality"]};let t={user:null,progress:{},authenticated:false,sessionToken:null,isLoading:false,labHistory:[]};const a=e=>document.getElementById(e),i=e=>e?.classList.remove("hidden"),s=e=>e?.classList.add("hidden"),n={get:e=>document.cookie.match(`${e}=([^;]+)`)?.[1],set:(e,t,a=7)=>{if(location.protocol!=="https:")console.warn("Cookie set attempted in non-HTTPS environment");document.cookie=`${e}=${t};path=/;max-age=${a*86400};SameSite=Strict;${location.protocol==="https:"?"Secure":""}`},delete:e=>{document.cookie=`${e}=;path=/;max-age=0;SameSite=Strict;${location.protocol==="https:"?"Secure":""}`}};function o(e,t="success"){const i=a("notification");i.textContent=e;i.className=`notification ${t} show`;i.setAttribute("aria-expanded","assertive");setTimeout(() => i.classList.remove("show"), 4000)}const r={async login(e){return{success:true,name:e.get("email").split("@")[0],role:"user",email:e.get("email"),sessionToken:"mock-token"}},async register(e){return{success:true,name:e.get("name"),role:"user",email:e.get("email"),sessionToken:"mock-token"}},async progress(){return{success:true,data:{}}},async logout(){return{success:true}},async csrf(){return{success:true,token:"mock-csrf-token"}}};async function c(e,l={}){const d=new AbortController,g=setTimeout(() => d.abort(), 30000);try{t.isLoading=true;const u=new Headers(l.headers||{});if(t.sessionToken)u.set("Authorization",`Bearer ${t.sessionToken}`);const h=!l.method||l.method.toUpperCase()==="GET";let m;if(!h){const e=await(fetch("/api/csrf",{credentials:"same-origin",signal:d.signal}).catch(() => r.csrf())),t=await e.json();if(l.body instanceof FormData){m=l.body;m.append("csrf_token",t.token)}else{m=new FormData();if(l.body){for(const [e,t] of Object.entries(l.body))m.append(e,t)}m.append("csrf_token",t.token)}}const response=await fetch(e,{credentials:"same-origin",headers:u,method:l.method||"GET",body:m,signal:d.signal}).catch(() => {if(e==="/api/login")return{ok: true, json: () => r.login(m)};if(e==="/api/register")return{ok: true, json: () => r.register(m)};if(m==="/api/users")return{ok: true};if(m==="/api")return{m}};if(!response.ok){if(response.status===401)throw new Error("Invalid credentials or session expired");if(response.status===403)throw new Error("Access denied - insufficient permissions");if(response.status===409)throw new Error("Email already registered");throw new Error(`Server error (${response.status})`)}clearTimeout(g);const data = await response.json();if(!data.success) throw new Error(data.error || 'Request failed'); return data} catch (error) {clearTimeout(g);if(error.name==="AbortError")throw new Error("Request timed out");throw error}finally{t.isLoading=false}}const p={async checkSession(){const e=n.get("user1"),r=n.get("session1");if(e&&r){try{t.user=JSON.parse(decodeURIComponent(e));t.authenticated=true;if(t.user.role==="admin")i(a("admin-button"));d.showDashboard()}catch(e){p.logout()}}else{d.showLanding()}},async login(e){try{const l=await c("/api/login",{method:"POST",body:e});n.set("user",encodeURIComponent(JSON.stringify({name:l.name,role:l.role,email:l.email})));n.set("session",l.sessionToken);t.user={name:l.name,role:l.role,email:l.email};t.authenticated=true;t.sessionToken=l.sessionToken;if(t.user.role==="admin")i(a("admin-button"));d.showDashboard();await d.loadProgress();window.closeModal();o(`Welcome back, ${l.name}!`)}catch(e){o(e.message,"error")}},async register(e){try{const l=await c("/api/register"));n.set("user",encodeURIComponent(JSON.stringify({name:l.name,role:l.role,email:l.email})));n.set("session",l.sessionToken);t.user={name:l.name,role:l.role,email:l.email};t.authenticated=true;t.sessionToken=l.sessionToken;d.showDashboard();await d.loadProgress();window.closeModal();o(`Welcome to Velocity Lab, ${l.name}!`)}catch(e){o(e.message,"error")}},logout(){c("/api/logout",{method:"POST"}).catch(console.log);n.delete("user");n.delete("session");t={user:undefined,progress:{},authenticated:undefined,sessionToken:undefined,isLoading:false,labHistory:[]};s(a("admin-button"));d.showLanding();o("Signed out")}},d={showLanding(){s(a("dashboard"));i(a("landing"));s(a("user-menu"));i(a("auth-buttons"))},showDashboard(){s(a("landing"));i(a("dashboard"));i(a("user-menu"));s(a("auth-buttons"));a("user-name").textContent=t.user?.name||""},toggleWeek(e){const t=a(`${e}-card`),i=t.getAttribute("aria-expanded")==="true";document.querySelectorAll(".week-card").forEach(t=>t.setAttribute("aria-expanded","false"));if(!i)t.setAttribute("aria-expanded","true")},toggleLabDropdown(){const e=a("lab-dropdown"),t=document.querySelector(".lab-button-container .btn"),i=e.classList.toggle("show");t.setAttribute("aria-expanded",i.toString());setTimeout(() => document.addEventListener("click",this.closeLabDropdownOnOutsideClick,{once: true}), 0)},closeLabDropdown(){const e=a("lab-dropdown"),t=document.querySelector(".lab-button-container .btn");e.classList.remove("show");t.setAttribute("aria-expanded","false")},closeLabDropdownOnOutsideClick(e){const t=a("lab-dropdown"),i=document.querySelector(".lab-button-container");if(!i.contains(e.target))d.closeLabDropdown()},showLabHistory(){const e=a("lab-history-content"),i=JSON.parse(localStorage.getItem("labHistory")||"[]");if(i.length===0){e.innerHTML=`<p style="color: var(--text-secondary); text-align: center; padding: 40px;">No lab history available yet. Complete your first lab to see history here.</p>`}else{e.innerHTML=`<div style="display: flex; flex-direction: column; gap: 16px;">${i.map((l,r)=>`<div style="background: var(--surface-secondary); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-light);"><h4 style="margin-bottom: 8px;">Lab #${r+1}</h4><p style="color: var(--text-secondary); font-size: 14px;">Started: ${new Date(l.startDate).toLocaleDateString()}<br>${l.endDate?`Completed: ${new Date(l.endDate).toLocaleDateString()}`:"In Progress"}<br>Progress: ${l.progress||0}% (${l.completedTasks||0}/42 tasks)</p></div>`).join("")}</div>`}const t=a("lab-history-modal");t.style.display="flex";t.setAttribute("aria-hidden","false")},changeTheme(e){localStorage.setItem("theme",e);if(e==="dark"){document.body.classList.add("dark")}else if(e==="light"){document.body.classList.remove("dark")}else if(e==="auto"){const t=window.matchMedia?.("(prefers-color-scheme: dark)").matches;document.body.classList.toggle("dark",t)}}},u={startNew(){const e=JSON.parse(localStorage.getItem("labHistory")||"[]");e.push({startDate:new Date().toISOString(),progress:0,completedTasks:0});localStorage.setItem("labHistory",JSON.stringify(e));t.progress={};m.updateDisplay();o("New lab started!")}},h={openModal(e,t){const i=`${e}-${t}`,s=window.TASK_DEFINITIONS?.[i]||{title:t.replace(/-/g," ").replace(/\b\w/g,l=>l.toUpperCase()),description:"No details available for this task."};a("task-title").textContent=s.title;a("task-content").innerHTML=s.description;const n=a("task-modal");n.style.display="flex";n.setAttribute("aria-hidden","false");const o=n.querySelectorAll('input[type="checkbox"]');o.forEach(e=>{const a=e.id.match(/step(\d+)/)?.[1];if(a&&t.progress[e]?.[t]?.subtasks?.[`step${a}`])e.checked=true})},async toggle(e,t,i){try{const s=new FormData;s.append("week",e);s.append("task",t);s.append("checked",i.toString());await c("/api/progress",{method:"POST",body:s});if(!t.progress[e])t.progress[e]={};if(!t.progress[e][t])t.progress[e][t]={};t.progress[e][t].completed=i;m.updateDisplay();o(i?"✅ Task completed!":"Task unmarked")}catch(s){o(s.message,"error");const n=document.querySelector(`input[onchange*="toggleTask('${e}', '${t}'"]`);if(n)n.checked=!i}},async toggleSubtask(e,i,s,n){try{const r=new FormData;r.append("week",e);r.append("task",i);r.append("subtask",`step${s}`);r.append("subtask_checked",n.toString());await c("/api/progress",{method:"POST",body:r});if(!t.progress[e])t.progress[e]={};if(!t.progress[e][i])t.progress[e][i]={subtasks:{}};if(!t.progress[e][i].subtasks)t.progress[e][i].subtasks={};t.progress[e][i].subtasks[`step${s}`]=n;await this.checkAndAutoTickMainTask(e,i);o(n?"✅ Step completed!":"Step unmarked")}catch(r){o(r.message,"error");const l=a(`${e}-${i}-step${s}`);if(l)l.checked=!n}},async checkAndAutoTickMainTask(e,i){const s=t.progress[e]?.[i];if(!s||!s.subtasks)return;const n=`${e}-${i}`,r=window.TASK_DEFINITIONS?.[n];if(!r)return;const l=r.description.match(/data-step="\d+"/g),d=l?l.length:0;if(d===0)return;const u=Object.values(s.subtasks).filter(Boolean).length;if(u===d&&!s.completed){const t=document.querySelector(`input[onchange*="toggleTask('${e}', '${i}'"]`);if(t&&!t.checked){t.checked=true;await this.toggle(e,i,true);o("🎉 Task auto-completed! All steps finished.")}}}},g={showPortal(){if(!t.user||t.user.role!=="admin"){o("Access denied - admin only","error");return}const e=a("admin-modal");e.style.display="flex";e.setAttribute("aria-hidden","false")},switchTab(e){document.querySelectorAll(".admin-tab").forEach(t=>{t.classList.remove("active");t.setAttribute("aria-selected","false")});document.querySelectorAll(".admin-section").forEach(e=>e.classList.remove("active"));const t=a(`tab-${e}`),i=a(`admin-${e}`);t.classList.add("active");t.setAttribute("aria-selected","true");i.classList.add("active");if(e==="leaderboard")this.refreshLeaderboard();if(e==="users")this.loadUsers()},async refreshLeaderboard(){const e=a("leaderboard-body");e.innerHTML='<tr><td colspan="5" style="text-align: center; padding: 40px;"><div class="loading"></div></td></tr>';try{const t=await c("/api/admin/users-progress");e.innerHTML=t.data.map(l=>`<tr><td>${l.rank}</td><td>${l.name}</td><td>${l.progress}%</td><td>${l.tasks}/42</td><td>${new Date(l.lastLogin).toLocaleDateString()}</td></tr>`).join("")}catch(t){e.innerHTML='<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--error);">Failed to load leaderboard</td></tr>'}},async loadUsers(){const e=a("users-list");e.innerHTML='<div style="text-align: center; padding: 40px;"><div class="loading"></div></div>';try{const t=await c("/api/admin/users-progress");e.innerHTML=t.data.map(l=>`<div class="user-card"><div class="user-info"><h4>${l.name}</h4><p>${l.email} | Role: ${l.role}</p><div class="user-progress-bar"><div class="user-progress-fill" style="width: ${l.progress}%"></div></div></div><div class="user-actions"><button class="btn btn-secondary" onclick="adminSystem.editUser(${l.id})">Edit</button><button class="btn btn-secondary" onclick="adminSystem.deleteUser(${l.id})">Delete</button></div></div>`).join("")}catch(t){e.innerHTML='<div style="text-align: center; padding: 40px; color: var(--error);">Failed to load users</div>'}},editUser(e){o(`Edit user ID ${e} (feature not implemented)`,"warning")},deleteUser(e){o(`Delete user ID ${e} (feature not implemented)`,"warning")},async exportProgress(){try{const e="User,Week,Task,Completed\n"+Object.entries(t.progress).flatMap(([e,i])=>Object.entries(i).map(([t,a])=>`${t.user.email},${e},${t},${a.completed?"Yes":"No"}`)).join("\n"),i=new Blob([e],{type:"text/csv"}),s=URL.createObjectURL(i),n=document.createElement("a");n.href=s;n.download="progress_export.csv";n.click();URL.revokeObjectURL(s);o("Progress exported successfully")}catch(e){o("Failed to export progress","error")}},async importProgress(e){if(!e.length)return;try{const i=e[0],s=await i.text(),n=s.split("\n").slice(1);for(const r of n){const[e,i,s,o]=r.split(",");if(e===t.user.email){if(!t.progress[i])t.progress[i]={};t.progress[i][s]={completed:o.toLowerCase()==="yes"}}}m.updateDisplay();o("Progress imported successfully")}catch(i){o("Failed to import progress","error")}}},m={async loadProgress(){try{const e=await c("/api/progress");t.progress=e.data||{};this.updateDisplay()}catch(e){o("Failed to load progress","error")}},updateDisplay(){let i=0;const s=Object.values(e).flat().length;Object.entries(e).forEach(([e,n])=>{const r=n.filter(e=>t.progress[e]?.[e]?.completed).length,l=r/n.length*100;i+=r;a(`${e}-completed`).textContent=r;a(`${e}-progress`).style.width=`${l}%`;const d=a(`${e}-tasks-grid`);d.innerHTML=n.map(t=>{const i=t.progress[e]?.[t]?.completed;return`<div class="task-item ${i?"completed":""}" onclick="window.openTaskModal('${e}', '${t}')"><input type="checkbox" class="task-checkbox" ${i?"checked":""} onchange="window.toggleTask('${e}', '${t}', this.checked)"><div class="task-content"><div class="task-title">${t.replace(/-/g," ").replace(/\b\w/g,l=>l.toUpperCase())}</div><div class="task-description">${window.TASK_DEFINITIONS?.[`${e}-${t}`]?.description.replace(/<[^>]+>/g,"").slice(0,50)||"No description available"}...</div></div></div>`}).join("")});const n=i/s*100;a("progress-percentage").textContent=`${Math.round(n)}%`;a("completed-tasks").textContent=i;a("progress-ring").style.strokeDashoffset=`calc(2 * 3.14159 * 85 * ${(100-n)/100})`;const r=Object.keys(e).find(e=>e.some(t=>!t.progress[e]?.[t]?.completed))||"Week 4";a("current-week").textContent=r.replace("week","Week ");const l=JSON.parse(localStorage.getItem("labHistory")||"[]");if(l.length>0){const e=l[l.length-1];e.progress=n;e.completedTasks=i;if(n===100&&!e.endDate)e.endDate=new Date().toISOString();localStorage.setItem("labHistory",JSON.stringify(l))}}};window.authSystem=p;window.uiSystem=d;window.labSystem=u;window.taskSystem=h;window.adminSystem=g;function y(){const e=localStorage.getItem("theme")||"auto";a("theme-selector").value=e;d.changeTheme(e);a("login-form").addEventListener("submit",e=>{e.preventDefault();p.login(new FormData(e.target))});a("register-form").addEventListener("submit",e=>{e.preventDefault();p.register(new FormData(e.target))});p.checkSession()}y()})();</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Velocity Lab</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #007AFF;
+            --primary-hover: #0056CC;
+            --success: #34C759;
+            --warning: #FF9500;
+            --error: #FF3B30;
+            --text-primary: #1D1D1F;
+            --text-secondary: #6B7280;
+            --text-tertiary: #9CA3AF;
+            --background: #F2F2F7;
+            --surface: #FFF;
+            --surface-secondary: #F9F9F9;
+            --border: #D1D1D6;
+            --border-light: #E5E5EA;
+            --shadow-color: rgba(0, 0, 0, .05);
+            --shadow-light: 0 1px 3px var(--shadow-color);
+            --shadow-medium: 0 4px 12px var(--shadow-color);
+            --shadow-heavy: 0 8px 25px var(--shadow-color);
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --transition: background-color .3s cubic-bezier(.2, 0, 0, 1), transform .3s cubic-bezier(.2, 0, 0, 1), box-shadow .3s cubic-bezier(.2, 0, 0, 1);
+            --transition-fast: background-color .2s cubic-bezier(.2, 0, 0, 1), transform .2s cubic-bezier(.2, 0, 0, 1);
+            --dark-primary: #0A84FF;
+            --dark-text-primary: #FFF;
+            --dark-text-secondary: #9CA3AF;
+            --dark-text-tertiary: #6B7280;
+            --dark-background: #000;
+            --dark-surface: #1C1C1E;
+            --dark-surface-secondary: #2C2C2E;
+            --dark-border: #38383A;
+            --dark-border-light: #48484A;
+            --dark-shadow-color: rgba(0, 0, 0, .3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            transition: var(--transition);
+        }
+
+        body.dark {
+            background: var(--dark-background);
+            color: var(--dark-text-primary);
+            --text-primary: var(--dark-text-primary);
+            --text-secondary: var(--dark-text-secondary);
+            --text-tertiary: var(--dark-text-tertiary);
+            --surface: var(--dark-surface);
+            --surface-secondary: var(--dark-surface-secondary);
+            --border: var(--dark-border);
+            --border-light: var(--dark-border-light);
+            --primary: var(--dark-primary);
+            --shadow-color: var(--dark-shadow-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, .85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-light);
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        body.dark header {
+            background: rgba(28, 28, 30, .85);
+        }
+
+        nav {
+            height: 64px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 32px;
+            transition: var(--transition-fast);
+        }
+
+        .logo img:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: var(--radius-lg);
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            text-decoration: none;
+            min-height: 36px;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface-secondary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-light);
+        }
+
+        .btn-admin {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+        }
+
+        .btn-admin:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .lab-button-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .lab-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-medium);
+            min-width: 200px;
+            z-index: 1001;
+            display: none;
+            overflow: hidden;
+        }
+
+        .lab-dropdown.show {
+            display: block;
+        }
+
+        .lab-dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .lab-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .lab-dropdown-item:hover {
+            background: var(--surface-secondary);
+        }
+
+        .lab-header {
+            font-weight: 700;
+            color: var(--text-primary);
+            background: var(--surface-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 16px;
+        }
+
+        .theme-selector {
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--surface);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            min-width: 100px;
+        }
+
+        .theme-selector:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .theme-selector:hover {
+            border-color: var(--primary);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        #landing {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding-top: 64px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+
+        #landing h1 {
+            font-size: clamp(48px, 8vw, 72px);
+            font-weight: 700;
+            margin-bottom: 24px;
+            letter-spacing: -.02em;
+        }
+
+        #landing p {
+            font-size: 20px;
+            opacity: .9;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+
+        .landing-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .landing-actions .btn {
+            min-width: 120px;
+            padding: 12px 24px;
+            font-size: 16px;
+        }
+
+        #dashboard {
+            padding: 100px 0 60px;
+            min-height: 100vh;
+        }
+
+        .progress-card {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-light);
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid var(--border-light);
+        }
+
+        .progress-card:hover {
+            box-shadow: var(--shadow-medium);
+        }
+
+        .progress-card h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 32px;
+            color: var(--text-primary);
+        }
+
+        .progress-ring {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 32px;
+            position: relative;
+        }
+
+        .progress-ring svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .progress-ring circle {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+        }
+
+        .progress-ring .background {
+            stroke: var(--border);
+        }
+
+        .progress-ring .foreground {
+            stroke: var(--primary);
+            stroke-dasharray: calc(2 * 3.14159 * 85);
+            stroke-dashoffset: calc(2 * 3.14159 * 85);
+            transition: stroke-dashoffset 1.5s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        .progress-percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 24px;
+            margin: 32px 0;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            font-weight: 600;
+        }
+
+        .weeks-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .week-card {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-light);
+        }
+
+        .week-card:hover {
+            box-shadow: var(--shadow-medium);
+            transform: translateY(-2px);
+        }
+
+        .week-card[aria-expanded="true"] .expand-icon {
+            transform: rotate(90deg);
+        }
+
+        .week-header {
+            padding: 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition-fast);
+            border-bottom: 1px solid transparent;
+        }
+
+        .week-header:hover {
+            background: var(--surface-secondary);
+        }
+
+        .week-info h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .week-info p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .week-progress {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .progress-bar {
+            width: 120px;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width var(--transition);
+            border-radius: 3px;
+        }
+
+        .expand-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--text-secondary);
+            transition: var(--transition-fast);
+            margin-left: 16px;
+        }
+
+        .tasks-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .4s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        .week-card[aria-expanded="true"] .tasks-container {
+            max-height: 2000px;
+        }
+
+        .tasks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            padding: 24px;
+        }
+
+        .task-item {
+            background: var(--surface-secondary);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .task-item:hover {
+            background: var(--surface);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-light);
+        }
+
+        .task-item.completed {
+            background: rgba(52, 199, 89, .1);
+            border-color: var(--success);
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            transition: var(--transition-fast);
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .task-checkbox:checked {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .task-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .task-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .5);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            padding: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal[aria-hidden="false"] {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-heavy);
+            position: relative;
+            animation: modalAppear .3s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: scale(.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--surface-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .modal-close svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            transition: var(--transition-fast);
+            background: var(--surface);
+            color: var(--text-primary);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, .1);
+        }
+
+        .form-checkbox {
+            margin-right: 8px;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            cursor: pointer;
+        }
+
+        .subtask-container {
+            margin: 16px 0;
+        }
+
+        .subtask-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition-fast);
+        }
+
+        .subtask-item:hover {
+            background: var(--surface-secondary);
+        }
+
+        .subtask input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            margin-top: 2px;
+            transition: var(--transition-fast);
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .subtask input[type="checkbox"]:checked {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .subtask input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .subtask label {
+            font-size: 14px;
+            line-height: 1.4;
+            color: var(--text-primary);
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .notification {
+            position: fixed;
+            top: 84px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: var(--radius-md);
+            color: #fff;
+            font-weight: 600;
+            transform: translateX(320px);
+            transition: var(--transition);
+            box-shadow: var(--shadow-medium);
+            z-index: 3000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: var(--success);
+        }
+
+        .notification.error {
+            background: var(--error);
+        }
+
+        .admin-content {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 32px;
+            background: var(--surface-secondary);
+            padding: 4px;
+            border-radius: var(--radius-md);
+        }
+
+        .admin-tab {
+            flex: 1;
+            padding: 12px 20px;
+            text-align: center;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .admin-tab.active {
+            background: var(--surface);
+            color: var(--primary);
+            box-shadow: var(--shadow-light);
+        }
+
+        .admin-section {
+            display: none;
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+        }
+
+        .admin-table th,
+        .admin-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .admin-table th {
+            background: var(--surface-secondary);
+            font-weight: 700;
+            color: var(--text-secondary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .admin-table tbody tr:hover {
+            background: var(--surface-secondary);
+        }
+
+        .user-card {
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition-fast);
+        }
+
+        .user-card:hover {
+            box-shadow: var(--shadow-light);
+            transform: translateY(-1px);
+        }
+
+        .user-info h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .user-info p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .user-progress-bar {
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 8px 0;
+            width: 100px;
+        }
+
+        .user-progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width var(--transition);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 16px;
+            }
+
+            nav {
+                height: 56px;
+            }
+
+            .nav-right {
+                gap: 8px;
+            }
+
+            #dashboard {
+                padding: 80px 0 40px;
+            }
+
+            .progress-card {
+                padding: 24px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+
+            .tasks-grid {
+                grid-template-columns: 1fr;
+                padding: 16px;
+            }
+
+            .week-header {
+                padding: 16px;
+            }
+
+            .week-progress {
+                align-items: center;
+            }
+
+            .progress-bar {
+                width: 80px;
+            }
+
+            .modal-content {
+                padding: 24px;
+                margin: 10px;
+            }
+
+            .landing-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .admin-tabs {
+                flex-direction: column;
+            }
+
+            .user-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .user-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .lab-dropdown {
+                right: 0;
+                left: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #landing h1 {
+                font-size: 36px;
+            }
+
+            #landing p {
+                font-size: 18px;
+            }
+
+            .progress-ring {
+                width: 140px;
+                height: 140px;
+            }
+
+            .progress-percentage {
+                font-size: 28px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">
+                <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" aria-label="Velocity Lab">
+            </div>
+            <div class="nav-right">
+                <span id="auth-buttons">
+                    <button onclick="window.showLogin()" class="btn btn-secondary" aria-label="Sign In">Sign In</button>
+                    <button onclick="window.showRegister()" class="btn btn-primary" aria-label="Register">Register</button>
+                </span>
+                <span id="user-menu" class="hidden">
+                    <span id="user-name" style="margin-right:12px;font-weight:600"></span>
+                    <button id="admin-button" class="btn btn-admin hidden" onclick="window.showAdmin()" aria-label="Admin Portal">Admin Portal</button>
+                    <button onclick="window.logout()" class="btn btn-secondary" aria-label="Sign Out">Sign Out</button>
+                    <label for="theme-selector" class="hidden">Theme Selector</label>
+                    <select id="theme-selector" class="theme-selector" onchange="window.changeTheme(this.value)" aria-label="Select Theme">
+                        <option value="auto">Auto</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                </span>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="landing" aria-labelledby="landing-title">
+            <div class="container">
+                <h1 id="landing-title">Master Exchange Hybrid</h1>
+                <p>42 tasks over 4 weeks. Build a lab with DCs, Exchange Server, and VMs.</p>
+                <div class="landing-actions">
+                    <button class="btn btn-primary" onclick="window.showRegister()" aria-label="Get Started">Get Started</button>
+                    <button class="btn btn-secondary" onclick="window.showLogin()" aria-label="Sign In">Sign In</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="dashboard" class="hidden" aria-labelledby="dashboard-title">
+            <div class="container">
+                <div class="progress-card">
+                    <h2 id="dashboard-title">Training Progress</h2>
+                    <div class="progress-ring">
+                        <svg viewBox="0 0 180 180" aria-label="Overall Progress">
+                            <circle cx="90" cy="90" r="85" class="background" />
+                            <circle cx="90" cy="90" r="85" class="foreground" id="progress-ring" />
+                        </svg>
+                        <div class="progress-percentage" id="progress-percentage">0%</div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat">
+                            <div class="stat-value" id="completed-tasks">0</div>
+                            <div class="stat-label">Tasks Done</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">42</div>
+                            <div class="stat-label">Total Tasks</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="current-week">Week 1</div>
+                            <div class="stat-label">Current</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">VMs</div>
+                        </div>
+                    </div>
+                    <div class="lab-button-container">
+                        <button class="btn btn-primary" onclick="window.toggleLabDropdown()" aria-haspopup="true" aria-expanded="false">Start New Lab ▼</button>
+                        <div class="lab-dropdown" id="lab-dropdown" role="menu">
+                            <div class="lab-header" role="presentation">Lab Options</div>
+                            <div class="lab-dropdown-item" onclick="window.startNewLab();window.closeLabDropdown()" role="menuitem" tabindex="0">🚀 Start Fresh Lab</div>
+                            <div class="lab-dropdown-item" onclick="window.showLabHistory();window.closeLabDropdown()" role="menuitem" tabindex="0">📅 Lab History</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="weeks-container" id="weeks-container">
+                    <div class="week-card" id="week1-card" role="region" aria-expanded="false" aria-labelledby="week1-title">
+                        <div class="week-header" onclick="window.toggleWeek('week1')" role="button" tabindex="0" aria-controls="week1-tasks">
+                            <div class="week-info">
+                                <h3 id="week1-title">Week 1: Foundation</h3>
+                                <p>DC setup, domain join, file shares</p>
+                            </div>
+                            <div class="week-progress">
+                                <div class="progress-text"><span id="week1-completed">0</span>/13 tasks</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="week1-progress" style="width:0%"></div>
+                                </div>
+                            </div>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <polyline points="9,18 15,12 9,6"></polyline>
+                            </svg>
+                        </div>
+                        <div class="tasks-container" id="week1-tasks">
+                            <div class="tasks-grid" id="week1-tasks-grid"></div>
+                        </div>
+                    </div>
+
+                    <div class="week-card" id="week2-card" role="region" aria-expanded="false" aria-labelledby="week2-title">
+                        <div class="week-header" onclick="window.toggleWeek('week2')" role="button" tabindex="0" aria-controls="week2-tasks">
+                            <div class="week-info">
+                                <h3 id="week2-title">Week 2: Infrastructure</h3>
+                                <p>Second DC, WSUS, time sync</p>
+                            </div>
+                            <div class="week-progress">
+                                <div class="progress-text"><span id="week2-completed">0</span>/8 tasks</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="week2-progress" style="width:0%"></div>
+                                </div>
+                            </div>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <polyline points="9,18 15,12 9,6"></polyline>
+                            </svg>
+                        </div>
+                        <div class="tasks-container" id="week2-tasks">
+                            <div class="tasks-grid" id="week2-tasks-grid"></div>
+                        </div>
+                    </div>
+
+                    <div class="week-card" id="week3-card" role="region" aria-expanded="false" aria-labelledby="week3-title">
+                        <div class="week-header" onclick="window.toggleWeek('week3')" role="button" tabindex="0" aria-controls="week3-tasks">
+                            <div class="week-info">
+                                <h3 id="week3-title">Week 3: Exchange</h3>
+                                <p>DC upgrades, Exchange 2019 setup</p>
+                            </div>
+                            <div class="week-progress">
+                                <div class="progress-text"><span id="week3-completed">0</span>/12 tasks</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="week3-progress" style="width:0%"></div>
+                                </div>
+                            </div>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <polyline points="9,18 15,12 9,6"></polyline>
+                            </svg>
+                        </div>
+                        <div class="tasks-container" id="week3-tasks">
+                            <div class="tasks-grid" id="week3-tasks-grid"></div>
+                        </div>
+                    </div>
+
+                    <div class="week-card" id="week4-card" role="region" aria-expanded="false" aria-labelledby="week4-title">
+                        <div class="week-header" onclick="window.toggleWeek('week4')" role="button" tabindex="0" aria-controls="week4-tasks">
+                            <div class="week-info">
+                                <h3 id="week4-title">Week 4: Hybrid</h3>
+                                <p>M365 integration, hybrid mail</p>
+                            </div>
+                            <div class="week-progress">
+                                <div class="progress-text"><span id="week4-completed">0</span>/10 tasks</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="week4-progress" style="width:0%"></div>
+                                </div>
+                            </div>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <polyline points="9,18 15,12 9,6"></polyline>
+                            </svg>
+                        </div>
+                        <div class="tasks-container" id="week4-tasks">
+                            <div class="tasks-grid" id="week4-tasks-grid"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <div id="login-modal" class="modal" role="dialog" aria-labelledby="login-title" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="login-title">Sign In</h2>
+                <button class="modal-close" onclick="window.closeModal()" aria-label="Close Modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="Email" required class="form-input" aria-label="Email">
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" placeholder="Password" required class="form-input" aria-label="Password">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" name="remember" class="form-checkbox" aria-label="Remember me">
+                        Remember me
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;margin-bottom:16px" aria-label="Sign In">Sign In</button>
+                <p style="text-align:center;color:var(--text-secondary)">New? <a href="#" onclick="window.showRegister()" style="color:var(--primary)">Create account</a></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="register-modal" class="modal" role="dialog" aria-labelledby="register-title" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="register-title">Create Account</h2>
+                <button class="modal-close" onclick="window.closeModal()" aria-label="Close Modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="register-form">
+                <div class="form-group">
+                    <input type="text" name="name" placeholder="Full name" required class="form-input" aria-label="Full name">
+                </div>
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="Email" required class="form-input" aria-label="Email">
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" placeholder="Password (8+ chars)" required minlength="8" class="form-input" aria-label="Password">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;margin-bottom:16px" aria-label="Create Account">Create Account</button>
+                <p style="text-align:center;color:var(--text-secondary)">Have account? <a href="#" onclick="window.showLogin()" style="color:var(--primary)">Sign in</a></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="task-modal" class="modal" role="dialog" aria-labelledby="task-title" aria-hidden="true">
+        <div class="modal-content" style="max-width:800px">
+            <div class="modal-header">
+                <h2 class="modal-title" id="task-title"></h2>
+                <button class="modal-close" onclick="window.closeModal()" aria-label="Close Modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div id="task-content"></div>
+        </div>
+    </div>
+
+    <div id="lab-history-modal" class="modal" role="dialog" aria-labelledby="lab-history-title" aria-hidden="true">
+        <div class="modal-content" style="max-width:600px">
+            <div class="modal-header">
+                <h2 class="modal-title" id="lab-history-title">Lab History</h2>
+                <button class="modal-close" onclick="window.closeModal()" aria-label="Close Modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div id="lab-history-content">
+                <p style="color:var(--text-secondary);text-align:center;padding:40px">No lab history yet. Complete your first lab.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-modal" class="modal" role="dialog" aria-labelledby="admin-title" aria-hidden="true">
+        <div class="admin-content modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="admin-title">Admin Portal</h2>
+                <button class="modal-close" onclick="window.closeModal()" aria-label="Close Modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="admin-tabs" role="tablist">
+                <div class="admin-tab active" onclick="window.switchAdminTab('leaderboard')" role="tab" aria-selected="true" aria-controls="admin-leaderboard" id="tab-leaderboard">Leaderboard</div>
+                <div class="admin-tab" onclick="window.switchAdminTab('users')" role="tab" aria-selected="false" aria-controls="admin-users" id="tab-users">Users</div>
+                <div class="admin-tab" onclick="window.switchAdminTab('data')" role="tab" aria-selected="false" aria-controls="admin-data" id="tab-data">Data Tools</div>
+            </div>
+            <div id="admin-leaderboard" class="admin-section active" role="tabpanel" aria-labelledby="tab-leaderboard">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Name</th>
+                            <th>Progress</th>
+                            <th>Tasks</th>
+                            <th>Last Login</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <tr>
+                            <td colspan="5" style="text-align:center;padding:40px">
+                                <div class="loading"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-secondary" onclick="window.refreshLeaderboard()" style="margin-top:16px" aria-label="Refresh Leaderboard">Refresh</button>
+            </div>
+            <div id="admin-users" class="admin-section" role="tabpanel" aria-labelledby="tab-users">
+                <div id="users-list">
+                    <div style="text-align:center;padding:40px">
+                        <div class="loading"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="admin-data" class="admin-section" role="tabpanel" aria-labelledby="tab-data">
+                <div style="display:flex;gap:16px;flex-wrap:wrap">
+                    <button class="btn btn-primary" onclick="window.exportProgress()" aria-label="Export Progress as CSV">Export CSV</button>
+                    <input type="file" accept=".csv" id="import-file" onchange="window.importProgress(this.files)" style="display:none" aria-label="Import Progress CSV">
+                    <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()" aria-label="Import Progress">Import</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification" role="alert"></div>
+
+    <script>
+        // Task definitions with proper structure
+        window.TASK_DEFINITIONS = {
+            "week1-install-server2012": {
+                title: "Install Windows Server 2012 R2",
+                description: "Install Windows Server 2012 R2 on your first virtual machine. Configure basic settings and network connectivity."
+            },
+            "week1-configure-static-ip": {
+                title: "Configure Static IP Address",
+                description: "Set up a static IP address for your server. Configure DNS settings appropriately."
+            },
+            "week1-install-adds-role": {
+                title: "Install Active Directory Domain Services",
+                description: "Install the Active Directory Domain Services role on Windows Server 2012 R2."
+            },
+            "week1-promote-to-dc": {
+                title: "Promote Server to Domain Controller",
+                description: "Promote the server to a domain controller and create a new forest."
+            },
+            "week1-configure-dns-server": {
+                title: "Configure DNS Server",
+                description: "Configure DNS server settings and create necessary DNS records."
+            },
+            "week1-create-domain-users": {
+                title: "Create Domain Users",
+                description: "Create several domain user accounts for testing purposes."
+            },
+            "week1-join-vm-domain": {
+                title: "Join Virtual Machine to Domain",
+                description: "Join a client virtual machine to the domain you created."
+            },
+            "week1-create-hidden-share": {
+                title: "Create Hidden File Share",
+                description: "Create a hidden file share on the domain controller."
+            },
+            "week1-map-drive-gpo": {
+                title: "Map Drive via Group Policy",
+                description: "Use Group Policy to map network drives for domain users."
+            },
+            "week1-map-drive-script": {
+                title: "Map Drive via Login Script",
+                description: "Create a login script to map network drives."
+            },
+            "week1-map-drive-powershell": {
+                title: "Map Drive via PowerShell",
+                description: "Use PowerShell to map network drives programmatically."
+            },
+            "week1-create-security-group": {
+                title: "Create Security Group",
+                description: "Create a security group and add users to it."
+            },
+            "week1-restrict-share-access": {
+                title: "Restrict Share Access",
+                description: "Configure file share permissions to restrict access to specific groups."
+            },
+            // Week 2 tasks
+            "week2-install-second-server": {
+                title: "Install Second Server",
+                description: "Install Windows Server 2012 R2 on a second virtual machine."
+            },
+            "week2-promote-additional-dc": {
+                title: "Promote Additional Domain Controller",
+                description: "Promote the second server to an additional domain controller."
+            },
+            "week2-install-wsus-role": {
+                title: "Install WSUS Role",
+                description: "Install Windows Server Update Services (WSUS) role."
+            },
+            "week2-configure-wsus-settings": {
+                title: "Configure WSUS Settings",
+                description: "Configure WSUS server settings and update classifications."
+            },
+            "week2-setup-wsus-gpo": {
+                title: "Setup WSUS Group Policy",
+                description: "Configure Group Policy to point clients to WSUS server."
+            },
+            "week2-configure-primary-time": {
+                title: "Configure Primary Time Server",
+                description: "Configure the primary domain controller as a time server."
+            },
+            "week2-configure-secondary-time": {
+                title: "Configure Secondary Time Sync",
+                description: "Configure the secondary domain controller to sync with primary."
+            },
+            "week2-test-infrastructure": {
+                title: "Test Infrastructure",
+                description: "Test domain services, DNS resolution, and replication."
+            },
+            // Week 3 tasks
+            "week3-backup-servers": {
+                title: "Backup Domain Controllers",
+                description: "Create system state backups of both domain controllers."
+            },
+            "week3-upgrade-dc1-2016": {
+                title: "Upgrade DC1 to Server 2016",
+                description: "Upgrade the first domain controller to Windows Server 2016."
+            },
+            "week3-upgrade-dc2-2016": {
+                title: "Upgrade DC2 to Server 2016", 
+                description: "Upgrade the second domain controller to Windows Server 2016."
+            },
+            "week3-raise-functional-levels": {
+                title: "Raise Domain Functional Levels",
+                description: "Raise the domain and forest functional levels to 2016."
+            },
+            "week3-install-exchange-server": {
+                title: "Install Exchange Server VM",
+                description: "Create a new virtual machine for Exchange Server 2019."
+            },
+            "week3-install-exchange-prereqs": {
+                title: "Install Exchange Prerequisites",
+                description: "Install all required prerequisites for Exchange Server 2019."
+            },
+            "week3-extend-ad-schema": {
+                title: "Extend Active Directory Schema",
+                description: "Extend the Active Directory schema for Exchange Server 2019."
+            },
+            "week3-install-exchange-2019": {
+                title: "Install Exchange Server 2019",
+                description: "Install Exchange Server 2019 with Mailbox role."
+            },
+            "week3-configure-exchange-basic": {
+                title: "Configure Basic Exchange Settings",
+                description: "Configure basic Exchange Server settings and virtual directories."
+            },
+            "week3-create-mailboxes": {
+                title: "Create User Mailboxes",
+                description: "Create mailboxes for domain users."
+            },
+            "week3-test-mailbox-access": {
+                title: "Test Mailbox Access",
+                description: "Test accessing mailboxes via Outlook Web App."
+            },
+            "week3-configure-internal-mailflow": {
+                title: "Configure Internal Mail Flow",
+                description: "Test and configure internal mail flow between users."
+            },
+            // Week 4 tasks
+            "week4-configure-external-dns": {
+                title: "Configure External DNS",
+                description: "Configure external DNS records for mail routing."
+            },
+            "week4-setup-firewall-rules": {
+                title: "Setup Firewall Rules",
+                description: "Configure firewall rules for Exchange Server access."
+            },
+            "week4-install-ssl-certificates": {
+                title: "Install SSL Certificates",
+                description: "Install and configure SSL certificates for Exchange."
+            },
+            "week4-configure-external-mailflow": {
+                title: "Configure External Mail Flow",
+                description: "Configure send and receive connectors for external mail."
+            },
+            "week4-setup-modern-auth": {
+                title: "Setup Modern Authentication",
+                description: "Configure modern authentication for Exchange Server."
+            },
+            "week4-prepare-m365-tenant": {
+                title: "Prepare Microsoft 365 Tenant",
+                description: "Set up and configure a Microsoft 365 tenant for hybrid."
+            },
+            "week4-install-aad-connect": {
+                title: "Install Azure AD Connect",
+                description: "Install and configure Azure AD Connect for directory synchronization."
+            },
+            "week4-run-hybrid-wizard": {
+                title: "Run Hybrid Configuration Wizard",
+                description: "Use the Hybrid Configuration Wizard to set up hybrid deployment."
+            },
+            "week4-configure-hybrid-mailflow": {
+                title: "Configure Hybrid Mail Flow",
+                description: "Configure mail routing between on-premises and cloud."
+            },
+            "week4-verify-hybrid-functionality": {
+                title: "Verify Hybrid Functionality",
+                description: "Test and verify all hybrid Exchange functionality."
+            }
+        };
+
+        // Global function definitions
+        window.showLogin = () => {
+            document.querySelectorAll(".modal").forEach(e => {
+                e.style.display = "none";
+                e.setAttribute("aria-hidden", "true");
+            });
+            let e = document.getElementById("login-modal");
+            e.style.display = "flex";
+            e.setAttribute("aria-hidden", "false");
+            e.querySelector('input[name="email"]').focus();
+        };
+
+        window.showRegister = () => {
+            document.querySelectorAll(".modal").forEach(e => {
+                e.style.display = "none";
+                e.setAttribute("aria-hidden", "true");
+            });
+            let e = document.getElementById("register-modal");
+            e.style.display = "flex";
+            e.setAttribute("aria-hidden", "false");
+            e.querySelector('input[name="name"]').focus();
+        };
+
+        window.closeModal = () => {
+            document.querySelectorAll(".modal").forEach(e => {
+                e.style.display = "none";
+                e.setAttribute("aria-hidden", "true");
+            });
+        };
+
+        window.logout = () => {
+            window.authSystem?.logout();
+        };
+
+        window.startNewLab = () => {
+            window.labSystem?.startNew();
+        };
+
+        window.showAdmin = () => {
+            window.adminSystem?.showPortal();
+        };
+
+        window.toggleWeek = e => {
+            window.uiSystem?.toggleWeek(e);
+        };
+
+        window.toggleLabDropdown = () => {
+            window.uiSystem?.toggleLabDropdown();
+        };
+
+        window.closeLabDropdown = () => {
+            window.uiSystem?.closeLabDropdown();
+        };
+
+        window.showLabHistory = () => {
+            window.uiSystem?.showLabHistory();
+        };
+
+        window.switchAdminTab = e => {
+            window.adminSystem?.switchTab(e);
+        };
+
+        window.refreshLeaderboard = () => {
+            window.adminSystem?.refreshLeaderboard();
+        };
+
+        window.exportProgress = () => {
+            window.adminSystem?.exportProgress();
+        };
+
+        window.importProgress = e => {
+            window.adminSystem?.importProgress(e);
+        };
+
+        window.changeTheme = e => {
+            window.uiSystem?.changeTheme(e);
+        };
+
+        window.openTaskModal = (e, t) => {
+            window.taskSystem?.openModal(e, t);
+        };
+
+        window.toggleTask = (e, t, a) => {
+            window.taskSystem?.toggle(e, t, a);
+        };
+
+        window.toggleSubtask = (e, t, a, i) => {
+            window.taskSystem?.toggleSubtask(e, t, a, i);
+        };
+
+        // Main application logic
+        (function() {
+            const tasksByWeek = {
+                week1: ["install-server2012", "configure-static-ip", "install-adds-role", "promote-to-dc", "configure-dns-server", "create-domain-users", "join-vm-domain", "create-hidden-share", "map-drive-gpo", "map-drive-script", "map-drive-powershell", "create-security-group", "restrict-share-access"],
+                week2: ["install-second-server", "promote-additional-dc", "install-wsus-role", "configure-wsus-settings", "setup-wsus-gpo", "configure-primary-time", "configure-secondary-time", "test-infrastructure"],
+                week3: ["backup-servers", "upgrade-dc1-2016", "upgrade-dc2-2016", "raise-functional-levels", "install-exchange-server", "install-exchange-prereqs", "extend-ad-schema", "install-exchange-2019", "configure-exchange-basic", "create-mailboxes", "test-mailbox-access", "configure-internal-mailflow"],
+                week4: ["configure-external-dns", "setup-firewall-rules", "install-ssl-certificates", "configure-external-mailflow", "setup-modern-auth", "prepare-m365-tenant", "install-aad-connect", "run-hybrid-wizard", "configure-hybrid-mailflow", "verify-hybrid-functionality"]
+            };
+
+            let appState = {
+                user: null,
+                progress: {},
+                authenticated: false,
+                sessionToken: null,
+                isLoading: false,
+                labHistory: []
+            };
+
+            const getId = e => document.getElementById(e);
+            const show = e => e?.classList.remove("hidden");
+            const hide = e => e?.classList.add("hidden");
+
+            const cookies = {
+                get: e => document.cookie.match(`${e}=([^;]+)`)?.[1],
+                set: (e, t, a = 7) => {
+                    if (location.protocol !== "https:") console.warn("Cookie set attempted in non-HTTPS environment");
+                    document.cookie = `${e}=${t};path=/;max-age=${a * 86400};SameSite=Strict;${location.protocol === "https:" ? "Secure" : ""}`;
+                },
+                delete: e => {
+                    document.cookie = `${e}=;path=/;max-age=0;SameSite=Strict;${location.protocol === "https:" ? "Secure" : ""}`;
+                }
+            };
+
+            function showNotification(message, type = "success") {
+                const notification = getId("notification");
+                notification.textContent = message;
+                notification.className = `notification ${type} show`;
+                notification.setAttribute("aria-expanded", "assertive");
+                setTimeout(() => notification.classList.remove("show"), 4000);
+            }
+
+            // Mock API responses for demo purposes
+            const mockAPI = {
+                async login(formData) {
+                    return {
+                        success: true,
+                        name: formData.get("email").split("@")[0],
+                        role: "user",
+                        email: formData.get("email"),
+                        sessionToken: "mock-token"
+                    };
+                },
+                async register(formData) {
+                    return {
+                        success: true,
+                        name: formData.get("name"),
+                        role: "user",
+                        email: formData.get("email"),
+                        sessionToken: "mock-token"
+                    };
+                },
+                async progress() {
+                    return { success: true, data: {} };
+                },
+                async logout() {
+                    return { success: true };
+                },
+                async csrf() {
+                    return { success: true, token: "mock-csrf-token" };
+                }
+            };
+
+            async function apiCall(endpoint, options = {}) {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 30000);
+
+                try {
+                    appState.isLoading = true;
+                    const headers = new Headers(options.headers || {});
+                    
+                    if (appState.sessionToken) {
+                        headers.set("Authorization", `Bearer ${appState.sessionToken}`);
+                    }
+
+                    const isGet = !options.method || options.method.toUpperCase() === "GET";
+                    let body;
+
+                    if (!isGet) {
+                        const csrfResponse = await (fetch("/api/csrf", {
+                            credentials: "same-origin",
+                            signal: controller.signal
+                        }).catch(() => mockAPI.csrf()));
+                        const csrfData = await csrfResponse.json();
+
+                        if (options.body instanceof FormData) {
+                            body = options.body;
+                            body.append("csrf_token", csrfData.token);
+                        } else {
+                            body = new FormData();
+                            if (options.body) {
+                                for (const [key, value] of Object.entries(options.body)) {
+                                    body.append(key, value);
+                                }
+                            }
+                            body.append("csrf_token", csrfData.token);
+                        }
+                    }
+
+                    const response = await fetch(endpoint, {
+                        credentials: "same-origin",
+                        headers: headers,
+                        method: options.method || "GET",
+                        body: body,
+                        signal: controller.signal
+                    }).catch(() => {
+                        // Mock API fallback for demo
+                        if (endpoint === "/api/login") return { ok: true, json: () => mockAPI.login(body) };
+                        if (endpoint === "/api/register") return { ok: true, json: () => mockAPI.register(body) };
+                        if (endpoint === "/api/progress") return { ok: true, json: () => mockAPI.progress() };
+                        if (endpoint === "/api/logout") return { ok: true, json: () => mockAPI.logout() };
+                        throw new Error("Network error");
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 401) throw new Error("Invalid credentials or session expired");
+                        if (response.status === 403) throw new Error("Access denied - insufficient permissions");
+                        if (response.status === 409) throw new Error("Email already registered");
+                        throw new Error(`Server error (${response.status})`);
+                    }
+
+                    clearTimeout(timeout);
+                    const data = await response.json();
+                    if (!data.success) throw new Error(data.error || 'Request failed');
+                    return data;
+                } catch (error) {
+                    clearTimeout(timeout);
+                    if (error.name === "AbortError") throw new Error("Request timed out");
+                    throw error;
+                } finally {
+                    appState.isLoading = false;
+                }
+            }
+
+            // Authentication system
+            const authSystem = {
+                async checkSession() {
+                    const userCookie = cookies.get("user");
+                    const sessionCookie = cookies.get("session");
+                    
+                    if (userCookie && sessionCookie) {
+                        try {
+                            appState.user = JSON.parse(decodeURIComponent(userCookie));
+                            appState.authenticated = true;
+                            appState.sessionToken = sessionCookie;
+                            
+                            if (appState.user.role === "admin") {
+                                show(getId("admin-button"));
+                            }
+                            
+                            uiSystem.showDashboard();
+                            await progressSystem.loadProgress();
+                        } catch (e) {
+                            authSystem.logout();
+                        }
+                    } else {
+                        uiSystem.showLanding();
+                    }
+                },
+
+                async login(formData) {
+                    try {
+                        const result = await apiCall("/api/login", {
+                            method: "POST",
+                            body: formData
+                        });
+
+                        cookies.set("user", encodeURIComponent(JSON.stringify({
+                            name: result.name,
+                            role: result.role,
+                            email: result.email
+                        })));
+                        cookies.set("session", result.sessionToken);
+
+                        appState.user = { name: result.name, role: result.role, email: result.email };
+                        appState.authenticated = true;
+                        appState.sessionToken = result.sessionToken;
+
+                        if (appState.user.role === "admin") {
+                            show(getId("admin-button"));
+                        }
+
+                        uiSystem.showDashboard();
+                        await progressSystem.loadProgress();
+                        window.closeModal();
+                        showNotification(`Welcome back, ${result.name}!`);
+                    } catch (e) {
+                        showNotification(e.message, "error");
+                    }
+                },
+
+                async register(formData) {
+                    try {
+                        const result = await apiCall("/api/register", {
+                            method: "POST",
+                            body: formData
+                        });
+
+                        cookies.set("user", encodeURIComponent(JSON.stringify({
+                            name: result.name,
+                            role: result.role,
+                            email: result.email
+                        })));
+                        cookies.set("session", result.sessionToken);
+
+                        appState.user = { name: result.name, role: result.role, email: result.email };
+                        appState.authenticated = true;
+                        appState.sessionToken = result.sessionToken;
+
+                        uiSystem.showDashboard();
+                        await progressSystem.loadProgress();
+                        window.closeModal();
+                        showNotification(`Welcome to Velocity Lab, ${result.name}!`);
+                    } catch (e) {
+                        showNotification(e.message, "error");
+                    }
+                },
+
+                logout() {
+                    apiCall("/api/logout", { method: "POST" }).catch(console.log);
+                    
+                    cookies.delete("user");
+                    cookies.delete("session");
+                    
+                    appState = {
+                        user: null,
+                        progress: {},
+                        authenticated: false,
+                        sessionToken: null,
+                        isLoading: false,
+                        labHistory: []
+                    };
+
+                    hide(getId("admin-button"));
+                    uiSystem.showLanding();
+                    showNotification("Signed out");
+                }
+            };
+
+            // UI system
+            const uiSystem = {
+                showLanding() {
+                    hide(getId("dashboard"));
+                    show(getId("landing"));
+                    hide(getId("user-menu"));
+                    show(getId("auth-buttons"));
+                },
+
+                showDashboard() {
+                    hide(getId("landing"));
+                    show(getId("dashboard"));
+                    show(getId("user-menu"));
+                    hide(getId("auth-buttons"));
+                    getId("user-name").textContent = appState.user?.name || "";
+                },
+
+                toggleWeek(weekId) {
+                    const weekCard = getId(`${weekId}-card`);
+                    const isExpanded = weekCard.getAttribute("aria-expanded") === "true";
+                    
+                    // Close all weeks first
+                    document.querySelectorAll(".week-card").forEach(card => 
+                        card.setAttribute("aria-expanded", "false")
+                    );
+                    
+                    // Open this week if it wasn't already open
+                    if (!isExpanded) {
+                        weekCard.setAttribute("aria-expanded", "true");
+                    }
+                },
+
+                toggleLabDropdown() {
+                    const dropdown = getId("lab-dropdown");
+                    const button = document.querySelector(".lab-button-container .btn");
+                    const isShown = dropdown.classList.toggle("show");
+                    
+                    button.setAttribute("aria-expanded", isShown.toString());
+                    
+                    if (isShown) {
+                        setTimeout(() => {
+                            document.addEventListener("click", this.closeLabDropdownOnOutsideClick, { once: true });
+                        }, 0);
+                    }
+                },
+
+                closeLabDropdown() {
+                    const dropdown = getId("lab-dropdown");
+                    const button = document.querySelector(".lab-button-container .btn");
+                    
+                    dropdown.classList.remove("show");
+                    button.setAttribute("aria-expanded", "false");
+                },
+
+                closeLabDropdownOnOutsideClick(event) {
+                    const container = document.querySelector(".lab-button-container");
+                    if (!container.contains(event.target)) {
+                        uiSystem.closeLabDropdown();
+                    }
+                },
+
+                showLabHistory() {
+                    const content = getId("lab-history-content");
+                    const history = JSON.parse(localStorage.getItem("labHistory") || "[]");
+                    
+                    if (history.length === 0) {
+                        content.innerHTML = `<p style="color: var(--text-secondary); text-align: center; padding: 40px;">No lab history available yet. Complete your first lab to see history here.</p>`;
+                    } else {
+                        content.innerHTML = `
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
+                                ${history.map((lab, index) => `
+                                    <div style="background: var(--surface-secondary); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
+                                        <h4 style="margin-bottom: 8px;">Lab #${index + 1}</h4>
+                                        <p style="color: var(--text-secondary); font-size: 14px;">
+                                            Started: ${new Date(lab.startDate).toLocaleDateString()}<br>
+                                            ${lab.endDate ? `Completed: ${new Date(lab.endDate).toLocaleDateString()}` : "In Progress"}<br>
+                                            Progress: ${lab.progress || 0}% (${lab.completedTasks || 0}/42 tasks)
+                                        </p>
+                                    </div>
+                                `).join("")}
+                            </div>
+                        `;
+                    }
+                    
+                    const modal = getId("lab-history-modal");
+                    modal.style.display = "flex";
+                    modal.setAttribute("aria-hidden", "false");
+                },
+
+                changeTheme(theme) {
+                    localStorage.setItem("theme", theme);
+                    
+                    if (theme === "dark") {
+                        document.body.classList.add("dark");
+                    } else if (theme === "light") {
+                        document.body.classList.remove("dark");
+                    } else if (theme === "auto") {
+                        const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+                        document.body.classList.toggle("dark", prefersDark);
+                    }
+                }
+            };
+
+            // Lab system
+            const labSystem = {
+                startNew() {
+                    const history = JSON.parse(localStorage.getItem("labHistory") || "[]");
+                    history.push({
+                        startDate: new Date().toISOString(),
+                        progress: 0,
+                        completedTasks: 0
+                    });
+                    localStorage.setItem("labHistory", JSON.stringify(history));
+                    
+                    appState.progress = {};
+                    progressSystem.updateDisplay();
+                    showNotification("New lab started!");
+                }
+            };
+
+            // Task system
+            const taskSystem = {
+                openModal(week, taskId) {
+                    const taskKey = `${week}-${taskId}`;
+                    const taskDef = window.TASK_DEFINITIONS?.[taskKey] || {
+                        title: taskId.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase()),
+                        description: "No details available for this task."
+                    };
+
+                    getId("task-title").textContent = taskDef.title;
+                    getId("task-content").innerHTML = taskDef.description;
+
+                    const modal = getId("task-modal");
+                    modal.style.display = "flex";
+                    modal.setAttribute("aria-hidden", "false");
+
+                    // Handle subtask checkboxes if they exist
+                    const checkboxes = modal.querySelectorAll('input[type="checkbox"]');
+                    checkboxes.forEach(checkbox => {
+                        const stepMatch = checkbox.id.match(/step(\d+)/);
+                        if (stepMatch) {
+                            const stepNum = stepMatch[1];
+                            if (appState.progress[week]?.[taskId]?.subtasks?.[`step${stepNum}`]) {
+                                checkbox.checked = true;
+                            }
+                        }
+                    });
+                },
+
+                async toggle(week, taskId, isChecked) {
+                    try {
+                        const formData = new FormData();
+                        formData.append("week", week);
+                        formData.append("task", taskId);
+                        formData.append("checked", isChecked.toString());
+
+                        await apiCall("/api/progress", {
+                            method: "POST",
+                            body: formData
+                        });
+
+                        if (!appState.progress[week]) appState.progress[week] = {};
+                        if (!appState.progress[week][taskId]) appState.progress[week][taskId] = {};
+                        
+                        appState.progress[week][taskId].completed = isChecked;
+                        progressSystem.updateDisplay();
+                        showNotification(isChecked ? "✅ Task completed!" : "Task unmarked");
+                    } catch (e) {
+                        showNotification(e.message, "error");
+                        
+                        // Revert checkbox state on error
+                        const checkbox = document.querySelector(`input[onchange*="toggleTask('${week}', '${taskId}'"]`);
+                        if (checkbox) checkbox.checked = !isChecked;
+                    }
+                },
+
+                async toggleSubtask(week, taskId, stepNum, isChecked) {
+                    try {
+                        const formData = new FormData();
+                        formData.append("week", week);
+                        formData.append("task", taskId);
+                        formData.append("subtask", `step${stepNum}`);
+                        formData.append("subtask_checked", isChecked.toString());
+
+                        await apiCall("/api/progress", {
+                            method: "POST",
+                            body: formData
+                        });
+
+                        if (!appState.progress[week]) appState.progress[week] = {};
+                        if (!appState.progress[week][taskId]) appState.progress[week][taskId] = { subtasks: {} };
+                        if (!appState.progress[week][taskId].subtasks) appState.progress[week][taskId].subtasks = {};
+                        
+                        appState.progress[week][taskId].subtasks[`step${stepNum}`] = isChecked;
+                        
+                        await this.checkAndAutoTickMainTask(week, taskId);
+                        showNotification(isChecked ? "✅ Step completed!" : "Step unmarked");
+                    } catch (e) {
+                        showNotification(e.message, "error");
+                        
+                        // Revert checkbox state on error
+                        const checkbox = getId(`${week}-${taskId}-step${stepNum}`);
+                        if (checkbox) checkbox.checked = !isChecked;
+                    }
+                },
+
+                async checkAndAutoTickMainTask(week, taskId) {
+                    const taskProgress = appState.progress[week]?.[taskId];
+                    if (!taskProgress || !taskProgress.subtasks) return;
+
+                    const taskKey = `${week}-${taskId}`;
+                    const taskDef = window.TASK_DEFINITIONS?.[taskKey];
+                    if (!taskDef) return;
+
+                    // Count total steps in task description
+                    const stepMatches = taskDef.description.match(/data-step="\d+"/g);
+                    const totalSteps = stepMatches ? stepMatches.length : 0;
+                    
+                    if (totalSteps === 0) return;
+
+                    // Count completed steps
+                    const completedSteps = Object.values(taskProgress.subtasks).filter(Boolean).length;
+                    
+                    // Auto-complete main task if all steps are done
+                    if (completedSteps === totalSteps && !taskProgress.completed) {
+                        const mainCheckbox = document.querySelector(`input[onchange*="toggleTask('${week}', '${taskId}'"]`);
+                        if (mainCheckbox && !mainCheckbox.checked) {
+                            mainCheckbox.checked = true;
+                            await this.toggle(week, taskId, true);
+                            showNotification("🎉 Task auto-completed! All steps finished.");
+                        }
+                    }
+                }
+            };
+
+            // Admin system
+            const adminSystem = {
+                showPortal() {
+                    if (!appState.user || appState.user.role !== "admin") {
+                        showNotification("Access denied - admin only", "error");
+                        return;
+                    }
+
+                    const modal = getId("admin-modal");
+                    modal.style.display = "flex";
+                    modal.setAttribute("aria-hidden", "false");
+                },
+
+                switchTab(tabName) {
+                    // Update tab states
+                    document.querySelectorAll(".admin-tab").forEach(tab => {
+                        tab.classList.remove("active");
+                        tab.setAttribute("aria-selected", "false");
+                    });
+                    document.querySelectorAll(".admin-section").forEach(section => 
+                        section.classList.remove("active")
+                    );
+
+                    const tab = getId(`tab-${tabName}`);
+                    const section = getId(`admin-${tabName}`);
+                    
+                    tab.classList.add("active");
+                    tab.setAttribute("aria-selected", "true");
+                    section.classList.add("active");
+
+                    if (tabName === "leaderboard") this.refreshLeaderboard();
+                    if (tabName === "users") this.loadUsers();
+                },
+
+                async refreshLeaderboard() {
+                    const tbody = getId("leaderboard-body");
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;"><div class="loading"></div></td></tr>';
+                    
+                    try {
+                        const result = await apiCall("/api/admin/users-progress");
+                        tbody.innerHTML = result.data.map(user => `
+                            <tr>
+                                <td>${user.rank}</td>
+                                <td>${user.name}</td>
+                                <td>${user.progress}%</td>
+                                <td>${user.tasks}/42</td>
+                                <td>${new Date(user.lastLogin).toLocaleDateString()}</td>
+                            </tr>
+                        `).join("");
+                    } catch (e) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--error);">Failed to load leaderboard</td></tr>';
+                    }
+                },
+
+                async loadUsers() {
+                    const container = getId("users-list");
+                    container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="loading"></div></div>';
+                    
+                    try {
+                        const result = await apiCall("/api/admin/users-progress");
+                        container.innerHTML = result.data.map(user => `
+                            <div class="user-card">
+                                <div class="user-info">
+                                    <h4>${user.name}</h4>
+                                    <p>${user.email} | Role: ${user.role}</p>
+                                    <div class="user-progress-bar">
+                                        <div class="user-progress-fill" style="width: ${user.progress}%"></div>
+                                    </div>
+                                </div>
+                                <div class="user-actions">
+                                    <button class="btn btn-secondary" onclick="adminSystem.editUser(${user.id})">Edit</button>
+                                    <button class="btn btn-secondary" onclick="adminSystem.deleteUser(${user.id})">Delete</button>
+                                </div>
+                            </div>
+                        `).join("");
+                    } catch (e) {
+                        container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--error);">Failed to load users</div>';
+                    }
+                },
+
+                editUser(userId) {
+                    showNotification(`Edit user ID ${userId} (feature not implemented)`, "warning");
+                },
+
+                deleteUser(userId) {
+                    showNotification(`Delete user ID ${userId} (feature not implemented)`, "warning");
+                },
+
+                async exportProgress() {
+                    try {
+                        const csvContent = "User,Week,Task,Completed\n" + 
+                            Object.entries(appState.progress)
+                                .flatMap(([week, tasks]) => 
+                                    Object.entries(tasks).map(([task, data]) => 
+                                        `${appState.user.email},${week},${task},${data.completed ? "Yes" : "No"}`
+                                    )
+                                ).join("\n");
+
+                        const blob = new Blob([csvContent], { type: "text/csv" });
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement("a");
+                        link.href = url;
+                        link.download = "progress_export.csv";
+                        link.click();
+                        URL.revokeObjectURL(url);
+                        
+                        showNotification("Progress exported successfully");
+                    } catch (e) {
+                        showNotification("Failed to export progress", "error");
+                    }
+                },
+
+                async importProgress(files) {
+                    if (!files.length) return;
+                    
+                    try {
+                        const file = files[0];
+                        const text = await file.text();
+                        const lines = text.split("\n").slice(1); // Skip header
+                        
+                        for (const line of lines) {
+                            const [user, week, task, completed] = line.split(",");
+                            if (user === appState.user.email) {
+                                if (!appState.progress[week]) appState.progress[week] = {};
+                                appState.progress[week][task] = { completed: completed.toLowerCase() === "yes" };
+                            }
+                        }
+                        
+                        progressSystem.updateDisplay();
+                        showNotification("Progress imported successfully");
+                    } catch (e) {
+                        showNotification("Failed to import progress", "error");
+                    }
+                }
+            };
+
+            // Progress system
+            const progressSystem = {
+                async loadProgress() {
+                    try {
+                        const result = await apiCall("/api/progress");
+                        appState.progress = result.data || {};
+                        this.updateDisplay();
+                    } catch (e) {
+                        showNotification("Failed to load progress", "error");
+                    }
+                },
+
+                updateDisplay() {
+                    let totalCompleted = 0;
+                    const totalTasks = Object.values(tasksByWeek).flat().length;
+
+                    // Update each week's progress
+                    Object.entries(tasksByWeek).forEach(([week, tasks]) => {
+                        const completedTasks = tasks.filter(task => 
+                            appState.progress[week]?.[task]?.completed
+                        ).length;
+                        const weekProgress = (completedTasks / tasks.length) * 100;
+                        
+                        totalCompleted += completedTasks;
+                        
+                        getId(`${week}-completed`).textContent = completedTasks;
+                        getId(`${week}-progress`).style.width = `${weekProgress}%`;
+
+                        // Update task grid
+                        const grid = getId(`${week}-tasks-grid`);
+                        grid.innerHTML = tasks.map(task => {
+                            const isCompleted = appState.progress[week]?.[task]?.completed;
+                            return `
+                                <div class="task-item ${isCompleted ? "completed" : ""}" onclick="window.openTaskModal('${week}', '${task}')">
+                                    <input type="checkbox" class="task-checkbox" ${isCompleted ? "checked" : ""} 
+                                           onchange="window.toggleTask('${week}', '${task}', this.checked)">
+                                    <div class="task-content">
+                                        <div class="task-title">${task.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}</div>
+                                        <div class="task-description">${(window.TASK_DEFINITIONS?.[`${week}-${task}`]?.description.replace(/<[^>]+>/g, "").slice(0, 50) || "No description available")}...</div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join("");
+                    });
+
+                    // Update overall progress
+                    const overallProgress = (totalCompleted / totalTasks) * 100;
+                    getId("progress-percentage").textContent = `${Math.round(overallProgress)}%`;
+                    getId("completed-tasks").textContent = totalCompleted;
+                    getId("progress-ring").style.strokeDashoffset = `calc(2 * 3.14159 * 85 * ${(100 - overallProgress) / 100})`;
+
+                    // Update current week
+                    const currentWeek = Object.keys(tasksByWeek).find(week => 
+                        tasksByWeek[week].some(task => !appState.progress[week]?.[task]?.completed)
+                    ) || "Week 4";
+                    getId("current-week").textContent = currentWeek.replace("week", "Week ");
+
+                    // Update lab history
+                    const history = JSON.parse(localStorage.getItem("labHistory") || "[]");
+                    if (history.length > 0) {
+                        const currentLab = history[history.length - 1];
+                        currentLab.progress = overallProgress;
+                        currentLab.completedTasks = totalCompleted;
+                        
+                        if (overallProgress === 100 && !currentLab.endDate) {
+                            currentLab.endDate = new Date().toISOString();
+                        }
+                        
+                        localStorage.setItem("labHistory", JSON.stringify(history));
+                    }
+                }
+            };
+
+            // Expose systems to window
+            window.authSystem = authSystem;
+            window.uiSystem = uiSystem;
+            window.labSystem = labSystem;
+            window.taskSystem = taskSystem;
+            window.adminSystem = adminSystem;
+
+            // Initialize app
+            function initializeApp() {
+                const savedTheme = localStorage.getItem("theme") || "auto";
+                getId("theme-selector").value = savedTheme;
+                uiSystem.changeTheme(savedTheme);
+
+                // Add form event listeners
+                getId("login-form").addEventListener("submit", e => {
+                    e.preventDefault();
+                    authSystem.login(new FormData(e.target));
+                });
+
+                getId("register-form").addEventListener("submit", e => {
+                    e.preventDefault();
+                    authSystem.register(new FormData(e.target));
+                });
+
+                // Check for existing session
+                authSystem.checkSession();
+            }
+
+            initializeApp();
+        })();
+    </script>
+</body>
+</html>
