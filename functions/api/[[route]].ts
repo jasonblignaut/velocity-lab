@@ -340,12 +340,9 @@ async function handleLogin(env: Env, request: Request, clientIP: string): Promis
     }, request);
 
     return createSuccessResponse({
-      user: {
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        preferences: user.preferences,
-      },
+      name: user.name,
+      role: user.role,
+      email: user.email,
       sessionToken,
       expiresIn: remember ? 30 * 24 * 60 * 60 : 24 * 60 * 60, // 30 days or 1 day
     }, 'Login successful');
@@ -447,12 +444,9 @@ async function handleRegister(env: Env, request: Request, clientIP: string): Pro
     }, request);
 
     return createSuccessResponse({
-      user: {
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        preferences: user.preferences,
-      },
+      name: user.name,
+      role: user.role,
+      email: user.email,
       sessionToken,
       expiresIn: 24 * 60 * 60, // 1 day
     }, 'Registration successful', 201);

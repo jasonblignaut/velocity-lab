@@ -119,6 +119,13 @@
           headers.set('Authorization', `Bearer ${appState.sessionToken}`);
         }
 
+        // Also try to get session from cookies as fallback
+        const sessionCookie = cookies.get('session');
+        if (sessionCookie && !appState.sessionToken) {
+          headers.set('Authorization', `Bearer ${sessionCookie}`);
+          appState.sessionToken = sessionCookie;
+        }
+
         const isGetRequest = !options.method || options.method.toUpperCase() === 'GET';
         let body = options.body;
 
@@ -179,9 +186,7 @@
             appState.sessionToken = sessionCookie;
             appState.authenticated = true;
             
-            if (appState.user.role === 'admin') {
-              show($('admin-button'));
-            }
+            console.log('Session restored:', appState.user);
             
             ui.showDashboard();
             await dashboard.loadProgress();
@@ -201,6 +206,8 @@
             body: formData
           });
 
+          console.log('Login response:', response);
+          
           cookies.set('user', JSON.stringify({
             name: response.name,
             email: response.email,
@@ -216,9 +223,7 @@
           appState.sessionToken = response.sessionToken;
           appState.authenticated = true;
 
-          if (appState.user.role === 'admin') {
-            show($('admin-button'));
-          }
+          console.log('User state after login:', appState.user);
 
           ui.showDashboard();
           await dashboard.loadProgress();
@@ -238,16 +243,16 @@
           });
 
           cookies.set('user', JSON.stringify({
-            name: response.name,
-            email: response.email,
-            role: response.role
+            name: response.user.name,
+            email: response.user.email,
+            role: response.user.role
           }));
           cookies.set('session', response.sessionToken);
 
           appState.user = {
-            name: response.name,
-            email: response.email,
-            role: response.role
+            name: response.user.name,
+            email: response.user.email,
+            role: response.user.role
           };
           appState.sessionToken = response.sessionToken;
           appState.authenticated = true;
@@ -255,7 +260,7 @@
           ui.showDashboard();
           await dashboard.loadProgress();
           closeModal();
-          showNotification(`Welcome to Velocity Lab, ${response.name}!`);
+          showNotification(`Welcome to Velocity Lab, ${response.user.name}!`);
         } catch (error) {
           console.error('Registration error:', error);
           showNotification(error.message || 'Registration failed', 'error');
@@ -300,10 +305,14 @@
         if (appState.user) {
           $('user-name').textContent = appState.user.name;
           
+          console.log('Checking admin role:', appState.user.role);
+          
           // Show admin button if user is admin
           if (appState.user.role === 'admin') {
+            console.log('Showing admin button');
             show($('admin-button'));
           } else {
+            console.log('Hiding admin button');
             hide($('admin-button'));
           }
         }
@@ -372,11 +381,17 @@
       },
 
       renderTasks() {
+        console.log('Rendering tasks, TASK_DEFINITIONS:', window.TASK_DEFINITIONS);
+        
         Object.entries(TASK_STRUCTURE).forEach(([weekKey, weekData]) => {
           const tasksGrid = $(`${weekKey}-tasks-grid`);
-          if (!tasksGrid) return;
+          if (!tasksGrid) {
+            console.warn(`Tasks grid not found for ${weekKey}`);
+            return;
+          }
 
           const weekProgress = appState.progress[weekKey] || {};
+          console.log(`Rendering ${weekKey} with ${weekData.tasks.length} tasks`);
           
           tasksGrid.innerHTML = weekData.tasks.map(taskId => {
             const isCompleted = weekProgress[taskId]?.completed || false;
@@ -400,6 +415,8 @@
               </div>
             `;
           }).join('');
+          
+          console.log(`Rendered ${weekData.tasks.length} tasks for ${weekKey}`);
         });
       },
 
@@ -869,15 +886,17 @@
 
     // Initialize application
     async function initializeApp() {
-      // Apply saved theme
+      // Apply saved theme - default to "auto" (Force Balance)
       const savedTheme = localStorage.getItem('theme') || 'auto';
       changeTheme(savedTheme);
       
       // Set theme selector value
-      const themeSelector = document.querySelector('.theme-selector');
-      if (themeSelector) {
-        themeSelector.value = savedTheme;
-      }
+      setTimeout(() => {
+        const themeSelector = document.querySelector('.theme-selector');
+        if (themeSelector) {
+          themeSelector.value = savedTheme;
+        }
+      }, 100);
 
       // Setup event handlers
       setupFormHandlers();
