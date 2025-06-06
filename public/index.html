@@ -134,6 +134,7 @@
       text-decoration: none;
       min-height: 36px;
       white-space: nowrap;
+      position: relative;
     }
     
     .btn-primary {
@@ -167,6 +168,52 @@
     .btn-admin:hover {
       transform: translateY(-1px);
       box-shadow: var(--shadow-medium);
+    }
+    
+    /* Lab Button with Dropdown */
+    .lab-button-container {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .lab-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-medium);
+      min-width: 200px;
+      z-index: 1001;
+      display: none;
+      overflow: hidden;
+    }
+    
+    .lab-dropdown.show {
+      display: block;
+    }
+    
+    .lab-dropdown-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .lab-dropdown-item:last-child {
+      border-bottom: none;
+    }
+    
+    .lab-dropdown-item:hover {
+      background: var(--surface-secondary);
+    }
+    
+    .lab-dropdown-header {
+      font-weight: 600;
+      color: var(--text-primary);
+      background: var(--surface-secondary);
+      border-bottom: 1px solid var(--border);
     }
     
     .theme-selector {
@@ -473,6 +520,8 @@
       position: relative;
       flex-shrink: 0;
       transition: var(--transition-fast);
+      appearance: none;
+      -webkit-appearance: none;
     }
     
     .task-checkbox:checked {
@@ -609,6 +658,77 @@
       color: var(--text-primary);
       margin-bottom: 16px;
       cursor: pointer;
+    }
+    
+    /* Subtask Styles */
+    .subtask-container {
+      margin: 16px 0;
+    }
+    
+    .subtask-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding: 8px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition-fast);
+    }
+    
+    .subtask-item:hover {
+      background: var(--surface-secondary);
+    }
+    
+    .subtask {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding: 8px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition-fast);
+    }
+    
+    .subtask:hover {
+      background: var(--surface-secondary);
+    }
+    
+    .subtask input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-radius: 3px;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: var(--transition-fast);
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    
+    .subtask input[type="checkbox"]:checked {
+      background: var(--success);
+      border-color: var(--success);
+    }
+    
+    .subtask input[type="checkbox"]:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 11px;
+      font-weight: bold;
+    }
+    
+    .subtask label {
+      font-size: 14px;
+      line-height: 1.4;
+      color: var(--text-primary);
+      cursor: pointer;
+      flex: 1;
     }
     
     /* Notification */
@@ -840,6 +960,11 @@
         width: 100%;
         justify-content: flex-end;
       }
+      
+      .lab-dropdown {
+        right: 0;
+        left: auto;
+      }
     }
     
     @media (max-width: 480px) {
@@ -905,7 +1030,6 @@
           <h2>Training Progress</h2>
           <div class="progress-ring">
             <svg viewBox="0 0 180 180">
-              <circle cx="90" cy="90" r="85" class="background"/>
               <circle cx="90" cy="90" r="85" class="foreground" id="progress-ring"/>
             </svg>
             <div class="progress-percentage" id="progress-percentage">0%</div>
@@ -928,7 +1052,18 @@
               <div class="stat-label">VMs</div>
             </div>
           </div>
-          <button class="btn btn-primary" onclick="startNewLab()">Start New Lab</button>
+          <div class="lab-button-container">
+            <button class="btn btn-primary" onclick="toggleLabDropdown()">Start New Lab ▼</button>
+            <div class="lab-dropdown" id="lab-dropdown">
+              <div class="lab-dropdown-header">Lab Options</div>
+              <div class="lab-dropdown-item" onclick="startNewLab(); closeLabDropdown();">
+                🚀 Start Fresh Lab
+              </div>
+              <div class="lab-dropdown-item" onclick="showLabHistory(); closeLabDropdown();">
+                📅 Lab History
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="weeks-container" id="weeks-container">
@@ -1083,6 +1218,21 @@
     </div>
   </div>
 
+  <!-- Lab History Modal -->
+  <div id="lab-history-modal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Lab History</h2>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div id="lab-history-content">
+        <p style="color: var(--text-secondary); text-align: center; padding: 40px;">
+          No lab history available yet. Complete your first lab to see history here.
+        </p>
+      </div>
+    </div>
+  </div>
+
   <!-- Admin Portal Modal -->
   <div id="admin-modal" class="modal">
     <div class="admin-content modal-content">
@@ -1158,7 +1308,8 @@
       progress: {},
       authenticated: false,
       sessionToken: null,
-      isLoading: false
+      isLoading: false,
+      labHistory: []
     };
 
     // Utility functions
@@ -1185,8 +1336,11 @@
       setTimeout(() => notification.classList.remove('show'), 4000);
     }
 
-    // API helper with improved error handling
+    // API helper with improved error handling and timeout management
     async function apiCall(endpoint, options = {}) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
       try {
         appState.isLoading = true;
         const headers = new Headers(options.headers || {});
@@ -1200,7 +1354,10 @@
 
         if (!isGet) {
           // Get CSRF token for non-GET requests
-          const csrfResponse = await fetch('/api/csrf', { credentials: 'same-origin' });
+          const csrfResponse = await fetch('/api/csrf', { 
+            credentials: 'same-origin',
+            signal: controller.signal
+          });
           if (!csrfResponse.ok) {
             throw new Error('Failed to get CSRF token');
           }
@@ -1224,8 +1381,11 @@
           credentials: 'same-origin',
           headers,
           method: options.method || 'GET',
-          body
+          body,
+          signal: controller.signal
         });
+
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
           // Handle specific error cases
@@ -1246,6 +1406,10 @@
 
         return data;
       } catch (error) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+          throw new Error('Request timed out');
+        }
         console.error(`API error for ${endpoint}:`, error);
         throw error;
       } finally {
@@ -1356,7 +1520,8 @@
           progress: {},
           authenticated: false,
           sessionToken: null,
-          isLoading: false
+          isLoading: false,
+          labHistory: []
         };
 
         hide($('admin-button'));
@@ -1473,7 +1638,7 @@
       }
     };
 
-    // Task management
+    // Task management with auto-tick functionality
     async function toggleTask(week, task, checked) {
       try {
         const formData = new FormData();
@@ -1524,10 +1689,43 @@
         if (!appState.progress[week][task].subtasks) appState.progress[week][task].subtasks = {};
         appState.progress[week][task].subtasks[`step${step}`] = checked;
 
+        // Auto-tick main task if all subtasks are completed
+        await checkAndAutoTickMainTask(week, task);
+
         showNotification(checked ? '✅ Step completed!' : 'Step unmarked');
       } catch (error) {
         console.error('Toggle subtask error:', error);
         showNotification('Failed to update step', 'error');
+      }
+    }
+
+    // Auto-tick main task when all subtasks are completed
+    async function checkAndAutoTickMainTask(week, task) {
+      const taskProgress = appState.progress[week]?.[task];
+      if (!taskProgress || !taskProgress.subtasks) return;
+
+      // Get the task definition to count expected subtasks
+      const taskKey = `${week}-${task}`;
+      const taskDefinition = window.TASK_DEFINITIONS?.[taskKey];
+      if (!taskDefinition) return;
+
+      // Count subtasks in the task definition
+      const subtaskMatches = taskDefinition.description.match(/data-step="\d+"/g);
+      const expectedSubtasks = subtaskMatches ? subtaskMatches.length : 0;
+      
+      if (expectedSubtasks === 0) return;
+
+      // Count completed subtasks
+      const completedSubtasks = Object.values(taskProgress.subtasks).filter(Boolean).length;
+
+      // If all subtasks are completed and main task isn't already completed, auto-tick it
+      if (completedSubtasks === expectedSubtasks && !taskProgress.completed) {
+        const mainTaskCheckbox = document.querySelector(`input[onchange*="toggleTask('${week}', '${task}'"]`);
+        if (mainTaskCheckbox && !mainTaskCheckbox.checked) {
+          mainTaskCheckbox.checked = true;
+          await toggleTask(week, task, true);
+          showNotification('🎉 Task auto-completed! All steps finished.');
+        }
       }
     }
 
@@ -1547,327 +1745,58 @@
       }
     }
 
-    // Modal management
-    function showLogin() {
-      closeModal();
-      $('login-modal').style.display = 'flex';
-    }
-
-    function showRegister() {
-      closeModal();
-      $('register-modal').style.display = 'flex';
-    }
-
-    function closeModal() {
-      document.querySelectorAll('.modal').forEach(modal => {
-        modal.style.display = 'none';
-      });
-    }
-
-    function openTaskModal(week, task) {
-      const taskKey = `${week}-${task}`;
-      const taskDefinition = window.TASK_DEFINITIONS?.[taskKey] || {
-        title: task.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        description: '<p>Task details will be available soon...</p>'
-      };
-
-      $('task-title').textContent = taskDefinition.title;
-      $('task-content').innerHTML = taskDefinition.description;
-
-      // Setup subtask checkboxes after content is loaded
+    // Lab dropdown management
+    function toggleLabDropdown() {
+      const dropdown = $('lab-dropdown');
+      dropdown.classList.toggle('show');
+      
+      // Close dropdown when clicking outside
       setTimeout(() => {
-        document.querySelectorAll('.subtask input').forEach(checkbox => {
-          const step = checkbox.dataset.step;
-          checkbox.checked = appState.progress[week]?.[task]?.subtasks?.[`step${step}`] || false;
-          checkbox.onchange = () => toggleSubtask(week, task, step, checkbox.checked);
-        });
-      }, 100);
-
-      $('task-modal').style.display = 'flex';
+        document.addEventListener('click', closeLabDropdownOnOutsideClick, { once: true });
+      }, 0);
     }
 
-    // Lab management
-    async function startNewLab() {
-      if (!confirm('Start a new lab? This will reset all your progress.')) return;
+    function closeLabDropdown() {
+      $('lab-dropdown').classList.remove('show');
+    }
+
+    function closeLabDropdownOnOutsideClick(e) {
+      const dropdown = $('lab-dropdown');
+      const container = document.querySelector('.lab-button-container');
+      if (!container.contains(e.target)) {
+        closeLabDropdown();
+      }
+    }
+
+    // Lab History functionality
+    function showLabHistory() {
+      // For now, show a placeholder. This can be extended with actual history data
+      const historyContent = $('lab-history-content');
       
-      try {
-        await apiCall('/api/lab/start-new', { method: 'POST' });
-        appState.progress = {};
-        dashboard.updateDisplay();
-        showNotification('🚀 New lab started! Your progress has been reset.');
-      } catch (error) {
-        console.error('New lab error:', error);
-        showNotification('Failed to start new lab', 'error');
-      }
-    }
-
-    // Admin functions
-    async function showAdmin() {
-      if (appState.user?.role !== 'admin') {
-        showNotification('Admin access required', 'error');
-        return;
-      }
-
-      try {
-        $('admin-modal').style.display = 'flex';
-        await refreshLeaderboard();
-      } catch (error) {
-        console.error('Admin load error:', error);
-        showNotification('Failed to load admin portal', 'error');
-      }
-    }
-
-    function switchAdminTab(tab) {
-      // Update tab buttons
-      document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+      // Get completion dates from localStorage (simple implementation)
+      const labHistory = JSON.parse(localStorage.getItem('labHistory') || '[]');
       
-      event.target.classList.add('active');
-      $(`admin-${tab}`).classList.add('active');
-
-      // Load data for the selected tab
-      if (tab === 'leaderboard') refreshLeaderboard();
-      if (tab === 'users') loadUsers();
-    }
-
-    async function refreshLeaderboard() {
-      try {
-        const response = await apiCall('/api/admin/users-progress');
-        const tbody = $('leaderboard-body');
-        
-        tbody.innerHTML = response.data.map((user, index) => {
-          const rank = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1;
-          const lastLogin = user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never';
-          
-          return `
-            <tr>
-              <td>${rank}</td>
-              <td>${user.name}</td>
-              <td>${user.progress}%</td>
-              <td>${user.completedTasks}/42</td>
-              <td>${lastLogin}</td>
-            </tr>
-          `;
-        }).join('');
-
-        showNotification('Leaderboard refreshed');
-      } catch (error) {
-        console.error('Leaderboard refresh error:', error);
-        showNotification('Failed to load leaderboard', 'error');
-      }
-    }
-
-    async function loadUsers() {
-      try {
-        const response = await apiCall('/api/admin/users-progress');
-        const usersList = $('users-list');
-        
-        usersList.innerHTML = response.data.map(user => `
-          <div class="user-card">
-            <div class="user-info">
-              <h4>${user.name}</h4>
-              <p>Email: ${user.email} | Role: ${user.role}</p>
-              <div class="user-progress-bar">
-                <div class="user-progress-fill" style="width: ${user.progress}%"></div>
+      if (labHistory.length === 0) {
+        historyContent.innerHTML = `
+          <p style="color: var(--text-secondary); text-align: center; padding: 40px;">
+            No lab history available yet. Complete your first lab to see history here.
+          </p>
+        `;
+      } else {
+        historyContent.innerHTML = `
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            ${labHistory.map((lab, index) => `
+              <div style="background: var(--surface-secondary); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
+                <h4 style="margin-bottom: 8px;">Lab #${index + 1}</h4>
+                <p style="color: var(--text-secondary); font-size: 14px;">
+                  Started: ${new Date(lab.startDate).toLocaleDateString()}<br>
+                  ${lab.endDate ? `Completed: ${new Date(lab.endDate).toLocaleDateString()}` : 'In Progress'}<br>
+                  Progress: ${lab.progress || 0}% (${lab.completedTasks || 0}/42 tasks)
+                </p>
               </div>
-              <p>Progress: ${user.progress}% (${user.completedTasks}/42 tasks)</p>
-            </div>
-            <div class="user-actions">
-              <button class="btn btn-secondary" onclick="toggleUserRole('${user.email}', '${user.role === 'admin' ? 'user' : 'admin'}')">
-                ${user.role === 'admin' ? 'Demote' : 'Promote'}
-              </button>
-              <button class="btn btn-primary" onclick="resetUserProgress('${user.email}')">
-                Reset Progress
-              </button>
-            </div>
+            `).join('')}
           </div>
-        `).join('');
-      } catch (error) {
-        console.error('Users load error:', error);
-        showNotification('Failed to load users', 'error');
+        `;
       }
-    }
-
-    async function toggleUserRole(email, newRole) {
-      if (!confirm(`Change ${email} to ${newRole} role?`)) return;
-      
-      try {
-        const formData = new FormData();
-        formData.append('email', email);
-        formData.append('role', newRole);
-        
-        await apiCall('/api/admin/update-role', {
-          method: 'POST',
-          body: formData
-        });
-        
-        await loadUsers();
-        showNotification(`Role updated for ${email}`);
-      } catch (error) {
-        console.error('Toggle role error:', error);
-        showNotification('Failed to update role', 'error');
-      }
-    }
-
-    async function resetUserProgress(email) {
-      if (!confirm(`Reset all progress for ${email}?`)) return;
-      
-      try {
-        const formData = new FormData();
-        formData.append('email', email);
-        
-        await apiCall('/api/admin/reset-progress', {
-          method: 'POST',
-          body: formData
-        });
-        
-        await loadUsers();
-        showNotification(`Progress reset for ${email}`);
-      } catch (error) {
-        console.error('Reset progress error:', error);
-        showNotification('Failed to reset progress', 'error');
-      }
-    }
-
-    async function exportProgress() {
-      try {
-        const response = await apiCall('/api/admin/export-progress');
-        const blob = new Blob([response.csv], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'velocitylab-progress.csv';
-        a.click();
-        URL.revokeObjectURL(url);
-        showNotification('Progress exported successfully');
-      } catch (error) {
-        console.error('Export error:', error);
-        showNotification('Failed to export progress', 'error');
-      }
-    }
-
-    async function importProgress(files) {
-      if (!files[0]) return;
-      
-      try {
-        const text = await files[0].text();
-        const formData = new FormData();
-        formData.append('csv', text);
-        
-        await apiCall('/api/admin/import-progress', {
-          method: 'POST',
-          body: formData
-        });
-        
-        await refreshLeaderboard();
-        await loadUsers();
-        showNotification('Progress imported successfully');
-      } catch (error) {
-        console.error('Import error:', error);
-        showNotification('Failed to import progress', 'error');
-      }
-    }
-
-    // Theme management
-    function changeTheme(theme) {
-      localStorage.setItem('theme', theme);
-      
-      if (theme === 'dark') {
-        document.body.classList.add('dark');
-      } else if (theme === 'light') {
-        document.body.classList.remove('dark');
-      } else if (theme === 'auto') {
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          document.body.classList.add('dark');
-        } else {
-          document.body.classList.remove('dark');
-        }
-      }
-    }
-
-    // Event listeners
-    document.addEventListener('DOMContentLoaded', () => {
-      // Set theme
-      const savedTheme = localStorage.getItem('theme') || 'auto';
-      changeTheme(savedTheme);
-      
-      // Set theme selector value
-      setTimeout(() => {
-        const themeSelector = document.querySelector('.theme-selector');
-        if (themeSelector) {
-          themeSelector.value = savedTheme;
-        }
-      }, 100);
-
-      // Form event listeners
-      $('login-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        auth.login(new FormData(e.target));
-      });
-
-      $('register-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        auth.register(new FormData(e.target));
-      });
-
-      // Modal click outside to close
-      document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal')) {
-          closeModal();
-        }
-      });
-
-      // Keyboard shortcuts
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          closeModal();
-        }
-      });
-
-      // Check authentication on load
-      auth.checkSession();
-    });
-
-    // System theme change listener
-    if (window.matchMedia) {
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'auto') {
-          changeTheme('auto');
-        }
-      });
-    }
-
-    // Global functions for onclick handlers
-    window.showLogin = showLogin;
-    window.showRegister = showRegister;
-    window.closeModal = closeModal;
-    window.logout = auth.logout;
-    window.startNewLab = startNewLab;
-    window.showAdmin = showAdmin;
-    window.openTaskModal = openTaskModal;
-    window.toggleTask = toggleTask;
-    window.toggleWeek = toggleWeek;
-    window.switchAdminTab = switchAdminTab;
-    window.refreshLeaderboard = refreshLeaderboard;
-    window.toggleUserRole = toggleUserRole;
-    window.resetUserProgress = resetUserProgress;
-    window.exportProgress = exportProgress;
-    window.importProgress = importProgress;
-    window.changeTheme = changeTheme;
-
-    // Error handling for unhandled promise rejections
-    window.addEventListener('unhandledrejection', (event) => {
-      console.error('Unhandled promise rejection:', event.reason);
-      showNotification('An unexpected error occurred', 'error');
-    });
-
-    // Service worker registration for offline support (optional)
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(console.error);
-      });
-    }
-  </script>
-</body>
-</html>
+       class="background"/>
+              <circle cx="90" cy="90" r="85"

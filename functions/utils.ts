@@ -17,9 +17,11 @@ export interface User {
   labHistory?: Array<{
     labId: string;
     startedAt: string;
+    endedAt?: string;
     totalTasks: number;
     completedTasks: number;
     progressPercentage: number;
+    isCompleted: boolean;
   }>;
 }
 
@@ -32,6 +34,16 @@ export interface Progress {
       notes?: string;
     };
   };
+}
+
+export interface LabHistoryEntry {
+  labId: string;
+  startedAt: string;
+  endedAt?: string;
+  totalTasks: number;
+  completedTasks: number;
+  progressPercentage: number;
+  isCompleted: boolean;
 }
 
 // Task structure that matches the frontend exactly - simplified flat arrays
@@ -109,23 +121,6 @@ export const validatePassword = (password: string): { valid: boolean; errors?: s
     errors.push('Password must be less than 128 characters');
   }
   
-  // Optional: Add more complexity requirements
-  // if (!/[A-Z]/.test(password)) {
-  //   errors.push('Password must contain at least one uppercase letter');
-  // }
-  
-  // if (!/[a-z]/.test(password)) {
-  //   errors.push('Password must contain at least one lowercase letter');
-  // }
-  
-  // if (!/[0-9]/.test(password)) {
-  //   errors.push('Password must contain at least one number');
-  // }
-  
-  // if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
-  //   errors.push('Password must contain at least one special character');
-  // }
-  
   return errors.length === 0 ? { valid: true } : { valid: false, errors };
 };
 
@@ -148,13 +143,18 @@ export const generateCSRFToken = async (env: Env): Promise<string> => {
 export const validateCSRFToken = async (env: Env, token: string): Promise<boolean> => {
   if (!token) return false;
   
-  const valid = await env.SESSIONS.get(`csrf:${token}`);
-  if (valid) {
-    // Delete token after use (one-time use)
-    await env.SESSIONS.delete(`csrf:${token}`);
-    return true;
+  try {
+    const valid = await env.SESSIONS.get(`csrf:${token}`);
+    if (valid) {
+      // Delete token after use (one-time use)
+      await env.SESSIONS.delete(`csrf:${token}`);
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.error('CSRF token validation error:', e);
+    return false;
   }
-  return false;
 };
 
 // Create session token for authenticated users
@@ -162,26 +162,35 @@ export const createSession = async (env: Env, userId: string, remember: boolean 
   const sessionToken = crypto.randomUUID();
   const expirationTime = remember ? 30 * 86400 : 86400; // 30 days if remember, else 1 day
   
-  await env.SESSIONS.put(`session:${sessionToken}`, userId, { 
-    expirationTtl: expirationTime 
-  });
-  
-  return sessionToken;
+  try {
+    await env.SESSIONS.put(`session:${sessionToken}`, userId, { 
+      expirationTtl: expirationTime 
+    });
+    return sessionToken;
+  } catch (e) {
+    console.error('Session creation error:', e);
+    throw new Error('Failed to create session');
+  }
 };
 
-// Validate session and return user ID
+// Validate session and return user ID with improved error handling
 export const validateSession = async (env: Env, request: Request): Promise<string | null> => {
-  // Try Authorization header first (Bearer token), then Cookie
-  const sessionToken = request.headers.get('Authorization')?.replace('Bearer ', '') ||
-                      request.headers.get('Cookie')?.match(/session=([^;]+)/)?.[1];
-  
-  if (!sessionToken) return null;
-  
-  const userId = await env.SESSIONS.get(`session:${sessionToken}`);
-  return userId || null;
+  try {
+    // Try Authorization header first (Bearer token), then Cookie
+    const sessionToken = request.headers.get('Authorization')?.replace('Bearer ', '') ||
+                        request.headers.get('Cookie')?.match(/session=([^;]+)/)?.[1];
+    
+    if (!sessionToken) return null;
+    
+    const userId = await env.SESSIONS.get(`session:${sessionToken}`);
+    return userId || null;
+  } catch (e) {
+    console.error('Session validation error:', e);
+    return null;
+  }
 };
 
-// Get user by email address
+// Get user by email address with improved error handling
 export const getUserByEmail = async (env: Env, email: string): Promise<User | null> => {
   try {
     const userData = await env.USERS.get(`user:${email.toLowerCase()}`);
@@ -192,17 +201,24 @@ export const getUserByEmail = async (env: Env, email: string): Promise<User | nu
   }
 };
 
-// Get user by ID - requires scanning all users
+// Get user by ID with improved error handling and timeout
 export const getUserById = async (env: Env, userId: string): Promise<User | null> => {
   try {
-    const userKeys = await env.USERS.list();
+    const userKeys = await env.USERS.list({ prefix: 'user:' });
+    
+    // Process users in batches to avoid timeout
     for (const key of userKeys.keys) {
-      const userData = await env.USERS.get(key.name);
-      if (userData) {
-        const user: User = JSON.parse(userData);
-        if (user.id === userId) {
-          return user;
+      try {
+        const userData = await env.USERS.get(key.name);
+        if (userData) {
+          const user: User = JSON.parse(userData);
+          if (user.id === userId) {
+            return user;
+          }
         }
+      } catch (e) {
+        console.error(`Error processing user key ${key.name}:`, e);
+        continue; // Skip this user and continue
       }
     }
     return null;
@@ -225,46 +241,116 @@ export const updateLastLogin = async (env: Env, user: User): Promise<void> => {
   }
 };
 
-// Update lab progress with history tracking
-export const updateLabProgress = async (env: Env, user: User, labId: string, progress: Progress): Promise<void> => {
+// Lab History Management
+export const startNewLab = async (env: Env, user: User): Promise<{ labId: string; updatedUser: User }> => {
   try {
-    const completedTasks = calculateCompletedTasks(progress);
-    const progressPercentage = calculateProgress(progress);
+    const labId = crypto.randomUUID();
+    const now = new Date().toISOString();
     
-    const updatedLabHistory = user.labHistory ? [...user.labHistory] : [];
-    const labIndex = updatedLabHistory.findIndex(lab => lab.labId === labId);
-    
-    if (labIndex >= 0) {
-      // Update existing lab entry
-      updatedLabHistory[labIndex] = {
-        ...updatedLabHistory[labIndex],
-        completedTasks,
-        progressPercentage,
-      };
-    } else {
-      // Add new lab entry
-      updatedLabHistory.push({
-        labId,
-        startedAt: new Date().toISOString(),
-        totalTasks: TOTAL_TASKS,
-        completedTasks,
-        progressPercentage,
-      });
+    // Initialize lab history if it doesn't exist
+    if (!user.labHistory) {
+      user.labHistory = [];
     }
     
-    const updatedUser: User = {
-      ...user,
-      currentLabId: labId,
-      labHistory: updatedLabHistory,
+    // End the current lab if it exists and isn't already completed
+    if (user.currentLabId) {
+      const currentLabIndex = user.labHistory.findIndex(lab => lab.labId === user.currentLabId);
+      if (currentLabIndex >= 0 && !user.labHistory[currentLabIndex].isCompleted) {
+        // Get current progress before ending
+        const progressData = await env.PROGRESS.get(`progress:${user.id}`);
+        const progress: Progress = progressData ? JSON.parse(progressData) : {};
+        const completedTasks = calculateCompletedTasks(progress);
+        const progressPercentage = calculateProgress(progress);
+        
+        user.labHistory[currentLabIndex] = {
+          ...user.labHistory[currentLabIndex],
+          endedAt: now,
+          completedTasks,
+          progressPercentage,
+          isCompleted: progressPercentage === 100
+        };
+      }
+    }
+    
+    // Add new lab to history
+    const newLabEntry: LabHistoryEntry = {
+      labId,
+      startedAt: now,
+      totalTasks: TOTAL_TASKS,
+      completedTasks: 0,
+      progressPercentage: 0,
+      isCompleted: false
     };
     
-    await env.USERS.put(`user:${user.email}`, JSON.stringify(updatedUser));
+    user.labHistory.push(newLabEntry);
+    user.currentLabId = labId;
+    
+    // Save updated user
+    await env.USERS.put(`user:${user.email}`, JSON.stringify(user));
+    
+    // Reset progress
+    await env.PROGRESS.put(`progress:${user.id}`, JSON.stringify({}));
+    
+    return { labId, updatedUser: user };
   } catch (e) {
-    console.error('Error updating lab progress:', e);
+    console.error('Error starting new lab:', e);
+    throw new Error('Failed to start new lab');
   }
 };
 
-// Log activity for audit trail
+// Update lab progress with history tracking
+export const updateLabProgress = async (env: Env, user: User, progress: Progress): Promise<User> => {
+  try {
+    const completedTasks = calculateCompletedTasks(progress);
+    const progressPercentage = calculateProgress(progress);
+    const now = new Date().toISOString();
+    
+    // Initialize lab history if it doesn't exist
+    if (!user.labHistory) {
+      user.labHistory = [];
+    }
+    
+    // If no current lab, create one
+    if (!user.currentLabId) {
+      const labResult = await startNewLab(env, user);
+      user = labResult.updatedUser;
+    }
+    
+    // Update current lab in history
+    const currentLabIndex = user.labHistory.findIndex(lab => lab.labId === user.currentLabId);
+    if (currentLabIndex >= 0) {
+      const isCompleted = progressPercentage === 100;
+      user.labHistory[currentLabIndex] = {
+        ...user.labHistory[currentLabIndex],
+        completedTasks,
+        progressPercentage,
+        isCompleted,
+        endedAt: isCompleted ? now : undefined
+      };
+    }
+    
+    // Save updated user
+    await env.USERS.put(`user:${user.email}`, JSON.stringify(user));
+    
+    return user;
+  } catch (e) {
+    console.error('Error updating lab progress:', e);
+    throw new Error('Failed to update lab progress');
+  }
+};
+
+// Get lab history for a user
+export const getLabHistory = async (env: Env, userId: string): Promise<LabHistoryEntry[]> => {
+  try {
+    const user = await getUserById(env, userId);
+    return user?.labHistory || [];
+  } catch (e) {
+    console.error('Error getting lab history:', e);
+    return [];
+  }
+};
+
+// Log activity for audit trail with improved error handling
 export const logActivity = async (env: Env, userId: string, action: string, details: any): Promise<void> => {
   try {
     const logEntry = {
@@ -281,6 +367,7 @@ export const logActivity = async (env: Env, userId: string, action: string, deta
     });
   } catch (e) {
     console.error('Error logging activity:', e);
+    // Don't throw - logging failures shouldn't break the main flow
   }
 };
 
@@ -472,7 +559,7 @@ export const getUserStats = (progress: Progress): {
   };
 };
 
-// Rate limiting helper
+// Rate limiting helper with improved error handling
 export const checkRateLimit = async (env: Env, identifier: string, limit: number = 10, window: number = 60): Promise<boolean> => {
   try {
     const key = `rate:${identifier}:${Math.floor(Date.now() / (window * 1000))}`;
@@ -517,4 +604,45 @@ export const verifyPassword = async (password: string, hash: string): Promise<bo
   // In production, use proper bcrypt verification
   // For now, simple comparison (NOT SECURE - only for development)
   return password === hash;
+};
+
+// Batch process users to avoid timeout issues
+export const batchProcessUsers = async <T>(
+  env: Env, 
+  processor: (user: User, progress: Progress) => T,
+  batchSize: number = 10
+): Promise<T[]> => {
+  try {
+    const results: T[] = [];
+    const userKeys = await env.USERS.list({ prefix: 'user:' });
+    
+    // Process in batches to avoid timeout
+    for (let i = 0; i < userKeys.keys.length; i += batchSize) {
+      const batch = userKeys.keys.slice(i, i + batchSize);
+      
+      const batchPromises = batch.map(async (key) => {
+        try {
+          const userData = await env.USERS.get(key.name);
+          if (!userData) return null;
+          
+          const user: User = JSON.parse(userData);
+          const progressData = await env.PROGRESS.get(`progress:${user.id}`);
+          const progress: Progress = progressData ? JSON.parse(progressData) : {};
+          
+          return processor(user, progress);
+        } catch (e) {
+          console.error(`Error processing user ${key.name}:`, e);
+          return null;
+        }
+      });
+      
+      const batchResults = await Promise.all(batchPromises);
+      results.push(...batchResults.filter((result): result is T => result !== null));
+    }
+    
+    return results;
+  } catch (e) {
+    console.error('Batch process users error:', e);
+    return [];
+  }
 };
