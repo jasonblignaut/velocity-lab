@@ -366,7 +366,7 @@
         <div class="modal-content" style="max-width:800px">
             <div class="modal-header">
                 <h2 class="modal-title" id="task-title"></h2>
-                <button class="modal-close" onclick="closeModal()" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
+                <button class="modal-close" onclick="closeModal()" aria-label="Close"><svg viewBox="0 0 24 人性:24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
             </div>
             <div id="task-content"></div>
             <div class="task-notes-section">
@@ -432,8 +432,8 @@
             hide: el => el?.classList.add("hidden"),
             cookies: {
                 get: name => document.cookie.match(`${name}=([^;]*)`)?.[1],
-                set: (name, value, days=7) => document.cookie = `${name}=${value};path=/api;Max-Age=${days*86400};SameSite=Strict;${location.protocol === "https:" ? "Secure" : ""}`,
-                delete: name => document.cookie = `${name}=;path=/api;Max-Age=0`
+                set: (name, value, days=7) => document.cookie = `${name}=${value};path=/;Max-Age=${days*86400};SameSite=Strict;${location.protocol === "https:" ? "Secure" : ""}`,
+                delete: name => document.cookie = `${name}=;path=/;Max-Age=0;SameSite=Strict`
             }
         };
         function showNotification(msg, type = "success") {
@@ -450,7 +450,7 @@
             if (!isGet) {
                 body = options.body instanceof FormData ? options.body : new FormData();
                 if (!(options.body instanceof FormData)) Object.entries(options.body || {}).forEach(([k, v]) => body.append(k, v));
-                body.append("api-csrf-token", "static-csrf-token-12345");
+                body.append("csrf_token", "static-csrf-token-12345");
             }
             for (let attempt = 1; attempt <= 3; attempt++) {
                 try {
@@ -474,12 +474,14 @@
             closeModal();
             const m = utils.getId("login-modal");
             m.style.display = "flex";
+            m.setAttribute("aria-hidden", "false");
             m.querySelector("input[name='email']").focus();
         }
         function showRegister() {
             closeModal();
             const m = utils.getId("register-modal");
             m.style.display = "flex";
+            m.setAttribute("aria-hidden", "false");
             m.querySelector("input[name='name']").focus();
         }
         function closeModal() {
@@ -492,7 +494,7 @@
             async checkSession() {
                 const user = utils.cookies.get("user");
                 const session = utils.cookies.get("session");
-                if (user || !session) return;
+                if (!user || !session) return;
                 try {
                     appState.user = JSON.parse(decodeURIComponent(user));
                     appState.sessionToken = session;
@@ -518,14 +520,14 @@
                     closeModal();
                     showNotification(`Welcome back, ${name}!`);
                 } catch (e) {
-                    showNotification(e.message, "error");
-                } catch
+                    showNotification(e.message || "Login failed", "error");
+                }
             },
             async register(formData) {
                 try {
-                    const { name, role, sessionToken, email } = await apiCall("/api/register", { method: "POST", body: bodyformData });
+                    const { name, role, sessionToken, email } = await apiCall("/api/register", { method: "POST", body: formData });
                     utils.cookies.set("user", encodeURIComponent(JSON.stringify({ name, role, email })));
-                    utils.cookies.set("session", sessionToken));
+                    utils.cookies.set("session", sessionToken);
                     appState.user = { name, role, email };
                     appState.sessionToken = sessionToken;
                     appState.authenticated = true;
@@ -534,11 +536,11 @@
                     closeModal();
                     showNotification(`Welcome, ${name}!`);
                 } catch (e) {
-                    showNotification(e.message, "error");
-                } catch
+                    showNotification(e.message || "Registration failed", "error");
+                }
             },
             logout() {
-                apiCall("/api/logout", { method: "POST" }).catch(console.log);
+                apiCall("/api/logout", { method: "POST" }).catch(e => console.error("Logout failed:", e));
                 utils.cookies.delete("user");
                 utils.cookies.delete("session");
                 appState = { user: null, progress: {}, authenticated: false, sessionToken: null };
@@ -548,7 +550,7 @@
             }
         };
         const uiSystem = {
-            showLanding() {() =>
+            showLanding() {
                 utils.hide(utils.getId("dashboard"));
                 utils.show(utils.getId("landing"));
                 utils.hide(utils.getId("user-menu"));
@@ -800,7 +802,7 @@
                             <td><div class="progress-container"><div class="progress-bar-mini"><div class="progress-fill-mini" style="width: ${user.progress}%"></div></div><span class="progress-text-mini">${user.progress}%</span></div></td>
                             <td style="text-align: center;"><strong>${user.completedTasks}</strong>/42</td>
                             <td>${user.notesCount ? `<span class="notes-badge">${user.notesCount}</span>` : "No notes"}</td>
-                            <td><small>${user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : "Never"}</small></td>
+                            <td><small>${user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : "Never"}</small></span></div></td>
                         `;
                         fragment.appendChild(tr);
                     });
