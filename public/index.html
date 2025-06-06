@@ -3,480 +3,880 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Velocity Lab</title>
+  <title>Velocity Lab - Exchange Hybrid Training</title>
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+    }
+    
     :root {
-      --p: #0078d4; /* Azure Blue */
-      --s: #34c759; /* Unifi Green */
-      --e: #d13438; /* Apple Red */
-      --g1: #f5f6f5; /* Light Gray (Azure) */
-      --g5: #605e5c; /* Gray Text */
-      --g9: #1c2526; /* Dark Text */
-      --d1: #1a252f; /* Dark Azure */
-      --d5: #c7d1d8; /* Dark Gray Text */
-      --r: 14px; /* Border Radius */
-      --t: 0.4s cubic-bezier(0.4, 0,0,0.2, 1); /* Apple-like easing */
-      --shadow: 0 4px 8px rgba(0,0,0,0.1);
-      --glass: rgba(255,255,255,0.85);
+      /* Apple/Azure inspired color palette */
+      --primary: #007AFF;
+      --primary-hover: #0056CC;
+      --success: #34C759;
+      --warning: #FF9500;
+      --error: #FF3B30;
+      --text-primary: #1D1D1F;
+      --text-secondary: #8E8E93;
+      --text-tertiary: #C7C7CC;
+      --background: #F2F2F7;
+      --surface: #FFFFFF;
+      --surface-secondary: #F9F9F9;
+      --border: #D1D1D6;
+      --border-light: #E5E5EA;
+      --shadow-light: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-medium: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-heavy: 0 8px 25px rgba(0,0,0,0.12);
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+      --transition-fast: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+      
+      /* Dark theme overrides */
+      --dark-primary: #0A84FF;
+      --dark-text-primary: #FFFFFF;
+      --dark-text-secondary: #98989D;
+      --dark-text-tertiary: #636366;
+      --dark-background: #000000;
+      --dark-surface: #1C1C1E;
+      --dark-surface-secondary: #2C2C2E;
+      --dark-border: #38383A;
+      --dark-border-light: #48484A;
     }
+    
     body {
-      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif';
-      background: linear-gradient(180deg, var(--g1), #e6e7e8);
-      color: var(--g9);
-      line-height: 1.6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--background);
+      color: var(--text-primary);
+      line-height: 1.5;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
-      transition: background var(--t), color var(--t);
+      transition: var(--transition);
     }
+    
     body.dark {
-      background: var(--d1);
-      color: var(--d5);
+      background: var(--dark-background);
+      color: var(--dark-text-primary);
+      --text-primary: var(--dark-text-primary);
+      --text-secondary: var(--dark-text-secondary);
+      --text-tertiary: var(--dark-text-tertiary);
+      --surface: var(--dark-surface);
+      --surface-secondary: var(--dark-surface-secondary);
+      --border: var(--dark-border);
+      --border-light: var(--dark-border-light);
+      --primary: var(--dark-primary);
     }
-    .c { max-width: 1280px; margin: 0 auto; padding: 0 16px; }
+    
+    .container { 
+      max-width: 1200px; 
+      margin: 0 auto; 
+      padding: 0 20px; 
+    }
+    
+    /* Header Styles */
     header {
       position: fixed;
       top: 0;
       width: 100%;
-      background: var(--glass);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-      z-index: 100;
-      transition: background var(--t);
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-light);
+      z-index: 1000;
+      transition: var(--transition);
     }
+    
     body.dark header {
-      background: rgba(26,37,47,0.9);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      background: rgba(28, 28, 30, 0.85);
     }
+    
     nav {
-      height: 60px;
+      height: 64px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+    
     .logo img {
-      height: 36px;
-      transition: transform var(--t);
+      height: 32px;
+      transition: var(--transition-fast);
     }
-    .logo img:hover { transform: scale(1.05); }
+    
+    .logo img:hover { 
+      transform: scale(1.05); 
+    }
+    
     .nav-right {
       display: flex;
       align-items: center;
       gap: 12px;
     }
+    
+    /* Button Styles */
     .btn {
-      padding: 10px 20px;
-      border-radius: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 16px;
+      border-radius: var(--radius-lg);
       border: none;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: all var(--t);
-      background: transparent;
-      border: 1px solid rgba(0,0,0,0.08);
+      transition: var(--transition-fast);
+      text-decoration: none;
+      min-height: 36px;
+      white-space: nowrap;
     }
-    body.dark .btn { border: 1px solid rgba(255,255,255,0.1); }
-    .btn-p {
-      background: var(--p);
-      color: #fff;
-      border: none;
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
     }
-    .btn-p:hover {
-      background: #005ba1;
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
-    }
-    .btn-s:hover {
-      background: rgba(0,0,0,0.05);
+    
+    .btn-primary:hover {
+      background: var(--primary-hover);
       transform: translateY(-1px);
+      box-shadow: var(--shadow-medium);
     }
-    .btn-a {
-      background: linear-gradient(135deg, #00b7eb, #0078d4);
-      color: #fff;
-      border: none;
+    
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
     }
-    .btn-a:hover {
-      background: linear-gradient(135deg, #0078d4, #00b7eb);
-      transform: translateY(-2px);
+    
+    .btn-secondary:hover {
+      background: var(--surface-secondary);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-light);
     }
+    
+    .btn-admin {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .btn-admin:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-medium);
+    }
+    
     .theme-selector {
       padding: 8px 12px;
-      border: 1px solid rgba(0,0,0,0.1);
-      border-radius: 8px;
-      background: white;
-      font-size: 13px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      color: var(--text-primary);
+      font-size: 14px;
       font-weight: 500;
       cursor: pointer;
-      transition: all var(--t);
+      transition: var(--transition-fast);
       min-width: 140px;
     }
-    body.dark .theme-selector {
-      background: var(--d1);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: var(--d5);
-    }
+    
     .theme-selector:focus {
-      outline: 2px solid var(--p);
+      outline: 2px solid var(--primary);
       outline-offset: 2px;
     }
+    
     .theme-selector:hover {
-      border-color: var(--p);
+      border-color: var(--primary);
     }
-    .h { display: none !important; }
-    #land {
+    
+    /* Layout Utilities */
+    .hidden { 
+      display: none !important; 
+    }
+    
+    /* Landing Page */
+    #landing {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding-top: 60px;
+      padding-top: 64px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
     }
-    #land h1 {
+    
+    #landing h1 {
       font-size: clamp(48px, 8vw, 72px);
-      font-weight: 900;
-      margin-bottom: 20px;
-      background: linear-gradient(180deg, var(--g9), #005ba1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+      margin-bottom: 24px;
+      letter-spacing: -0.02em;
     }
-    #land p {
+    
+    #landing p {
       font-size: 20px;
-      color: var(--g5);
+      opacity: 0.9;
       max-width: 600px;
       margin: 0 auto 40px;
+      line-height: 1.6;
     }
-    #dash {
-      padding: 80px 0 40px;
+    
+    .landing-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .landing-actions .btn {
+      min-width: 120px;
+      padding: 12px 24px;
+      font-size: 16px;
+    }
+    
+    /* Dashboard */
+    #dashboard {
+      padding: 100px 0 60px;
       min-height: 100vh;
     }
-    .card {
-      background: #fff;
-      border-radius: var(--r);
-      padding: 32px;
-      margin-bottom: 24px;
-      box-shadow: var(--shadow);
-      transition: box-shadow var(--t);
+    
+    /* Progress Card */
+    .progress-card {
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      padding: 40px;
+      margin-bottom: 32px;
+      box-shadow: var(--shadow-light);
+      text-align: center;
+      transition: var(--transition);
+      border: 1px solid var(--border-light);
     }
-    body.dark .card { background: rgba(40,50,60,0.9); }
-    .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
-    .ring {
-      width: 160px;
-      height: 160px;
-      margin: 0 auto 24px;
+    
+    .progress-card:hover {
+      box-shadow: var(--shadow-medium);
     }
-    .ring svg { transform: rotate(-90deg); }
-    .ring circle {
+    
+    .progress-card h2 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 32px;
+      color: var(--text-primary);
+    }
+    
+    /* Progress Ring */
+    .progress-ring {
+      width: 180px;
+      height: 180px;
+      margin: 0 auto 32px;
+      position: relative;
+    }
+    
+    .progress-ring svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+    
+    .progress-ring circle {
       fill: none;
-      stroke-width: 12;
+      stroke-width: 8;
       stroke-linecap: round;
     }
-    .ring .bg { stroke: #e8ecef; }
-    body.dark .ring .bg { stroke: #374151; }
-    .ring .fg {
-      stroke: var(--p);
-      stroke-dasharray: 472;
-      stroke-dashoffset: 472;
-      transition: stroke-dashoffset 1.2s var(--t);
+    
+    .progress-ring .background {
+      stroke: var(--border);
     }
-    .stats {
+    
+    .progress-ring .foreground {
+      stroke: var(--primary);
+      stroke-dasharray: 565;
+      stroke-dashoffset: 565;
+      transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .progress-percentage {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 20px;
-      margin: 24px 0;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 24px;
+      margin: 32px 0;
     }
-    .stat { text-align: center; }
-    .stat-v {
+    
+    .stat {
+      text-align: center;
+    }
+    
+    .stat-value {
       font-size: 32px;
       font-weight: 700;
-      color: var(--p);
+      color: var(--primary);
+      margin-bottom: 4px;
     }
-    .stat-l {
+    
+    .stat-label {
       font-size: 13px;
-      color: var(--g5);
+      color: var(--text-secondary);
       text-transform: uppercase;
-      letter-spacing: 0.8px;
+      letter-spacing: 0.5px;
+      font-weight: 600;
     }
-    body.dark .stat-l { color: var(--d5); }
-    .week {
-      background: #fff;
-      border-radius: var(--r);
-      margin-bottom: 20px;
+    
+    /* Week Cards */
+    .weeks-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .week-card {
+      background: var(--surface);
+      border-radius: var(--radius-xl);
       overflow: hidden;
-      transition: all var(--t);
-      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-light);
     }
-    body.dark .week { background: rgba(40,50,60,0.9); }
-    .week:hover { box-shadow: var(--shadow); }
-    .wh {
+    
+    .week-card:hover {
+      box-shadow: var(--shadow-medium);
+      transform: translateY(-2px);
+    }
+    
+    .week-header {
       padding: 24px;
+      cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      transition: var(--transition-fast);
+      border-bottom: 1px solid transparent;
     }
-    .wh h3 {
+    
+    .week-header:hover {
+      background: var(--surface-secondary);
+    }
+    
+    .week-info h3 {
       font-size: 20px;
       font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text-primary);
     }
-    .wh p {
-      color: var(--g5);
+    
+    .week-info p {
+      color: var(--text-secondary);
       font-size: 14px;
     }
-    body.dark .wh p { color: var(--d5); }
-    .wp { text-align: right; }
-    .bar {
-      width: 100px;
+    
+    .week-progress {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+    
+    .progress-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .progress-bar {
+      width: 120px;
       height: 6px;
-      background: #e8ecef;
+      background: var(--border);
       border-radius: 3px;
       overflow: hidden;
-      margin-top: 8px;
     }
-    body.dark .bar { background: #374151; }
-    .fill {
+    
+    .progress-fill {
       height: 100%;
-      background: var(--p);
-      transition: width var(--t);
+      background: var(--primary);
+      transition: width var(--transition);
+      border-radius: 3px;
     }
-    .tasks {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 16px;
-      padding: 0 24px 24px;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height var(--t);
-    }
-    .tasks.show { max-height: 3000px; }
-    .task {
-      background: var(--g1);
-      border-radius: var(--r);
-      padding: 16px;
-      cursor: pointer;
-      transition: all var(--t);
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-    body.dark .task { background: rgba(31,41,55,0.5); }
-    .task:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
-    }
-    .task.done {
-      background: rgba(52,199,89,0.08);
-      border: 1px solid var(--s);
-    }
-    .task input {
+    
+    .expand-icon {
       width: 20px;
       height: 20px;
+      color: var(--text-secondary);
+      transition: var(--transition-fast);
+      margin-left: 16px;
+    }
+    
+    .week-card.expanded .expand-icon {
+      transform: rotate(90deg);
+    }
+    
+    /* Tasks Container */
+    .tasks-container {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-top: 1px solid var(--border-light);
+    }
+    
+    .week-card.expanded .tasks-container {
+      max-height: 2000px;
+    }
+    
+    .tasks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      padding: 24px;
+    }
+    
+    /* Task Items */
+    .task-item {
+      background: var(--surface-secondary);
+      border-radius: var(--radius-md);
+      padding: 16px;
       cursor: pointer;
+      transition: var(--transition-fast);
+      border: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    .task-t {
-      font-weight: 500;
+    
+    .task-item:hover {
+      background: var(--surface);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-light);
+    }
+    
+    .task-item.completed {
+      background: rgba(52, 199, 89, 0.1);
+      border-color: var(--success);
+    }
+    
+    .task-checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+      transition: var(--transition-fast);
+    }
+    
+    .task-checkbox:checked {
+      background: var(--success);
+      border-color: var(--success);
+    }
+    
+    .task-checkbox:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .task-content {
+      flex: 1;
+    }
+    
+    .task-title {
+      font-weight: 600;
       font-size: 15px;
+      color: var(--text-primary);
+      margin-bottom: 2px;
     }
-    .task-d {
+    
+    .task-description {
       font-size: 13px;
-      color: var(--g5);
+      color: var(--text-secondary);
     }
-    body.dark .task-d { color: var(--d5); }
+    
+    /* Modal Styles */
     .modal {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(10px);
+      z-index: 2000;
+      padding: 20px;
       justify-content: center;
       align-items: center;
-      z-index: 1000;
-      padding: 16px;
     }
-    .modal-c {
-      background: var(--glass);
-      border-radius: 20px;
+    
+    .modal-content {
+      background: var(--surface);
+      border-radius: var(--radius-xl);
       padding: 32px;
-      max-width: 900px;
+      max-width: 500px;
       width: 100%;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 12px 48px rgba(0,0,0,0.2);
+      box-shadow: var(--shadow-heavy);
+      position: relative;
+      animation: modalAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    body.dark .modal-c { background: rgba(40,50,60,0.9); }
-    .modal-h {
+    
+    @keyframes modalAppear {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+    
+    .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 24px;
     }
-    .modal-h h2 {
+    
+    .modal-title {
       font-size: 24px;
       font-weight: 700;
+      color: var(--text-primary);
     }
-    .close {
+    
+    .modal-close {
       width: 32px;
       height: 32px;
       border-radius: 50%;
       border: none;
-      background: var(--g1);
+      background: var(--surface-secondary);
       cursor: pointer;
-      font-size: 18px;
-      transition: all var(--t);
-    }
-    body.dark .close { background: var(--d1); }
-    .close:hover { background: var(--g5); color: #fff; }
-    body.dark .close:hover { background: var(--d5); }
-    .modal input, .modal select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid rgba(0,0,0,0.1);
-      border-radius: 10px;
-      margin-bottom: 16px;
-      font-size: 15px;
-      transition: border-color var(--t);
-    }
-    body.dark .modal input, body.dark .modal select { border: 1px solid rgba(255,255,255,0.1); }
-    .modal input:focus, .modal select:focus {
-      outline: none;
-      border-color: var(--p);
-    }
-    .subtask { margin: 16px 0; }
-    .sub-item {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 8px 0;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: var(--transition-fast);
     }
-    .sub-item input {
-      width: 18px;
-      height: 18px;
+    
+    .modal-close:hover {
+      background: var(--border);
+      color: var(--text-primary);
     }
-    .sub-item label {
-      font-size: 14px;
+    
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 20px;
     }
-    .notif {
-      position: fixed;
-      top: 80px;
-      right: 20px;
-      padding: 14px 24px;
-      border-radius: 12px;
-      color: #fff;
-      font-size: 15px;
-      transform: translateX(320px);
-      transition: all var(--t);
-      box-shadow: var(--shadow);
-    }
-    .notif.show { transform: translateX(0); }
-    .notif.s { background: var(--s); }
-    .notif.e { background: var(--e); }
-    table {
+    
+    .form-input {
       width: 100%;
-      border-collapse: collapse;
-      font-size: 15px;
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 16px;
+      transition: var(--transition-fast);
+      background: var(--surface);
+      color: var(--text-primary);
     }
-    th, td {
-      text-align: left;
-      padding: 12px;
-      border-bottom: 1px solid rgba(0,0,0,0.06);
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
     }
-    body.dark th, body.dark td { border-bottom: 1px solid rgba(255,255,255,0.06); }
-    th {
-      font-size: 13px;
-      color: var(--g5);
-      text-transform: uppercase;
-      font-weight: 600;
+    
+    .form-checkbox {
+      margin-right: 8px;
+    }
+    
+    .form-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-primary);
+      margin-bottom: 16px;
       cursor: pointer;
     }
-    body.dark th { color: var(--d5); }
+    
+    /* Notification */
+    .notification {
+      position: fixed;
+      top: 84px;
+      right: 20px;
+      padding: 16px 24px;
+      border-radius: var(--radius-md);
+      color: white;
+      font-weight: 600;
+      transform: translateX(320px);
+      transition: var(--transition);
+      box-shadow: var(--shadow-medium);
+      z-index: 3000;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+    }
+    
+    .notification.success {
+      background: var(--success);
+    }
+    
+    .notification.error {
+      background: var(--error);
+    }
+    
+    /* Admin Portal Styles */
+    .admin-content {
+      max-width: 1000px;
+      width: 100%;
+    }
+    
     .admin-tabs {
       display: flex;
-      gap: 8px;
-      margin-bottom: 24px;
-      border-bottom: 1px solid rgba(0,0,0,0.08);
+      gap: 4px;
+      margin-bottom: 32px;
+      background: var(--surface-secondary);
+      padding: 4px;
+      border-radius: var(--radius-md);
     }
-    body.dark .admin-tabs { border-bottom: 1px solid rgba(255,255,255,0.08); }
+    
     .admin-tab {
+      flex: 1;
       padding: 12px 20px;
-      font-size: 15px;
-      font-weight: 600;
+      text-align: center;
+      border-radius: var(--radius-sm);
       cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: all var(--t);
+      transition: var(--transition-fast);
+      font-weight: 600;
+      color: var(--text-secondary);
     }
+    
     .admin-tab.active {
-      color: var(--p);
-      border-bottom-color: var(--p);
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: var(--shadow-light);
     }
-    .admin-tab:hover { color: var(--p); }
-    .admin-section { display: none; }
-    .admin-section.active { display: block; }
+    
+    .admin-section {
+      display: none;
+    }
+    
+    .admin-section.active {
+      display: block;
+    }
+    
+    /* Table Styles */
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-light);
+    }
+    
+    .admin-table th,
+    .admin-table td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .admin-table th {
+      background: var(--surface-secondary);
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .admin-table tbody tr:hover {
+      background: var(--surface-secondary);
+    }
+    
+    /* User Cards */
     .user-card {
-      background: #fff;
-      border-radius: var(--r);
+      background: var(--surface);
+      border-radius: var(--radius-md);
       padding: 20px;
       margin-bottom: 16px;
+      border: 1px solid var(--border-light);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: var(--shadow);
-      transition: all var(--t);
+      transition: var(--transition-fast);
     }
-    body.dark .user-card { background: rgba(40,50,60,0.9); }
-    .user-card:hover { transform: translateY(-2px); }
-    .user-info h4 { font-size: 16px; font-weight: 600; }
-    .user-info p { font-size: 14px; color: var(--g5); }
-    body.dark .user-info p { color: var(--d5); }
-    .user-actions { display: flex; gap: 12px; }
-    .progress-bar {
-      height: 8px;
-      background: #e8ecef;
-      border-radius: 4px;
+    
+    .user-card:hover {
+      box-shadow: var(--shadow-light);
+      transform: translateY(-1px);
+    }
+    
+    .user-info h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .user-info p {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    .user-actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .user-progress-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
       overflow: hidden;
       margin: 8px 0;
+      width: 200px;
     }
-    body.dark .progress-bar { background: #374151; }
-    .progress-fill {
+    
+    .user-progress-fill {
       height: 100%;
-      background: var(--p);
-      transition: width var(--t);
+      background: var(--primary);
+      transition: var(--transition);
     }
-    .data-tools {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
+    
+    /* Loading State */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
     }
-    .data-tools input[type="file"] {
-      padding: 10px;
-      border: 1px dashed var(--g5);
-      border-radius: 10px;
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
-    body.dark .data-tools input[type="file"] { border: 1px dashed var(--d5); }
+    
+    /* Responsive Design */
     @media (max-width: 768px) {
-      .stats { grid-template-columns: repeat(2, 1fr); }
-      .tasks { grid-template-columns: 1fr; }
-      #land h1 { font-size: clamp(36px, 7vw, 56px); }
-      #land p { font-size: 18px; }
-      .modal-c { padding: 20px; }
-      .admin-tabs { flex-wrap: wrap; }
-      .user-card { flex-direction: column; align-items: flex-start; gap: 16px; }
-      .user-actions { width: 100%; justify-content: flex-end; }
+      .container {
+        padding: 0 16px;
+      }
+      
+      nav {
+        height: 56px;
+      }
+      
+      .nav-right {
+        gap: 8px;
+      }
+      
+      #dashboard {
+        padding: 80px 0 40px;
+      }
+      
+      .progress-card {
+        padding: 24px;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      
+      .tasks-grid {
+        grid-template-columns: 1fr;
+        padding: 16px;
+      }
+      
+      .week-header {
+        padding: 16px;
+      }
+      
+      .week-progress {
+        align-items: center;
+      }
+      
+      .progress-bar {
+        width: 80px;
+      }
+      
+      .modal-content {
+        padding: 24px;
+        margin: 10px;
+      }
+      
+      .landing-actions {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .admin-tabs {
+        flex-direction: column;
+      }
+      
+      .user-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      
+      .user-actions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      #landing h1 {
+        font-size: 36px;
+      }
+      
+      #landing p {
+        font-size: 18px;
+      }
+      
+      .progress-ring {
+        width: 140px;
+        height: 140px;
+      }
+      
+      .progress-percentage {
+        font-size: 28px;
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <nav class="c">
+    <nav class="container">
       <div class="logo">
         <img src="/assets/Velocity-Logo.png" alt="Velocity Lab">
       </div>
       <div class="nav-right">
-        <span id="auth">
-          <button onclick="showLogin()" class="btn btn-s">Sign In</button>
-          <button onclick="showRegister()" class="btn btn-p">Register</button>
+        <span id="auth-buttons">
+          <button onclick="showLogin()" class="btn btn-secondary">Sign In</button>
+          <button onclick="showRegister()" class="btn btn-primary">Register</button>
         </span>
-        <span id="user" class="h">
-          <span id="userName"></span>
-          <button id="adminBtn" class="btn btn-a h" onclick="showAdmin()">Admin Portal</button>
-          <button onclick="logout()" class="btn btn-s">Sign Out</button>
+        <span id="user-menu" class="hidden">
+          <span id="user-name" style="margin-right: 12px; font-weight: 600;"></span>
+          <button id="admin-button" class="btn btn-admin hidden" onclick="showAdmin()">Admin Portal</button>
+          <button onclick="logout()" class="btn btn-secondary">Sign Out</button>
           <select class="theme-selector" onchange="changeTheme(this.value)">
             <option value="auto">Force Balance (Auto)</option>
             <option value="light">Jedi (Light)</option>
@@ -488,595 +888,888 @@
   </header>
 
   <main>
-    <section id="land">
-      <div class="c">
+    <section id="landing">
+      <div class="container">
         <h1>Master Exchange Hybrid</h1>
-        <p>42 hands-on tasks over 4 weeks. Build a lab with DC, Exchange, and workstation VMs.</p>
-        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-          <button class="btn btn-p" onclick="showRegister()">Register</button>
-          <button class="btn btn-s" onclick="showLogin()">Sign In</button>
+        <p>42 hands-on tasks over 4 weeks. Build a comprehensive lab with Domain Controllers, Exchange Server, and workstation VMs in a production-ready environment.</p>
+        <div class="landing-actions">
+          <button class="btn btn-primary" onclick="showRegister()">Get Started</button>
+          <button class="btn btn-secondary" onclick="showLogin()">Sign In</button>
         </div>
       </div>
     </section>
 
-    <section id="dash" class="h">
-      <div class="c">
-        <div class="card" style="text-align: center;">
-          <h2 style="margin-bottom: 24px;">Training Progress</h2>
-          <div class="ring">
-            <svg viewBox="0 0 160 160">
-              <circle cx="80" cy="80" r="75" class="bg"/>
-              <circle cx="80" cy="80" r="75" class="fg" id="ring"/>
+    <section id="dashboard" class="hidden">
+      <div class="container">
+        <div class="progress-card">
+          <h2>Training Progress</h2>
+          <div class="progress-ring">
+            <svg viewBox="0 0 180 180">
+              <circle cx="90" cy="90" r="85" class="background"/>
+              <circle cx="90" cy="90" r="85" class="foreground" id="progress-ring"/>
             </svg>
-            <div style="margin-top: -100px; font-size: 36px; font-weight: 700;" id="pct">0%</div>
+            <div class="progress-percentage" id="progress-percentage">0%</div>
           </div>
-          <div class="stats">
-            <div class="stat"><div class="stat-v" id="done">0</div><div class="stat-l">Tasks Done</div></div>
-            <div class="stat"><div class="stat-v">42</div><div class="stat-l">Total Tasks</div></div>
-            <div class="stat"><div class="stat-v" id="curWeek">Week 1</div><div class="stat-l">Current</div></div>
-            <div class="stat"><div class="stat-v">3</div><div class="stat-l">VMs</div></div>
+          <div class="stats-grid">
+            <div class="stat">
+              <div class="stat-value" id="completed-tasks">0</div>
+              <div class="stat-label">Tasks Done</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">42</div>
+              <div class="stat-label">Total Tasks</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value" id="current-week">Week 1</div>
+              <div class="stat-label">Current</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">3</div>
+              <div class="stat-label">VMs</div>
+            </div>
           </div>
-          <button class="btn btn-p" onclick="newLab()">Start New Lab</button>
+          <button class="btn btn-primary" onclick="startNewLab()">Start New Lab</button>
         </div>
 
-        <div id="weeks">
-          <div class="week">
-            <div class="wh" onclick="toggleWeek(this)">
-              <div>
-                <h3>Week 1: Foundation</h3>
-                <p>DC setup, domain join, shares</p>
+        <div class="weeks-container" id="weeks-container">
+          <div class="week-card" id="week1-card">
+            <div class="week-header" onclick="toggleWeek('week1')">
+              <div class="week-info">
+                <h3>Week 1: Foundation Setup</h3>
+                <p>Domain Controller setup, domain join, and file shares</p>
               </div>
-              <div class="wp">
-                <div><span id="week1-done">0</span>/12 tasks</div>
-                <div class="bar"><div class="fill" id="week1-bar" style="width: 0%;"></div></div>
+              <div class="week-progress">
+                <div class="progress-text"><span id="week1-completed">0</span>/13 tasks</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" id="week1-progress" style="width: 0%;"></div>
+                </div>
               </div>
+              <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9,18 15,12 9,6"></polyline>
+              </svg>
             </div>
-            <div class="tasks" id="week1-tasks"></div>
+            <div class="tasks-container" id="week1-tasks">
+              <div class="tasks-grid" id="week1-tasks-grid"></div>
+            </div>
           </div>
 
-          <div class="week">
-            <div class="wh" onclick="toggleWeek(this)">
-              <div>
-                <h3>Week 2: Infrastructure</h3>
-                <p>Second DC, WSUS, time</p>
+          <div class="week-card" id="week2-card">
+            <div class="week-header" onclick="toggleWeek('week2')">
+              <div class="week-info">
+                <h3>Week 2: Infrastructure Services</h3>
+                <p>Second DC, WSUS server, and time synchronization</p>
               </div>
-              <div class="wp">
-                <div><span id="week2-done">0</span>/8 tasks</div>
-                <div class="bar"><div class="fill" id="week2-bar" style="width: 0%;"></div></div>
+              <div class="week-progress">
+                <div class="progress-text"><span id="week2-completed">0</span>/8 tasks</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" id="week2-progress" style="width: 0%;"></div>
+                </div>
               </div>
+              <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9,18 15,12 9,6"></polyline>
+              </svg>
             </div>
-            <div class="tasks" id="week2-tasks"></div>
+            <div class="tasks-container" id="week2-tasks">
+              <div class="tasks-grid" id="week2-tasks-grid"></div>
+            </div>
           </div>
 
-          <div class="week">
-            <div class="wh" onclick="toggleWeek(this)">
-              <div>
-                <h3>Week 3: Exchange</h3>
-                <p>DC upgrade, Exchange setup</p>
+          <div class="week-card" id="week3-card">
+            <div class="week-header" onclick="toggleWeek('week3')">
+              <div class="week-info">
+                <h3>Week 3: Exchange Server</h3>
+                <p>DC upgrades, Exchange 2019 installation and configuration</p>
               </div>
-              <div class="wp">
-                <div><span id="week3-done">0</span>/12 tasks</div>
-                <div class="bar"><div class="fill" id="week3-bar" style="width: 0%;"></div></div>
+              <div class="week-progress">
+                <div class="progress-text"><span id="week3-completed">0</span>/12 tasks</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" id="week3-progress" style="width: 0%;"></div>
+                </div>
               </div>
+              <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9,18 15,12 9,6"></polyline>
+              </svg>
             </div>
-            <div class="tasks" id="week3-tasks"></div>
+            <div class="tasks-container" id="week3-tasks">
+              <div class="tasks-grid" id="week3-tasks-grid"></div>
+            </div>
           </div>
 
-          <div class="week">
-            <div class="wh" onclick="toggleWeek(this)">
-              <div>
-                <h3>Week 4: Hybrid</h3>
-                <p>M365 integration, hybrid</p>
+          <div class="week-card" id="week4-card">
+            <div class="week-header" onclick="toggleWeek('week4')">
+              <div class="week-info">
+                <h3>Week 4: Hybrid Configuration</h3>
+                <p>Microsoft 365 integration and hybrid mail flow</p>
               </div>
-              <div class="wp">
-                <div><span id="week4-done">0</span>/10 tasks</div>
-                <div class="bar"><div class="fill" id="week4-bar" style="width: 0%;"></div></div>
+              <div class="week-progress">
+                <div class="progress-text"><span id="week4-completed">0</span>/10 tasks</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" id="week4-progress" style="width: 0%;"></div>
+                </div>
               </div>
+              <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9,18 15,12 9,6"></polyline>
+              </svg>
             </div>
-            <div class="tasks" id="week4-tasks"></div>
+            <div class="tasks-container" id="week4-tasks">
+              <div class="tasks-grid" id="week4-tasks-grid"></div>
+            </div>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <div id="loginModal" class="modal">
-    <div class="modal-c">
-      <div class="modal-h">
-        <h2>Sign In</h2>
-        <button class="close" onclick="closeModal()">×</button>
+  <!-- Login Modal -->
+  <div id="login-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Sign In</h2>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
       </div>
-      <form id="loginForm">
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
-          <input type="checkbox" name="remember" style="width: auto; margin: 0;"> Remember me
-        </label>
-        <button type="submit" class="btn btn-p" style="width: 100%;">Sign In</button>
-        <p style="text-align: center; margin-top: 16px; font-size: 13px;">
-          New? <a href="#" onclick="showRegister()">Register</a>
+      <form id="login-form">
+        <div class="form-group">
+          <input type="email" name="email" placeholder="Email address" required class="form-input">
+        </div>
+        <div class="form-group">
+          <input type="password" name="password" placeholder="Password" required class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            <input type="checkbox" name="remember" class="form-checkbox"> Remember me
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 16px;">Sign In</button>
+        <p style="text-align: center; color: var(--text-secondary);">
+          New to Velocity Lab? <a href="#" onclick="showRegister()" style="color: var(--primary);">Create account</a>
         </p>
       </form>
     </div>
   </div>
 
-  <div id="registerModal" class="modal">
-    <div class="modal-c">
-      <div class="modal-h">
-        <h2>Register</h2>
-        <button class="close" onclick="closeModal()">×</button>
+  <!-- Register Modal -->
+  <div id="register-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Create Account</h2>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
       </div>
-      <form id="registerForm">
-        <input type="text" name="name" placeholder="Full Name" required>
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password (8+ chars)" required minlength="8">
-        <button type="submit" class="btn btn-p" style="width: 100%;">Register</button>
-        <p style="text-align: center; margin-top: 16px; font-size: 13px;">
-          Have account? <a href="#" onclick="showLogin()">Sign In</a>
+      <form id="register-form">
+        <div class="form-group">
+          <input type="text" name="name" placeholder="Full name" required class="form-input">
+        </div>
+        <div class="form-group">
+          <input type="email" name="email" placeholder="Email address" required class="form-input">
+        </div>
+        <div class="form-group">
+          <input type="password" name="password" placeholder="Password (8+ characters)" required minlength="8" class="form-input">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 16px;">Create Account</button>
+        <p style="text-align: center; color: var(--text-secondary);">
+          Already have an account? <a href="#" onclick="showLogin()" style="color: var(--primary);">Sign in</a>
         </p>
       </form>
     </div>
   </div>
 
-  <div id="taskModal" class="modal">
-    <div class="modal-c">
-      <div class="modal-h">
-        <h2 id="taskTitle"></h2>
-        <button class="close" onclick="closeModal()">×</button>
+  <!-- Task Detail Modal -->
+  <div id="task-modal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="task-title"></h2>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
       </div>
-      <div id="taskBody"></div>
+      <div id="task-content"></div>
     </div>
   </div>
 
-  <div id="adminModal" class="modal">
-    <div class="modal-c">
-      <div class="modal-h">
-        <h2>Admin Portal</h2>
-        <button class="close" onclick="closeModal()">×</button>
+  <!-- Admin Portal Modal -->
+  <div id="admin-modal" class="modal">
+    <div class="admin-content modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Admin Portal</h2>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
       </div>
+      
       <div class="admin-tabs">
         <div class="admin-tab active" onclick="switchAdminTab('leaderboard')">Leaderboard</div>
         <div class="admin-tab" onclick="switchAdminTab('users')">Users</div>
         <div class="admin-tab" onclick="switchAdminTab('data')">Data Tools</div>
       </div>
+
       <div id="admin-leaderboard" class="admin-section active">
-        <table id="leaderboard-table">
+        <table class="admin-table">
           <thead>
             <tr>
-              <th onclick="sortTable(0)">Rank</th>
-              <th onclick="sortTable(1)">Name</th>
-              <th onclick="sortTable(2)">Progress</th>
-              <th onclick="sortTable(3)">Tasks</th>
-              <th onclick="sortTable(4)">Last Login</th>
+              <th>Rank</th>
+              <th>Name</th>
+              <th>Progress</th>
+              <th>Tasks</th>
+              <th>Last Login</th>
             </tr>
           </thead>
-          <tbody id="leaderboard-body"></tbody>
+          <tbody id="leaderboard-body">
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 40px;">
+                <div class="loading"></div>
+              </td>
+            </tr>
+          </tbody>
         </table>
-        <button class="btn btn-s" onclick="refreshLeaderboard()" style="margin-top: 16px;">Refresh</button>
+        <button class="btn btn-secondary" onclick="refreshLeaderboard()" style="margin-top: 16px;">
+          Refresh Data
+        </button>
       </div>
+
       <div id="admin-users" class="admin-section">
-        <div id="users-list"></div>
+        <div id="users-list">
+          <div style="text-align: center; padding: 40px;">
+            <div class="loading"></div>
+          </div>
+        </div>
       </div>
+
       <div id="admin-data" class="admin-section">
-        <div class="data-tools">
-          <button class="btn btn-p" onclick="exportProgress()">Export Progress (CSV)</button>
-          <input type="file" accept=".csv" id="importProgress" onchange="importProgress(this.files)">
+        <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="exportProgress()">Export Progress (CSV)</button>
+          <input type="file" accept=".csv" id="import-file" onchange="importProgress(this.files)" style="display: none;">
+          <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">Import Progress</button>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="notif" class="notif"></div>
+  <!-- Notification -->
+  <div id="notification" class="notification"></div>
 
   <script src="/task-definitions.js"></script>
   <script>
+    // Task structure matching backend
     const TASKS = {
-      week1: { t: ['install-server2012', 'configure-static-ip', 'install-adds-role', 'promote-to-dc', 'configure-dns-server', 'create-domain-users', 'join-vm-domain', 'create-hidden-share', 'map-drive-gpo', 'map-drive-script', 'map-drive-powershell', 'create-security-group', 'restrict-share-access'] },
-      week2: { t: ['install-second-server', 'promote-additional-dc', 'install-wsus-role', 'configure-wsus-settings', 'setup-wsus-gpo', 'configure-primary-time', 'configure-secondary-time', 'test-infrastructure'] },
-      week3: { t: ['backup-servers', 'upgrade-dc1-2016', 'upgrade-dc2-2016', 'raise-functional-levels', 'install-exchange-server', 'install-exchange-prereqs', 'extend-ad-schema', 'install-exchange-2019', 'configure-exchange-basic', 'create-mailboxes', 'test-mailbox-access', 'configure-internal-mailflow'] },
-      week4: { t: ['configure-external-dns', 'setup-firewall-rules', 'install-ssl-certificates', 'configure-external-mailflow', 'setup-modern-auth', 'prepare-m365-tenant', 'install-aad-connect', 'run-hybrid-wizard', 'configure-hybrid-mailflow', 'verify-hybrid-functionality'] }
+      week1: ['install-server2012', 'configure-static-ip', 'install-adds-role', 'promote-to-dc', 'configure-dns-server', 'create-domain-users', 'join-vm-domain', 'create-hidden-share', 'map-drive-gpo', 'map-drive-script', 'map-drive-powershell', 'create-security-group', 'restrict-share-access'],
+      week2: ['install-second-server', 'promote-additional-dc', 'install-wsus-role', 'configure-wsus-settings', 'setup-wsus-gpo', 'configure-primary-time', 'configure-secondary-time', 'test-infrastructure'],
+      week3: ['backup-servers', 'upgrade-dc1-2016', 'upgrade-dc2-2016', 'raise-functional-levels', 'install-exchange-server', 'install-exchange-prereqs', 'extend-ad-schema', 'install-exchange-2019', 'configure-exchange-basic', 'create-mailboxes', 'test-mailbox-access', 'configure-internal-mailflow'],
+      week4: ['configure-external-dns', 'setup-firewall-rules', 'install-ssl-certificates', 'configure-external-mailflow', 'setup-modern-auth', 'prepare-m365-tenant', 'install-aad-connect', 'run-hybrid-wizard', 'configure-hybrid-mailflow', 'verify-hybrid-functionality']
     };
-    let A = { u: null, p: {}, auth: false, sessionToken: null };
+
+    // Application state
+    let appState = {
+      user: null,
+      progress: {},
+      authenticated: false,
+      sessionToken: null,
+      isLoading: false
+    };
+
+    // Utility functions
     const $ = id => document.getElementById(id);
-    const show = e => e?.classList.remove('h');
-    const hide = e => e?.classList.add('h');
+    const show = element => element?.classList.remove('hidden');
+    const hide = element => element?.classList.add('hidden');
 
-    const ck = {
-      get: n => document.cookie.match(`${n}=([^;]+)`)?.[1],
-      set: (n, v) => {
-        document.cookie = `${n}=${v};path=/;max-age=604800;SameSite=Strict;Secure`;
+    // Cookie management
+    const cookies = {
+      get: name => document.cookie.match(`${name}=([^;]+)`)?.[1],
+      set: (name, value, days = 7) => {
+        document.cookie = `${name}=${value};path=/;max-age=${days * 86400};SameSite=Strict;Secure`;
       },
-      del: n => { document.cookie = `${n}=;path=/;max-age=0;SameSite=Strict;Secure`; }
-    };
-
-    const msg = (m, t = 's') => {
-      const n = $('notif');
-      n.textContent = m;
-      n.className = `notif ${t} show`;
-      setTimeout(() => n.classList.remove('show'), 3000);
-    };
-
-    const api = async (ep, opt = {}) => {
-      try {
-        const headers = new Headers(opt.headers || {});
-        if (A.sessionToken) headers.set('Authorization', `Bearer ${A.sessionToken}`);
-        const isGet = !opt.method || opt.method.toUpperCase() === 'GET';
-        
-        let body;
-        if (!isGet) {
-          const r = await fetch('/api/csrf', { credentials: 'same-origin' });
-          if (!r.ok) throw new Error(`CSRF fetch failed: ${r.status}`);
-          const { token } = await r.json();
-          
-          let fd;
-          if (opt.body instanceof FormData) {
-            fd = opt.body;
-            fd.append('csrf_token', token);
-          } else {
-            fd = new FormData();
-            if (opt.body) {
-              for (const [key, value] of Object.entries(opt.body)) {
-                fd.append(key, value);
-              }
-            }
-            fd.append('csrf_token', token);
-          }
-          body = fd;
-        }
-        
-        const res = await fetch(ep, {
-          credentials: 'same-origin',
-          headers,
-          method: opt.method || 'GET',
-          body
-        });
-        
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-        const d = await res.json();
-        if (!d.success) throw new Error(d.error || 'Request failed');
-        return d;
-      } catch (e) {
-        console.error(`API error for ${ep}:`, e);
-        throw e;
+      delete: name => {
+        document.cookie = `${name}=;path=/;max-age=0;SameSite=Strict;Secure`;
       }
     };
 
+    // Notification system
+    function showNotification(message, type = 'success') {
+      const notification = $('notification');
+      notification.textContent = message;
+      notification.className = `notification ${type} show`;
+      setTimeout(() => notification.classList.remove('show'), 4000);
+    }
+
+    // API helper with improved error handling
+    async function apiCall(endpoint, options = {}) {
+      try {
+        appState.isLoading = true;
+        const headers = new Headers(options.headers || {});
+        
+        if (appState.sessionToken) {
+          headers.set('Authorization', `Bearer ${appState.sessionToken}`);
+        }
+
+        const isGet = !options.method || options.method.toUpperCase() === 'GET';
+        let body;
+
+        if (!isGet) {
+          // Get CSRF token for non-GET requests
+          const csrfResponse = await fetch('/api/csrf', { credentials: 'same-origin' });
+          if (!csrfResponse.ok) {
+            throw new Error('Failed to get CSRF token');
+          }
+          const { token } = await csrfResponse.json();
+
+          if (options.body instanceof FormData) {
+            body = options.body;
+            body.append('csrf_token', token);
+          } else {
+            body = new FormData();
+            if (options.body) {
+              for (const [key, value] of Object.entries(options.body)) {
+                body.append(key, value);
+              }
+            }
+            body.append('csrf_token', token);
+          }
+        }
+
+        const response = await fetch(endpoint, {
+          credentials: 'same-origin',
+          headers,
+          method: options.method || 'GET',
+          body
+        });
+
+        if (!response.ok) {
+          // Handle specific error cases
+          if (response.status === 401) {
+            throw new Error('Invalid credentials or session expired');
+          } else if (response.status === 403) {
+            throw new Error('Access denied - insufficient permissions');
+          } else if (response.status === 409) {
+            throw new Error('Email already registered');
+          }
+          throw new Error(`Server error (${response.status})`);
+        }
+
+        const data = await response.json();
+        if (!data.success) {
+          throw new Error(data.error || 'Request failed');
+        }
+
+        return data;
+      } catch (error) {
+        console.error(`API error for ${endpoint}:`, error);
+        throw error;
+      } finally {
+        appState.isLoading = false;
+      }
+    }
+
+    // Authentication functions
     const auth = {
-      async check() {
-        const u = ck.get('user');
-        A.sessionToken = ck.get('session');
-        if (u && A.sessionToken) {
+      async checkSession() {
+        const userCookie = cookies.get('user');
+        appState.sessionToken = cookies.get('session');
+        
+        if (userCookie && appState.sessionToken) {
           try {
-            A.u = JSON.parse(decodeURIComponent(u));
-            A.auth = true;
-            if (A.u.role === 'admin') show($('adminBtn'));
-            ui.dash();
-            dash.load();
-          } catch (e) {
-            console.error('Auth check error:', e);
+            appState.user = JSON.parse(decodeURIComponent(userCookie));
+            appState.authenticated = true;
+            
+            if (appState.user.role === 'admin') {
+              show($('admin-button'));
+            }
+            
+            ui.showDashboard();
+            await dashboard.loadProgress();
+          } catch (error) {
+            console.error('Session check error:', error);
             auth.logout();
           }
         } else {
-          ui.land();
+          ui.showLanding();
         }
       },
-      async login(fd) {
+
+      async login(formData) {
         try {
-          const r = await api('/api/login', { method: 'POST', body: fd });
-          ck.set('user', encodeURIComponent(JSON.stringify({ name: r.name, role: r.role, email: r.email })));
-          ck.set('session', r.sessionToken);
-          A.u = { name: r.name, role: r.role, email: r.email };
-          A.auth = true;
-          A.sessionToken = r.sessionToken;
-          if (A.u.role === 'admin') show($('adminBtn'));
-          ui.dash();
-          dash.load();
+          const response = await apiCall('/api/login', {
+            method: 'POST',
+            body: formData
+          });
+
+          cookies.set('user', encodeURIComponent(JSON.stringify({
+            name: response.name,
+            role: response.role,
+            email: response.email
+          })));
+          cookies.set('session', response.sessionToken);
+
+          appState.user = {
+            name: response.name,
+            role: response.role,
+            email: response.email
+          };
+          appState.authenticated = true;
+          appState.sessionToken = response.sessionToken;
+
+          if (appState.user.role === 'admin') {
+            show($('admin-button'));
+          }
+
+          ui.showDashboard();
+          await dashboard.loadProgress();
           closeModal();
-          msg(`Welcome, ${r.name}!`);
-        } catch (e) {
-          console.error('Login error:', e);
-          msg(e.message || 'Login failed', 'e');
+          showNotification(`Welcome back, ${response.name}!`);
+        } catch (error) {
+          showNotification(error.message, 'error');
         }
       },
-      async register(fd) {
+
+      async register(formData) {
         try {
-          const r = await api('/api/register', { method: 'POST', body: fd });
-          ck.set('user', encodeURIComponent(JSON.stringify({ name: r.name, role: r.role, email: r.email })));
-          ck.set('session', r.sessionToken);
-          A.u = { name: r.name, role: r.role, email: r.email };
-          A.auth = true;
-          A.sessionToken = r.sessionToken;
-          ui.dash();
-          dash.load();
+          const response = await apiCall('/api/register', {
+            method: 'POST',
+            body: formData
+          });
+
+          cookies.set('user', encodeURIComponent(JSON.stringify({
+            name: response.name,
+            role: response.role,
+            email: response.email
+          })));
+          cookies.set('session', response.sessionToken);
+
+          appState.user = {
+            name: response.name,
+            role: response.role,
+            email: response.email
+          };
+          appState.authenticated = true;
+          appState.sessionToken = response.sessionToken;
+
+          ui.showDashboard();
+          await dashboard.loadProgress();
           closeModal();
-          msg(`Welcome, ${r.name}!`);
-        } catch (e) {
-          console.error('Register error:', e);
-          msg(e.message || 'Registration failed', 'e');
+          showNotification(`Welcome to Velocity Lab, ${response.name}!`);
+        } catch (error) {
+          showNotification(error.message, 'error');
         }
       },
+
       logout() {
-        api('/api/logout', { method: 'POST' }).catch(e => console.error('Logout error:', e));
-        ck.del('user');
-        ck.del('session');
-        A = { u: null, p: {}, auth: false, sessionToken: null };
-        hide($('adminBtn'));
-        ui.land();
-        msg('Signed out');
+        apiCall('/api/logout', { method: 'POST' }).catch(console.error);
+        
+        cookies.delete('user');
+        cookies.delete('session');
+        
+        appState = {
+          user: null,
+          progress: {},
+          authenticated: false,
+          sessionToken: null,
+          isLoading: false
+        };
+
+        hide($('admin-button'));
+        ui.showLanding();
+        showNotification('Signed out successfully');
       }
     };
 
+    // UI management
     const ui = {
-      land() {
-        hide($('dash'));
-        show($('land'));
-        hide($('user'));
-        show($('auth'));
+      showLanding() {
+        hide($('dashboard'));
+        show($('landing'));
+        hide($('user-menu'));
+        show($('auth-buttons'));
       },
-      dash() {
-        hide($('land'));
-        show($('dash'));
-        show($('user'));
-        hide($('auth'));
-        $('userName').textContent = A.u?.name || '';
+
+      showDashboard() {
+        hide($('landing'));
+        show($('dashboard'));
+        show($('user-menu'));
+        hide($('auth-buttons'));
+        $('user-name').textContent = appState.user?.name || '';
       }
     };
 
-    const dash = {
-      async load() {
-        if (!A.auth) return;
+    // Dashboard functionality
+    const dashboard = {
+      async loadProgress() {
+        if (!appState.authenticated) return;
+        
         try {
-          const r = await api('/api/progress');
-          A.p = r.data || {};
-          dash.update();
-        } catch (e) {
-          console.error('Progress load error:', e);
-          msg('Failed to load progress', 'e');
+          const response = await apiCall('/api/progress');
+          appState.progress = response.data || {};
+          dashboard.updateDisplay();
+        } catch (error) {
+          console.error('Progress load error:', error);
+          showNotification('Failed to load progress', 'error');
         }
       },
-      update() {
-        let done = 0;
-        Object.entries(TASKS).forEach(([w, d]) => {
-          const wp = A.p[w] || {};
-          const wd = d.t.filter(t => wp[t]?.completed).length;
-          done += wd;
-          const doneEl = $(`${w}-done`);
-          const barEl = $(`${w}-bar`);
-          const tasksEl = $(`${w}-tasks`);
-          if (doneEl) doneEl.textContent = `${wd}`;
-          if (barEl) barEl.style.width = `${(wd / d.t.length) * 100}%`;
-          if (tasksEl) {
-            tasksEl.innerHTML = d.t.map(t => `
-              <div class="task ${wp[t]?.completed ? 'done' : ''}" onclick="openTask('${w}', '${t}')">
-                <input type="checkbox" ${wp[t]?.completed ? 'checked' : ''} onchange="toggleTask('${w}', '${t}', this.checked)" onclick="event.stopPropagation()">
-                <div>
-                  <div class="task-t">${t.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>
-                  <div class="task-d">Click for details</div>
+
+      updateDisplay() {
+        let totalCompleted = 0;
+        const totalTasks = 42;
+
+        Object.entries(TASKS).forEach(([week, tasks]) => {
+          const weekProgress = appState.progress[week] || {};
+          const weekCompleted = tasks.filter(task => weekProgress[task]?.completed).length;
+          totalCompleted += weekCompleted;
+
+          // Update week progress
+          const completedElement = $(`${week}-completed`);
+          const progressElement = $(`${week}-progress`);
+          const tasksGrid = $(`${week}-tasks-grid`);
+
+          if (completedElement) {
+            completedElement.textContent = weekCompleted;
+          }
+          
+          if (progressElement) {
+            const percentage = (weekCompleted / tasks.length) * 100;
+            progressElement.style.width = `${percentage}%`;
+          }
+
+          // Update tasks grid
+          if (tasksGrid) {
+            tasksGrid.innerHTML = tasks.map(task => {
+              const isCompleted = weekProgress[task]?.completed || false;
+              const taskTitle = task.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+              
+              return `
+                <div class="task-item ${isCompleted ? 'completed' : ''}" onclick="openTaskModal('${week}', '${task}')">
+                  <input type="checkbox" class="task-checkbox" ${isCompleted ? 'checked' : ''} 
+                         onchange="toggleTask('${week}', '${task}', this.checked)" 
+                         onclick="event.stopPropagation()">
+                  <div class="task-content">
+                    <div class="task-title">${taskTitle}</div>
+                    <div class="task-description">Click for details</div>
+                  </div>
                 </div>
-              </div>
-            `).join('');
+              `;
+            }).join('');
           }
         });
-        const pct = Math.round((done / 42) * 100);
-        const pctEl = $('pct');
-        const doneEl = $('done');
-        const curWeekEl = $('curWeek');
-        const ringEl = $('ring');
-        if (pctEl) pctEl.textContent = `${pct}%`;
-        if (doneEl) doneEl.textContent = `${done}`;
-        if (curWeekEl) curWeekEl.textContent = done >= 32 ? 'Week 4' : done >= 20 ? 'Week 3' : done >= 12 ? 'Week 2' : 'Week 1';
-        if (ringEl) ringEl.style.strokeDashoffset = `${472 - (pct / 100) * 472}`;
+
+        // Update overall progress
+        const progressPercentage = Math.round((totalCompleted / totalTasks) * 100);
+        const progressRing = $('progress-ring');
+        const progressText = $('progress-percentage');
+        const completedTasksElement = $('completed-tasks');
+        const currentWeekElement = $('current-week');
+
+        if (progressText) {
+          progressText.textContent = `${progressPercentage}%`;
+        }
+        
+        if (completedTasksElement) {
+          completedTasksElement.textContent = totalCompleted;
+        }
+        
+        if (currentWeekElement) {
+          let currentWeek = 'Week 1';
+          if (totalCompleted >= 32) currentWeek = 'Week 4';
+          else if (totalCompleted >= 20) currentWeek = 'Week 3';
+          else if (totalCompleted >= 13) currentWeek = 'Week 2';
+          currentWeekElement.textContent = currentWeek;
+        }
+
+        if (progressRing) {
+          const circumference = 2 * Math.PI * 85; // radius = 85
+          const offset = circumference - (progressPercentage / 100) * circumference;
+          progressRing.style.strokeDashoffset = offset;
+        }
       }
     };
 
-    const toggleWeek = h => h.nextElementSibling.classList.toggle('show');
-
-    const toggleTask = async (w, t, c) => {
+    // Task management
+    async function toggleTask(week, task, checked) {
       try {
-        const fd = new FormData();
-        fd.append('week', w);
-        fd.append('task', t);
-        fd.append('checked', c.toString());
-        await api('/api/progress', { method: 'POST', body: fd });
-        if (!A.p[w]) A.p[w] = {};
-        if (!A.p[w][t]) A.p[w][t] = {};
-        A.p[w][t].completed = c;
-        dash.update();
-        msg(c ? '✅ Task completed!' : 'Task unmarked');
-      } catch (e) {
-        console.error('Toggle task error:', e);
-        msg('Failed to update task', 'e');
-        event.target.checked = !c;
-      }
-    };
+        const formData = new FormData();
+        formData.append('week', week);
+        formData.append('task', task);
+        formData.append('checked', checked.toString());
 
-    const toggleSub = async (w, t, s, c) => {
+        await apiCall('/api/progress', {
+          method: 'POST',
+          body: formData
+        });
+
+        // Update local state
+        if (!appState.progress[week]) {
+          appState.progress[week] = {};
+        }
+        if (!appState.progress[week][task]) {
+          appState.progress[week][task] = {};
+        }
+        appState.progress[week][task].completed = checked;
+
+        dashboard.updateDisplay();
+        showNotification(checked ? '✅ Task completed!' : 'Task unmarked');
+      } catch (error) {
+        console.error('Toggle task error:', error);
+        showNotification('Failed to update task', 'error');
+        // Revert checkbox state on error
+        event.target.checked = !checked;
+      }
+    }
+
+    async function toggleSubtask(week, task, step, checked) {
       try {
-        const fd = new FormData();
-        fd.append('week', w);
-        fd.append('task', t);
-        fd.append('subtask', `step${s}`);
-        fd.append('subtask_checked', c.toString());
-        await api('/api/progress', { method: 'POST', body: fd });
-        if (!A.p[w]) A.p[w] = {};
-        if (!A.p[w][t]) A.p[w][t] = { subtasks: {} };
-        if (!A.p[w][t].subtasks) A.p[w][t].subtasks = {};
-        A.p[w][t].subtasks[`step${s}`] = c;
-        msg(c ? '✅ Step completed!' : 'Step unmarked');
-      } catch (e) {
-        console.error('Toggle subtask error:', e);
-        msg('Failed to update step', 'e');
-      }
-    };
+        const formData = new FormData();
+        formData.append('week', week);
+        formData.append('task', task);
+        formData.append('subtask', `step${step}`);
+        formData.append('subtask_checked', checked.toString());
 
-    const openTask = (w, t) => {
-      const k = `${w}-${t}`;
-      const td = window.TASK_DEFINITIONS?.[k] || {
-        title: t.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        description: '<p>Details coming soon...</p>'
+        await apiCall('/api/progress', {
+          method: 'POST',
+          body: formData
+        });
+
+        // Update local state
+        if (!appState.progress[week]) appState.progress[week] = {};
+        if (!appState.progress[week][task]) appState.progress[week][task] = { subtasks: {} };
+        if (!appState.progress[week][task].subtasks) appState.progress[week][task].subtasks = {};
+        appState.progress[week][task].subtasks[`step${step}`] = checked;
+
+        showNotification(checked ? '✅ Step completed!' : 'Step unmarked');
+      } catch (error) {
+        console.error('Toggle subtask error:', error);
+        showNotification('Failed to update step', 'error');
+      }
+    }
+
+    // Week expansion/collapse
+    function toggleWeek(week) {
+      const weekCard = $(`${week}-card`);
+      const isExpanded = weekCard.classList.contains('expanded');
+      
+      // Close all other weeks first
+      document.querySelectorAll('.week-card').forEach(card => {
+        card.classList.remove('expanded');
+      });
+      
+      // Toggle current week
+      if (!isExpanded) {
+        weekCard.classList.add('expanded');
+      }
+    }
+
+    // Modal management
+    function showLogin() {
+      closeModal();
+      $('login-modal').style.display = 'flex';
+    }
+
+    function showRegister() {
+      closeModal();
+      $('register-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.style.display = 'none';
+      });
+    }
+
+    function openTaskModal(week, task) {
+      const taskKey = `${week}-${task}`;
+      const taskDefinition = window.TASK_DEFINITIONS?.[taskKey] || {
+        title: task.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        description: '<p>Task details will be available soon...</p>'
       };
-      $('taskTitle').textContent = td.title;
-      $('taskBody').innerHTML = td.description;
+
+      $('task-title').textContent = taskDefinition.title;
+      $('task-content').innerHTML = taskDefinition.description;
+
+      // Setup subtask checkboxes after content is loaded
       setTimeout(() => {
-        document.querySelectorAll('.subtask input').forEach(cb => {
-          const s = cb.dataset.step;
-          cb.checked = A.p[w]?.[t]?.subtasks?.[`step${s}`] || false;
-          cb.onchange = () => toggleSub(w, t, s, cb.checked);
+        document.querySelectorAll('.subtask input').forEach(checkbox => {
+          const step = checkbox.dataset.step;
+          checkbox.checked = appState.progress[week]?.[task]?.subtasks?.[`step${step}`] || false;
+          checkbox.onchange = () => toggleSubtask(week, task, step, checkbox.checked);
         });
       }, 100);
-      $('taskModal').style.display = 'flex';
-    };
 
-    const newLab = async () => {
-      if (!confirm('Start a new lab? This will reset your progress.')) return;
+      $('task-modal').style.display = 'flex';
+    }
+
+    // Lab management
+    async function startNewLab() {
+      if (!confirm('Start a new lab? This will reset all your progress.')) return;
+      
       try {
-        await api('/api/lab/start-new', { method: 'POST' });
-        A.p = {};
-        dash.update();
-        msg('🚀 New lab started!');
-      } catch (e) {
-        console.error('New lab error:', e);
-        msg('Failed to start new lab', 'e');
+        await apiCall('/api/lab/start-new', { method: 'POST' });
+        appState.progress = {};
+        dashboard.updateDisplay();
+        showNotification('🚀 New lab started! Your progress has been reset.');
+      } catch (error) {
+        console.error('New lab error:', error);
+        showNotification('Failed to start new lab', 'error');
       }
-    };
+    }
 
-    const switchAdminTab = tab => {
+    // Admin functions
+    async function showAdmin() {
+      if (appState.user?.role !== 'admin') {
+        showNotification('Admin access required', 'error');
+        return;
+      }
+
+      try {
+        $('admin-modal').style.display = 'flex';
+        await refreshLeaderboard();
+      } catch (error) {
+        console.error('Admin load error:', error);
+        showNotification('Failed to load admin portal', 'error');
+      }
+    }
+
+    function switchAdminTab(tab) {
+      // Update tab buttons
       document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
-      document.querySelector(`[onclick="switchAdminTab('${tab}')"]`).classList.add('active');
+      
+      event.target.classList.add('active');
       $(`admin-${tab}`).classList.add('active');
+
+      // Load data for the selected tab
       if (tab === 'leaderboard') refreshLeaderboard();
       if (tab === 'users') loadUsers();
-    };
+    }
 
-    const refreshLeaderboard = async () => {
+    async function refreshLeaderboard() {
       try {
-        const r = await api('/api/admin/users-progress');
+        const response = await apiCall('/api/admin/users-progress');
         const tbody = $('leaderboard-body');
-        tbody.innerHTML = r.data.map((u, i) => `
-          <tr>
-            <td>${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</td>
-            <td>${u.name}</td>
-            <td>${u.progress}%</td>
-            <td>${u.completedTasks}/42</td>
-            <td>${u.lastLogin ? new Date(u.lastLogin).toLocaleString() : 'Never'}</td>
-          </tr>
-        `).join('');
-        msg('Leaderboard refreshed', 's');
-      } catch (e) {
-        console.error('Leaderboard refresh error:', e);
-        msg('Failed to load leaderboard', 'e');
-      }
-    };
+        
+        tbody.innerHTML = response.data.map((user, index) => {
+          const rank = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1;
+          const lastLogin = user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never';
+          
+          return `
+            <tr>
+              <td>${rank}</td>
+              <td>${user.name}</td>
+              <td>${user.progress}%</td>
+              <td>${user.completedTasks}/42</td>
+              <td>${lastLogin}</td>
+            </tr>
+          `;
+        }).join('');
 
-    const loadUsers = async () => {
+        showNotification('Leaderboard refreshed');
+      } catch (error) {
+        console.error('Leaderboard refresh error:', error);
+        showNotification('Failed to load leaderboard', 'error');
+      }
+    }
+
+    async function loadUsers() {
       try {
-        const r = await api('/api/admin/users-progress');
-        const list = $('users-list');
-        list.innerHTML = r.data.map(u => `
+        const response = await apiCall('/api/admin/users-progress');
+        const usersList = $('users-list');
+        
+        usersList.innerHTML = response.data.map(user => `
           <div class="user-card">
             <div class="user-info">
-              <h4>${u.name}</h4>
-              <p>Email: ${u.email} | Role: ${u.role} | Progress: ${u.progress}%</p>
-              <div class="progress-bar"><div class="progress-fill" style="width: ${u.progress}%"></div></div>
+              <h4>${user.name}</h4>
+              <p>Email: ${user.email} | Role: ${user.role}</p>
+              <div class="user-progress-bar">
+                <div class="user-progress-fill" style="width: ${user.progress}%"></div>
+              </div>
+              <p>Progress: ${user.progress}% (${user.completedTasks}/42 tasks)</p>
             </div>
             <div class="user-actions">
-              <button class="btn btn-s" onclick="toggleRole('${u.email}', '${u.role === 'admin' ? 'user' : 'admin'}')">${u.role === 'admin' ? 'Demote' : 'Promote'}</button>
-              <button class="btn btn-e" onclick="resetProgress('${u.email}')">Reset Progress</button>
+              <button class="btn btn-secondary" onclick="toggleUserRole('${user.email}', '${user.role === 'admin' ? 'user' : 'admin'}')">
+                ${user.role === 'admin' ? 'Demote' : 'Promote'}
+              </button>
+              <button class="btn btn-primary" onclick="resetUserProgress('${user.email}')">
+                Reset Progress
+              </button>
             </div>
           </div>
         `).join('');
-      } catch (e) {
-        console.error('Users load error:', e);
-        msg('Failed to load users', 'e');
+      } catch (error) {
+        console.error('Users load error:', error);
+        showNotification('Failed to load users', 'error');
       }
-    };
+    }
 
-    const toggleRole = async (email, role) => {
-      if (!confirm(`Change ${email} to ${role}?`)) return;
+    async function toggleUserRole(email, newRole) {
+      if (!confirm(`Change ${email} to ${newRole} role?`)) return;
+      
       try {
-        const fd = new FormData();
-        fd.append('email', email);
-        fd.append('role', role);
-        await api('/api/admin/update-role', { method: 'POST', body: fd });
-        loadUsers();
-        msg(`Role updated for ${email}`, 's');
-      } catch (e) {
-        console.error('Toggle role error:', e);
-        msg('Failed to update role', 'e');
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('role', newRole);
+        
+        await apiCall('/api/admin/update-role', {
+          method: 'POST',
+          body: formData
+        });
+        
+        await loadUsers();
+        showNotification(`Role updated for ${email}`);
+      } catch (error) {
+        console.error('Toggle role error:', error);
+        showNotification('Failed to update role', 'error');
       }
-    };
+    }
 
-    const resetProgress = async (email) => {
-      if (!confirm(`Reset progress for ${email}?`)) return;
+    async function resetUserProgress(email) {
+      if (!confirm(`Reset all progress for ${email}?`)) return;
+      
       try {
-        const fd = new FormData();
-        fd.append('email', email);
-        await api('/api/admin/reset-progress', { method: 'POST', body: fd });
-        loadUsers();
-        msg(`Progress reset for ${email}`, 's');
-      } catch (e) {
-        console.error('Reset progress error:', e);
-        msg('Failed to reset progress', 'e');
+        const formData = new FormData();
+        formData.append('email', email);
+        
+        await apiCall('/api/admin/reset-progress', {
+          method: 'POST',
+          body: formData
+        });
+        
+        await loadUsers();
+        showNotification(`Progress reset for ${email}`);
+      } catch (error) {
+        console.error('Reset progress error:', error);
+        showNotification('Failed to reset progress', 'error');
       }
-    };
+    }
 
-    const exportProgress = async () => {
+    async function exportProgress() {
       try {
-        const r = await api('/api/admin/export-progress');
-        const blob = new Blob([r.csv], { type: 'text/csv' });
+        const response = await apiCall('/api/admin/export-progress');
+        const blob = new Blob([response.csv], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
         a.download = 'velocitylab-progress.csv';
         a.click();
         URL.revokeObjectURL(url);
-        msg('Progress exported', 's');
-      } catch (e) {
-        console.error('Export error:', e);
-        msg('Failed to export progress', 'e');
+        showNotification('Progress exported successfully');
+      } catch (error) {
+        console.error('Export error:', error);
+        showNotification('Failed to export progress', 'error');
       }
-    };
+    }
 
-    const importProgress = async (files) => {
+    async function importProgress(files) {
       if (!files[0]) return;
+      
       try {
         const text = await files[0].text();
-        const fd = new FormData();
-        fd.append('csv', text);
-        await api('/api/admin/import-progress', { method: 'POST', body: fd });
-        refreshLeaderboard();
-        loadUsers();
-        msg('Progress imported', 's');
-      } catch (e) {
-        console.error('Import error:', e);
-        msg('Failed to import progress', 'e');
+        const formData = new FormData();
+        formData.append('csv', text);
+        
+        await apiCall('/api/admin/import-progress', {
+          method: 'POST',
+          body: formData
+        });
+        
+        await refreshLeaderboard();
+        await loadUsers();
+        showNotification('Progress imported successfully');
+      } catch (error) {
+        console.error('Import error:', error);
+        showNotification('Failed to import progress', 'error');
       }
-    };
+    }
 
-    const sortTable = (col) => {
-      const table = $('leaderboard-table');
-      const tbody = $('leaderboard-body');
-      const rows = Array.from(tbody.querySelectorAll('tr'));
-      const isAsc = table.dataset.sortCol === col.toString() ? !table.dataset.sortAsc : true;
-      table.dataset.sortCol = col;
-      table.dataset.sortAsc = isAsc;
-      rows.sort((a, b) => {
-        let va = a.children[col].textContent;
-        let vb = b.children[col].textContent;
-        if (col === 2 || col === 3) {
-          va = parseFloat(va.replace('%', '')) || parseInt(va.split('/')[0]);
-          vb = parseFloat(vb.replace('%', '')) || parseInt(vb.split('/')[0]);
-          return isAsc ? va - vb : vb - va;
-        }
-        return isAsc ? va.localeCompare(vb) : vb.localeCompare(va);
-      });
-      tbody.innerHTML = '';
-      rows.forEach(row => tbody.appendChild(row));
-    };
-
-    // Star Wars theme management
-    const changeTheme = (theme) => {
+    // Theme management
+    function changeTheme(theme) {
       localStorage.setItem('theme', theme);
       
       if (theme === 'dark') {
@@ -1084,55 +1777,17 @@
       } else if (theme === 'light') {
         document.body.classList.remove('dark');
       } else if (theme === 'auto') {
-        // Auto mode - use system preference
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
           document.body.classList.add('dark');
         } else {
           document.body.classList.remove('dark');
         }
       }
-    };
+    }
 
-    const showAdmin = async () => {
-      if (A.u?.role !== 'admin') {
-        msg('Admin access required', 'e');
-        return;
-      }
-      try {
-        await refreshLeaderboard();
-        $('adminModal').style.display = 'flex';
-      } catch (e) {
-        console.error('Admin load error:', e);
-        msg('Failed to load admin portal', 'e');
-      }
-    };
-
-    window.showLogin = () => {
-      hide($('registerModal'));
-      $('loginModal').style.display = 'flex';
-    };
-    window.showRegister = () => {
-      hide($('loginModal'));
-      $('registerModal').style.display = 'flex';
-    };
-    window.closeModal = () => document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-    window.logout = auth.logout;
-    window.newLab = newLab;
-    window.showAdmin = showAdmin;
-    window.openTask = openTask;
-    window.toggleTask = toggleTask;
-    window.toggleWeek = toggleWeek;
-    window.switchAdminTab = switchAdminTab;
-    window.refreshLeaderboard = refreshLeaderboard;
-    window.toggleRole = toggleRole;
-    window.resetProgress = resetProgress;
-    window.exportProgress = exportProgress;
-    window.importProgress = importProgress;
-    window.sortTable = sortTable;
-    window.changeTheme = changeTheme;
-
+    // Event listeners
     document.addEventListener('DOMContentLoaded', () => {
-      // Set Force Balance as default theme
+      // Set theme
       const savedTheme = localStorage.getItem('theme') || 'auto';
       changeTheme(savedTheme);
       
@@ -1144,26 +1799,75 @@
         }
       }, 100);
 
-      $('loginForm').onsubmit = e => {
+      // Form event listeners
+      $('login-form').addEventListener('submit', (e) => {
         e.preventDefault();
         auth.login(new FormData(e.target));
-      };
-      $('registerForm').onsubmit = e => {
+      });
+
+      $('register-form').addEventListener('submit', (e) => {
         e.preventDefault();
         auth.register(new FormData(e.target));
-      };
-      document.onclick = e => {
-        if (e.target.classList.contains('modal')) closeModal();
-      };
-      console.log('Loaded scripts:', Array.from(document.scripts).map(s => s.src));
-      auth.check();
+      });
+
+      // Modal click outside to close
+      document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+          closeModal();
+        }
+      });
+
+      // Keyboard shortcuts
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeModal();
+        }
+      });
+
+      // Check authentication on load
+      auth.checkSession();
     });
 
-    window.addEventListener('message', e => {
-      if (e.data?.type === 'hide-notification') {
-        console.error('Caught hide-notification message:', e);
-      }
-    }, true);
+    // System theme change listener
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'auto') {
+          changeTheme('auto');
+        }
+      });
+    }
+
+    // Global functions for onclick handlers
+    window.showLogin = showLogin;
+    window.showRegister = showRegister;
+    window.closeModal = closeModal;
+    window.logout = auth.logout;
+    window.startNewLab = startNewLab;
+    window.showAdmin = showAdmin;
+    window.openTaskModal = openTaskModal;
+    window.toggleTask = toggleTask;
+    window.toggleWeek = toggleWeek;
+    window.switchAdminTab = switchAdminTab;
+    window.refreshLeaderboard = refreshLeaderboard;
+    window.toggleUserRole = toggleUserRole;
+    window.resetUserProgress = resetUserProgress;
+    window.exportProgress = exportProgress;
+    window.importProgress = importProgress;
+    window.changeTheme = changeTheme;
+
+    // Error handling for unhandled promise rejections
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('Unhandled promise rejection:', event.reason);
+      showNotification('An unexpected error occurred', 'error');
+    });
+
+    // Service worker registration for offline support (optional)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(console.error);
+      });
+    }
   </script>
 </body>
 </html>
