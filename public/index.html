@@ -1294,6 +1294,113 @@
 
   <script src="/task-definitions.js"></script>
   <script>
+    // IMMEDIATE GLOBAL FUNCTION DEFINITIONS - Must be first!
+    window.showLogin = function() {
+      document.querySelectorAll('.modal').forEach(modal => modal.style.display = 'none');
+      document.getElementById('login-modal').style.display = 'flex';
+    };
+
+    window.showRegister = function() {
+      document.querySelectorAll('.modal').forEach(modal => modal.style.display = 'none');
+      document.getElementById('register-modal').style.display = 'flex';
+    };
+
+    window.closeModal = function() {
+      document.querySelectorAll('.modal').forEach(modal => modal.style.display = 'none');
+    };
+
+    window.logout = function() {
+      if (window.authSystem) {
+        window.authSystem.logout();
+      }
+    };
+
+    // Assign to window for global access  
+    window.taskSystem = tasks;
+
+    // Assign to window for global access
+    window.uiSystem = ui;
+
+    window.startNewLab = function() {
+      if (window.labSystem) {
+        window.labSystem.startNew();
+      }
+    };
+
+    window.showAdmin = function() {
+      if (window.adminSystem) {
+        window.adminSystem.showPortal();
+      }
+    };
+
+    window.toggleWeek = function(week) {
+      if (window.uiSystem) {
+        window.uiSystem.toggleWeek(week);
+      }
+    };
+
+    window.toggleLabDropdown = function() {
+      if (window.uiSystem) {
+        window.uiSystem.toggleLabDropdown();
+      }
+    };
+
+    window.closeLabDropdown = function() {
+      if (window.uiSystem) {
+        window.uiSystem.closeLabDropdown();
+      }
+    };
+
+    window.showLabHistory = function() {
+      if (window.uiSystem) {
+        window.uiSystem.showLabHistory();
+      }
+    };
+
+    window.switchAdminTab = function(tab) {
+      if (window.adminSystem) {
+        window.adminSystem.switchTab(tab);
+      }
+    };
+
+    window.refreshLeaderboard = function() {
+      if (window.adminSystem) {
+        window.adminSystem.refreshLeaderboard();
+      }
+    };
+
+    window.exportProgress = function() {
+      if (window.adminSystem) {
+        window.adminSystem.exportProgress();
+      }
+    };
+
+    window.importProgress = function(files) {
+      if (window.adminSystem) {
+        window.adminSystem.importProgress(files);
+      }
+    };
+
+    window.changeTheme = function(theme) {
+      if (window.uiSystem) {
+        window.uiSystem.changeTheme(theme);
+      }
+    };
+
+    window.openTaskModal = function(week, task) {
+      if (window.taskSystem) {
+        window.taskSystem.openModal(week, task);
+      }
+    };
+
+    window.toggleTask = function(week, task, checked) {
+      if (window.taskSystem) {
+        window.taskSystem.toggle(week, task, checked);
+      }
+    };
+
+    // NOW START THE MAIN APPLICATION CODE
+    (function() {
     // Task structure matching backend
     const TASKS = {
       week1: ['install-server2012', 'configure-static-ip', 'install-adds-role', 'promote-to-dc', 'configure-dns-server', 'create-domain-users', 'join-vm-domain', 'create-hidden-share', 'map-drive-gpo', 'map-drive-script', 'map-drive-powershell', 'create-security-group', 'restrict-share-access'],
@@ -1316,38 +1423,6 @@
     const $ = id => document.getElementById(id);
     const show = element => element?.classList.remove('hidden');
     const hide = element => element?.classList.add('hidden');
-
-    // Define global functions immediately to avoid "not defined" errors
-    window.showLogin = () => {
-      closeModal();
-      $('login-modal').style.display = 'flex';
-    };
-
-    window.showRegister = () => {
-      closeModal();
-      $('register-modal').style.display = 'flex';
-    };
-
-    window.closeModal = () => {
-      document.querySelectorAll('.modal').forEach(modal => {
-        modal.style.display = 'none';
-      });
-    };
-
-    window.logout = () => auth.logout();
-    window.startNewLab = () => lab.startNew();
-    window.showAdmin = () => admin.showPortal();
-    window.toggleWeek = (week) => ui.toggleWeek(week);
-    window.toggleLabDropdown = () => ui.toggleLabDropdown();
-    window.closeLabDropdown = () => ui.closeLabDropdown();
-    window.showLabHistory = () => ui.showLabHistory();
-    window.switchAdminTab = (tab) => admin.switchTab(tab);
-    window.refreshLeaderboard = () => admin.refreshLeaderboard();
-    window.exportProgress = () => admin.exportProgress();
-    window.importProgress = (files) => admin.importProgress(files);
-    window.changeTheme = (theme) => ui.changeTheme(theme);
-    window.openTaskModal = (week, task) => tasks.openModal(week, task);
-    window.toggleTask = (week, task, checked) => tasks.toggle(week, task, checked);
 
     // Define closeModal as a standalone function too for internal use
     function closeModal() {
@@ -1672,6 +1747,12 @@
         }
       }
     };
+
+    // Assign to window for global access
+    window.authSystem = auth;
+
+    // Assign to window for global access
+    window.adminSystem = admin;
 
     // Dashboard functionality
     const dashboard = {
