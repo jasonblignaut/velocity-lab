@@ -1,794 +1,1082 @@
-<script>
-    // Task structure definition
-    const TASK_STRUCTURE = {
-      week1: {
-        title: "Foundation Setup",
-        tasks: [
-          'install-server2012',
-          'configure-static-ip', 
-          'install-adds-role',
-          'promote-to-dc',
-          'configure-dns-server',
-          'create-domain-users',
-          'setup-vm-dns',
-          'join-vm-domain',
-          'create-hidden-share',
-          'map-drive-gpo',
-          'map-drive-script',
-          'create-security-group'
-        ]
-      },
-      week2: {
-        title: "Infrastructure Expansion",
-        tasks: [
-          'install-second-server',
-          'promote-additional-dc',
-          'install-wsus-role',
-          'configure-wsus-settings',
-          'setup-wsus-gpo',
-          'configure-primary-time',
-          'configure-secondary-time',
-          'test-infrastructure'
-        ]
-      },
-      week3: {
-        title: "Exchange Server Deployment", 
-        tasks: [
-          'backup-servers',
-          'upgrade-dc1-2016',
-          'upgrade-dc2-2016',
-          'raise-functional-levels',
-          'prepare-exchange-server',
-          'install-exchange-prereqs',
-          'extend-ad-schema',
-          'install-exchange-2019',
-          'configure-exchange-basic',
-          'create-mailboxes',
-          'test-mailbox-access',
-          'configure-internal-mailflow'
-        ]
-      },
-      week4: {
-        title: "Cloud Integration",
-        tasks: [
-          'configure-external-dns',
-          'setup-firewall-rules', 
-          'install-ssl-certificates',
-          'configure-external-mailflow',
-          'setup-modern-auth',
-          'prepare-m365-tenant',
-          'install-aad-connect',
-          'run-hybrid-wizard',
-          'configure-hybrid-mailflow',
-          'verify-hybrid-functionality'
-        ]
-      }
-    };
-
-    const TOTAL_TASKS = 42;
-
-    // Application state
-    let appState = {
-      user: null,
-      progress: {},
-      authenticated: false,
-      sessionToken: null,
-      csrfToken: null
-    };
-
-    // Utility functions
-    const $ = (id) => document.getElementById(id);
-    const show = (element) => element?.classList.remove('hidden');
-    const hide = (element) => element?.classList.add('hidden');
-
-    // Cookie management
-    const cookies = {
-      get: (name) => {
-        const match = document.cookie.match(`${name}=([^;]+)`);
-        return match ? decodeURIComponent(match[1]) : null;
-      },
-      set: (name, value, days = 7) => {
-        const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
-        document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires};path=/;SameSite=Strict;Secure`;
-      },
-      delete: (name) => {
-        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;SameSite=Strict;Secure`;
-      }
-    };
-
-    // Notification system
-    function showNotification(message, type = 'success') {
-      const notification = $('notification');
-      const messageEl = $('notification-message');
-      
-      messageEl.textContent = message;
-      notification.className = `notification ${type} show`;
-      
-      setTimeout(() => {
-        notification.classList.remove('show');
-      }, 4000);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Velocity Lab</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --p: #0078d4; /* Azure Blue */
+      --s: #34c759; /* Unifi Green */
+      --e: #d13438; /* Apple Red */
+      --g1: #f5f6f5; /* Light Gray (Azure) */
+      --g5: #605e5c; /* Gray Text */
+      --g9: #1c2526; /* Dark Text */
+      --d1: #1a252f; /* Dark Azure */
+      --d5: #c7d1d8; /* Dark Gray Text */
+      --r: 14px; /* Border Radius */
+      --t: 0.4s cubic-bezier(0.4, 0,0,0.2, 1); /* Apple-like easing */
+      --shadow: 0 4px 8px rgba(0,0,0,0.1);
+      --glass: rgba(255,255,255,0.85);
     }
+    body {
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif';
+      background: linear-gradient(180deg, var(--g1), #e6e7e8);
+      color: var(--g9);
+      line-height: 1.6;
+      overflow-x: hidden;
+      transition: background var(--t), color var(--t);
+    }
+    body.dark {
+      background: var(--d1);
+      color: var(--d5);
+    }
+    .c { max-width: 1280px; margin: 0 auto; padding: 0 16px; }
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: var(--glass);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      z-index: 100;
+      transition: background var(--t);
+    }
+    body.dark header {
+      background: rgba(26,37,47,0.9);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    nav {
+      height: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo img {
+      height: 36px;
+      transition: transform var(--t);
+    }
+    .logo img:hover { transform: scale(1.05); }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 24px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--t);
+      background: transparent;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    body.dark .btn { border: 1px solid rgba(255,255,255,0.1); }
+    .btn-p {
+      background: var(--p);
+      color: #fff;
+      border: none;
+    }
+    .btn-p:hover {
+      background: #005ba1;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+    .btn-s:hover {
+      background: rgba(0,0,0,0.05);
+      transform: translateY(-1px);
+    }
+    .btn-a {
+      background: linear-gradient(135deg, #00b7eb, #0078d4);
+      color: #fff;
+      border: none;
+    }
+    .btn-a:hover {
+      background: linear-gradient(135deg, #0078d4, #00b7eb);
+      transform: translateY(-2px);
+    }
+    .theme-selector {
+      padding: 8px 12px;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 8px;
+      background: white;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--t);
+      min-width: 140px;
+    }
+    body.dark .theme-selector {
+      background: var(--d1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--d5);
+    }
+    .theme-selector:focus {
+      outline: 2px solid var(--p);
+      outline-offset: 2px;
+    }
+    .theme-selector:hover {
+      border-color: var(--p);
+    }
+    .h { display: none !important; }
+    #land {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding-top: 60px;
+    }
+    #land h1 {
+      font-size: clamp(48px, 8vw, 72px);
+      font-weight: 900;
+      margin-bottom: 20px;
+      background: linear-gradient(180deg, var(--g9), #005ba1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    #land p {
+      font-size: 20px;
+      color: var(--g5);
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+    #dash {
+      padding: 80px 0 40px;
+      min-height: 100vh;
+    }
+    .card {
+      background: #fff;
+      border-radius: var(--r);
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      transition: box-shadow var(--t);
+    }
+    body.dark .card { background: rgba(40,50,60,0.9); }
+    .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+    .ring {
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 24px;
+    }
+    .ring svg { transform: rotate(-90deg); }
+    .ring circle {
+      fill: none;
+      stroke-width: 12;
+      stroke-linecap: round;
+    }
+    .ring .bg { stroke: #e8ecef; }
+    body.dark .ring .bg { stroke: #374151; }
+    .ring .fg {
+      stroke: var(--p);
+      stroke-dasharray: 472;
+      stroke-dashoffset: 472;
+      transition: stroke-dashoffset 1.2s var(--t);
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 20px;
+      margin: 24px 0;
+    }
+    .stat { text-align: center; }
+    .stat-v {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--p);
+    }
+    .stat-l {
+      font-size: 13px;
+      color: var(--g5);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    body.dark .stat-l { color: var(--d5); }
+    .week {
+      background: #fff;
+      border-radius: var(--r);
+      margin-bottom: 20px;
+      overflow: hidden;
+      transition: all var(--t);
+      cursor: pointer;
+    }
+    body.dark .week { background: rgba(40,50,60,0.9); }
+    .week:hover { box-shadow: var(--shadow); }
+    .wh {
+      padding: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .wh h3 {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .wh p {
+      color: var(--g5);
+      font-size: 14px;
+    }
+    body.dark .wh p { color: var(--d5); }
+    .wp { text-align: right; }
+    .bar {
+      width: 100px;
+      height: 6px;
+      background: #e8ecef;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    body.dark .bar { background: #374151; }
+    .fill {
+      height: 100%;
+      background: var(--p);
+      transition: width var(--t);
+    }
+    .tasks {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+      padding: 0 24px 24px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height var(--t);
+    }
+    .tasks.show { max-height: 3000px; }
+    .task {
+      background: var(--g1);
+      border-radius: var(--r);
+      padding: 16px;
+      cursor: pointer;
+      transition: all var(--t);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    body.dark .task { background: rgba(31,41,55,0.5); }
+    .task:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+    .task.done {
+      background: rgba(52,199,89,0.08);
+      border: 1px solid var(--s);
+    }
+    .task input {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    .task-t {
+      font-weight: 500;
+      font-size: 15px;
+    }
+    .task-d {
+      font-size: 13px;
+      color: var(--g5);
+    }
+    body.dark .task-d { color: var(--d5); }
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(10px);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+    .modal-c {
+      background: var(--glass);
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.2);
+    }
+    body.dark .modal-c { background: rgba(40,50,60,0.9); }
+    .modal-h {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .modal-h h2 {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: var(--g1);
+      cursor: pointer;
+      font-size: 18px;
+      transition: all var(--t);
+    }
+    body.dark .close { background: var(--d1); }
+    .close:hover { background: var(--g5); color: #fff; }
+    body.dark .close:hover { background: var(--d5); }
+    .modal input, .modal select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 15px;
+      transition: border-color var(--t);
+    }
+    body.dark .modal input, body.dark .modal select { border: 1px solid rgba(255,255,255,0.1); }
+    .modal input:focus, .modal select:focus {
+      outline: none;
+      border-color: var(--p);
+    }
+    .subtask { margin: 16px 0; }
+    .sub-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+    }
+    .sub-item input {
+      width: 18px;
+      height: 18px;
+    }
+    .sub-item label {
+      font-size: 14px;
+    }
+    .notif {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      padding: 14px 24px;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 15px;
+      transform: translateX(320px);
+      transition: all var(--t);
+      box-shadow: var(--shadow);
+    }
+    .notif.show { transform: translateX(0); }
+    .notif.s { background: var(--s); }
+    .notif.e { background: var(--e); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+    th, td {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    body.dark th, body.dark td { border-bottom: 1px solid rgba(255,255,255,0.06); }
+    th {
+      font-size: 13px;
+      color: var(--g5);
+      text-transform: uppercase;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    body.dark th { color: var(--d5); }
+    .admin-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    body.dark .admin-tabs { border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .admin-tab {
+      padding: 12px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all var(--t);
+    }
+    .admin-tab.active {
+      color: var(--p);
+      border-bottom-color: var(--p);
+    }
+    .admin-tab:hover { color: var(--p); }
+    .admin-section { display: none; }
+    .admin-section.active { display: block; }
+    .user-card {
+      background: #fff;
+      border-radius: var(--r);
+      padding: 20px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+      transition: all var(--t);
+    }
+    body.dark .user-card { background: rgba(40,50,60,0.9); }
+    .user-card:hover { transform: translateY(-2px); }
+    .user-info h4 { font-size: 16px; font-weight: 600; }
+    .user-info p { font-size: 14px; color: var(--g5); }
+    body.dark .user-info p { color: var(--d5); }
+    .user-actions { display: flex; gap: 12px; }
+    .progress-bar {
+      height: 8px;
+      background: #e8ecef;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+    body.dark .progress-bar { background: #374151; }
+    .progress-fill {
+      height: 100%;
+      background: var(--p);
+      transition: width var(--t);
+    }
+    .data-tools {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .data-tools input[type="file"] {
+      padding: 10px;
+      border: 1px dashed var(--g5);
+      border-radius: 10px;
+    }
+    body.dark .data-tools input[type="file"] { border: 1px dashed var(--d5); }
+    @media (max-width: 768px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .tasks { grid-template-columns: 1fr; }
+      #land h1 { font-size: clamp(36px, 7vw, 56px); }
+      #land p { font-size: 18px; }
+      .modal-c { padding: 20px; }
+      .admin-tabs { flex-wrap: wrap; }
+      .user-card { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .user-actions { width: 100%; justify-content: flex-end; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="c">
+      <div class="logo">
+        <img src="/assets/Velocity-Logo.png" alt="Velocity Lab">
+      </div>
+      <div class="nav-right">
+        <span id="auth">
+          <button onclick="showLogin()" class="btn btn-s">Sign In</button>
+          <button onclick="showRegister()" class="btn btn-p">Register</button>
+        </span>
+        <span id="user" class="h">
+          <span id="userName"></span>
+          <button id="adminBtn" class="btn btn-a h" onclick="showAdmin()">Admin Portal</button>
+          <button onclick="logout()" class="btn btn-s">Sign Out</button>
+          <select class="theme-selector" onchange="changeTheme(this.value)">
+            <option value="auto">Force Balance (Auto)</option>
+            <option value="light">Jedi (Light)</option>
+            <option value="dark">Sith (Dark)</option>
+          </select>
+        </span>
+      </div>
+    </nav>
+  </header>
 
-    // API communication with improved error handling
-    async function apiCall(endpoint, options = {}) {
+  <main>
+    <section id="land">
+      <div class="c">
+        <h1>Master Exchange Hybrid</h1>
+        <p>42 hands-on tasks over 4 weeks. Build a lab with DC, Exchange, and workstation VMs.</p>
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+          <button class="btn btn-p" onclick="showRegister()">Register</button>
+          <button class="btn btn-s" onclick="showLogin()">Sign In</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="dash" class="h">
+      <div class="c">
+        <div class="card" style="text-align: center;">
+          <h2 style="margin-bottom: 24px;">Training Progress</h2>
+          <div class="ring">
+            <svg viewBox="0 0 160 160">
+              <circle cx="80" cy="80" r="75" class="bg"/>
+              <circle cx="80" cy="80" r="75" class="fg" id="ring"/>
+            </svg>
+            <div style="margin-top: -100px; font-size: 36px; font-weight: 700;" id="pct">0%</div>
+          </div>
+          <div class="stats">
+            <div class="stat"><div class="stat-v" id="done">0</div><div class="stat-l">Tasks Done</div></div>
+            <div class="stat"><div class="stat-v">42</div><div class="stat-l">Total Tasks</div></div>
+            <div class="stat"><div class="stat-v" id="curWeek">Week 1</div><div class="stat-l">Current</div></div>
+            <div class="stat"><div class="stat-v">3</div><div class="stat-l">VMs</div></div>
+          </div>
+          <button class="btn btn-p" onclick="newLab()">Start New Lab</button>
+        </div>
+
+        <div id="weeks">
+          <div class="week">
+            <div class="wh" onclick="toggleWeek(this)">
+              <div>
+                <h3>Week 1: Foundation</h3>
+                <p>DC setup, domain join, shares</p>
+              </div>
+              <div class="wp">
+                <div><span id="week1-done">0</span>/12 tasks</div>
+                <div class="bar"><div class="fill" id="week1-bar" style="width: 0%;"></div></div>
+              </div>
+            </div>
+            <div class="tasks" id="week1-tasks"></div>
+          </div>
+
+          <div class="week">
+            <div class="wh" onclick="toggleWeek(this)">
+              <div>
+                <h3>Week 2: Infrastructure</h3>
+                <p>Second DC, WSUS, time</p>
+              </div>
+              <div class="wp">
+                <div><span id="week2-done">0</span>/8 tasks</div>
+                <div class="bar"><div class="fill" id="week2-bar" style="width: 0%;"></div></div>
+              </div>
+            </div>
+            <div class="tasks" id="week2-tasks"></div>
+          </div>
+
+          <div class="week">
+            <div class="wh" onclick="toggleWeek(this)">
+              <div>
+                <h3>Week 3: Exchange</h3>
+                <p>DC upgrade, Exchange setup</p>
+              </div>
+              <div class="wp">
+                <div><span id="week3-done">0</span>/12 tasks</div>
+                <div class="bar"><div class="fill" id="week3-bar" style="width: 0%;"></div></div>
+              </div>
+            </div>
+            <div class="tasks" id="week3-tasks"></div>
+          </div>
+
+          <div class="week">
+            <div class="wh" onclick="toggleWeek(this)">
+              <div>
+                <h3>Week 4: Hybrid</h3>
+                <p>M365 integration, hybrid</p>
+              </div>
+              <div class="wp">
+                <div><span id="week4-done">0</span>/10 tasks</div>
+                <div class="bar"><div class="fill" id="week4-bar" style="width: 0%;"></div></div>
+              </div>
+            </div>
+            <div class="tasks" id="week4-tasks"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="loginModal" class="modal">
+    <div class="modal-c">
+      <div class="modal-h">
+        <h2>Sign In</h2>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
+      <form id="loginForm">
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+          <input type="checkbox" name="remember" style="width: auto; margin: 0;"> Remember me
+        </label>
+        <button type="submit" class="btn btn-p" style="width: 100%;">Sign In</button>
+        <p style="text-align: center; margin-top: 16px; font-size: 13px;">
+          New? <a href="#" onclick="showRegister()">Register</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <div id="registerModal" class="modal">
+    <div class="modal-c">
+      <div class="modal-h">
+        <h2>Register</h2>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
+      <form id="registerForm">
+        <input type="text" name="name" placeholder="Full Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password (8+ chars)" required minlength="8">
+        <button type="submit" class="btn btn-p" style="width: 100%;">Register</button>
+        <p style="text-align: center; margin-top: 16px; font-size: 13px;">
+          Have account? <a href="#" onclick="showLogin()">Sign In</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <div id="taskModal" class="modal">
+    <div class="modal-c">
+      <div class="modal-h">
+        <h2 id="taskTitle"></h2>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
+      <div id="taskBody"></div>
+    </div>
+  </div>
+
+  <div id="adminModal" class="modal">
+    <div class="modal-c">
+      <div class="modal-h">
+        <h2>Admin Portal</h2>
+        <button class="close" onclick="closeModal()">×</button>
+      </div>
+      <div class="admin-tabs">
+        <div class="admin-tab active" onclick="switchAdminTab('leaderboard')">Leaderboard</div>
+        <div class="admin-tab" onclick="switchAdminTab('users')">Users</div>
+        <div class="admin-tab" onclick="switchAdminTab('data')">Data Tools</div>
+      </div>
+      <div id="admin-leaderboard" class="admin-section active">
+        <table id="leaderboard-table">
+          <thead>
+            <tr>
+              <th onclick="sortTable(0)">Rank</th>
+              <th onclick="sortTable(1)">Name</th>
+              <th onclick="sortTable(2)">Progress</th>
+              <th onclick="sortTable(3)">Tasks</th>
+              <th onclick="sortTable(4)">Last Login</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body"></tbody>
+        </table>
+        <button class="btn btn-s" onclick="refreshLeaderboard()" style="margin-top: 16px;">Refresh</button>
+      </div>
+      <div id="admin-users" class="admin-section">
+        <div id="users-list"></div>
+      </div>
+      <div id="admin-data" class="admin-section">
+        <div class="data-tools">
+          <button class="btn btn-p" onclick="exportProgress()">Export Progress (CSV)</button>
+          <input type="file" accept=".csv" id="importProgress" onchange="importProgress(this.files)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="notif" class="notif"></div>
+
+  <script src="/task-definitions.js"></script>
+  <script>
+    const TASKS = {
+      week1: { t: ['install-server2012', 'configure-static-ip', 'install-adds-role', 'promote-to-dc', 'configure-dns-server', 'create-domain-users', 'join-vm-domain', 'create-hidden-share', 'map-drive-gpo', 'map-drive-script', 'map-drive-powershell', 'create-security-group', 'restrict-share-access'] },
+      week2: { t: ['install-second-server', 'promote-additional-dc', 'install-wsus-role', 'configure-wsus-settings', 'setup-wsus-gpo', 'configure-primary-time', 'configure-secondary-time', 'test-infrastructure'] },
+      week3: { t: ['backup-servers', 'upgrade-dc1-2016', 'upgrade-dc2-2016', 'raise-functional-levels', 'install-exchange-server', 'install-exchange-prereqs', 'extend-ad-schema', 'install-exchange-2019', 'configure-exchange-basic', 'create-mailboxes', 'test-mailbox-access', 'configure-internal-mailflow'] },
+      week4: { t: ['configure-external-dns', 'setup-firewall-rules', 'install-ssl-certificates', 'configure-external-mailflow', 'setup-modern-auth', 'prepare-m365-tenant', 'install-aad-connect', 'run-hybrid-wizard', 'configure-hybrid-mailflow', 'verify-hybrid-functionality'] }
+    };
+    let A = { u: null, p: {}, auth: false, sessionToken: null };
+    const $ = id => document.getElementById(id);
+    const show = e => e?.classList.remove('h');
+    const hide = e => e?.classList.add('h');
+
+    const ck = {
+      get: n => document.cookie.match(`${n}=([^;]+)`)?.[1],
+      set: (n, v) => {
+        document.cookie = `${n}=${v};path=/;max-age=604800;SameSite=Strict;Secure`;
+      },
+      del: n => { document.cookie = `${n}=;path=/;max-age=0;SameSite=Strict;Secure`; }
+    };
+
+    const msg = (m, t = 's') => {
+      const n = $('notif');
+      n.textContent = m;
+      n.className = `notif ${t} show`;
+      setTimeout(() => n.classList.remove('show'), 3000);
+    };
+
+    const api = async (ep, opt = {}) => {
       try {
-        const headers = new Headers(options.headers || {});
+        const headers = new Headers(opt.headers || {});
+        if (A.sessionToken) headers.set('Authorization', `Bearer ${A.sessionToken}`);
+        const isGet = !opt.method || opt.method.toUpperCase() === 'GET';
         
-        // Add session token if available
-        if (appState.sessionToken) {
-          headers.set('Authorization', `Bearer ${appState.sessionToken}`);
-        }
-
-        // Also try to get session from cookies as fallback
-        const sessionCookie = cookies.get('session');
-        if (sessionCookie && !appState.sessionToken) {
-          headers.set('Authorization', `Bearer ${sessionCookie}`);
-          appState.sessionToken = sessionCookie;
-        }
-
-        const isGetRequest = !options.method || options.method.toUpperCase() === 'GET';
-        let body = options.body;
-
-        // Handle CSRF token for non-GET requests (like the original)
-        if (!isGetRequest) {
-          // Handle FormData vs regular body
-          if (body instanceof FormData) {
-            // CSRF token will be added by the server-side processing
+        let body;
+        if (!isGet) {
+          const r = await fetch('/api/csrf', { credentials: 'same-origin' });
+          if (!r.ok) throw new Error(`CSRF fetch failed: ${r.status}`);
+          const { token } = await r.json();
+          
+          let fd;
+          if (opt.body instanceof FormData) {
+            fd = opt.body;
+            fd.append('csrf_token', token);
           } else {
-            const formData = new FormData();
-            if (body && typeof body === 'object') {
-              Object.entries(body).forEach(([key, value]) => {
-                formData.append(key, value);
-              });
+            fd = new FormData();
+            if (opt.body) {
+              for (const [key, value] of Object.entries(opt.body)) {
+                fd.append(key, value);
+              }
             }
-            body = formData;
+            fd.append('csrf_token', token);
           }
+          body = fd;
         }
-
-        const response = await fetch(endpoint, {
+        
+        const res = await fetch(ep, {
           credentials: 'same-origin',
           headers,
-          method: options.method || 'GET',
+          method: opt.method || 'GET',
           body
         });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          try {
-            const errorJson = JSON.parse(errorText);
-            throw new Error(errorJson.error || `HTTP ${response.status}`);
-          } catch {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-          }
-        }
-
-        const data = await response.json();
-        if (!data.success) {
-          throw new Error(data.error || 'Request failed');
-        }
-
-        return data;
-      } catch (error) {
-        console.error(`API Error for ${endpoint}:`, error);
-        throw error;
-      }
-    }
-
-    // Authentication functions
-    const auth = {
-      async checkSession() {
-        const userCookie = cookies.get('user');
-        const sessionCookie = cookies.get('session');
         
-        if (userCookie && sessionCookie) {
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        const d = await res.json();
+        if (!d.success) throw new Error(d.error || 'Request failed');
+        return d;
+      } catch (e) {
+        console.error(`API error for ${ep}:`, e);
+        throw e;
+      }
+    };
+
+    const auth = {
+      async check() {
+        const u = ck.get('user');
+        A.sessionToken = ck.get('session');
+        if (u && A.sessionToken) {
           try {
-            appState.user = JSON.parse(userCookie);
-            appState.sessionToken = sessionCookie;
-            appState.authenticated = true;
-            
-            console.log('Session restored:', appState.user);
-            
-            ui.showDashboard();
-            await dashboard.loadProgress();
-          } catch (error) {
-            console.error('Session validation error:', error);
+            A.u = JSON.parse(decodeURIComponent(u));
+            A.auth = true;
+            if (A.u.role === 'admin') show($('adminBtn'));
+            ui.dash();
+            dash.load();
+          } catch (e) {
+            console.error('Auth check error:', e);
             auth.logout();
           }
         } else {
-          ui.showLanding();
+          ui.land();
         }
       },
-
-      async login(formData) {
+      async login(fd) {
         try {
-          const response = await apiCall('/api/login', {
-            method: 'POST',
-            body: formData
-          });
-
-          console.log('Login response:', response);
-          
-          cookies.set('user', JSON.stringify({
-            name: response.name,
-            email: response.email,
-            role: response.role
-          }));
-          cookies.set('session', response.sessionToken);
-
-          appState.user = {
-            name: response.name,
-            email: response.email,
-            role: response.role
-          };
-          appState.sessionToken = response.sessionToken;
-          appState.authenticated = true;
-
-          console.log('User state after login:', appState.user);
-
-          ui.showDashboard();
-          await dashboard.loadProgress();
+          const r = await api('/api/login', { method: 'POST', body: fd });
+          ck.set('user', encodeURIComponent(JSON.stringify({ name: r.name, role: r.role, email: r.email })));
+          ck.set('session', r.sessionToken);
+          A.u = { name: r.name, role: r.role, email: r.email };
+          A.auth = true;
+          A.sessionToken = r.sessionToken;
+          if (A.u.role === 'admin') show($('adminBtn'));
+          ui.dash();
+          dash.load();
           closeModal();
-          showNotification(`Welcome back, ${response.name}!`);
-        } catch (error) {
-          console.error('Login error:', error);
-          showNotification(error.message || 'Login failed', 'error');
+          msg(`Welcome, ${r.name}!`);
+        } catch (e) {
+          console.error('Login error:', e);
+          msg(e.message || 'Login failed', 'e');
         }
       },
-
-      async register(formData) {
+      async register(fd) {
         try {
-          const response = await apiCall('/api/register', {
-            method: 'POST',
-            body: formData
-          });
-
-          cookies.set('user', JSON.stringify({
-            name: response.user.name,
-            email: response.user.email,
-            role: response.user.role
-          }));
-          cookies.set('session', response.sessionToken);
-
-          appState.user = {
-            name: response.user.name,
-            email: response.user.email,
-            role: response.user.role
-          };
-          appState.sessionToken = response.sessionToken;
-          appState.authenticated = true;
-
-          ui.showDashboard();
-          await dashboard.loadProgress();
+          const r = await api('/api/register', { method: 'POST', body: fd });
+          ck.set('user', encodeURIComponent(JSON.stringify({ name: r.name, role: r.role, email: r.email })));
+          ck.set('session', r.sessionToken);
+          A.u = { name: r.name, role: r.role, email: r.email };
+          A.auth = true;
+          A.sessionToken = r.sessionToken;
+          ui.dash();
+          dash.load();
           closeModal();
-          showNotification(`Welcome to Velocity Lab, ${response.user.name}!`);
-        } catch (error) {
-          console.error('Registration error:', error);
-          showNotification(error.message || 'Registration failed', 'error');
+          msg(`Welcome, ${r.name}!`);
+        } catch (e) {
+          console.error('Register error:', e);
+          msg(e.message || 'Registration failed', 'e');
         }
       },
-
       logout() {
-        // Call logout API
-        apiCall('/api/logout', { method: 'POST' }).catch(console.error);
-
-        // Clear local state
-        cookies.delete('user');
-        cookies.delete('session');
-        appState = {
-          user: null,
-          progress: {},
-          authenticated: false,
-          sessionToken: null
-        };
-
-        hide($('admin-button'));
-        ui.showLanding();
-        showNotification('Signed out successfully');
+        api('/api/logout', { method: 'POST' }).catch(e => console.error('Logout error:', e));
+        ck.del('user');
+        ck.del('session');
+        A = { u: null, p: {}, auth: false, sessionToken: null };
+        hide($('adminBtn'));
+        ui.land();
+        msg('Signed out');
       }
     };
 
-    // UI management
     const ui = {
-      showLanding() {
-        hide($('dashboard'));
-        show($('landing'));
-        hide($('user-menu'));
-        show($('auth-buttons'));
+      land() {
+        hide($('dash'));
+        show($('land'));
+        hide($('user'));
+        show($('auth'));
       },
-
-      showDashboard() {
-        hide($('landing'));
-        show($('dashboard'));
-        show($('user-menu'));
-        hide($('auth-buttons'));
-        
-        if (appState.user) {
-          $('user-name').textContent = appState.user.name;
-          
-          console.log('Checking admin role:', appState.user.role);
-          
-          // Show admin button if user is admin
-          if (appState.user.role === 'admin') {
-            console.log('Showing admin button');
-            show($('admin-button'));
-          } else {
-            console.log('Hiding admin button');
-            hide($('admin-button'));
-          }
-        }
+      dash() {
+        hide($('land'));
+        show($('dash'));
+        show($('user'));
+        hide($('auth'));
+        $('userName').textContent = A.u?.name || '';
       }
     };
 
-    // Dashboard functionality
-    const dashboard = {
-      async loadProgress() {
-        if (!appState.authenticated) return;
-
+    const dash = {
+      async load() {
+        if (!A.auth) return;
         try {
-          const response = await apiCall('/api/progress');
-          appState.progress = response.data || {};
-          dashboard.updateUI();
-          dashboard.renderTasks();
-        } catch (error) {
-          console.error('Failed to load progress:', error);
-          showNotification('Failed to load progress data', 'error');
+          const r = await api('/api/progress');
+          A.p = r.data || {};
+          dash.update();
+        } catch (e) {
+          console.error('Progress load error:', e);
+          msg('Failed to load progress', 'e');
         }
       },
-
-      updateUI() {
-        let totalCompleted = 0;
-
-        // Update week progress
-        Object.entries(TASK_STRUCTURE).forEach(([weekKey, weekData]) => {
-          const weekProgress = appState.progress[weekKey] || {};
-          const completed = weekData.tasks.filter(taskId => 
-            weekProgress[taskId]?.completed
-          ).length;
-          
-          totalCompleted += completed;
-          const percentage = Math.round((completed / weekData.tasks.length) * 100);
-
-          // Update week display
-          const completedEl = $(`${weekKey}-completed`);
-          const progressEl = $(`${weekKey}-progress`);
-          
-          if (completedEl) completedEl.textContent = completed;
-          if (progressEl) progressEl.style.width = `${percentage}%`;
-        });
-
-        // Update overall progress
-        const overallPercentage = Math.round((totalCompleted / TOTAL_TASKS) * 100);
-        const progressRing = $('progress-ring');
-        const progressPercentage = $('progress-percentage');
-        const completedTasks = $('completed-tasks');
-        const currentWeek = $('current-week');
-
-        if (progressPercentage) progressPercentage.textContent = `${overallPercentage}%`;
-        if (completedTasks) completedTasks.textContent = totalCompleted;
-        if (currentWeek) {
-          if (totalCompleted >= 32) currentWeek.textContent = 'Week 4';
-          else if (totalCompleted >= 20) currentWeek.textContent = 'Week 3';
-          else if (totalCompleted >= 12) currentWeek.textContent = 'Week 2';
-          else currentWeek.textContent = 'Week 1';
-        }
-
-        // Animate progress ring
-        if (progressRing) {
-          const circumference = 534; // 2 * π * 85
-          const offset = circumference - (overallPercentage / 100) * circumference;
-          progressRing.style.strokeDashoffset = offset;
-        }
-      },
-
-      renderTasks() {
-        console.log('Rendering tasks, TASK_DEFINITIONS:', window.TASK_DEFINITIONS);
-        
-        Object.entries(TASK_STRUCTURE).forEach(([weekKey, weekData]) => {
-          const tasksGrid = $(`${weekKey}-tasks-grid`);
-          if (!tasksGrid) {
-            console.warn(`Tasks grid not found for ${weekKey}`);
-            return;
-          }
-
-          const weekProgress = appState.progress[weekKey] || {};
-          console.log(`Rendering ${weekKey} with ${weekData.tasks.length} tasks`);
-          
-          tasksGrid.innerHTML = weekData.tasks.map(taskId => {
-            const isCompleted = weekProgress[taskId]?.completed || false;
-            const taskTitle = this.formatTaskTitle(taskId);
-            
-            return `
-              <div class="task-item ${isCompleted ? 'completed' : ''}" 
-                   onclick="openTaskDetail('${weekKey}', '${taskId}')"
-                   tabindex="0"
-                   role="button"
-                   aria-pressed="${isCompleted}">
-                <input type="checkbox" 
-                       class="task-checkbox" 
-                       ${isCompleted ? 'checked' : ''}
-                       onchange="toggleTask('${weekKey}', '${taskId}', this.checked)"
-                       onclick="event.stopPropagation()">
-                <div class="task-content">
-                  <div class="task-title">${taskTitle}</div>
-                  <div class="task-description">Click for detailed instructions</div>
+      update() {
+        let done = 0;
+        Object.entries(TASKS).forEach(([w, d]) => {
+          const wp = A.p[w] || {};
+          const wd = d.t.filter(t => wp[t]?.completed).length;
+          done += wd;
+          const doneEl = $(`${w}-done`);
+          const barEl = $(`${w}-bar`);
+          const tasksEl = $(`${w}-tasks`);
+          if (doneEl) doneEl.textContent = `${wd}`;
+          if (barEl) barEl.style.width = `${(wd / d.t.length) * 100}%`;
+          if (tasksEl) {
+            tasksEl.innerHTML = d.t.map(t => `
+              <div class="task ${wp[t]?.completed ? 'done' : ''}" onclick="openTask('${w}', '${t}')">
+                <input type="checkbox" ${wp[t]?.completed ? 'checked' : ''} onchange="toggleTask('${w}', '${t}', this.checked)" onclick="event.stopPropagation()">
+                <div>
+                  <div class="task-t">${t.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>
+                  <div class="task-d">Click for details</div>
                 </div>
               </div>
-            `;
-          }).join('');
-          
-          console.log(`Rendered ${weekData.tasks.length} tasks for ${weekKey}`);
+            `).join('');
+          }
         });
-      },
-
-      formatTaskTitle(taskId) {
-        return taskId
-          .split('-')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
+        const pct = Math.round((done / 42) * 100);
+        const pctEl = $('pct');
+        const doneEl = $('done');
+        const curWeekEl = $('curWeek');
+        const ringEl = $('ring');
+        if (pctEl) pctEl.textContent = `${pct}%`;
+        if (doneEl) doneEl.textContent = `${done}`;
+        if (curWeekEl) curWeekEl.textContent = done >= 32 ? 'Week 4' : done >= 20 ? 'Week 3' : done >= 12 ? 'Week 2' : 'Week 1';
+        if (ringEl) ringEl.style.strokeDashoffset = `${472 - (pct / 100) * 472}`;
       }
     };
 
-    // Task management
-    async function toggleTask(weekKey, taskId, checked) {
+    const toggleWeek = h => h.nextElementSibling.classList.toggle('show');
+
+    const toggleTask = async (w, t, c) => {
       try {
-        await apiCall('/api/progress', {
-          method: 'POST',
-          body: {
-            week: weekKey,
-            task: taskId,
-            checked: checked.toString()
-          }
-        });
-
-        // Update local state
-        if (!appState.progress[weekKey]) appState.progress[weekKey] = {};
-        if (!appState.progress[weekKey][taskId]) appState.progress[weekKey][taskId] = {};
-        appState.progress[weekKey][taskId].completed = checked;
-
-        // Update UI
-        dashboard.updateUI();
-        showNotification(checked ? '✅ Task completed!' : 'Task unmarked');
-      } catch (error) {
-        console.error('Failed to update task:', error);
-        showNotification('Failed to update task', 'error');
-        // Revert checkbox state
-        event.target.checked = !checked;
+        const fd = new FormData();
+        fd.append('week', w);
+        fd.append('task', t);
+        fd.append('checked', c.toString());
+        await api('/api/progress', { method: 'POST', body: fd });
+        if (!A.p[w]) A.p[w] = {};
+        if (!A.p[w][t]) A.p[w][t] = {};
+        A.p[w][t].completed = c;
+        dash.update();
+        msg(c ? '✅ Task completed!' : 'Task unmarked');
+      } catch (e) {
+        console.error('Toggle task error:', e);
+        msg('Failed to update task', 'e');
+        event.target.checked = !c;
       }
-    }
+    };
 
-    async function toggleSubtask(weekKey, taskId, subtaskId, checked) {
+    const toggleSub = async (w, t, s, c) => {
       try {
-        await apiCall('/api/progress', {
-          method: 'POST',
-          body: {
-            week: weekKey,
-            task: taskId,
-            subtask: subtaskId,
-            subtask_checked: checked.toString()
-          }
-        });
-
-        // Update local state
-        if (!appState.progress[weekKey]) appState.progress[weekKey] = {};
-        if (!appState.progress[weekKey][taskId]) appState.progress[weekKey][taskId] = { subtasks: {} };
-        if (!appState.progress[weekKey][taskId].subtasks) appState.progress[weekKey][taskId].subtasks = {};
-        appState.progress[weekKey][taskId].subtasks[subtaskId] = checked;
-
-        showNotification(checked ? '✅ Step completed!' : 'Step unmarked');
-      } catch (error) {
-        console.error('Failed to update subtask:', error);
-        showNotification('Failed to update step', 'error');
+        const fd = new FormData();
+        fd.append('week', w);
+        fd.append('task', t);
+        fd.append('subtask', `step${s}`);
+        fd.append('subtask_checked', c.toString());
+        await api('/api/progress', { method: 'POST', body: fd });
+        if (!A.p[w]) A.p[w] = {};
+        if (!A.p[w][t]) A.p[w][t] = { subtasks: {} };
+        if (!A.p[w][t].subtasks) A.p[w][t].subtasks = {};
+        A.p[w][t].subtasks[`step${s}`] = c;
+        msg(c ? '✅ Step completed!' : 'Step unmarked');
+      } catch (e) {
+        console.error('Toggle subtask error:', e);
+        msg('Failed to update step', 'e');
       }
-    }
+    };
 
-    function openTaskDetail(weekKey, taskId) {
-      const taskKey = `${weekKey}-${taskId}`;
-      const taskDefinition = window.TASK_DEFINITIONS?.[taskKey];
-      
-      if (!taskDefinition) {
-        showNotification('Task details not available', 'error');
-        return;
-      }
-
-      $('task-title').textContent = taskDefinition.title;
-      $('task-content').innerHTML = taskDefinition.description;
-
-      // Set up subtask checkboxes after content is loaded
+    const openTask = (w, t) => {
+      const k = `${w}-${t}`;
+      const td = window.TASK_DEFINITIONS?.[k] || {
+        title: t.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        description: '<p>Details coming soon...</p>'
+      };
+      $('taskTitle').textContent = td.title;
+      $('taskBody').innerHTML = td.description;
       setTimeout(() => {
-        const subtaskCheckboxes = document.querySelectorAll('.subtask-checkbox');
-        subtaskCheckboxes.forEach(checkbox => {
-          const stepId = checkbox.dataset.step;
-          const subtaskKey = `step${stepId}`;
-          
-          // Set initial state
-          checkbox.checked = appState.progress[weekKey]?.[taskId]?.subtasks?.[subtaskKey] || false;
-          
-          // Add event listener
-          checkbox.onchange = () => toggleSubtask(weekKey, taskId, subtaskKey, checkbox.checked);
+        document.querySelectorAll('.subtask input').forEach(cb => {
+          const s = cb.dataset.step;
+          cb.checked = A.p[w]?.[t]?.subtasks?.[`step${s}`] || false;
+          cb.onchange = () => toggleSub(w, t, s, cb.checked);
         });
       }, 100);
+      $('taskModal').style.display = 'flex';
+    };
 
-      showModal('task-modal');
-    }
-
-    async function startNewLab() {
-      if (!confirm('Start a new lab? This will reset all your progress.')) return;
-
+    const newLab = async () => {
+      if (!confirm('Start a new lab? This will reset your progress.')) return;
       try {
-        await apiCall('/api/lab/start-new', { method: 'POST' });
-        appState.progress = {};
-        dashboard.updateUI();
-        dashboard.renderTasks();
-        showNotification('🚀 New lab started! Your progress has been reset.');
-      } catch (error) {
-        console.error('Failed to start new lab:', error);
-        showNotification('Failed to start new lab', 'error');
+        await api('/api/lab/start-new', { method: 'POST' });
+        A.p = {};
+        dash.update();
+        msg('🚀 New lab started!');
+      } catch (e) {
+        console.error('New lab error:', e);
+        msg('Failed to start new lab', 'e');
       }
-    }
+    };
 
-    // Week expansion toggle
-    function toggleWeek(headerElement) {
-      const weekCard = headerElement.closest('.week-card');
-      const tasksContainer = weekCard.querySelector('.tasks-container');
-      const isExpanded = tasksContainer.classList.contains('expanded');
-      
-      tasksContainer.classList.toggle('expanded');
-      weekCard.setAttribute('aria-expanded', !isExpanded);
-      
-      // Smooth scroll to week if expanding
-      if (!isExpanded) {
-        setTimeout(() => {
-          weekCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 300);
-      }
-    }
+    const switchAdminTab = tab => {
+      document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+      document.querySelector(`[onclick="switchAdminTab('${tab}')"]`).classList.add('active');
+      $(`admin-${tab}`).classList.add('active');
+      if (tab === 'leaderboard') refreshLeaderboard();
+      if (tab === 'users') loadUsers();
+    };
 
-    // Modal management
-    function showModal(modalId) {
-      const modal = $(modalId);
-      if (modal) {
-        modal.classList.add('show');
-        document.body.style.overflow = 'hidden';
-        
-        // Focus management for accessibility
-        const firstInput = modal.querySelector('input, button, textarea, select');
-        if (firstInput) firstInput.focus();
-      }
-    }
-
-    function closeModal() {
-      document.querySelectorAll('.modal').forEach(modal => {
-        modal.classList.remove('show');
-      });
-      document.body.style.overflow = '';
-    }
-
-    function showLogin() {
-      closeModal();
-      showModal('login-modal');
-    }
-
-    function showRegister() {
-      closeModal();
-      showModal('register-modal');
-    }
-
-    // Admin functionality
-    async function showAdmin() {
-      if (appState.user?.role !== 'admin') {
-        showNotification('Admin access required', 'error');
-        return;
-      }
-
+    const refreshLeaderboard = async () => {
       try {
-        await refreshLeaderboard();
-        showModal('admin-modal');
-      } catch (error) {
-        console.error('Failed to load admin portal:', error);
-        showNotification('Failed to load admin portal', 'error');
-      }
-    }
-
-    function switchAdminTab(tabName) {
-      // Update tab buttons
-      document.querySelectorAll('.admin-tab').forEach(tab => {
-        tab.classList.remove('active');
-      });
-      document.querySelector(`[onclick="switchAdminTab('${tabName}')"]`).classList.add('active');
-
-      // Update sections
-      document.querySelectorAll('.admin-section').forEach(section => {
-        section.classList.remove('active');
-      });
-      $(`admin-${tabName}`).classList.add('active');
-
-      // Load data for specific tabs
-      if (tabName === 'leaderboard') refreshLeaderboard();
-      if (tabName === 'users') loadUsers();
-    }
-
-    async function refreshLeaderboard() {
-      try {
-        const response = await apiCall('/api/admin/users-progress');
+        const r = await api('/api/admin/users-progress');
         const tbody = $('leaderboard-body');
-        
-        tbody.innerHTML = response.data.map((user, index) => {
-          const rank = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1;
-          const lastLogin = user.lastLogin 
-            ? new Date(user.lastLogin).toLocaleDateString() 
-            : 'Never';
-          
-          return `
-            <tr>
-              <td>${rank}</td>
-              <td>${user.name}</td>
-              <td>${user.progress}%</td>
-              <td>${user.completedTasks}/42</td>
-              <td>${lastLogin}</td>
-            </tr>
-          `;
-        }).join('');
-
-        showNotification('Leaderboard refreshed');
-      } catch (error) {
-        console.error('Failed to refresh leaderboard:', error);
-        showNotification('Failed to load leaderboard', 'error');
+        tbody.innerHTML = r.data.map((u, i) => `
+          <tr>
+            <td>${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</td>
+            <td>${u.name}</td>
+            <td>${u.progress}%</td>
+            <td>${u.completedTasks}/42</td>
+            <td>${u.lastLogin ? new Date(u.lastLogin).toLocaleString() : 'Never'}</td>
+          </tr>
+        `).join('');
+        msg('Leaderboard refreshed', 's');
+      } catch (e) {
+        console.error('Leaderboard refresh error:', e);
+        msg('Failed to load leaderboard', 'e');
       }
-    }
+    };
 
-    async function loadUsers() {
+    const loadUsers = async () => {
       try {
-        const response = await apiCall('/api/admin/users-progress');
-        const usersList = $('users-list');
-        
-        usersList.innerHTML = response.data.map(user => `
+        const r = await api('/api/admin/users-progress');
+        const list = $('users-list');
+        list.innerHTML = r.data.map(u => `
           <div class="user-card">
             <div class="user-info">
-              <h4>${user.name}</h4>
-              <p>Email: ${user.email} | Role: ${user.role}</p>
-              <p>Progress: ${user.progress}% (${user.completedTasks}/42 tasks)</p>
-              <div class="user-progress-bar">
-                <div class="user-progress-fill" style="width: ${user.progress}%"></div>
-              </div>
+              <h4>${u.name}</h4>
+              <p>Email: ${u.email} | Role: ${u.role} | Progress: ${u.progress}%</p>
+              <div class="progress-bar"><div class="progress-fill" style="width: ${u.progress}%"></div></div>
             </div>
             <div class="user-actions">
-              <button class="btn btn-small btn-secondary" 
-                      onclick="toggleUserRole('${user.email}', '${user.role === 'admin' ? 'user' : 'admin'}')">
-                ${user.role === 'admin' ? 'Demote' : 'Make Admin'}
-              </button>
-              <button class="btn btn-small btn-danger" 
-                      onclick="resetUserProgress('${user.email}')">
-                Reset Progress
-              </button>
+              <button class="btn btn-s" onclick="toggleRole('${u.email}', '${u.role === 'admin' ? 'user' : 'admin'}')">${u.role === 'admin' ? 'Demote' : 'Promote'}</button>
+              <button class="btn btn-e" onclick="resetProgress('${u.email}')">Reset Progress</button>
             </div>
           </div>
         `).join('');
-      } catch (error) {
-        console.error('Failed to load users:', error);
-        showNotification('Failed to load users', 'error');
+      } catch (e) {
+        console.error('Users load error:', e);
+        msg('Failed to load users', 'e');
       }
-    }
+    };
 
-    async function toggleUserRole(email, newRole) {
-      if (!confirm(`Change ${email} to ${newRole}?`)) return;
-
+    const toggleRole = async (email, role) => {
+      if (!confirm(`Change ${email} to ${role}?`)) return;
       try {
-        await apiCall('/api/admin/update-role', {
-          method: 'POST',
-          body: { email, role: newRole }
-        });
-
-        await loadUsers();
-        showNotification(`Role updated for ${email}`);
-      } catch (error) {
-        console.error('Failed to update role:', error);
-        showNotification('Failed to update role', 'error');
+        const fd = new FormData();
+        fd.append('email', email);
+        fd.append('role', role);
+        await api('/api/admin/update-role', { method: 'POST', body: fd });
+        loadUsers();
+        msg(`Role updated for ${email}`, 's');
+      } catch (e) {
+        console.error('Toggle role error:', e);
+        msg('Failed to update role', 'e');
       }
-    }
+    };
 
-    async function resetUserProgress(email) {
-      if (!confirm(`Reset all progress for ${email}? This cannot be undone.`)) return;
-
+    const resetProgress = async (email) => {
+      if (!confirm(`Reset progress for ${email}?`)) return;
       try {
-        await apiCall('/api/admin/reset-progress', {
-          method: 'POST',
-          body: { email }
-        });
-
-        await loadUsers();
-        await refreshLeaderboard();
-        showNotification(`Progress reset for ${email}`);
-      } catch (error) {
-        console.error('Failed to reset progress:', error);
-        showNotification('Failed to reset progress', 'error');
+        const fd = new FormData();
+        fd.append('email', email);
+        await api('/api/admin/reset-progress', { method: 'POST', body: fd });
+        loadUsers();
+        msg(`Progress reset for ${email}`, 's');
+      } catch (e) {
+        console.error('Reset progress error:', e);
+        msg('Failed to reset progress', 'e');
       }
-    }
+    };
 
-    async function exportProgress() {
+    const exportProgress = async () => {
       try {
-        const response = await apiCall('/api/admin/export-progress');
-        
-        // Create and download CSV file
-        const blob = new Blob([response.csv], { type: 'text/csv' });
+        const r = await api('/api/admin/export-progress');
+        const blob = new Blob([r.csv], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        
-        link.href = url;
-        link.download = `velocity-lab-progress-${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'velocitylab-progress.csv';
+        a.click();
         URL.revokeObjectURL(url);
-
-        showNotification('Progress data exported successfully');
-      } catch (error) {
-        console.error('Failed to export progress:', error);
-        showNotification('Failed to export progress', 'error');
+        msg('Progress exported', 's');
+      } catch (e) {
+        console.error('Export error:', e);
+        msg('Failed to export progress', 'e');
       }
-    }
+    };
 
-    async function importProgress(files) {
-      if (!files || files.length === 0) return;
-
+    const importProgress = async (files) => {
+      if (!files[0]) return;
       try {
-        const file = files[0];
-        const csvContent = await file.text();
-        
-        await apiCall('/api/admin/import-progress', {
-          method: 'POST',
-          body: { csv: csvContent }
-        });
-
-        await refreshLeaderboard();
-        await loadUsers();
-        showNotification('Progress data imported successfully');
-      } catch (error) {
-        console.error('Failed to import progress:', error);
-        showNotification('Failed to import progress', 'error');
+        const text = await files[0].text();
+        const fd = new FormData();
+        fd.append('csv', text);
+        await api('/api/admin/import-progress', { method: 'POST', body: fd });
+        refreshLeaderboard();
+        loadUsers();
+        msg('Progress imported', 's');
+      } catch (e) {
+        console.error('Import error:', e);
+        msg('Failed to import progress', 'e');
       }
-    }
+    };
 
-    // Table sorting
-    function sortTable(columnIndex) {
+    const sortTable = (col) => {
       const table = $('leaderboard-table');
       const tbody = $('leaderboard-body');
       const rows = Array.from(tbody.querySelectorAll('tr'));
-      
-      const currentSort = table.dataset.sortColumn;
-      const currentDirection = table.dataset.sortDirection || 'asc';
-      const newDirection = currentSort === columnIndex.toString() && currentDirection === 'asc' ? 'desc' : 'asc';
-      
-      table.dataset.sortColumn = columnIndex;
-      table.dataset.sortDirection = newDirection;
-
+      const isAsc = table.dataset.sortCol === col.toString() ? !table.dataset.sortAsc : true;
+      table.dataset.sortCol = col;
+      table.dataset.sortAsc = isAsc;
       rows.sort((a, b) => {
-        let valueA = a.cells[columnIndex].textContent.trim();
-        let valueB = b.cells[columnIndex].textContent.trim();
-
-        // Handle numeric columns
-        if (columnIndex === 2) { // Progress column
-          valueA = parseFloat(valueA.replace('%', ''));
-          valueB = parseFloat(valueB.replace('%', ''));
-        } else if (columnIndex === 3) { // Completed tasks column
-          valueA = parseInt(valueA.split('/')[0]);
-          valueB = parseInt(valueB.split('/')[0]);
+        let va = a.children[col].textContent;
+        let vb = b.children[col].textContent;
+        if (col === 2 || col === 3) {
+          va = parseFloat(va.replace('%', '')) || parseInt(va.split('/')[0]);
+          vb = parseFloat(vb.replace('%', '')) || parseInt(vb.split('/')[0]);
+          return isAsc ? va - vb : vb - va;
         }
-
-        if (typeof valueA === 'number' && typeof valueB === 'number') {
-          return newDirection === 'asc' ? valueA - valueB : valueB - valueA;
-        }
-
-        return newDirection === 'asc' 
-          ? valueA.localeCompare(valueB)
-          : valueB.localeCompare(valueA);
+        return isAsc ? va.localeCompare(vb) : vb.localeCompare(va);
       });
-
-      // Re-append sorted rows
+      tbody.innerHTML = '';
       rows.forEach(row => tbody.appendChild(row));
-    }
+    };
 
-    // Theme management
-    function changeTheme(theme) {
+    // Star Wars theme management
+    const changeTheme = (theme) => {
       localStorage.setItem('theme', theme);
       
       if (theme === 'dark') {
@@ -803,90 +1091,48 @@
           document.body.classList.remove('dark');
         }
       }
-    }
+    };
 
-    function toggleTheme() {
-      // Legacy function for compatibility
-      const isDark = document.body.classList.contains('dark');
-      changeTheme(isDark ? 'light' : 'dark');
-      
-      // Update dropdown
-      const selector = document.querySelector('.theme-selector');
-      if (selector) {
-        selector.value = isDark ? 'light' : 'dark';
+    const showAdmin = async () => {
+      if (A.u?.role !== 'admin') {
+        msg('Admin access required', 'e');
+        return;
       }
-    }
-
-    // Form submissions
-    function setupFormHandlers() {
-      const loginForm = $('login-form');
-      const registerForm = $('register-form');
-
-      if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const formData = new FormData(e.target);
-          auth.login(formData);
-        });
+      try {
+        await refreshLeaderboard();
+        $('adminModal').style.display = 'flex';
+      } catch (e) {
+        console.error('Admin load error:', e);
+        msg('Failed to load admin portal', 'e');
       }
+    };
 
-      if (registerForm) {
-        registerForm.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const formData = new FormData(e.target);
-          auth.register(formData);
-        });
-      }
-    }
+    window.showLogin = () => {
+      hide($('registerModal'));
+      $('loginModal').style.display = 'flex';
+    };
+    window.showRegister = () => {
+      hide($('loginModal'));
+      $('registerModal').style.display = 'flex';
+    };
+    window.closeModal = () => document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    window.logout = auth.logout;
+    window.newLab = newLab;
+    window.showAdmin = showAdmin;
+    window.openTask = openTask;
+    window.toggleTask = toggleTask;
+    window.toggleWeek = toggleWeek;
+    window.switchAdminTab = switchAdminTab;
+    window.refreshLeaderboard = refreshLeaderboard;
+    window.toggleRole = toggleRole;
+    window.resetProgress = resetProgress;
+    window.exportProgress = exportProgress;
+    window.importProgress = importProgress;
+    window.sortTable = sortTable;
+    window.changeTheme = changeTheme;
 
-    // Event listeners
-    function setupEventListeners() {
-      // Close modals when clicking outside
-      document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal')) {
-          closeModal();
-        }
-      });
-
-      // Keyboard navigation
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          closeModal();
-        }
-      });
-
-      // Task and week card keyboard navigation
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          if (e.target.classList.contains('week-card')) {
-            e.preventDefault();
-            const header = e.target.querySelector('.week-header');
-            if (header) toggleWeek(header);
-          } else if (e.target.classList.contains('task-item')) {
-            e.preventDefault();
-            e.target.click();
-          }
-        }
-      });
-
-      // Form validation
-      const passwordInputs = document.querySelectorAll('input[type="password"]');
-      passwordInputs.forEach(input => {
-        input.addEventListener('input', (e) => {
-          const password = e.target.value;
-          const isValid = password.length >= 8 && 
-                         /[A-Z]/.test(password) && 
-                         /[0-9]/.test(password) && 
-                         /[!@#$%^&*]/.test(password);
-          
-          e.target.setCustomValidity(isValid ? '' : 'Password must be at least 8 characters with uppercase, number, and special character');
-        });
-      });
-    }
-
-    // Initialize application
-    async function initializeApp() {
-      // Apply saved theme - default to "auto" (Force Balance)
+    document.addEventListener('DOMContentLoaded', () => {
+      // Set Force Balance as default theme
       const savedTheme = localStorage.getItem('theme') || 'auto';
       changeTheme(savedTheme);
       
@@ -898,1678 +1144,26 @@
         }
       }, 100);
 
-      // Setup event handlers
-      setupFormHandlers();
-      setupEventListeners();
-
-      // Check authentication
-      await auth.checkSession();
-
-      console.log('Velocity Lab initialized successfully');
-    }
-
-    // Global function exports for onclick handlers
-    window.showLogin = showLogin;
-    window.showRegister = showRegister;
-    window.closeModal = closeModal;
-    window.logout = auth.logout;
-    window.startNewLab = startNewLab;
-    window.showAdmin = showAdmin;
-    window.openTaskDetail = openTaskDetail;
-    window.toggleTask = toggleTask;
-    window.toggleWeek = toggleWeek;
-    window.switchAdminTab = switchAdminTab;
-    window.refreshLeaderboard = refreshLeaderboard;
-    window.toggleUserRole = toggleUserRole;
-    window.resetUserProgress = resetUserProgress;
-    window.exportProgress = exportProgress;
-    window.importProgress = importProgress;
-    window.sortTable = sortTable;
-    window.toggleTheme = toggleTheme;
-    window.changeTheme = changeTheme;
-
-    // Start the application when DOM is ready
-    document.addEventListener('DOMContentLoaded', initializeApp);
-
-    // Handle page visibility changes to refresh data
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && appState.authenticated) {
-        dashboard.loadProgress();
-      }
+      $('loginForm').onsubmit = e => {
+        e.preventDefault();
+        auth.login(new FormData(e.target));
+      };
+      $('registerForm').onsubmit = e => {
+        e.preventDefault();
+        auth.register(new FormData(e.target));
+      };
+      document.onclick = e => {
+        if (e.target.classList.contains('modal')) closeModal();
+      };
+      console.log('Loaded scripts:', Array.from(document.scripts).map(s => s.src));
+      auth.check();
     });
+
+    window.addEventListener('message', e => {
+      if (e.data?.type === 'hide-notification') {
+        console.error('Caught hide-notification message:', e);
+      }
+    }, true);
   </script>
 </body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Velocity Lab - Master Exchange Hybrid</title>
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
-  <style>
-    * { 
-      margin: 0; 
-      padding: 0; 
-      box-sizing: border-box; 
-    }
-    
-    :root {
-      --p: #0078d4; /* Azure Blue */
-      --s: #34c759; /* Success Green */
-      --e: #d13438; /* Error Red */
-      --w: #ff9500; /* Warning Orange */
-      --g1: #f5f6f5; /* Light Gray */
-      --g3: #e8ecef; /* Medium Light Gray */
-      --g5: #605e5c; /* Gray Text */
-      --g7: #323130; /* Dark Gray */
-      --g9: #1c2526; /* Dark Text */
-      --d1: #1a252f; /* Dark Background */
-      --d3: #2d3748; /* Dark Card */
-      --d5: #c7d1d8; /* Dark Text Light */
-      --r: 14px; /* Border Radius */
-      --t: 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth transitions */
-      --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-      --shadow: 0 4px 12px rgba(0,0,0,0.15);
-      --shadow-lg: 0 8px 32px rgba(0,0,0,0.2);
-      --glass: rgba(255,255,255,0.85);
-      --glass-dark: rgba(26,37,47,0.9);
-      --gradient-primary: linear-gradient(135deg, #0078d4, #00b7eb);
-      --gradient-bg: linear-gradient(180deg, var(--g1), #e6e7e8);
-      --gradient-bg-dark: linear-gradient(180deg, var(--d1), #0f1419);
-    }
-
-    body {
-      font-family: -apple-system, 'Segoe UI', system-ui, 'Roboto', sans-serif;
-      background: var(--gradient-bg);
-      color: var(--g9);
-      line-height: 1.6;
-      overflow-x: hidden;
-      transition: all var(--t);
-      min-height: 100vh;
-    }
-
-    body.dark {
-      background: var(--gradient-bg-dark);
-      color: var(--d5);
-    }
-
-    .container { 
-      max-width: 1280px; 
-      margin: 0 auto; 
-      padding: 0 20px; 
-    }
-
-    /* Header Styles */
-    header {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      background: var(--glass);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(0,0,0,0.08);
-      z-index: 100;
-      transition: all var(--t);
-    }
-
-    body.dark header {
-      background: var(--glass-dark);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-
-    nav {
-      height: 64px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo img {
-      height: 40px;
-      transition: transform var(--t);
-    }
-
-    .logo img:hover { 
-      transform: scale(1.05); 
-    }
-
-    .logo-text {
-      font-size: 24px;
-      font-weight: 700;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .user-name {
-      font-weight: 600;
-      color: var(--g7);
-      margin-right: 12px;
-    }
-
-    body.dark .user-name {
-      color: var(--d5);
-    }
-
-    .theme-selector {
-      padding: 8px 12px;
-      border: 1px solid rgba(0,0,0,0.1);
-      border-radius: 8px;
-      background: white;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all var(--t);
-      min-width: 140px;
-    }
-
-    body.dark .theme-selector {
-      background: var(--d1);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: var(--d5);
-    }
-
-    .theme-selector:focus {
-      outline: 2px solid var(--p);
-      outline-offset: 2px;
-    }
-
-    .theme-selector:hover {
-      border-color: var(--p);
-    }
-
-    /* Button Styles */
-    .btn {
-      padding: 12px 24px;
-      border-radius: 24px;
-      border: none;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all var(--t);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-height: 44px;
-      white-space: nowrap;
-    }
-
-    .btn:focus {
-      outline: 2px solid var(--p);
-      outline-offset: 2px;
-    }
-
-    .btn-primary {
-      background: var(--gradient-primary);
-      color: white;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #005ba1, #0078d4);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--g7);
-      border: 1px solid rgba(0,0,0,0.1);
-    }
-
-    body.dark .btn-secondary {
-      color: var(--d5);
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(0,0,0,0.05);
-      transform: translateY(-1px);
-    }
-
-    body.dark .btn-secondary:hover {
-      background: rgba(255,255,255,0.1);
-    }
-
-    .btn-admin {
-      background: linear-gradient(135deg, #ff6b6b, #ff8e53);
-      color: white;
-    }
-
-    .btn-admin:hover {
-      background: linear-gradient(135deg, #ff5252, #ff7043);
-      transform: translateY(-2px);
-    }
-
-    .btn-success {
-      background: var(--s);
-      color: white;
-    }
-
-    .btn-success:hover {
-      background: #2ecc40;
-      transform: translateY(-2px);
-    }
-
-    .btn-danger {
-      background: var(--e);
-      color: white;
-    }
-
-    .btn-danger:hover {
-      background: #c12127;
-      transform: translateY(-2px);
-    }
-
-    .btn-small {
-      padding: 8px 16px;
-      font-size: 13px;
-      min-height: 36px;
-    }
-
-    .theme-toggle {
-      padding: 10px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 18px;
-      border-radius: 50%;
-      transition: all var(--t);
-      width: 44px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .theme-toggle:hover {
-      background: rgba(0,0,0,0.1);
-    }
-
-    body.dark .theme-toggle:hover {
-      background: rgba(255,255,255,0.1);
-    }
-
-    /* Utility Classes */
-    .hidden { 
-      display: none !important; 
-    }
-
-    .text-center { 
-      text-align: center; 
-    }
-
-    .flex {
-      display: flex;
-    }
-
-    .flex-center {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .gap-12 {
-      gap: 12px;
-    }
-
-    .gap-16 {
-      gap: 16px;
-    }
-
-    .gap-24 {
-      gap: 24px;
-    }
-
-    /* Landing Page */
-    #landing {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding-top: 64px;
-      background: var(--gradient-bg);
-    }
-
-    body.dark #landing {
-      background: var(--gradient-bg-dark);
-    }
-
-    .landing-content {
-      max-width: 800px;
-      padding: 40px 20px;
-    }
-
-    .landing-title {
-      font-size: clamp(48px, 8vw, 72px);
-      font-weight: 900;
-      margin-bottom: 24px;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      line-height: 1.1;
-    }
-
-    .landing-subtitle {
-      font-size: 20px;
-      color: var(--g5);
-      max-width: 600px;
-      margin: 0 auto 40px;
-      line-height: 1.5;
-    }
-
-    body.dark .landing-subtitle {
-      color: var(--d5);
-    }
-
-    .landing-actions {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 32px;
-    }
-
-    /* Dashboard */
-    #dashboard {
-      padding: 100px 0 60px;
-      min-height: 100vh;
-    }
-
-    .dashboard-header {
-      margin-bottom: 40px;
-    }
-
-    .dashboard-title {
-      font-size: 32px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .dashboard-subtitle {
-      color: var(--g5);
-      font-size: 16px;
-    }
-
-    body.dark .dashboard-subtitle {
-      color: var(--d5);
-    }
-
-    /* Cards */
-    .card {
-      background: white;
-      border-radius: var(--r);
-      padding: 32px;
-      margin-bottom: 32px;
-      box-shadow: var(--shadow);
-      transition: all var(--t);
-      border: 1px solid rgba(0,0,0,0.05);
-    }
-
-    body.dark .card {
-      background: var(--d3);
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .card:hover {
-      box-shadow: var(--shadow-lg);
-      transform: translateY(-2px);
-    }
-
-    .card-title {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 16px;
-    }
-
-    /* Progress Ring */
-    .progress-ring-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 32px;
-    }
-
-    .progress-ring {
-      width: 180px;
-      height: 180px;
-      position: relative;
-      margin-bottom: 24px;
-    }
-
-    .progress-ring svg {
-      transform: rotate(-90deg);
-      width: 100%;
-      height: 100%;
-    }
-
-    .progress-ring circle {
-      fill: none;
-      stroke-width: 8;
-      stroke-linecap: round;
-    }
-
-    .progress-ring .background {
-      stroke: var(--g3);
-    }
-
-    body.dark .progress-ring .background {
-      stroke: #374151;
-    }
-
-    .progress-ring .foreground {
-      stroke: var(--p);
-      stroke-dasharray: 534;
-      stroke-dashoffset: 534;
-      transition: stroke-dashoffset 1.5s var(--t);
-    }
-
-    .progress-percentage {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 36px;
-      font-weight: 700;
-      color: var(--p);
-    }
-
-    /* Stats Grid */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 24px;
-      margin: 32px 0;
-    }
-
-    .stat-item {
-      text-align: center;
-    }
-
-    .stat-value {
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--p);
-      margin-bottom: 4px;
-    }
-
-    .stat-label {
-      font-size: 13px;
-      color: var(--g5);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      font-weight: 600;
-    }
-
-    body.dark .stat-label {
-      color: var(--d5);
-    }
-
-    /* Week Cards */
-    .weeks-container {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .week-card {
-      background: white;
-      border-radius: var(--r);
-      overflow: hidden;
-      transition: all var(--t);
-      cursor: pointer;
-      border: 1px solid rgba(0,0,0,0.05);
-    }
-
-    body.dark .week-card {
-      background: var(--d3);
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .week-card:hover {
-      box-shadow: var(--shadow);
-      transform: translateY(-2px);
-    }
-
-    .week-header {
-      padding: 24px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: linear-gradient(135deg, rgba(0,120,212,0.05), rgba(0,183,235,0.05));
-    }
-
-    body.dark .week-header {
-      background: linear-gradient(135deg, rgba(0,120,212,0.1), rgba(0,183,235,0.1));
-    }
-
-    .week-info h3 {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .week-info p {
-      color: var(--g5);
-      font-size: 14px;
-    }
-
-    body.dark .week-info p {
-      color: var(--d5);
-    }
-
-    .week-progress {
-      text-align: right;
-    }
-
-    .week-progress-text {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .progress-bar {
-      width: 120px;
-      height: 8px;
-      background: var(--g3);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    body.dark .progress-bar {
-      background: #374151;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: var(--gradient-primary);
-      transition: width var(--t);
-      border-radius: 4px;
-    }
-
-    /* Tasks Container */
-    .tasks-container {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height var(--t);
-      background: rgba(0,0,0,0.02);
-    }
-
-    body.dark .tasks-container {
-      background: rgba(255,255,255,0.02);
-    }
-
-    .tasks-container.expanded {
-      max-height: 2000px;
-    }
-
-    .tasks-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 16px;
-      padding: 24px 32px;
-    }
-
-    /* Task Items */
-    .task-item {
-      background: white;
-      border-radius: var(--r);
-      padding: 20px;
-      cursor: pointer;
-      transition: all var(--t);
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      border: 1px solid rgba(0,0,0,0.05);
-    }
-
-    body.dark .task-item {
-      background: var(--d1);
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .task-item:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
-    }
-
-    .task-item.completed {
-      background: rgba(52,199,89,0.1);
-      border: 1px solid var(--s);
-    }
-
-    body.dark .task-item.completed {
-      background: rgba(52,199,89,0.15);
-    }
-
-    .task-checkbox {
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-      accent-color: var(--s);
-    }
-
-    .task-content {
-      flex: 1;
-    }
-
-    .task-title {
-      font-weight: 600;
-      font-size: 15px;
-      margin-bottom: 4px;
-    }
-
-    .task-description {
-      font-size: 13px;
-      color: var(--g5);
-    }
-
-    body.dark .task-description {
-      color: var(--d5);
-    }
-
-    /* Modals */
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(10px);
-      z-index: 1000;
-      padding: 20px;
-    }
-
-    .modal.show {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-content {
-      background: white;
-      border-radius: 20px;
-      padding: 32px;
-      max-width: 500px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: var(--shadow-lg);
-      position: relative;
-    }
-
-    body.dark .modal-content {
-      background: var(--d3);
-    }
-
-    .modal-content.large {
-      max-width: 1000px;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid rgba(0,0,0,0.1);
-    }
-
-    body.dark .modal-header {
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .modal-title {
-      font-size: 24px;
-      font-weight: 700;
-    }
-
-    .modal-close {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: none;
-      background: var(--g1);
-      cursor: pointer;
-      font-size: 18px;
-      transition: all var(--t);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    body.dark .modal-close {
-      background: var(--d1);
-      color: var(--d5);
-    }
-
-    .modal-close:hover {
-      background: var(--e);
-      color: white;
-    }
-
-    /* Form Styles */
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: var(--g7);
-    }
-
-    body.dark .form-label {
-      color: var(--d5);
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 14px 16px;
-      border: 1px solid rgba(0,0,0,0.1);
-      border-radius: 10px;
-      font-size: 15px;
-      transition: border-color var(--t);
-      background: white;
-    }
-
-    body.dark .form-input {
-      background: var(--d1);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: var(--d5);
-    }
-
-    .form-input:focus {
-      outline: none;
-      border-color: var(--p);
-      box-shadow: 0 0 0 3px rgba(0,120,212,0.1);
-    }
-
-    .form-checkbox {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .form-checkbox input {
-      width: auto;
-      margin: 0;
-      accent-color: var(--p);
-    }
-
-    /* Task Detail Styles */
-    .task-detail {
-      line-height: 1.6;
-    }
-
-    .task-detail h3 {
-      color: var(--p);
-      margin: 24px 0 16px;
-      font-size: 18px;
-    }
-
-    .task-detail p {
-      margin-bottom: 16px;
-    }
-
-    .task-detail ul {
-      margin: 16px 0;
-      padding-left: 20px;
-    }
-
-    .task-detail li {
-      margin-bottom: 8px;
-    }
-
-    .task-detail a {
-      color: var(--p);
-      text-decoration: none;
-    }
-
-    .task-detail a:hover {
-      text-decoration: underline;
-    }
-
-    .task-detail pre {
-      background: var(--g1);
-      padding: 16px;
-      border-radius: 8px;
-      overflow-x: auto;
-      font-size: 14px;
-      margin: 16px 0;
-    }
-
-    body.dark .task-detail pre {
-      background: var(--d1);
-    }
-
-    .subtask-container {
-      margin: 16px 0;
-    }
-
-    .subtask-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(0,0,0,0.05);
-    }
-
-    body.dark .subtask-item {
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .subtask-item:last-child {
-      border-bottom: none;
-    }
-
-    .subtask-checkbox {
-      margin-top: 2px;
-      accent-color: var(--s);
-    }
-
-    .subtask-item label {
-      flex: 1;
-      cursor: pointer;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    /* Admin Styles */
-    .admin-tabs {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 32px;
-      border-bottom: 1px solid rgba(0,0,0,0.1);
-    }
-
-    body.dark .admin-tabs {
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .admin-tab {
-      padding: 16px 24px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-      transition: all var(--t);
-      background: none;
-      border-left: none;
-      border-right: none;
-      border-top: none;
-      color: var(--g5);
-    }
-
-    body.dark .admin-tab {
-      color: var(--d5);
-    }
-
-    .admin-tab.active {
-      color: var(--p);
-      border-bottom-color: var(--p);
-    }
-
-    .admin-tab:hover {
-      color: var(--p);
-      background: rgba(0,120,212,0.05);
-    }
-
-    .admin-section {
-      display: none;
-    }
-
-    .admin-section.active {
-      display: block;
-    }
-
-    /* Table Styles */
-    .table-container {
-      overflow-x: auto;
-      border-radius: var(--r);
-      border: 1px solid rgba(0,0,0,0.1);
-    }
-
-    body.dark .table-container {
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-      background: white;
-    }
-
-    body.dark table {
-      background: var(--d3);
-    }
-
-    th, td {
-      text-align: left;
-      padding: 16px;
-      border-bottom: 1px solid rgba(0,0,0,0.05);
-    }
-
-    body.dark th, body.dark td {
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-
-    th {
-      background: var(--g1);
-      font-weight: 700;
-      color: var(--g7);
-      text-transform: uppercase;
-      font-size: 12px;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-    }
-
-    body.dark th {
-      background: var(--d1);
-      color: var(--d5);
-    }
-
-    th:hover {
-      background: rgba(0,120,212,0.1);
-    }
-
-    tr:hover {
-      background: rgba(0,0,0,0.02);
-    }
-
-    body.dark tr:hover {
-      background: rgba(255,255,255,0.02);
-    }
-
-    /* User Card Styles */
-    .user-card {
-      background: white;
-      border-radius: var(--r);
-      padding: 24px;
-      margin-bottom: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: var(--shadow-sm);
-      transition: all var(--t);
-      border: 1px solid rgba(0,0,0,0.05);
-    }
-
-    body.dark .user-card {
-      background: var(--d3);
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .user-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
-    }
-
-    .user-info h4 {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .user-info p {
-      font-size: 14px;
-      color: var(--g5);
-      margin-bottom: 8px;
-    }
-
-    body.dark .user-info p {
-      color: var(--d5);
-    }
-
-    .user-progress-bar {
-      height: 6px;
-      background: var(--g3);
-      border-radius: 3px;
-      overflow: hidden;
-      width: 200px;
-    }
-
-    body.dark .user-progress-bar {
-      background: #374151;
-    }
-
-    .user-progress-fill {
-      height: 100%;
-      background: var(--gradient-primary);
-      transition: width var(--t);
-      border-radius: 3px;
-    }
-
-    .user-actions {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    /* Data Tools */
-    .data-tools {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-bottom: 24px;
-    }
-
-    .file-input {
-      padding: 12px;
-      border: 2px dashed var(--g5);
-      border-radius: var(--r);
-      background: transparent;
-      cursor: pointer;
-      transition: all var(--t);
-    }
-
-    body.dark .file-input {
-      border-color: var(--d5);
-      color: var(--d5);
-    }
-
-    .file-input:hover {
-      border-color: var(--p);
-      background: rgba(0,120,212,0.05);
-    }
-
-    /* Notifications */
-    .notification {
-      position: fixed;
-      top: 80px;
-      right: 20px;
-      padding: 16px 24px;
-      border-radius: 12px;
-      color: white;
-      font-size: 15px;
-      font-weight: 600;
-      transform: translateX(400px);
-      transition: all var(--t);
-      box-shadow: var(--shadow);
-      z-index: 1001;
-      max-width: 400px;
-    }
-
-    .notification.show {
-      transform: translateX(0);
-    }
-
-    .notification.success {
-      background: var(--s);
-    }
-
-    .notification.error {
-      background: var(--e);
-    }
-
-    .notification.warning {
-      background: var(--w);
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .container {
-        padding: 0 16px;
-      }
-
-      nav {
-        height: 60px;
-      }
-
-      .nav-actions {
-        gap: 8px;
-      }
-
-      .btn {
-        padding: 10px 16px;
-        font-size: 13px;
-      }
-
-      .landing-title {
-        font-size: clamp(36px, 7vw, 56px);
-      }
-
-      .landing-subtitle {
-        font-size: 18px;
-      }
-
-      .landing-actions {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .landing-actions .btn {
-        min-width: 200px;
-      }
-
-      #dashboard {
-        padding: 80px 0 40px;
-      }
-
-      .card {
-        padding: 24px;
-      }
-
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-      }
-
-      .tasks-grid {
-        grid-template-columns: 1fr;
-        padding: 20px;
-      }
-
-      .week-header {
-        padding: 20px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-      }
-
-      .week-progress {
-        text-align: left;
-        width: 100%;
-      }
-
-      .modal-content {
-        padding: 24px;
-        margin: 16px;
-      }
-
-      .user-card {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-      }
-
-      .user-actions {
-        width: 100%;
-        justify-content: flex-end;
-      }
-
-      .admin-tabs {
-        overflow-x: auto;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-      }
-
-      .admin-tabs::-webkit-scrollbar {
-        display: none;
-      }
-
-      .data-tools {
-        flex-direction: column;
-      }
-
-      .table-container {
-        font-size: 12px;
-      }
-
-      th, td {
-        padding: 12px 8px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .btn {
-        padding: 8px 12px;
-        font-size: 12px;
-      }
-
-      .modal-content {
-        padding: 20px;
-        border-radius: 16px;
-      }
-
-      .card {
-        padding: 20px;
-      }
-
-      .task-item {
-        padding: 16px;
-      }
-
-      .user-card {
-        padding: 20px;
-      }
-    }
-
-    /* Animation Classes */
-    .fade-in {
-      animation: fadeIn 0.5s ease-out;
-    }
-
-    .slide-up {
-      animation: slideUp 0.5s ease-out;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Loading Spinner */
-    .spinner {
-      width: 20px;
-      height: 20px;
-      border: 2px solid transparent;
-      border-top: 2px solid currentColor;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* Focus styles for accessibility */
-    .task-item:focus {
-      outline: 2px solid var(--p);
-      outline-offset: 2px;
-    }
-
-    .week-card:focus {
-      outline: 2px solid var(--p);
-      outline-offset: 2px;
-    }
-
-    /* Print styles */
-    @media print {
-      header {
-        position: static;
-      }
-
-      #landing {
-        display: none;
-      }
-
-      .btn {
-        display: none;
-      }
-
-      .modal {
-        display: none;
-      }
-
-      .card {
-        break-inside: avoid;
-        box-shadow: none;
-        border: 1px solid #ccc;
-      }
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <nav class="container">
-      <div class="logo">
-        <img src="/assets/Velocity-Logo.png" alt="Velocity Lab" onerror="this.style.display='none'">
-      </div>
-      <div class="nav-actions">
-        <span id="auth-buttons">
-          <button onclick="showLogin()" class="btn btn-secondary">Sign In</button>
-          <button onclick="showRegister()" class="btn btn-primary">Register</button>
-        </span>
-        <span id="user-menu" class="hidden">
-          <span id="user-name" class="user-name"></span>
-          <button id="admin-button" class="btn btn-admin btn-small hidden" onclick="showAdmin()">
-            <span>Admin Portal</span>
-          </button>
-          <button onclick="logout()" class="btn btn-secondary btn-small">Sign Out</button>
-          <select class="theme-selector" onchange="changeTheme(this.value)">
-            <option value="light">Jedi (Light)</option>
-            <option value="dark">Sith (Dark)</option>
-            <option value="auto">Force Balance (Auto)</option>
-          </select>
-        </span>
-      </div>
-    </nav>
-  </header>
-
-  <main>
-    <!-- Landing Page -->
-    <section id="landing" class="fade-in">
-      <div class="container">
-        <div class="landing-content">
-          <h1 class="landing-title">Master Exchange Hybrid</h1>
-          <p class="landing-subtitle">
-            Complete hands-on training with 42 structured tasks over 4 weeks. 
-            Build a comprehensive lab environment with Domain Controllers, Exchange Server, and Microsoft 365 integration.
-          </p>
-          <div class="landing-actions">
-            <button class="btn btn-primary" onclick="showRegister()">
-              <span>Start Your Journey</span>
-            </button>
-            <button class="btn btn-secondary" onclick="showLogin()">
-              <span>Sign In</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Dashboard -->
-    <section id="dashboard" class="hidden">
-      <div class="container">
-        <div class="dashboard-header slide-up">
-          <h1 class="dashboard-title">Training Progress</h1>
-          <p class="dashboard-subtitle">Track your progress through the Exchange Hybrid deployment lab</p>
-        </div>
-
-        <!-- Progress Overview Card -->
-        <div class="card slide-up">
-          <div class="progress-ring-container">
-            <div class="progress-ring">
-              <svg viewBox="0 0 180 180">
-                <circle cx="90" cy="90" r="85" class="background"/>
-                <circle cx="90" cy="90" r="85" class="foreground" id="progress-ring"/>
-              </svg>
-              <div class="progress-percentage" id="progress-percentage">0%</div>
-            </div>
-          </div>
-
-          <div class="stats-grid">
-            <div class="stat-item">
-              <div class="stat-value" id="completed-tasks">0</div>
-              <div class="stat-label">Tasks Completed</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-value">42</div>
-              <div class="stat-label">Total Tasks</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-value" id="current-week">Week 1</div>
-              <div class="stat-label">Current Phase</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-value">4</div>
-              <div class="stat-label">Weeks Total</div>
-            </div>
-          </div>
-
-          <div class="text-center">
-            <button class="btn btn-primary" onclick="startNewLab()">
-              <span>Start New Lab</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Weeks Container -->
-        <div class="weeks-container" id="weeks-container">
-          <!-- Week 1 -->
-          <div class="week-card slide-up" tabindex="0" role="button" aria-expanded="false">
-            <div class="week-header" onclick="toggleWeek(this)">
-              <div class="week-info">
-                <h3>Week 1: Foundation Setup</h3>
-                <p>Active Directory infrastructure, domain controllers, and basic networking</p>
-              </div>
-              <div class="week-progress">
-                <div class="week-progress-text">
-                  <span id="week1-completed">0</span>/12 tasks completed
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill" id="week1-progress" style="width: 0%;"></div>
-                </div>
-              </div>
-            </div>
-            <div class="tasks-container" id="week1-tasks">
-              <div class="tasks-grid" id="week1-tasks-grid">
-                <!-- Tasks will be populated by JavaScript -->
-              </div>
-            </div>
-          </div>
-
-          <!-- Week 2 -->
-          <div class="week-card slide-up" tabindex="0" role="button" aria-expanded="false">
-            <div class="week-header" onclick="toggleWeek(this)">
-              <div class="week-info">
-                <h3>Week 2: Infrastructure Expansion</h3>
-                <p>Secondary domain controller, WSUS deployment, and time synchronization</p>
-              </div>
-              <div class="week-progress">
-                <div class="week-progress-text">
-                  <span id="week2-completed">0</span>/8 tasks completed
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill" id="week2-progress" style="width: 0%;"></div>
-                </div>
-              </div>
-            </div>
-            <div class="tasks-container" id="week2-tasks">
-              <div class="tasks-grid" id="week2-tasks-grid">
-                <!-- Tasks will be populated by JavaScript -->
-              </div>
-            </div>
-          </div>
-
-          <!-- Week 3 -->
-          <div class="week-card slide-up" tabindex="0" role="button" aria-expanded="false">
-            <div class="week-header" onclick="toggleWeek(this)">
-              <div class="week-info">
-                <h3>Week 3: Exchange Server Deployment</h3>
-                <p>Server upgrades, Exchange 2019 installation, and email configuration</p>
-              </div>
-              <div class="week-progress">
-                <div class="week-progress-text">
-                  <span id="week3-completed">0</span>/12 tasks completed
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill" id="week3-progress" style="width: 0%;"></div>
-                </div>
-              </div>
-            </div>
-            <div class="tasks-container" id="week3-tasks">
-              <div class="tasks-grid" id="week3-tasks-grid">
-                <!-- Tasks will be populated by JavaScript -->
-              </div>
-            </div>
-          </div>
-
-          <!-- Week 4 -->
-          <div class="week-card slide-up" tabindex="0" role="button" aria-expanded="false">
-            <div class="week-header" onclick="toggleWeek(this)">
-              <div class="week-info">
-                <h3>Week 4: Cloud Integration</h3>
-                <p>Microsoft 365 setup, hybrid configuration, and mail flow testing</p>
-              </div>
-              <div class="week-progress">
-                <div class="week-progress-text">
-                  <span id="week4-completed">0</span>/10 tasks completed
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill" id="week4-progress" style="width: 0%;"></div>
-                </div>
-              </div>
-            </div>
-            <div class="tasks-container" id="week4-tasks">
-              <div class="tasks-grid" id="week4-tasks-grid">
-                <!-- Tasks will be populated by JavaScript -->
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Login Modal -->
-  <div id="login-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title">Sign In</h2>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
-      </div>
-      <form id="login-form">
-        <div class="form-group">
-          <label class="form-label" for="login-email">Email Address</label>
-          <input type="email" id="login-email" name="email" class="form-input" placeholder="Enter your email" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="login-password">Password</label>
-          <input type="password" id="login-password" name="password" class="form-input" placeholder="Enter your password" required>
-        </div>
-        <div class="form-checkbox">
-          <input type="checkbox" id="remember-me" name="remember">
-          <label for="remember-me">Remember me for 30 days</label>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%;">
-          <span>Sign In</span>
-        </button>
-        <p style="text-align: center; margin-top: 16px; font-size: 14px;">
-          Don't have an account? <a href="#" onclick="showRegister()" style="color: var(--p);">Register here</a>
-        </p>
-      </form>
-    </div>
-  </div>
-
-  <!-- Register Modal -->
-  <div id="register-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title">Create Account</h2>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
-      </div>
-      <form id="register-form">
-        <div class="form-group">
-          <label class="form-label" for="register-name">Full Name</label>
-          <input type="text" id="register-name" name="name" class="form-input" placeholder="Enter your full name" required minlength="2">
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="register-email">Email Address</label>
-          <input type="email" id="register-email" name="email" class="form-input" placeholder="Enter your email" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="register-password">Password</label>
-          <input type="password" id="register-password" name="password" class="form-input" placeholder="Minimum 8 characters" required minlength="8">
-          <small style="color: var(--g5); font-size: 12px;">Must contain uppercase, number, and special character</small>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%;">
-          <span>Create Account</span>
-        </button>
-        <p style="text-align: center; margin-top: 16px; font-size: 14px;">
-          Already have an account? <a href="#" onclick="showLogin()" style="color: var(--p);">Sign in</a>
-        </p>
-      </form>
-    </div>
-  </div>
-
-  <!-- Task Detail Modal -->
-  <div id="task-modal" class="modal">
-    <div class="modal-content large">
-      <div class="modal-header">
-        <h2 class="modal-title" id="task-title">Task Details</h2>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
-      </div>
-      <div id="task-content" class="task-detail">
-        <!-- Task content will be populated by JavaScript -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Admin Modal -->
-  <div id="admin-modal" class="modal">
-    <div class="modal-content large">
-      <div class="modal-header">
-        <h2 class="modal-title">Admin Dashboard</h2>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
-      </div>
-      
-      <div class="admin-tabs">
-        <button class="admin-tab active" onclick="switchAdminTab('leaderboard')">Leaderboard</button>
-        <button class="admin-tab" onclick="switchAdminTab('users')">Manage Users</button>
-        <button class="admin-tab" onclick="switchAdminTab('data')">Data Management</button>
-      </div>
-
-      <!-- Leaderboard Section -->
-      <div id="admin-leaderboard" class="admin-section active">
-        <div class="table-container">
-          <table id="leaderboard-table">
-            <thead>
-              <tr>
-                <th onclick="sortTable(0)">Rank</th>
-                <th onclick="sortTable(1)">Name</th>
-                <th onclick="sortTable(2)">Progress</th>
-                <th onclick="sortTable(3)">Completed</th>
-                <th onclick="sortTable(4)">Last Login</th>
-              </tr>
-            </thead>
-            <tbody id="leaderboard-body">
-              <!-- Leaderboard data will be populated by JavaScript -->
-            </tbody>
-          </table>
-        </div>
-        <button class="btn btn-secondary" onclick="refreshLeaderboard()" style="margin-top: 16px;">
-          <span>Refresh Data</span>
-        </button>
-      </div>
-
-      <!-- Users Management Section -->
-      <div id="admin-users" class="admin-section">
-        <div id="users-list">
-          <!-- User cards will be populated by JavaScript -->
-        </div>
-      </div>
-
-      <!-- Data Management Section -->
-      <div id="admin-data" class="admin-section">
-        <div class="data-tools">
-          <button class="btn btn-primary" onclick="exportProgress()">
-            <span>Export Progress (CSV)</span>
-          </button>
-          <input type="file" accept=".csv" id="import-file" class="file-input" onchange="importProgress(this.files)">
-        </div>
-        <p style="color: var(--g5); font-size: 14px; margin-top: 16px;">
-          Export user progress data or import bulk progress updates via CSV files.
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Notification -->
-  <div id="notification" class="notification">
-    <span id="notification-message"></span>
-  </div>
-
-  <!-- Scripts -->
-  <script>
-    // Placeholder for task definitions - this will be loaded from task-definitions.js
-    window.TASK_DEFINITIONS = window.TASK_DEFINITIONS || {};
-  </script>
-  <script src="/task-definitions.js"></script>
-  <script>
+</html>
