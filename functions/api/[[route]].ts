@@ -51,6 +51,7 @@ export const onRequest: PagesFunction<{
   const path = url.pathname;
   const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
 
+  // CORS Options Handler
   if (request.method === 'OPTIONS') {
     return new Response(null, {
       headers: {
@@ -81,6 +82,7 @@ export const onRequest: PagesFunction<{
     try {
       let email, password, remember, csrf_token;
       const contentType = request.headers.get('Content-Type') || '';
+      
       if (contentType.includes('form-data')) {
         const formData = await request.formData();
         email = formData.get('email')?.toString();
@@ -92,8 +94,14 @@ export const onRequest: PagesFunction<{
         ({ email, password, remember, csrf_token } = data);
       }
 
-      if (!email || !password || !csrf_token) return errorResponse('Missing required fields', 400);
-      if (!validateEmail(email)) return errorResponse('Invalid email address', 400);
+      if (!email || !password || !csrf_token) {
+        return errorResponse('Missing required fields', 400);
+      }
+      
+      if (!validateEmail(email)) {
+        return errorResponse('Invalid email address', 400);
+      }
+      
       if (!(await validateCSRFToken(env, csrf_token))) {
         await logActivity(env, 'unknown', 'login_failed_csrf', { email, ip });
         return errorResponse('Invalid CSRF token', 403);
@@ -134,6 +142,7 @@ export const onRequest: PagesFunction<{
     try {
       let name, email, password, csrf_token;
       const contentType = request.headers.get('Content-Type') || '';
+      
       if (contentType.includes('form-data')) {
         const formData = await request.formData();
         name = formData.get('name')?.toString();
@@ -145,23 +154,34 @@ export const onRequest: PagesFunction<{
         ({ name, email, password, csrf_token } = data);
       }
 
-      if (!name || !email || !password || !csrf_token) return errorResponse('Missing required fields', 400);
-      if (name.length < 2 || !validateEmail(email)) return errorResponse('Invalid name or email', 400);
+      if (!name || !email || !password || !csrf_token) {
+        return errorResponse('Missing required fields', 400);
+      }
+      
+      if (name.length < 2 || !validateEmail(email)) {
+        return errorResponse('Invalid name or email', 400);
+      }
+      
       const pwdValidation = validatePassword(password);
-      if (!pwdValidation.valid) return errorResponse(pwdValidation.errors?.join(', ') || 'Invalid password', 400);
+      if (!pwdValidation.valid) {
+        return errorResponse(pwdValidation.errors?.join(', ') || 'Invalid password', 400);
+      }
+      
       if (!(await validateCSRFToken(env, csrf_token))) {
         await logActivity(env, 'unknown', 'register_failed_csrf', { email, ip });
         return errorResponse('Invalid CSRF token', 403);
       }
 
-      if (await getUserByEmail(env, email)) return errorResponse('Email already registered', 409);
+      if (await getUserByEmail(env, email)) {
+        return errorResponse('Email already registered', 409);
+      }
 
       const userId = crypto.randomUUID();
       const userData: User = {
         id: userId,
         name: sanitizeInput(name),
         email: email.toLowerCase(),
-        password, // Note: In production, hash passwords
+        password, // Note: In production, hash passwords with bcrypt
         role: 'user',
         createdAt: new Date().toISOString(),
       };
@@ -196,10 +216,13 @@ export const onRequest: PagesFunction<{
     try {
       const sessionToken = request.headers.get('Authorization')?.replace('Bearer ', '') || 
                           request.headers.get('Cookie')?.match(/session=([^;]+)/)?.[1];
+      
       if (sessionToken) {
         await env.SESSIONS.delete(`session:${sessionToken}`);
       }
+      
       await logActivity(env, 'unknown', 'logout', { ip });
+      
       return new Response(JSON.stringify({ success: true }), {
         status: 200,
         headers: {
@@ -218,7 +241,9 @@ export const onRequest: PagesFunction<{
   if (path === '/api/progress' && request.method === 'GET') {
     try {
       const userId = await validateSession(env, request);
-      if (!userId) return errorResponse('Unauthorized', 401);
+      if (!userId) {
+        return errorResponse('Unauthorized', 401);
+      }
       
       const progressData = await env.PROGRESS.get(`progress:${userId}`);
       const data: Progress = progressData ? JSON.parse(progressData) : {};
@@ -237,10 +262,13 @@ export const onRequest: PagesFunction<{
   if (path === '/api/progress' && request.method === 'POST') {
     try {
       const userId = await validateSession(env, request);
-      if (!userId) return errorResponse('Unauthorized', 401);
+      if (!userId) {
+        return errorResponse('Unauthorized', 401);
+      }
 
       let week, task, checked, subtask, subtask_checked, csrf_token;
       const contentType = request.headers.get('Content-Type') || '';
+      
       if (contentType.includes('form-data')) {
         const formData = await request.formData();
         week = formData.get('week')?.toString();
@@ -254,25 +282,44 @@ export const onRequest: PagesFunction<{
         ({ week, task, checked, subtask, subtask_checked, csrf_token } = data);
       }
 
-      if (!week || (!task && !subtask) || !csrf_token) return errorResponse('Missing required fields', 400);
+      if (!week || (!task && !subtask) || !csrf_token) {
+        return errorResponse('Missing required fields', 400);
+      }
+      
       if (!(await validateCSRFToken(env, csrf_token))) {
         await logActivity(env, userId, 'progress_failed_csrf', { week, task, ip });
         return errorResponse('Invalid CSRF token', 403);
       }
-      if (!TASK_STRUCTURE[week as keyof typeof TASK_STRUCTURE]) return errorResponse('Invalid week', 400);
-      if (task && !TASK_STRUCTURE[week as keyof typeof TASK_STRUCTURE].includes(task)) return errorResponse('Invalid task', 400);
+      
+      if (!TASK_STRUCTURE[week as keyof typeof TASK_STRUCTURE]) {
+        return errorResponse('Invalid week', 400);
+      }
+      
+      if (task && !TASK_STRUCTURE[week as keyof typeof TASK_STRUCTURE].includes(task)) {
+        return errorResponse('Invalid task', 400);
+      }
 
       const progressData = await env.PROGRESS.get(`progress:${userId}`);
       let progress: Progress = progressData ? JSON.parse(progressData) : {};
-      if (!progress[week]) progress[week] = {};
+      
+      if (!progress[week]) {
+        progress[week] = {};
+      }
 
       if (task) {
-        if (!progress[week][task]) progress[week][task] = { completed: false };
+        if (!progress[week][task]) {
+          progress[week][task] = { completed: false };
+        }
         progress[week][task].completed = checked;
       }
+      
       if (subtask) {
-        if (!progress[week][task]) progress[week][task] = { completed: false, subtasks: {} };
-        if (!progress[week][task].subtasks) progress[week][task].subtasks = {};
+        if (!progress[week][task]) {
+          progress[week][task] = { completed: false, subtasks: {} };
+        }
+        if (!progress[week][task].subtasks) {
+          progress[week][task].subtasks = {};
+        }
         progress[week][task].subtasks![subtask] = subtask_checked;
       }
 
@@ -293,15 +340,19 @@ export const onRequest: PagesFunction<{
   if (path === '/api/lab/start-new' && request.method === 'POST') {
     try {
       const userId = await validateSession(env, request);
-      if (!userId) return errorResponse('Unauthorized', 401);
+      if (!userId) {
+        return errorResponse('Unauthorized', 401);
+      }
       
       const formData = await request.formData();
       const csrf_token = formData.get('csrf_token')?.toString();
+      
       if (!csrf_token || !(await validateCSRFToken(env, csrf_token))) {
         await logActivity(env, userId, 'lab_start_failed_csrf', { ip });
         return errorResponse('Invalid CSRF token', 403);
       }
 
+      // Reset progress to empty object
       await env.PROGRESS.put(`progress:${userId}`, JSON.stringify({}));
       await logActivity(env, userId, 'lab_started', { ip });
       
@@ -315,55 +366,23 @@ export const onRequest: PagesFunction<{
     }
   }
 
-  // Admin - Get Users Progress
+  // Admin - Get Users Progress Leaderboard
   if (path === '/api/admin/users-progress' && request.method === 'GET') {
     try {
       const userId = await validateSession(env, request);
-      if (!userId) return errorResponse('Unauthorized', 401);
+      if (!userId) {
+        return errorResponse('Unauthorized', 401);
+      }
 
       const currentUser = await getUserById(env, userId);
       if (!currentUser || currentUser.role !== 'admin') {
-        await logActivity(env, userId, 'admin_import_denied', { ip });
-        return errorResponse('Forbidden', 403);
-      }
-
-      const formData = await request.formData();
-      const csv = formData.get('csv')?.toString();
-      const csrf_token = formData.get('csrf_token')?.toString();
-
-      if (!csv || !csrf_token) return errorResponse('Invalid request', 400);
-      if (!(await validateCSRFToken(env, csrf_token))) {
-        await logActivity(env, userId, 'import_failed_csrf', { ip });
-        return errorResponse('Invalid CSRF token', 403);
-      }
-
-      const progressData = parseProgressCSV(csv);
-      for (const { email, progress } of progressData) {
-        const user = await getUserByEmail(env, email);
-        if (user) {
-          await env.PROGRESS.put(`progress:${user.id}`, JSON.stringify(progress));
-        }
-      }
-
-      await logActivity(env, userId, 'progress_imported', { ip });
-      return new Response(JSON.stringify({ success: true }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      });
-    } catch (e) {
-      await logActivity(env, 'unknown', 'import_error', { ip, error: e.message });
-      return errorResponse('Server error', 500);
-    }
-  }
-
-  return errorResponse('Not found', 404);
-};
         await logActivity(env, userId, 'admin_access_denied', { ip });
         return errorResponse('Forbidden', 403);
       }
 
       const users = [];
       const userKeys = await env.USERS.list();
+      
       for (const key of userKeys.keys) {
         try {
           const userData = await env.USERS.get(key.name);
@@ -371,6 +390,7 @@ export const onRequest: PagesFunction<{
             const user: User = JSON.parse(userData);
             const progressData = await env.PROGRESS.get(`progress:${user.id}`);
             const progress: Progress = progressData ? JSON.parse(progressData) : {};
+            
             users.push({
               name: user.name,
               email: user.email,
@@ -386,6 +406,7 @@ export const onRequest: PagesFunction<{
         }
       }
 
+      // Sort by progress descending
       users.sort((a, b) => b.progress - a.progress);
       await logActivity(env, userId, 'admin_users_progress', { ip });
       
@@ -403,7 +424,9 @@ export const onRequest: PagesFunction<{
   if (path === '/api/admin/update-role' && request.method === 'POST') {
     try {
       const userId = await validateSession(env, request);
-      if (!userId) return errorResponse('Unauthorized', 401);
+      if (!userId) {
+        return errorResponse('Unauthorized', 401);
+      }
 
       const currentUser = await getUserById(env, userId);
       if (!currentUser || currentUser.role !== 'admin') {
@@ -416,15 +439,23 @@ export const onRequest: PagesFunction<{
       const role = formData.get('role')?.toString() as 'user' | 'admin';
       const csrf_token = formData.get('csrf_token')?.toString();
 
-      if (!email || !role || !csrf_token || !['user', 'admin'].includes(role)) return errorResponse('Invalid request', 400);
+      if (!email || !role || !csrf_token || !['user', 'admin'].includes(role)) {
+        return errorResponse('Invalid request', 400);
+      }
+      
       if (!(await validateCSRFToken(env, csrf_token))) {
         await logActivity(env, userId, 'role_update_failed_csrf', { email, ip });
         return errorResponse('Invalid CSRF token', 403);
       }
 
       const user = await getUserByEmail(env, email);
-      if (!user) return errorResponse('User not found', 404);
-      if (user.id === userId && role !== 'admin') return errorResponse('Cannot demote yourself', 400);
+      if (!user) {
+        return errorResponse('User not found', 404);
+      }
+      
+      if (user.id === userId && role !== 'admin') {
+        return errorResponse('Cannot demote yourself', 400);
+      }
 
       user.role = role;
       await env.USERS.put(`user:${email}`, JSON.stringify(user));
@@ -444,7 +475,9 @@ export const onRequest: PagesFunction<{
   if (path === '/api/admin/reset-progress' && request.method === 'POST') {
     try {
       const userId = await validateSession(env, request);
-      if (!userId) return errorResponse('Unauthorized', 401);
+      if (!userId) {
+        return errorResponse('Unauthorized', 401);
+      }
 
       const currentUser = await getUserById(env, userId);
       if (!currentUser || currentUser.role !== 'admin') {
@@ -456,15 +489,21 @@ export const onRequest: PagesFunction<{
       const email = formData.get('email')?.toString();
       const csrf_token = formData.get('csrf_token')?.toString();
 
-      if (!email || !csrf_token) return errorResponse('Invalid request', 400);
+      if (!email || !csrf_token) {
+        return errorResponse('Invalid request', 400);
+      }
+      
       if (!(await validateCSRFToken(env, csrf_token))) {
         await logActivity(env, userId, 'reset_progress_failed_csrf', { email, ip });
         return errorResponse('Invalid CSRF token', 403);
       }
 
       const user = await getUserByEmail(env, email);
-      if (!user) return errorResponse('User not found', 404);
+      if (!user) {
+        return errorResponse('User not found', 404);
+      }
 
+      // Reset user's progress to empty
       await env.PROGRESS.put(`progress:${user.id}`, JSON.stringify({}));
       await logActivity(env, userId, 'progress_reset', { email, ip });
 
@@ -478,11 +517,13 @@ export const onRequest: PagesFunction<{
     }
   }
 
-  // Admin - Export Progress
+  // Admin - Export Progress as CSV
   if (path === '/api/admin/export-progress' && request.method === 'GET') {
     try {
       const userId = await validateSession(env, request);
-      if (!userId) return errorResponse('Unauthorized', 401);
+      if (!userId) {
+        return errorResponse('Unauthorized', 401);
+      }
 
       const currentUser = await getUserById(env, userId);
       if (!currentUser || currentUser.role !== 'admin') {
@@ -492,6 +533,7 @@ export const onRequest: PagesFunction<{
 
       const users = [];
       const userKeys = await env.USERS.list();
+      
       for (const key of userKeys.keys) {
         try {
           const userData = await env.USERS.get(key.name);
@@ -499,6 +541,7 @@ export const onRequest: PagesFunction<{
             const user: User = JSON.parse(userData);
             const progressData = await env.PROGRESS.get(`progress:${user.id}`);
             const progress: Progress = progressData ? JSON.parse(progressData) : {};
+            
             users.push({
               name: user.name,
               email: user.email,
@@ -527,11 +570,56 @@ export const onRequest: PagesFunction<{
     }
   }
 
-  // Admin - Import Progress
+  // Admin - Import Progress from CSV
   if (path === '/api/admin/import-progress' && request.method === 'POST') {
     try {
       const userId = await validateSession(env, request);
-      if (!userId) return errorResponse('Unauthorized', 401);
+      if (!userId) {
+        return errorResponse('Unauthorized', 401);
+      }
 
       const currentUser = await getUserById(env, userId);
       if (!currentUser || currentUser.role !== 'admin') {
+        await logActivity(env, userId, 'admin_import_denied', { ip });
+        return errorResponse('Forbidden', 403);
+      }
+
+      const formData = await request.formData();
+      const csv = formData.get('csv')?.toString();
+      const csrf_token = formData.get('csrf_token')?.toString();
+
+      if (!csv || !csrf_token) {
+        return errorResponse('Invalid request', 400);
+      }
+      
+      if (!(await validateCSRFToken(env, csrf_token))) {
+        await logActivity(env, userId, 'import_failed_csrf', { ip });
+        return errorResponse('Invalid CSRF token', 403);
+      }
+
+      const progressData = parseProgressCSV(csv);
+      let importedCount = 0;
+      
+      for (const { email, progress } of progressData) {
+        const user = await getUserByEmail(env, email);
+        if (user) {
+          await env.PROGRESS.put(`progress:${user.id}`, JSON.stringify(progress));
+          importedCount++;
+        }
+      }
+
+      await logActivity(env, userId, 'progress_imported', { ip, importedCount });
+      
+      return new Response(JSON.stringify({ success: true, importedCount }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      });
+    } catch (e) {
+      await logActivity(env, 'unknown', 'import_error', { ip, error: e.message });
+      return errorResponse('Server error', 500);
+    }
+  }
+
+  // 404 - Route not found
+  return errorResponse('Not found', 404);
+};

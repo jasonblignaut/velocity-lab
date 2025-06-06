@@ -12,6 +12,15 @@ export interface User {
   role: 'user' | 'admin';
   createdAt: string;
   lastLogin?: string;
+  passwordChangedAt?: string;
+  currentLabId?: string;
+  labHistory?: Array<{
+    labId: string;
+    startedAt: string;
+    totalTasks: number;
+    completedTasks: number;
+    progressPercentage: number;
+  }>;
 }
 
 export interface Progress {
@@ -19,98 +28,266 @@ export interface Progress {
     [task: string]: {
       completed: boolean;
       subtasks?: { [subtask: string]: boolean };
+      completedAt?: string;
+      notes?: string;
     };
   };
 }
 
-// Simple task structure matching the frontend exactly
+// Task structure that matches the frontend exactly - simplified flat arrays
 export const TASK_STRUCTURE = {
-  week1: ['install-server2012', 'configure-static-ip', 'install-adds-role', 'promote-to-dc', 'configure-dns-server', 'create-domain-users', 'join-vm-domain', 'create-hidden-share', 'map-drive-gpo', 'map-drive-script', 'map-drive-powershell', 'create-security-group', 'restrict-share-access'],
-  week2: ['install-second-server', 'promote-additional-dc', 'install-wsus-role', 'configure-wsus-settings', 'setup-wsus-gpo', 'configure-primary-time', 'configure-secondary-time', 'test-infrastructure'],
-  week3: ['backup-servers', 'upgrade-dc1-2016', 'upgrade-dc2-2016', 'raise-functional-levels', 'install-exchange-server', 'install-exchange-prereqs', 'extend-ad-schema', 'install-exchange-2019', 'configure-exchange-basic', 'create-mailboxes', 'test-mailbox-access', 'configure-internal-mailflow'],
-  week4: ['configure-external-dns', 'setup-firewall-rules', 'install-ssl-certificates', 'configure-external-mailflow', 'setup-modern-auth', 'prepare-m365-tenant', 'install-aad-connect', 'run-hybrid-wizard', 'configure-hybrid-mailflow', 'verify-hybrid-functionality']
+  week1: [
+    'install-server2012',
+    'configure-static-ip', 
+    'install-adds-role',
+    'promote-to-dc',
+    'configure-dns-server',
+    'create-domain-users',
+    'join-vm-domain',
+    'create-hidden-share',
+    'map-drive-gpo',
+    'map-drive-script',
+    'map-drive-powershell',
+    'create-security-group',
+    'restrict-share-access'
+  ],
+  week2: [
+    'install-second-server',
+    'promote-additional-dc',
+    'install-wsus-role',
+    'configure-wsus-settings',
+    'setup-wsus-gpo',
+    'configure-primary-time',
+    'configure-secondary-time',
+    'test-infrastructure'
+  ],
+  week3: [
+    'backup-servers',
+    'upgrade-dc1-2016',
+    'upgrade-dc2-2016',
+    'raise-functional-levels',
+    'install-exchange-server',
+    'install-exchange-prereqs',
+    'extend-ad-schema',
+    'install-exchange-2019',
+    'configure-exchange-basic',
+    'create-mailboxes',
+    'test-mailbox-access',
+    'configure-internal-mailflow'
+  ],
+  week4: [
+    'configure-external-dns',
+    'setup-firewall-rules',
+    'install-ssl-certificates',
+    'configure-external-mailflow',
+    'setup-modern-auth',
+    'prepare-m365-tenant',
+    'install-aad-connect',
+    'run-hybrid-wizard',
+    'configure-hybrid-mailflow',
+    'verify-hybrid-functionality'
+  ]
 };
 
 export const TOTAL_TASKS = 42;
 
+// Email validation using standard regex
 export const validateEmail = (email: string): boolean => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email) && email.length <= 254;
 };
 
+// Password validation - can be made more strict for production
 export const validatePassword = (password: string): { valid: boolean; errors?: string[] } => {
   const errors: string[] = [];
-  if (password.length < 8) errors.push('Password must be at least 8 characters');
-  return errors.length ? { valid: false, errors } : { valid: true };
+  
+  if (password.length < 8) {
+    errors.push('Password must be at least 8 characters long');
+  }
+  
+  if (password.length > 128) {
+    errors.push('Password must be less than 128 characters');
+  }
+  
+  // Optional: Add more complexity requirements
+  // if (!/[A-Z]/.test(password)) {
+  //   errors.push('Password must contain at least one uppercase letter');
+  // }
+  
+  // if (!/[a-z]/.test(password)) {
+  //   errors.push('Password must contain at least one lowercase letter');
+  // }
+  
+  // if (!/[0-9]/.test(password)) {
+  //   errors.push('Password must contain at least one number');
+  // }
+  
+  // if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+  //   errors.push('Password must contain at least one special character');
+  // }
+  
+  return errors.length === 0 ? { valid: true } : { valid: false, errors };
 };
 
+// Basic input sanitization
 export const sanitizeInput = (input: string): string => {
-  return input.replace(/[<>&'"]/g, '');
+  return input
+    .replace(/[<>&'"]/g, '') // Remove potentially dangerous characters
+    .trim() // Remove leading/trailing whitespace
+    .substring(0, 1000); // Limit length to prevent abuse
 };
 
+// Generate CSRF token for form protection
 export const generateCSRFToken = async (env: Env): Promise<string> => {
   const token = crypto.randomUUID();
-  await env.SESSIONS.put(`csrf:${token}`, 'valid', { expirationTtl: 3600 });
+  await env.SESSIONS.put(`csrf:${token}`, 'valid', { expirationTtl: 3600 }); // 1 hour expiry
   return token;
 };
 
+// Validate and consume CSRF token
 export const validateCSRFToken = async (env: Env, token: string): Promise<boolean> => {
+  if (!token) return false;
+  
   const valid = await env.SESSIONS.get(`csrf:${token}`);
   if (valid) {
+    // Delete token after use (one-time use)
     await env.SESSIONS.delete(`csrf:${token}`);
     return true;
   }
   return false;
 };
 
+// Create session token for authenticated users
 export const createSession = async (env: Env, userId: string, remember: boolean = false): Promise<string> => {
   const sessionToken = crypto.randomUUID();
-  const expires = remember ? 30 * 86400 : 86400; // 30 days or 1 day
-  await env.SESSIONS.put(`session:${sessionToken}`, userId, { expirationTtl: expires });
+  const expirationTime = remember ? 30 * 86400 : 86400; // 30 days if remember, else 1 day
+  
+  await env.SESSIONS.put(`session:${sessionToken}`, userId, { 
+    expirationTtl: expirationTime 
+  });
+  
   return sessionToken;
 };
 
+// Validate session and return user ID
 export const validateSession = async (env: Env, request: Request): Promise<string | null> => {
+  // Try Authorization header first (Bearer token), then Cookie
   const sessionToken = request.headers.get('Authorization')?.replace('Bearer ', '') ||
                       request.headers.get('Cookie')?.match(/session=([^;]+)/)?.[1];
+  
   if (!sessionToken) return null;
+  
   const userId = await env.SESSIONS.get(`session:${sessionToken}`);
   return userId || null;
 };
 
+// Get user by email address
 export const getUserByEmail = async (env: Env, email: string): Promise<User | null> => {
-  const userData = await env.USERS.get(`user:${email.toLowerCase()}`);
-  return userData ? JSON.parse(userData) : null;
-};
-
-export const getUserById = async (env: Env, userId: string): Promise<User | null> => {
-  const userKeys = await env.USERS.list();
-  for (const key of userKeys.keys) {
-    const userData = await env.USERS.get(key.name);
-    if (userData) {
-      const user: User = JSON.parse(userData);
-      if (user.id === userId) return user;
-    }
+  try {
+    const userData = await env.USERS.get(`user:${email.toLowerCase()}`);
+    return userData ? JSON.parse(userData) : null;
+  } catch (e) {
+    console.error('Error getting user by email:', e);
+    return null;
   }
-  return null;
 };
 
+// Get user by ID - requires scanning all users
+export const getUserById = async (env: Env, userId: string): Promise<User | null> => {
+  try {
+    const userKeys = await env.USERS.list();
+    for (const key of userKeys.keys) {
+      const userData = await env.USERS.get(key.name);
+      if (userData) {
+        const user: User = JSON.parse(userData);
+        if (user.id === userId) {
+          return user;
+        }
+      }
+    }
+    return null;
+  } catch (e) {
+    console.error('Error getting user by ID:', e);
+    return null;
+  }
+};
+
+// Update user's last login timestamp
 export const updateLastLogin = async (env: Env, user: User): Promise<void> => {
-  const updatedUser = { ...user, lastLogin: new Date().toISOString() };
-  await env.USERS.put(`user:${user.email}`, JSON.stringify(updatedUser));
+  try {
+    const updatedUser = { 
+      ...user, 
+      lastLogin: new Date().toISOString() 
+    };
+    await env.USERS.put(`user:${user.email}`, JSON.stringify(updatedUser));
+  } catch (e) {
+    console.error('Error updating last login:', e);
+  }
 };
 
+// Update lab progress with history tracking
+export const updateLabProgress = async (env: Env, user: User, labId: string, progress: Progress): Promise<void> => {
+  try {
+    const completedTasks = calculateCompletedTasks(progress);
+    const progressPercentage = calculateProgress(progress);
+    
+    const updatedLabHistory = user.labHistory ? [...user.labHistory] : [];
+    const labIndex = updatedLabHistory.findIndex(lab => lab.labId === labId);
+    
+    if (labIndex >= 0) {
+      // Update existing lab entry
+      updatedLabHistory[labIndex] = {
+        ...updatedLabHistory[labIndex],
+        completedTasks,
+        progressPercentage,
+      };
+    } else {
+      // Add new lab entry
+      updatedLabHistory.push({
+        labId,
+        startedAt: new Date().toISOString(),
+        totalTasks: TOTAL_TASKS,
+        completedTasks,
+        progressPercentage,
+      });
+    }
+    
+    const updatedUser: User = {
+      ...user,
+      currentLabId: labId,
+      labHistory: updatedLabHistory,
+    };
+    
+    await env.USERS.put(`user:${user.email}`, JSON.stringify(updatedUser));
+  } catch (e) {
+    console.error('Error updating lab progress:', e);
+  }
+};
+
+// Log activity for audit trail
 export const logActivity = async (env: Env, userId: string, action: string, details: any): Promise<void> => {
-  const logEntry = {
-    userId,
-    action,
-    timestamp: new Date().toISOString(),
-    details,
-  };
-  await env.SESSIONS.put(`log:${crypto.randomUUID()}`, JSON.stringify(logEntry), { expirationTtl: 7 * 86400 });
+  try {
+    const logEntry = {
+      userId,
+      action,
+      timestamp: new Date().toISOString(),
+      details,
+    };
+    
+    // Store logs with 7-day expiry
+    const logKey = `log:${crypto.randomUUID()}`;
+    await env.SESSIONS.put(logKey, JSON.stringify(logEntry), { 
+      expirationTtl: 7 * 86400 // 7 days
+    });
+  } catch (e) {
+    console.error('Error logging activity:', e);
+  }
 };
 
+// Calculate overall progress percentage
 export const calculateProgress = (progress: Progress): number => {
   let completedTasks = 0;
+  
   Object.keys(TASK_STRUCTURE).forEach(week => {
     if (progress[week]) {
       TASK_STRUCTURE[week as keyof typeof TASK_STRUCTURE].forEach(task => {
@@ -120,11 +297,14 @@ export const calculateProgress = (progress: Progress): number => {
       });
     }
   });
+  
   return Math.round((completedTasks / TOTAL_TASKS) * 100);
 };
 
+// Calculate total completed tasks count
 export const calculateCompletedTasks = (progress: Progress): number => {
   let completedTasks = 0;
+  
   Object.keys(TASK_STRUCTURE).forEach(week => {
     if (progress[week]) {
       TASK_STRUCTURE[week as keyof typeof TASK_STRUCTURE].forEach(task => {
@@ -134,9 +314,31 @@ export const calculateCompletedTasks = (progress: Progress): number => {
       });
     }
   });
+  
   return completedTasks;
 };
 
+// Calculate week-specific progress
+export const calculateWeekProgress = (progress: Progress, week: string): { completed: number; total: number; percentage: number } => {
+  const weekTasks = TASK_STRUCTURE[week as keyof typeof TASK_STRUCTURE] || [];
+  let completed = 0;
+  
+  if (progress[week]) {
+    weekTasks.forEach(task => {
+      if (progress[week][task]?.completed) {
+        completed++;
+      }
+    });
+  }
+  
+  return {
+    completed,
+    total: weekTasks.length,
+    percentage: weekTasks.length > 0 ? Math.round((completed / weekTasks.length) * 100) : 0
+  };
+};
+
+// Generate CSV export of user progress
 export const generateProgressCSV = (users: Array<{
   name: string;
   email: string;
@@ -145,36 +347,174 @@ export const generateProgressCSV = (users: Array<{
   completedTasks: number;
   lastLogin?: string;
 }>): string => {
-  const headers = ['Name', 'Email', 'Role', 'Progress (%)', 'Completed Tasks', 'Last Login'];
-  const rows = users.map(u => [
-    `"${u.name.replace(/"/g, '""')}"`,
-    u.email,
-    u.role,
-    u.progress,
-    u.completedTasks,
-    u.lastLogin ? new Date(u.lastLogin).toISOString() : 'Never',
-  ]);
-  return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+  const headers = [
+    'Name',
+    'Email', 
+    'Role',
+    'Progress (%)',
+    'Completed Tasks',
+    'Total Tasks',
+    'Last Login'
+  ];
+  
+  const csvRows = [headers.join(',')];
+  
+  users.forEach(user => {
+    const row = [
+      `"${user.name.replace(/"/g, '""')}"`, // Escape quotes in names
+      user.email,
+      user.role,
+      user.progress.toString(),
+      user.completedTasks.toString(),
+      TOTAL_TASKS.toString(),
+      user.lastLogin ? new Date(user.lastLogin).toISOString() : 'Never'
+    ];
+    csvRows.push(row.join(','));
+  });
+  
+  return csvRows.join('\n');
 };
 
+// Parse CSV import of progress data
 export const parseProgressCSV = (csv: string): Array<{ email: string; progress: Progress }> => {
-  const lines = csv.split('\n').map(line => line.trim()).filter(line => line);
-  if (lines.length < 1) return [];
-  const headers = lines[0].split(',').map(h => h.trim());
-  const emailIndex = headers.indexOf('Email');
-  if (emailIndex === -1) return [];
-
+  const lines = csv.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+  
+  if (lines.length < 2) { // Need at least header + 1 data row
+    return [];
+  }
+  
+  const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+  const emailIndex = headers.findIndex(h => h.toLowerCase().includes('email'));
+  
+  if (emailIndex === -1) {
+    throw new Error('CSV must contain an Email column');
+  }
+  
   const result: Array<{ email: string; progress: Progress }> = [];
+  
   for (let i = 1; i < lines.length; i++) {
     const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
-    if (values.length > emailIndex) {
-      const email = values[emailIndex];
+    
+    if (values.length > emailIndex && values[emailIndex]) {
+      const email = values[emailIndex].toLowerCase();
+      
       if (validateEmail(email)) {
-        // For simplicity, reset progress; extend for full parsing if needed
+        // For basic import, reset progress to empty
+        // Could be extended to parse actual progress data from CSV
         const progress: Progress = {};
         result.push({ email, progress });
       }
     }
   }
+  
   return result;
+};
+
+// Detailed progress export with task-level data
+export const generateDetailedProgressCSV = (users: Array<{
+  name: string;
+  email: string;
+  role: string;
+  progress: Progress;
+  lastLogin?: string;
+}>): string => {
+  const headers = ['Name', 'Email', 'Role', 'Week', 'Task', 'Completed', 'Last Login'];
+  const csvRows = [headers.join(',')];
+  
+  users.forEach(user => {
+    Object.keys(TASK_STRUCTURE).forEach(week => {
+      TASK_STRUCTURE[week as keyof typeof TASK_STRUCTURE].forEach(task => {
+        const completed = user.progress[week]?.[task]?.completed || false;
+        const row = [
+          `"${user.name.replace(/"/g, '""')}"`,
+          user.email,
+          user.role,
+          week,
+          task,
+          completed ? 'TRUE' : 'FALSE',
+          user.lastLogin ? new Date(user.lastLogin).toISOString() : 'Never'
+        ];
+        csvRows.push(row.join(','));
+      });
+    });
+  });
+  
+  return csvRows.join('\n');
+};
+
+// Validate task exists in structure
+export const isValidTask = (week: string, task: string): boolean => {
+  const weekTasks = TASK_STRUCTURE[week as keyof typeof TASK_STRUCTURE];
+  return weekTasks ? weekTasks.includes(task) : false;
+};
+
+// Get user statistics
+export const getUserStats = (progress: Progress): {
+  totalCompleted: number;
+  totalTasks: number;
+  progressPercentage: number;
+  weekStats: { [week: string]: { completed: number; total: number; percentage: number } };
+} => {
+  const weekStats: { [week: string]: { completed: number; total: number; percentage: number } } = {};
+  let totalCompleted = 0;
+  
+  Object.keys(TASK_STRUCTURE).forEach(week => {
+    const weekProgress = calculateWeekProgress(progress, week);
+    weekStats[week] = weekProgress;
+    totalCompleted += weekProgress.completed;
+  });
+  
+  return {
+    totalCompleted,
+    totalTasks: TOTAL_TASKS,
+    progressPercentage: Math.round((totalCompleted / TOTAL_TASKS) * 100),
+    weekStats
+  };
+};
+
+// Rate limiting helper
+export const checkRateLimit = async (env: Env, identifier: string, limit: number = 10, window: number = 60): Promise<boolean> => {
+  try {
+    const key = `rate:${identifier}:${Math.floor(Date.now() / (window * 1000))}`;
+    const current = await env.SESSIONS.get(key);
+    const count = current ? parseInt(current) : 0;
+    
+    if (count >= limit) {
+      return false;
+    }
+    
+    await env.SESSIONS.put(key, (count + 1).toString(), { expirationTtl: window });
+    return true;
+  } catch (e) {
+    console.error('Rate limit check error:', e);
+    return true; // Allow on error to avoid blocking legitimate users
+  }
+};
+
+// Generate secure random string
+export const generateSecureToken = (length: number = 32): string => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  const randomArray = new Uint8Array(length);
+  crypto.getRandomValues(randomArray);
+  
+  for (let i = 0; i < length; i++) {
+    result += chars[randomArray[i] % chars.length];
+  }
+  
+  return result;
+};
+
+// Hash password for production use (placeholder for bcrypt)
+export const hashPassword = async (password: string): Promise<string> => {
+  // In production, use proper bcrypt hashing
+  // For now, return plain text (NOT SECURE - only for development)
+  return password;
+};
+
+// Verify password hash
+export const verifyPassword = async (password: string, hash: string): Promise<boolean> => {
+  // In production, use proper bcrypt verification
+  // For now, simple comparison (NOT SECURE - only for development)
+  return password === hash;
 };
