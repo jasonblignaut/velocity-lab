@@ -1,30 +1,3 @@
-import crypto from 'crypto';
-
-// Helper function to authenticate user
-async function authenticateUser(request, env) {
-    const authHeader = request.headers.get('Authorization');
-    const sessionToken = authHeader?.replace('Bearer ', '');
-    
-    if (!sessionToken) {
-        throw new Error('No session token provided');
-    }
-    
-    const sessionData = await env.SESSIONS.get(`session:${sessionToken}`);
-    if (!sessionData) {
-        throw new Error('Invalid or expired session');
-    }
-    
-    const session = JSON.parse(sessionData);
-    
-    // Check if session is expired
-    if (new Date(session.expiresAt) < new Date()) {
-        await env.SESSIONS.delete(`session:${sessionToken}`);
-        throw new Error('Session expired');
-    }
-    
-    return session;
-}
-
 export async function onRequestPost(context) {
     const { request, env } = context;
     
