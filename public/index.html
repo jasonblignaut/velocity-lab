@@ -711,8 +711,8 @@
             }
         }
 
-        // Modal management functions
-        function showLogin() {
+        // Modal management functions - GLOBAL SCOPE
+        window.showLogin = function() {
             closeModal();
             const modal = utils.getId('login-modal');
             modal.style.display = 'flex';
@@ -720,7 +720,7 @@
             modal.querySelector('input[name="email"]').focus();
         }
 
-        function showRegister() {
+        window.showRegister = function() {
             closeModal();
             const modal = utils.getId('register-modal');
             modal.style.display = 'flex';
@@ -728,11 +728,25 @@
             modal.querySelector('input[name="name"]').focus();
         }
 
-        function closeModal() {
+        window.closeModal = function() {
             document.querySelectorAll('.modal').forEach(modal => {
                 modal.style.display = 'none';
                 modal.setAttribute('aria-hidden', 'true');
             });
+        }
+
+        // Make functions available globally for onclick handlers
+        window.showAdmin = function() {
+            if (!appState.authenticated || appState.user?.role !== 'admin') {
+                showNotification('Access denied. Admins only.', 'error');
+                return;
+            }
+            closeModal();
+            const modal = utils.getId('admin-modal');
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+            adminSystem.switchTab('leaderboard');
+            modal.querySelector('.admin-tab.active').focus();
         }
 
         // Authentication system
