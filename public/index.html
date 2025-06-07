@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Velocity Lab</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Velocity Lab - Exchange Hybrid Migration</title>
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
-    <script src="/assets/task-definitions.js"></script>
+    <script src="/assets/task-definitions.js" defer></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -18,52 +18,62 @@
             --transition: background-color .3s ease, transform .3s ease;
             --dark-primary: #0A84FF; --dark-text-primary: #FFF; --dark-text-secondary: #9CA3AF;
             --dark-background: #000; --dark-surface: #1C1C1E; --dark-surface-secondary: #2C2C2E;
-            --dark-border: #38383A; --dark-border-light: #48484A; --dark-shadow-color: rgba(0,0,0,.3);
+            --dark-border: #38383A; --dark-border-light: #48484A; --dark-shadow-color: rgba(0,0,0,0.3);
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--background); color: var(--text-primary); line-height: 1.5;
             font-size: 16px; -webkit-font-smoothing: antialiased; overflow-x: hidden;
         }
         body.dark {
             background: var(--dark-background); color: var(--dark-text-primary);
-            --text-primary: var(--dark-text-primary); --text-secondary: var(--dark-text-secondary);
-            --surface: var(--dark-surface); --surface-secondary: var(--dark-surface-secondary);
-            --border: var(--dark-border); --border-light: var(--dark-border-light);
-            --primary: var(--dark-primary); --shadow-color: var(--dark-shadow-color);
+            --text-primary: textvar(--dark-text-primary);
+            --text-secondary: var(--dark-text); --surface: var(--secondary-dark-surface-text); --surface: var(--secondarydark:--dark-surface); --surface-secondary: var(--surface-dark-secondary-surface-secondary);;
+            --borderdark: var(--border-dark-border); --border-light: var(--shadowdark); --text-primary-border-light);
+            --primary: var(--dark-shadow); --shadow-color: var(--shadow-dark-shadow-dark);
+            }
         }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
         header {
             position: fixed; top: 0; width: 100%; background: rgba(255,255,255,.85);
             backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-light);
-            z-index: 1000; transition: var(--transition);
+            z-index: 1000; transition: var(--transition);;
         }
         body.dark header { background: rgba(28,28,30,.85); }
         nav { height: 56px; display: flex; justify-content: space-between; align-items: center; }
-        .logo img { height: 32px; transition: var(--transition); }
-        .logo img:hover { transform: scale(1.05); }
-        .nav-right { display: flex; align-items: center; gap: 8px; }
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        .logo img { height: height32px; width: auto; transition: transform 0.3s easevar(--transition); }
+        .logo img:hover { transform: scale(1.05);
+        }
+        .nav-right { display: flex; align-items: center; gap: 12px; gap: 8px; }
         .btn {
             padding: 8px 16px; border-radius: var(--radius-lg); border: none;
             font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition);
             min-height: 36px; white-space: nowrap;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .btn-primary { background: var(--primary); color: #fff; }
-        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-medium); }
+        .btn-primary { background: var(--primary); color: #ffffff; }
+        .btn-primary:hover { background: var(--backgroundprimary-color: var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-medium); }
         .btn-secondary { background: var(--surface); color: var(--text-primary); border: 1px solid var(--border); }
         .btn-secondary:hover { background: var(--surface-secondary); transform: translateY(-1px); }
-        .btn-admin { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
+        .btn-admin { background: linear-gradient(135deg, #667eea, #764ba2); color: #ffffff; }
         .btn-admin:hover { transform: translateY(-1px); box-shadow: var(--shadow-medium); }
         .lab-button-container { position: relative; display: inline-block; }
         .lab-dropdown {
             position: absolute; top: 100%; right: 0; background: var(--surface);
             border: 1px solid var(--border); border-radius: var(--radius-md);
             box-shadow: var(--shadow-medium); min-width: 200px; z-index: 1001; display: none;
+            overflow: hidden;
         }
         .lab-dropdown.show { display: block; }
         .lab-dropdown-item {
-            padding: 12px 16px; cursor: pointer; transition: var(--transition);
+            padding: 12px 16px; cursor: pointer; transition: background-color 0.3s easevar(--transition);;
             border-bottom: 1px solid var(--border-light);
+            font-size: 14px;
+            color: var(--text-primary);
         }
         .lab-dropdown-item:last-child { border-bottom: none; }
         .lab-dropdown-item:hover { background: var(--surface-secondary); }
@@ -71,16 +81,24 @@
             padding: 8px; border: 1px solid var(--border); border-radius: var(--radius-md);
             background: var(--surface); color: var(--text-primary); font-size: 14px;
             font-weight: 600; cursor: pointer; min-width: 100px;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%228%22%20viewBox%3D%220%200%2012%208%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M1%201L6%206L11%201%22%20stroke%3D%22%236B7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 24px;
         }
-        .theme-selector:focus { outline: 2px solid var(--primary); }
+        body.dark .theme-selector {
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%228%22%20viewBox%3D%220%200%2012%208%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M1%201L6%206L11%201%22%20stroke%3D%22%239CA3AF%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E');
+        }
+        .theme-selector:focus { outline: 2px solid var(--primary); outline-offset: 2px; }
         .hidden { display: none !important; }
         #landing {
             min-height: 100vh; display: flex; align-items: center; justify-content: center;
             text-align: center; padding-top: 56px; background: var(--background);
             color: var(--text-primary);
         }
-        #landing h1 { font-size: clamp(36px, 8vw, 64px); font-weight: 700; margin-bottom: 24px; }
-        #landing p { font-size: 18px; opacity: .9; max-width: 600px; margin: 0 auto 32px; }
+        #landing h1 { font-size: clamp(36px, 8vw, 64px); font-weight: 700; margin-bottom: 24px; line-height: 1.2; }
+        #landing p { font-size: 18px; opacity: .9; max-width: 600px; margin: 0 auto 32px; line-height: 1.6; }
         .landing-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
         #dashboard { padding: 80px 0 40px; min-height: 100vh; }
         .progress-card {
@@ -92,7 +110,7 @@
         .progress-ring svg { transform: rotate(-90deg); width: 100%; height: 100%; }
         .progress-ring circle { fill: none; stroke-width: 8; stroke-linecap: round; }
         .progress-ring .background { stroke: var(--border); }
-        .progress-ring .foreground { stroke: var(--primary); stroke-dasharray: calc(2 * 3.14159 * 65); }
+        .progress-ring .foreground { stroke: var(--primary); stroke-dasharray: calc(2 * 3.14159 * 65); stroke-dashoffset: calc(2 * 3.14159 * 65); transition: stroke-dashoffset 0.5s ease; }
         .progress-percentage {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             font-size: 28px; font-weight: 700; color: var(--primary);
@@ -100,52 +118,67 @@
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px; margin: 24px 0; }
         .stat { text-align: center; }
         .stat-value { font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
-        .stat-label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; }
+        .stat-label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
         .weeks-container { display: flex; flex-direction: column; gap: 16px; }
         .week-card {
             background: var(--surface); border-radius: var(--radius-xl); overflow: hidden;
             border: 1px solid var(--border-light); box-shadow: var(--shadow-light);
+            transition: box-shadow 0.3s ease;
         }
+        .week-card:hover { box-shadow: var(--shadow-medium); }
         .week-card[aria-expanded="true"] .expand-icon { transform: rotate(90deg); }
         .week-header {
             padding: 16px; cursor: pointer; display: flex; justify-content: space-between;
-            align-items: center; transition: var(--transition);
+            align-items: center; transition: background-color 0.3s easevar(--transition);;
+            user-select: none;
         }
         .week-header:hover { background: var(--surface-secondary); }
+        .week-header:focus { outline: 2px solid var(--primary); outline-offset: -2px; }
         .week-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
         .week-info p { color: var(--text-secondary); font-size: 13px; }
         .week-progress { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-        .progress-text { font-size: 13px; font-weight: 600; }
+        .progress-text { font-size: 13px; font-weight: 600; color: var(--text-primary); }
         .progress-bar { width: 80px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); transition: width .3s ease; }
-        .expand-icon { width: 18px; height: 18px; color: var(--text-secondary); transition: var(--transition); }
-        .tasks-container { max-height: 0; overflow: hidden; transition: max-height .4s ease; }
+        .progress-fill { height: 100%; background: var(--primary); transition: width 0.5s ease; }
+        .expand-icon { width: 18px; height: 18px; color: var(--text-secondary); transition: transform 0.3s easevar(--transition); }
+        .tasks-container { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
         .week-card[aria-expanded="true"] .tasks-container { max-height: 2000px; }
         .tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; padding: 16px; }
         .task-item {
             background: var(--surface-secondary); border-radius: var(--radius-md); padding: 12px;
-            cursor: pointer; transition: var(--transition); border: 1px solid var(--border-light);
+            cursor: pointer; transition: background-color 0.3s ease, transform 0.3s easevar(--transition); border: 1px solid var(--border-light);
             display: flex; align-items: center; gap: 12px;
         }
-        .task-item:hover { background: var(--surface); transform: translateY(-1px); }
+        .task-item:hover { background: var(--surface); transform: translateY(-1px); box-shadow: var(--shadow-light); }
         .task-item.completed { background: rgba(52,199,89,.1); border-color: var(--success); }
         .task-checkbox {
             width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px;
-            cursor: pointer; appearance: none; transition: var(--transition);
+            cursor: pointer; appearance: none; position: relative; transition: background-color 0.3s ease, border-color 0.3s easevar(--transition);;
         }
         .task-checkbox:checked { background: var(--success); border-color: var(--success); }
-        .task-checkbox:checked::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 11px; }
+        .task-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 11px;
+            font-weight: bold;
+        }
         .task-content { flex: 1; }
-        .task-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
-        .task-description { font-size: 12px; color: var(--text-secondary); }
+        .task-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; color: var(--text-primary); }
+        .task-description { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
         .modal {
             display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5);
             backdrop-filter: blur(10px); z-index: 2000; padding: 16px; justify-content: center; align-items: center;
+            overflow-y: auto;
         }
         .modal[aria-hidden="false"] { display: flex; }
         .modal-content {
             background: var(--surface); border-radius: var(--radius-xl); padding: 24px;
             max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 25px var(--shadow-color);
+            position: relative;
         }
         .modal-branded {
             background: url('/assets/VelocityBackground.jpg') center/cover no-repeat;
@@ -156,28 +189,49 @@
         .task-notes-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-light); }
         #task-notes {
             width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: var(--radius-md);
-            font-size: 14px; resize: vertical; transition: var(--transition);
+            font-size: 14px; resize: vertical; transition: border-color 0.3s ease, box-shadow 0.3s easevar(--transition);;
+            background: var(--surface); color: var(--text-primary);
+            min-height: 100px;
         }
         #task-notes:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,122,255,.1); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .modal-title { font-size: 20px; font-weight: 700; }
+        .modal-title { font-size: 20px; font-weight: 700; color: var(--text-primary); }
         .modal-close {
             width: 28px; height: 28px; border-radius: 50%; background: var(--surface-secondary);
-            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition);
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.3s easevar(--transition);;
+            border: none;
         }
         .modal-close:hover { background: var(--border); }
-        .modal-close svg { width: 16px; height: 16px; }
+        .modal-close svg { width: 16px; height: 16px; stroke: var(--text-secondary); }
         .form-group { margin-bottom: 16px; }
         .form-input {
             width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: var(--radius-md);
-            font-size: 15px; transition: var(--transition); background: var(--surface);
+            font-size: 15px; transition: border-color 0.3s ease, box-shadow 0.3s easevar(--transition); background: var(--surface);
+            color: var(--text-primary);
         }
-        .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,122,255,.1); }
+        .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,122,255,.1); outline: none; }
         .form-label { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; cursor: pointer; }
+        .form-checkbox {
+            width: 16px; height: 16px; border: 2px solid var(--border); border-radius: 4px;
+            cursor: pointer; appearance: none; position: relative;
+        }
+        .form-checkbox:checked { background: var(--primary); border-color: var(--primary); }
+        .form-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 10px;
+            font-weight: bold;
+        }
         .notification {
             position: fixed; top: 80px; right: 16px; padding: 12px 20px; border-radius: var(--radius-md);
-            color: #fff; font-weight: 600; transform: translateX(300px); transition: var(--transition);
+            color: #fff; font-weight: 600; transform: translateX(300px); transition: transform 0.3s easevar(--transition);;
             box-shadow: 0 4px 12px var(--shadow-color); z-index: 3000; aria-live: "assertive";
+            max-width: 300px;
+            text-align: center;
         }
         .notification.show { transform: translateX(0); }
         .notification.success { background: var(--success); }
@@ -186,9 +240,11 @@
         .admin-tabs { display: flex; gap: 4px; margin-bottom: 24px; background: var(--surface-secondary); padding: 4px; border-radius: var(--radius-md); }
         .admin-tab {
             flex: 1; padding: 12px; text-align: center; border-radius: var(--radius-md);
-            cursor: pointer; transition: var(--transition); font-weight: 600; color: var(--text-secondary);
+            cursor: pointer; transition: background-color 0.3s ease, color 0.3s easevar(--transition); font-weight: 600; color: var(--text-secondary);
         }
+        .admin-tab:hover { background: var(--surface); }
         .admin-tab.active { background: var(--surface); color: var(--primary); }
+        .admin-tab:focus { outline: 2px solid var(--primary); outline-offset: -2px; }
         .admin-section { display: none; }
         .admin-section.active { display: block; }
         .admin-table {
@@ -196,26 +252,31 @@
             border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-light);
         }
         .admin-table th, .admin-table td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-light); }
-        .admin-table th { background: var(--surface-secondary); font-weight: 700; color: var(--text-secondary); font-size: 12px; }
+        .admin-table th { background: var(--surface-secondary); font-weight: 700; color: var(--text-secondary); font-size: 12px; text-transform: uppercase; }
         .leaderboard-table th { scope: col; }
         .rank-cell { text-align: center; font-weight: bold; }
         .medal-icon { font-size: 18px; margin-right: 4px; }
         .progress-container { display: flex; align-items: center; gap: 8px; }
         .progress-bar-mini { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-        .progress-fill-mini { height: 100%; background: var(--primary); transition: width .3s ease; }
+        .progress-fill-mini { height: 100%; background: var(--primary); transition: width 0.5s ease; }
         .progress-text-mini { font-size: 12px; font-weight: 600; min-width: 30px; }
-        .notes-badge { background: var(--primary); color: white; padding: 2px 6px; border-radius: 10px; font-size: 11px; }
+        .notes-badge { background: var(--primary); color: #fff; padding: 2px 6px; border-radius: 10px; font-size: 11px; }
         .user-card {
             background: var(--surface); border-radius: var(--radius-md); padding: 12px;
             margin-bottom: 12px; border: 1px solid var(--border-light); display: flex; justify-content: space-between;
+            align-items: center; transition: box-shadow 0.3s ease, transform 0.3s ease;
         }
         .user-card:hover { box-shadow: var(--shadow-light); transform: translateY(-1px); }
-        .user-info h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+        .user-info h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; color: var(--text-primary); }
         .user-info p { font-size: 13px; color: var(--text-secondary); }
         .user-actions { display: flex; gap: 8px; }
         .user-progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin: 8px 0; width: 80px; }
-        .user-progress-fill { height: 100%; background: var(--primary); transition: width .3s ease; }
-        .loading { width: 14px; height: 14px; border: 2px solid var(--border); border-radius: 50%; border-top-color: var(--primary); animation: spin 1s ease-in-out infinite; }
+        .user-progress-fill { height: 100%; background: var(--primary); transition: width 0.5s ease; }
+        .loading {
+            width: 14px; height: 14px; border: 2px solid var(--border); border-radius: 50%;
+            border-top-color: var(--primary); animation: spin 1s ease-in-out infinite;
+            display: inline-block;
+        }
         @keyframes spin { to { transform: rotate(360deg); } }
         @media (max-width: 768px) {
             .container { padding: 0 12px; }
@@ -223,14 +284,24 @@
             .modal-content { padding: 16px; margin: 8px; }
             .modal-logo { max-height: 32px; }
             .admin-tabs { flex-direction: column; }
+            .admin-tab { padding: 10px; }
             .user-card { flex-direction: column; align-items: flex-start; gap: 12px; }
             .user-actions { width: 100%; justify-content: flex-end; }
             .leaderboard-table th, .leaderboard-table td { padding: 8px 4px; font-size: 12px; }
+            .progress-bar { width: 60px; }
+            .nav-right { gap: 4px; }
+            .btn { padding: 6px 12px; font-size: 13px; }
+            .theme-selector { min-width: 80px; font-size: 13px; }
         }
         @media (max-width: 480px) {
             #landing h1 { font-size: 32px; }
             #landing p { font-size: 16px; }
             .stats-grid { grid-template-columns: 1fr; }
+            .progress-ring { width: 120px; height: 120px; }
+            .progress-percentage { font-size: 24px; }
+            .stat-value { font-size: 24px; }
+            .landing-actions { flex-direction: column; gap: 12px; }
+            .landing-actions .btn { width: 100%; max-width: 200px; }
         }
     </style>
 </head>
@@ -246,7 +317,7 @@
                     <button onclick="showRegister()" class="btn btn-primary" aria-label="Register">Register</button>
                 </span>
                 <span id="user-menu" class="hidden">
-                    <span id="user-name" style="margin-right:8px;font-weight:600"></span>
+                    <span id="user-name" style="margin-right: 8px; font-weight: 600;"></span>
                     <button id="admin-button" class="btn btn-admin hidden" onclick="showAdmin()" aria-label="Admin Portal">Admin</button>
                     <button onclick="authSystem.logout()" class="btn btn-secondary" aria-label="Sign Out">Sign Out</button>
                     <select id="theme-selector" class="theme-selector" onchange="uiSystem.changeTheme(this.value)" aria-label="Select Theme">
@@ -262,7 +333,7 @@
         <section id="landing" aria-labelledby="landing-title">
             <div class="container">
                 <h1 id="landing-title">Master Exchange Hybrid</h1>
-                <p>42 tasks over 4 weeks. Build a lab with DCs, Exchange Server, and VMs.</p>
+                <p>Embark on a 4-week journey with 42 hands-on tasks to build a complete Exchange Hybrid lab, including Domain Controllers, Exchange Server, and virtual machines.</p>
                 <div class="landing-actions">
                     <button class="btn btn-primary" onclick="showRegister()" aria-label="Get Started">Get Started</button>
                     <button class="btn btn-secondary" onclick="showLogin()" aria-label="Sign In">Sign In</button>
@@ -287,45 +358,85 @@
                         <div class="stat"><div class="stat-value">3</div><div class="stat-label">VMs</div></div>
                     </div>
                     <div class="lab-button-container">
-                        <button class="btn btn-primary" onclick="uiSystem.toggleLabDropdown()" aria-haspopup="true" aria-expanded="false">Start New Lab ▼</button>
+                        <button class="btn btn-primary" onclick="uiSystem.toggleLabDropdown()" aria-haspopup="true" aria-expanded="false">Lab Options ▼</button>
                         <div class="lab-dropdown" id="lab-dropdown" role="menu">
-                            <div class="lab-dropdown-item" onclick="labSystem.startNew();uiSystem.closeLabDropdown()" role="menuitem">🚀 Start Fresh Lab</div>
-                            <div class="lab-dropdown-item" onclick="uiSystem.showLabHistory();uiSystem.closeLabDropdown()" role="menuitem">📅 Lab History</div>
+                            <div class="lab-dropdown-item" onclick="labSystem.startNew(); uiSystem.closeLabDropdown()" role="menuitem">🚀 Start Fresh Lab</div>
+                            <div class="lab-dropdown-item" onclick="uiSystem.showLabHistory(); uiSystem.closeLabDropdown()" role="menuitem">📅 View Lab History</div>
                         </div>
                     </div>
                 </div>
                 <div class="weeks-container" id="weeks-container">
                     <div class="week-card" id="week1-card" role="region" aria-expanded="false" aria-labelledby="week1-title">
                         <div class="week-header" onclick="progressSystem.toggleWeek('week1')" role="button" tabindex="0">
-                            <div class="week-info"><h3 id="week1-title">Week 1: Foundation</h3><p>DC setup, domain join, file shares</p></div>
-                            <div class="week-progress"><div class="progress-text"><span id="week1-completed">0</span>/13 tasks</div><div class="progress-bar"><div class="progress-fill" id="week1-progress"></div></div></div>
-                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"></polyline></svg>
+                            <div class="week-info">
+                                <h3 id="week1-title">Week 1: Foundation Setup</h3>
+                                <p>Configure Domain Controller, domain join, and file shares</p>
+                            </div>
+                            <div class="week-progress">
+                                <div class="progress-text"><span id="week1-completed">0</span>/13 tasks</div>
+                                <div class="progress-bar"><div class="progress-fill" id="week1-progress" style="width: 0%;"></div></div>
+                            </div>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9,18 15,12 9,6"></polyline>
+                            </svg>
                         </div>
-                        <div class="tasks-container"><div class="tasks-grid" id="week1-tasks-grid"></div></div>
+                        <div class="tasks-container">
+                            <div class="tasks-grid" id="week1-tasks-grid"></div>
+                        </div>
                     </div>
                     <div class="week-card" id="week2-card" role="region" aria-expanded="false" aria-labelledby="week2-title">
                         <div class="week-header" onclick="progressSystem.toggleWeek('week2')" role="button" tabindex="0">
-                            <div class="week-info"><h3 id="week2-title">Week 2: Infrastructure</h3><p>Second DC, WSUS, time sync</p></div>
-                            <div class="week-progress"><div class="progress-text"><span id="week2-completed">0</span>/8 tasks</div><div class="progress-bar"><div class="progress-fill" id="week2-progress"></div></div></div>
-                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"></polyline></svg>
+                            <div class="week-info">
+                                <h3 id="week2-title">Week 2: Infrastructure Build</h3>
+                                <p>Deploy second DC, WSUS, and time synchronization</p>
+                            </div>
+                            <div class="week-progress">
+                                <div class="progress-text"><span id="week2-completed">0</span>/8 tasks</div>
+                                <div class="progress-bar"><div class="progress-fill" id="week2-progress" style="width: 0%;"></div></div>
+                            </div>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9,18 15,12 9,6"></polyline>
+                            </svg>
                         </div>
-                        <div class="tasks-container"><div class="tasks-grid" id="week2-tasks-grid"></div></div>
+                        <div class="tasks-container">
+                            <div class="tasks-grid" id="week2-tasks-grid"></div>
+                        </div>
                     </div>
                     <div class="week-card" id="week3-card" role="region" aria-expanded="false" aria-labelledby="week3-title">
                         <div class="week-header" onclick="progressSystem.toggleWeek('week3')" role="button" tabindex="0">
-                            <div class="week-info"><h3 id="week3-title">Week 3: Exchange</h3><p>DC upgrades, Exchange 2019 setup</p></div>
-                            <div class="week-progress"><div class="progress-text"><span id="week3-completed">0</span>/12 tasks</div><div class="progress-bar"><div class="progress-fill" id="week3-progress"></div></div></div>
-                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"></polyline></svg>
+                            <div class="week-info">
+                                <h3 id="week3-title">Week 3: Exchange Deployment</h3>
+                                <p>Upgrade DCs and install Exchange Server 2019</p>
+                            </div>
+                            <div class="week-progress">
+                                <div class="progress-text"><span id="week3-completed">0</span>/12 tasks</div>
+                                <div class="progress-bar"><div class="progress-fill" id="week3-progress" style="width: 0%;"></div></div>
+                            </div>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9,18 15,12 9,6"></polyline>
+                            </svg>
                         </div>
-                        <div class="tasks-container"><div class="tasks-grid" id="week3-tasks-grid"></div></div>
+                        <div class="tasks-container">
+                            <div class="tasks-grid" id="week3-tasks-grid"></div>
+                        </div>
                     </div>
                     <div class="week-card" id="week4-card" role="region" aria-expanded="false" aria-labelledby="week4-title">
                         <div class="week-header" onclick="progressSystem.toggleWeek('week4')" role="button" tabindex="0">
-                            <div class="week-info"><h3 id="week4-title">Week 4: Hybrid</h3><p>M365 integration, hybrid mail</p></div>
-                            <div class="week-progress"><div class="progress-text"><span id="week4-completed">0</span>/10 tasks</div><div class="progress-bar"><div class="progress-fill" id="week4-progress"></div></div></div>
-                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"></polyline></svg>
+                            <div class="week-info">
+                                <h3 id="week4-title">Week 4: Hybrid Integration</h3>
+                                <p>Connect to Microsoft 365 and configure hybrid mail flow</p>
+                            </div>
+                            <div class="week-progress">
+                                <div class="progress-text"><span id="week4-completed">0</span>/10 tasks</div>
+                                <div class="progress-bar"><div class="progress-fill" id="week4-progress" style="width: 0%;"></div></div>
+                            </div>
+                            <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9,18 15,12 9,6"></polyline>
+                            </svg>
                         </div>
-                        <div class="tasks-container"><div class="tasks-grid" id="week4-tasks-grid"></div></div>
+                        <div class="tasks-container">
+                            <div class="tasks-grid" id="week4-tasks-grid"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -333,80 +444,128 @@
     </main>
     <div id="login-modal" class="modal" role="dialog" aria-labelledby="login-title" aria-hidden="true">
         <div class="modal-content modal-branded">
-            <img src="/assets/Velocity-Logo.png" alt="Velocity Logo" class="modal-logo">
+            <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="modal-logo">
             <div class="modal-header">
                 <h2 class="modal-title" id="login-title">Sign In</h2>
-                <button class="modal-close" onclick="closeModal()" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
+                <button class="modal-close" onclick="closeModal()" aria-label="Close Modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
-            <form id="login-form">
-                <div class="form-group"><input type="email" name="email" placeholder="Email" required class="form-input" aria-label="Email"></div>
-                <div class="form-group"><input type="password" name="password" placeholder="Password" required class="form-input" aria-label="Password"></div>
-                <div class="form-group"><label class="form-label"><input type="checkbox" name="remember" class="form-checkbox" aria-label="Remember me">Remember me</label></div>
-                <button type="submit" class="btn btn-primary" style="width:100%" aria-label="Sign In">Sign In</button>
-                <p style="text-align:center;color:var(--text-secondary)">New? <a href="#" onclick="showRegister()" style="color:var(--primary)">Create account</a></p>
+            <form id="login-form" novalidate>
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="Email" required class="form-input" aria-label="Email Address" autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" placeholder="Password" required class="form-input" aria-label="Password" autocomplete="current-password">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" name="remember" class="form-checkbox" aria-label="Remember me">
+                        Remember me
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" aria-label="Sign In">Sign In</button>
+                <p style="text-align: center; color: var(--text-secondary); margin-top: 16px;">
+                    New to Velocity Lab? <a href="#" onclick="showRegister()" style="color: var(--primary); text-decoration: none;">Create an account</a>
+                </p>
             </form>
         </div>
     </div>
     <div id="register-modal" class="modal" role="dialog" aria-labelledby="register-title" aria-hidden="true">
         <div class="modal-content modal-branded">
-            <img src="/assets/Velocity-Logo.png" alt="Velocity Logo" class="modal-logo">
+            <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" class="modal-logo">
             <div class="modal-header">
                 <h2 class="modal-title" id="register-title">Create Account</h2>
-                <button class="modal-close" onclick="closeModal()" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
+                <button class="modal-close" onclick="closeModal()" aria-label="Close Modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
-            <form id="register-form">
-                <div class="form-group"><input type="text" name="name" placeholder="Full name" required class="form-input" aria-label="Full name"></div>
-                <div class="form-group"><input type="email" name="email" placeholder="Email" required class="form-input" aria-label="Email"></div>
-                <div class="form-group"><input type="password" name="password" placeholder="Password (8+ chars)" required minlength="8" class="form-input" aria-label="Password"></div>
-                <button type="submit" class="btn btn-primary" style="width:100%;" aria-label="Create Account">Create Account</button>
-                <p style="text-align:center;color:var(--text-secondary)">Have account? <a href="#" onclick="showLogin()" style="color:var(--primary)">Sign in</a></p>
+            <form id="register-form" novalidate>
+                <div class="form-group">
+                    <input type="text" name="name" placeholder="Full Name" required class="form-input" aria-label="Full Name" autocomplete="name">
+                </div>
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="Email" required class="form-input" aria-label="Email Address" autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" placeholder="Password (8+ characters)" required minlength="8" class="form-input" aria-label="Password" autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;" aria-label="Create Account">Create Account</button>
+                <p style="text-align: center; color: var(--text-secondary); margin-top: 16px;">
+                    Already have an account? <a href="#" onclick="showLogin()" style="color: var(--primary); text-decoration: none;">Sign in</a>
+                </p>
             </form>
         </div>
     </div>
     <div id="task-modal" class="modal" role="dialog" aria-labelledby="task-title" aria-hidden="true">
-        <div class="modal-content" style="max-width:800px">
+        <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
-                <h2 class="modal-title" id="task-title"></h2>
-                <button class="modal-close" onclick="closeModal()" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
+                <h2 class="modal-title" id="task-title">Task Details</h2>
+                <button class="modal-close" onclick="closeModal()" aria-label="Close Modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
-            <div id="task-content"></div>
+            <div id="task-content" style="font-size: 14px; line-height: 1.6;"></div>
             <div class="task-notes-section">
                 <h3 style="font-size: 15px; margin-bottom: 8px;">📝 Notes</h3>
-                <textarea id="task-notes" placeholder="Add notes..." maxlength="500" rows="4" aria-label="Task Notes"></textarea>
-                <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+                <textarea id="task-notes" placeholder="Add your notes here..." maxlength="500" rows="4" aria-label="Task Notes"></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
                     <small id="notes-counter" style="color: var(--text-secondary);">0/500</small>
-                    <button id="save-notes-btn" class="btn btn-secondary" onclick="taskSystem.saveNotes()">💾 Save</button>
+                    <button id="save-notes-btn" class="btn btn-secondary" onclick="taskSystem.saveNotes()" aria-label="Save Notes">💾 Save</button>
                 </div>
             </div>
         </div>
     </div>
     <div id="lab-history-modal" class="modal" role="dialog" aria-labelledby="lab-history-title" aria-hidden="true">
-        <div class="modal-content" style="max-width:600px">
+        <div class="modal-content" style="max-width: 600px;">
             <div class="modal-header">
                 <h2 class="modal-title" id="lab-history-title">Lab History</h2>
-                <button class="modal-close" onclick="closeModal()" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
+                <button class="modal-close" onclick="closeModal()" aria-label="Close Modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
-            <div id="lab-history-content"></div>
+            <div id="lab-history-content" style="font-size: 14px;"></div>
         </div>
     </div>
     <div id="admin-modal" class="modal" role="dialog" aria-labelledby="admin-title" aria-hidden="true">
         <div class="admin-content modal-content">
             <div class="modal-header">
                 <h2 class="modal-title" id="admin-title">Admin Portal</h2>
-                <button class="modal-close" onclick="closeModal()" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
+                <button class="modal-close" onclick="closeModal()" aria-label="Close Modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
             <div class="admin-tabs" role="tablist">
-                <div class="admin-tab active" onclick="adminSystem.switchTab('leaderboard')" role="tab" aria-selected="true" id="tab-leaderboard">Leaderboard</div>
-                <div class="admin-tab" onclick="adminSystem.switchTab('users')" role="tab" aria-selected="false" id="tab-users">Users</div>
-                <div class="admin-tab" onclick="adminSystem.switchTab('data')" role="tab" aria-selected="false" id="tab-data">Data Tools</div>
+                <div class="admin-tab active" onclick="adminSystem.switchTab('leaderboard')" role="tab" aria-selected="true" id="tab-leaderboard" tabindex="0">Leaderboard</div>
+                <div class="admin-tab" onclick="adminSystem.switchTab('users')" role="tab" aria-selected="false" id="tab-users" tabindex="0">Users</div>
+                <div class="admin-tab" onclick="adminSystem.switchTab('data')" role="tab" aria-selected="false" id="tab-data" tabindex="0">Data Tools</div>
             </div>
             <div id="admin-leaderboard" class="admin-section active" role="tabpanel" aria-labelledby="tab-leaderboard">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h3 style="margin: 0;">🏆 Leaderboard</h3>
-                    <button class="btn btn-secondary" onclick="adminSystem.refreshLeaderboard()" style="padding: 6px 12px; font-size: 13px;" aria-label="Refresh">🔄 Refresh</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 style="margin: 0; font-size: 18px;">🏆 Leaderboard</h3>
+                    <button class="btn btn-secondary" onclick="adminSystem.refreshLeaderboard(true)" style="padding: 6px 12px; font-size: 14px;" aria-label="Refresh Leaderboard">🔄 Refresh</button>
                 </div>
-                <table class="admin-table">
-                    <thead><tr><th>Rank</th><th>Student</th><th>Progress</th><th>Tasks</th><th>Notes</th><th>Last Active</th></tr></thead>
+                <table class="admin-table leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Rank</th>
+                            <th scope="col">Student</th>
+                            <th scope="col">Progress</th>
+                            <th scope="col">Tasks</th>
+                            <th scope="col">Notes</th>
+                            <th scope="col">Last Active</th>
+                        </tr>
+                    </thead>
                     <tbody id="leaderboard-body"></tbody>
                 </table>
             </div>
@@ -414,502 +573,848 @@
                 <div id="users-list"></div>
             </div>
             <div id="admin-data" class="admin-section" role="tabpanel" aria-labelledby="tab-data">
-                <div style="display:flex;gap:12px"><button class="btn btn-primary" onclick="adminSystem.exportProgress()">Export CSV</button><input type="file" accept=".csv" id="import-file" style="display:none;" onchange="adminSystem.importProgress(this.files[0])"><button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">Import</button></div>
+                <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                    <button class="btn btn-primary" onclick="adminSystem.exportProgress()" aria-label="Export Progress as CSV">Export CSV</button>
+                    <input type="file" accept=".csv" id="import-file" style="display: none;" onchange="adminSystem.importProgress(this.files[0])" aria-label="Import CSV File">
+                    <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()" aria-label="Import Progress CSV">Import CSV</button>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 14px;">Use these tools to export or import user progress data in CSV format.</p>
             </div>
         </div>
     </div>
-    <div id="notification" class="notification" role="alert"></div>
+    <div id="notification" class="notification" role="alert" aria-live="assertive"></div>
     <script>
+        // Task definitions are loaded from /assets/task-definitions.js
+        // Define tasks by week for mapping purposes
         const tasksByWeek = {
-            1: ["install-server2012", "configure-static-ip", "install-adds-role", "promote-toad", "configure-dns-server", "create-domain-users", "join-vm-domain", "create-hidden-task", "map-drive-gpo", "map-drive-script", "map-drive-powershell", "create-security-group", "restrict-share-task"],
-            2: ["install-second-task", "promote-additional-dc", "install-wsus-role", "configure-wsus-task", "setup-wsus-gpo", "configure-primary-task", "configure-time-task", "test-infrastructure-task"],
-            3: ["backup-tasks", "upgrade-task", "upgrade-second-task", "raise-functional-task", "install-exchange", "install-exchange-prereqs", "extend-ad-task", "install-exchange-task", "configure-exchange-task", "create-mailboxes", "test-mailbox-task", "configure-internal-mailflow"],
-            4: ["configure-external-dns", "setup-firewall-rules", "install-ssl-certificate", "configure-external-task", "setup-modern-task", "prepare-m365-task", "install-aad-connect", "run-hybrid-task", "configure-hybrid-mailflow", "verify-hybrid-task"]
+            1: [
+                "install-server2012",
+                "configure-static-ip",
+                "install-ad-ds-role",
+                "promote-to-dc",
+                "configure-dns-server",
+                "create-domain-users",
+                "join-vm-domain",
+                "create-hidden-share",
+                "map-drive-gpo",
+                "map-drive-script",
+                "map-drive-powershell",
+                "create-security-group",
+                "restrict-share-access"
+            ],
+            2: [
+                "install-second-dc",
+                "promote-additional-dc",
+                "install-wsus-role",
+                "configure-wsus",
+                "setup-wsus-gpo",
+                "configure-primary-dns",
+                "configure-time-sync",
+                "test-infrastructure"
+            ],
+            3: [
+                "backup-ad",
+                "upgrade-domain",
+                "upgrade-second-dc",
+                "raise-functional-level",
+                "install-exchange-prereqs",
+                "extend-ad-schema",
+                "install-exchange-2019",
+                "configure-exchange",
+                "create-mailboxes",
+                "test-mailbox-access",
+                "configure-internal-mailflow",
+                "verify-email-delivery"
+            ],
+            4: [
+                "configure-external-dns",
+                "setup-firewall-rules",
+                "install-ssl-certificate",
+                "configure-external-access",
+                "setup-modern-auth",
+                "prepare-m365-tenant",
+                "install-aad-connect",
+                "run-hybrid-config",
+                "configure-hybrid-mailflow",
+                "verify-hybrid-setup"
+            ]
         };
-        let appState = { user: null, progress: {}, authenticated: false, sessionToken: null };
+
+        // Application state
+        let appState = {
+            user: null,
+            progress: {},
+            authenticated: false,
+            sessionToken: null
+        };
+
+        // Utility functions
         const utils = {
             getId: id => document.getElementById(id),
-            show: el => el?.classList.remove("hidden"),
-            hide: el => el?.classList.add("hidden"),
+            show: element => element?.classList.remove('hidden'),
+            hide: element => element?.classList.add('hidden'),
             cookies: {
-                get: name => document.cookie.match(`(?:^|;)${name}=([^;]*)`)?.[1],
-                set: (name, value, days=8) => document.cookie = `${name}=${value};path=/;Max-Age=${days*86400};SameSite=Strict;${location.protocol.toLowerCase() === "https:" ? "Secure" : ""}`,
-                delete: name => document.cookie = `${name}=;path=/;Max-Age=0;SameSite=Strict`
+                get(name) {
+                    const match = document.cookie.match(`(?:${name}=)([^;]*)`);
+                    return match ? match[1] : null;
+                },
+                set(name, value, days = 30) {
+                    const expires = new Date(Date.now() + days * 86400000).toUTCString();
+                    document.cookie = `${name}=${value}; path=/; SameSite=Strict; expires=${expires}${location.protocol === 'https:' ? '; Secure' : ''}`;
+                },
+                delete(name) {
+                    document.cookie = `${name}=; path=/; SameSite=Strict; max-age=0`;
+                }
+            },
+            formatDate(dateString) {
+                if (!dateString) return 'Never';
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             }
         };
-        function showNotification(msg, type = "success") {
-            const n = utils.getId("notification");
-            n.textContent = msg;
-            n.className = `notification ${type} show`;
-            setTimeout(() => n.classList.remove("show"), 3000);
+
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const notification = utils.getId('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            setTimeout(() => notification.classList.remove('show'), 4000);
         }
+
+        // API call handler with retry logic
         async function apiCall(endpoint, options = {}) {
             const headers = new Headers(options.headers || {});
-            if (appState.sessionToken) headers.set("Authorization", `Bearer ${appState.sessionToken}`);
-            const isGet = !options.method || options.method.toUpperCase() === "GET";
-            let body = options.body;
-            if (!isGet) {
-                body = options.body instanceof FormData ? options.body : new FormData();
-                if (!(options.body instanceof FormData)) Object.entries(options.body || {}).forEach(([k, v]) => body.append(k, v));
-                body.append("csrf_token", "static-csrf-token-12345");
+            if (appState.sessionToken) {
+                headers.set('Authorization', `Bearer ${appState.sessionToken}`);
             }
+            headers.set('Accept', 'application/json');
+            let body = options.body;
+            const method = options.method || 'GET';
+            if (method !== 'GET' && !(body instanceof FormData)) {
+                body = new FormData();
+                Object.entries(options.body || {}).forEach(([key, v]) => body.append(key, v));
+                body.append('csrf_token', 'static-csrf-token-9876543210'); // Simulated CSRF token
+            }
+
             for (let attempt = 1; attempt <= 3; attempt++) {
                 try {
-                    const response = await fetch(endpoint, {
-                        credentials: "same-origin", headers, method: options.method || "GET", body,
-                        signal: AbortSignal.timeout(30000)
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 30000);
+                    const response = await fetch(`${endpoint}`, {
+                        method,
+                        headers,
+                        body,
+                        credentials: 'same-origin',
+                        signal: controller.signal
                     });
-                    if (!response.ok) throw new Error(`Server error (${response.status})`);
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error: ${response.status} ${response.statusText}`);
+                    }
                     const data = await response.json();
-                    if (!data.success) throw new Error(data.error || "Request failed");
+                    if (!data.success) {
+                        throw new Error(data.message || 'Request failed');
+                    }
                     return data;
                 } catch (error) {
-                    if (attempt === 3) {
-                        showNotification(error.message || "Request failed", "error");
+                    if (attempt === 3 || error.name === 'AbortError') {
+                        showNotification(error.message || 'Network error occurred', 'error');
                         throw error;
                     }
+                    await new Promise(resolve => setTimeout(resolve, attempt * 1000)); // Exponential backoff
                 }
             }
         }
+
+        // Modal management functions
         function showLogin() {
             closeModal();
-            const m = utils.getId("login-modal");
-            m.style.display = "flex";
-            m.setAttribute("aria-hidden", "false");
-            m.querySelector("input[name='email']").focus();
+            const modal = utils.getId('login-modal');
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+            modal.querySelector('input[name="email"]').focus();
         }
+
         function showRegister() {
             closeModal();
-            const m = utils.getId("register-modal");
-            m.style.display = "flex";
-            m.setAttribute("aria-hidden", "false");
-            m.querySelector("input[name='name']").focus();
+            const modal = utils.getId('register-modal');
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+            modal.querySelector('input[name="name"]').focus();
         }
+
         function closeModal() {
-            document.querySelectorAll(".modal").forEach(m => {
-                m.style.display = "none";
-                m.setAttribute("aria-hidden", "true");
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+                modal.setAttribute('aria-hidden', 'true');
             });
         }
+
+        // Authentication system
         const authSystem = {
             async checkSession() {
-                const user = utils.cookies.get("user");
-                const session = utils.cookies.get("session");
-                if (!user || !session) return;
+                const userCookie = utils.cookies.get('user');
+                const sessionCookie = utils.cookies.get('session');
+                if (!userCookie || !sessionCookie) return;
                 try {
-                    appState.user = JSON.parse(decodeURIComponent(user));
-                    appState.sessionToken = session;
+                    appState.user = JSON.parse(decodeURIComponent(userCookie));
+                    appState.sessionToken = sessionCookie;
                     appState.authenticated = true;
-                    if (appState.user.role === "admin") utils.show(utils.getId("admin-button"));
+                    if (appState.user.role === 'admin') {
+                        utils.show(utils.getId('admin-button'));
+                    }
                     uiSystem.showDashboard();
                     await progressSystem.loadProgress();
-                } catch (e) {
+                } catch (err) {
+                    console.warn('Invalid session, logging out:', err);
                     this.logout();
                 }
             },
             async login(formData) {
                 try {
-                    const { name, role, email, sessionToken } = await apiCall("/api/login", { method: "POST", body: formData });
-                    utils.cookies.set("user", encodeURIComponent(JSON.stringify({ name, role, email })));
-                    utils.cookies.set("session", sessionToken);
+                    const { data } = await apiCall('/api/users/login', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const { name, role, email, sessionToken } = data;
+                    utils.cookies.set('user', encodeURIComponent(JSON.stringify({ name, role, email })));
+                    utils.cookies.set('session', sessionToken);
                     appState.user = { name, role, email };
                     appState.sessionToken = sessionToken;
                     appState.authenticated = true;
-                    if (role === "admin") utils.show(utils.getId("admin-button"));
+                    if (role === 'admin') {
+                        utils.show('admin-button'));
+                    }
                     uiSystem.showDashboard();
                     await progressSystem.loadProgress();
                     closeModal();
-                    showNotification("Welcome back, " + name + "!");
-                } catch (e) {
-                    showNotification(e.message || "Login failed", "error");
+                    showNotification(`Welcome back, ${name}!`, 'success');
+                } catch (err) {
+                    showNotification(err.message || 'Login failed, please check your credentials.', 'error');
                 }
             },
             async register(formData) {
                 try {
-                    const { name, role, sessionToken, email } = await apiCall("/api/register", { method: "POST", body: formData });
-                    utils.cookies.set("user", encodeURIComponent(JSON.stringify({ name, role, email })));
-                    utils.cookies.set("session", sessionToken);
-                    appState.user = { name, role, email };
+                    const { data } = await apiCall('/api/users/register', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const { name, email, role, sessionToken } = data;
+                    utils.cookies.set('user', encodeURIComponent(JSON.stringify({ name, email, role })));
+                    utils.cookies.set('session', sessionToken);
+                    appState.user = { name, email, role };
                     appState.sessionToken = sessionToken;
                     appState.authenticated = true;
+                    if (role === 'admin') {
+                        utils.show(utils.getId('admin-button'));
+                    }
                     uiSystem.showDashboard();
                     await progressSystem.loadProgress();
                     closeModal();
-                    showNotification("Welcome, " + name + "!");
-                } catch (e) {
-                    showNotification(e.message || "Registration failed", "error");
+                    showNotification(`Welcome to Velocity Lab, ${name}!`, 'success');
+                } catch (err) {
+                    showNotification(err.message || 'Registration failed, please try again.', 'error');
                 }
             },
             logout() {
-                apiCall("/api/logout", { method: "POST" }).catch(e => console.error("Logout failed:", e));
-                utils.cookies.delete("user");
-                utils.cookies.delete("session");
+                try {
+                    apiCall('/api/users/logout', { method: 'POST' });
+                } catch (err) {
+                    console.error('Logout API call failed:', err);
+                }
+                utils.cookies.delete('user');
+                utils.cookies.delete('session');
                 appState = { user: null, progress: {}, authenticated: false, sessionToken: null };
-                utils.hide(utils.getId("admin-button"));
+                utils.hide(utils.getId('admin-button'));
                 uiSystem.showLanding();
-                showNotification("Signed out");
+                showNotification('Signed out successfully');
             }
         };
+
+        // UI System
         const uiSystem = {
             showLanding() {
-                utils.hide(utils.getId("dashboard"));
-                utils.show(utils.getId("landing"));
-                utils.hide(utils.getId("user-menu"));
-                utils.show(utils.getId("auth-buttons"));
+                utils.hide(utils.getId('dashboard'));
+                utils.show(utils.getId('landing'));
+                utils.hide(utils.getId('user-menu'));
+                utils.show(utils.getId('auth-buttons'));
             },
             showDashboard() {
-                utils.show(utils.getId("dashboard"));
-                utils.hide(utils.getId("landing"));
-                utils.show(utils.getId("user-menu"));
-                utils.hide(utils.getId("auth-buttons"));
-                utils.getId("user-name").textContent = appState.user?.name || "";
+                utils.show(utils.getId('dashboard'));
+                utils.hide(utils.getId('landing'));
+                utils.show(utils.getId('user-menu'));
+                utils.hide(utils.getId('auth-buttons'));
+                const userName = utils.getId('user-name');
+                userName.textContent = appState.user?.name || '';
+                userName.setAttribute('aria-label', `Logged in as ${appState.user.name}`);
             },
             toggleLabDropdown() {
-                const d = utils.getId("lab-dropdown");
-                const b = document.querySelector(".lab-button-container .btn");
-                const is = d.classList.toggle("show");
-                b.setAttribute("aria-expanded", is.toString());
-                if (is) document.addEventListener("click", e => !d.contains(e.target) && !b.contains(e.target) && this.closeLabDropdown(), { once: true });
+                const dropdown = utils.getId('lab-dropdown');
+                const button = document.querySelector('.lab-button-container .btn');
+                const isExpanded = dropdown.classList.toggle('show');
+                button.setAttribute('aria-expanded', isExpanded.toString());
+                if (isExpanded) {
+                    document.addEventListener('mousedown', (event) => {
+                        if (!dropdown.contains(event.target) && !button.contains(event.target)) {
+                            this.closeLabDropdown();
+                        }
+                    }, { once: true });
+                    dropdown.querySelector('.lab-dropdown-item').focus();
+                }
             },
             closeLabDropdown() {
-                const d = utils.getId("lab-dropdown");
-                const b = document.querySelector(".lab-button-container .btn");
-                d.classList.remove("show");
-                b.setAttribute("aria-expanded", "false");
+                const dropdown = utils.getId('lab-dropdown');
+                const button = document.querySelector('.lab-button-container .btn');
+                dropdown.classList.remove('show');
+                button.setAttribute('aria-expanded', 'false');
             },
             showLabHistory() {
                 closeModal();
-                const m = labHistoryModal();
-                m.style.display = "flex";
-                m.setAttribute("aria-hidden", "false");
+                const modal = utils.getId('lab-history-modal');
+                modal.style.display = 'flex';
+                modal.setAttribute('aria-hidden', 'false');
                 labSystem.loadHistory();
             },
             changeTheme(theme) {
-                if (theme === "auto") {
-                    document.body.classList.remove("dark", "light");
-                    localStorage.removeItem("theme");
+                const body = document.body;
+                if (theme === 'auto') {
+                    body.classList.remove('dark', 'light');
+                    localStorage.removeItem('theme');
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches);
+                    if (prefersDark) {
+                        body.classList.add('dark');
+                    }
                 } else {
-                    document.body.classList.remove("dark", "light");
-                    document.body.classList.add(theme);
-                    localStorage.setItem("theme", theme);
+                    body.classList.remove('dark', 'light');
+                    body.classList.add(theme);
+                    localStorage.setItem('theme', theme);
                 }
+                const selector = utils.getId('theme-selector');
+                selector.value = theme;
             },
             initTheme() {
-                const saved = localStorage.getItem("theme");
-                const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-                if (saved) this.changeTheme(saved);
-                else if (prefersDark) this.changeTheme("dark");
-                utils.getId("theme-selector").value = saved || "auto";
+                const savedTheme = localStorage.getItem('theme');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches);
+                if (savedTheme) {
+                    this.changeTheme(savedTheme);
+                } else if (prefersDark) {
+                    this.changeTheme('dark');
+                } else {
+                    this.changeTheme('light');
+                }
+                const selector = utils.getId('theme-selector');
+                selector.value = savedTheme || 'auto';
             }
         };
+
+        // Progress System
         const progressSystem = {
             observer: null,
             initObserver() {
-                this.observer = new IntersectionObserver(entries => {
+                this.observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
-                            const id = entry.target.id.replace("-card", "");
-                            this.loadWeekTasks(id);
+                            const weekId = entry.target.id.replace('-card', '');
+                            this.loadWeekTasks(weekId);
                             this.observer.unobserve(entry.target);
                         }
                     });
-                }, { rootMargin: "100px" });
-                document.querySelectorAll(".week-card").forEach(card => this.observer.observe(card));
+                }, {
+                    root: null,
+                    rootMargin: '100px',
+                    threshold: 0.1
+                });
+                document.querySelectorAll('.week-card').forEach(card => this.observer.observe(card));
             },
             async loadProgress() {
                 try {
-                    const { data } = await apiCall("/api/progress");
-                    appState.progress = data;
+                    const { data } = await apiCall('/api/user/progress');
+                    appState.progress = data || {};
                     this.updateProgressUI();
                     this.initObserver();
-                } catch (e) {
-                    showNotification("Failed to load progress", "error");
+                } catch (err) {
+                    showNotification('Failed to load progress data.', 'error');
+                    console.error('Progress load error:', err);
                 }
             },
             updateProgressUI() {
-                const totalTasks = Object.values(tasksByWeek).flat().length;
-                const completed = Object.values(appState.progress).filter(t => t.completed).length;
-                const percentage = Math.round((completed / totalTasks) * 100);
-                const ring = utils.getId("progress-ring");
-                const offset = (1 - percentage / 100) * (2 * Math.PI * 65);
-                ring.style.strokeDashoffset = offset;
-                utils.getId("progress-percentage").textContent = `${percentage}%`;
-                utils.getId("completed-tasks").textContent = completed;
-                utils.getId("current-week").textContent = `Week ${Math.min(Math.floor(completed / 10) + 1, 4)}`;
+                const totalTasks = Object.values(tasksByWeek).reduce((sum, tasks) => sum + tasks.length, 0);
+                const completedTasks = Object.values(appState.progress).filter(task => task.completed).length;
+                const percentage = Math.round((completedTasks / totalTasks) * 100);
+                const progressRing = utils.getId('progress-ring');
+                const circumference = 2 * Math.PI * 65; // Radius = 65
+                progressRing.style.strokeDashoffset = circumference - (percentage / 100) * circumference;
+                utils.getId('progress-percentage').textContent = `${percentage}%`;
+                utils.getId('completed-tasks').textContent = completedTasks;
+                const currentWeek = Math.min(Math.floor(completedTasks / 10) + 1, 4);
+                utils.getId('current-week').textContent = `Week ${currentWeek}`;
                 Object.keys(tasksByWeek).forEach(week => this.updateWeekProgress(`week${week}`));
             },
             updateWeekProgress(weekId) {
-                const week = weekId.replace("week", "");
-                const tasks = tasksByWeek[week] || [];
-                const completed = tasks.filter(id => appState.progress[`${week}-${id}`]?.completed).length;
-                const progress = tasks.length ? (completed / tasks.length) * 100 : 0;
-                utils.getId(`${weekId}-completed`).textContent = completed;
-                utils.getId(`${weekId}-progress`).style.width = `${progress}%`;
+                const weekNumber = weekId.replace('week', '');
+                const tasks = tasksByWeek[weekNumber] || [];
+                const completed = tasks.filter(taskId => appState.progress[`${weekNumber}${taskId}`])?.completed)?.length;
+                const progressPercentage = tasks.length ? Math.round((completed / tasks.length) * 100) : 0;
+                const completedElement = utils.getId(`${weekId}-completed`);
+                completedElement.textContent = completed;
+                const progressFill = completedElement.getId(`${weekId}-progress`);
+                progressFill.style.width = `${progressPercentage}%`;
+                completedElement.setAttribute('aria-label', `${completed} of ${tasks.length} tasks completed`);
             },
-            async loadWeekTasks(weekId) {
-                const week = weekId.replace("week", "");
+            loadWeekTasks(weekId) {
+                const weekNumber = weekId.replace('week', '');
                 const grid = utils.getId(`${weekId}-tasks-grid`);
-                if (grid.dataset.loaded) return;
-                grid.dataset.loaded = "true";
+                if (grid.dataset.loaded) {
+                    return;
+                }
+                grid.dataset.loaded = 'true';
                 const fragment = document.createDocumentFragment();
-                tasksByWeek[week].forEach(taskId => {
-                    const task = appState.progress[`${week}-${taskId}`] || {};
-                    const div = document.createElement("div");
-                    div.className = `task-item ${task.completed ? "completed" : ""}`;
-                    div.innerHTML = `
-                        <input type="checkbox" class="task-checkbox" ${task.completed ? "checked" : ""} 
-                            onchange="progressSystem.toggleTask('${week}', '${taskId}', this.checked)" aria-label="${taskId.replace(/-/g, " ")}">
-                        <div class="task-content">
-                            <div class="task-title">${taskId.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())}</div>
-                            <div class="task-description">${task.description || "Click for details"}</div>
-                        </div>
-                    `;
-                    div.onclick = e => {
-                        if (e.target.type !== "checkbox") taskSystem.openModal(week, taskId);
+                tasksByWeek[weekNumber].forEach(taskId => {
+                    const task = appState.progress[`${weekNumber}${taskId}`] || {};
+                    const taskDef = window.TASK_DEFINITIONS?.[`${weekNumber}${taskId}`] || {
+                        title: taskId.replace(/[-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+                        description: 'No details available for this task.'
                     };
-                    fragment.appendChild(div);
+                    const taskElement = document.createElement('div');
+                    taskElement.className = `task-item ${task.completed ? 'completed' : ''}`;
+                    taskElement.innerHTML = `
+                        <input type="checkbox" class="checkbox-task-checkbox" id="task-${week}-${taskId}" ${task.completed ? 'checked' : ''} onchange="progressSystem.toggleTask('${weekNumber}', '${taskId}', this.checked)" aria-label="Toggle completion of ${taskDef.title}">
+                        <label for="task-${weekNumber}-${taskId}" class="task-content">
+                            <div class="task-title">${taskDef.title || taskId.replace(/[-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</div>
+                            <div class="task-description">${taskDef.description || 'Click to view task details'}</div>
+                        </label>
+                    `;
+                    taskElement.setAttribute('role', 'button');
+                    taskElement.setAttribute('tabindex', '0');
+                    taskElement.addEventListener('click', (event) => {
+                        if (!event.target.matches('input[type="checkbox"]')) {
+                            taskSystem.showTaskModal(weekNumber, taskId);
+                        }
+                    });
+                    taskElement.addEventListener('keydown', (event) => {
+                            if (event.key === 'Enter' || event.key === 'Space') {
+                            event.preventDefault();
+                            taskSystem.showTaskModal(weekNumber, taskId);
+                        }
+                    });
+                    fragment.appendChild(taskElement);
                 });
                 grid.appendChild(fragment);
             },
             toggleWeek(weekId) {
-                const card = utils.getId(`${weekId}-card`);
-                const isExpanded = card.getAttribute("aria-expanded") === "true";
-                card.setAttribute("aria-expanded", (!isExpanded).toString());
-                if (!isExpanded && !card.querySelector(".tasks-grid").dataset.loaded) {
+                const weekCard = utils.getId(`${weekId}-card`);
+                const isExpanded = weekCard.getAttribute('aria-expanded') === 'true';
+                weekCard.setAttribute('aria-expanded', (!isExpanded).toString());
+                if (!isExpanded && !weekCard.querySelector('.tasks-grid').dataset.loaded) {
                     this.loadWeekTasks(weekId);
                 }
             },
-            async toggleTask(week, taskId, completed) {
+            async function toggleTask(week, taskId, completed) {
                 try {
-                    await apiCall("/api/progress", {
-                        method: "POST",
-                        body: { week, task: taskId, completed }
+                    await apiCall('/api/user/task', {
+                        method: 'POST',
+                        body: {
+                            week,
+                            task: taskId,
+                            completed
+                        }
                     });
-                    appState.progress[`${week}-${taskId}`] = { ...appState.progress[`${week}-${taskId}`], completed };
+                    appState.progress[`${week}-${taskId}`] = {
+                        ...appState.progress[`${week}-${taskId}`],
+                        completed
+                    };
                     this.updateProgressUI();
-                    showNotification(`Task ${completed ? "completed" : "marked incomplete"}!`);
-                } catch (e) {
-                    showNotification("Failed to update task", "error");
+                    showNotification(`Task ${completed ? 'completed' : 'marked incomplete'} successfully!`, 'success');
+                } catch (err) {
+                    showNotification('Failed to update task status.', 'error');
+                    console.error('Task toggle error:', err);
+                    // Revert checkbox state
+                    const checkbox = document.getElementById(`task-${week}-${taskId}`);
+                    if (checkbox) {
+                        checkbox.checked = !completed;
+                    }
                 }
             }
         };
+
+        // Lab System
         const labSystem = {
             async startNew() {
                 try {
-                    await apiCall("/api/lab/start", { method: "POST" });
-                    showNotification("New lab started!");
-                } catch (e) {
-                    showNotification("Failed to start lab", "error");
+                    await apiCall('/api/lab/start', {
+                        method: 'POST',
+                        body: {}
+                    });
+                    showNotification('New lab environment started successfully!', 'success');
+                    await progressSystem.loadProgress(); // Refresh progress
+                } catch (err) {
+                    showNotification('Failed to start a new lab environment.', 'error');
+                    console.error('Start lab error:', err);
                 }
             },
             async loadHistory() {
-                const content = utils.getId("lab-history-content");
+                const content = utils.getId('lab-history-content');
+                content.innerHTML = '<div style="text-align: center; padding: 20px;"><span class="loading"></span> Loading...</div>';
                 try {
-                    const { data } = await apiCall("/api/lab/history");
-                    content.innerHTML = data.length ? data.map(lab => `
-                        <div class="user-card">
+                    const { data } = await apiCall('/api/lab/history');
+                    if (data.length === 0) {
+                        content.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No lab history available.</p>';
+                        return;
+                    }
+                    const html = data.map(lab => `
+                        <div class="user-card" role="article">
                             <div class="user-info">
-                                <h4>Lab ${lab.id}</h4>
-                                <p>Started: ${new Date(lab.startTime).toLocaleString()}</p>
-                                <p>Status: ${lab.status}</p>
+                                <h4>Lab #${lab.id}</h4>
+                                <p>Started: ${new Date(lab.startTime).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+                                <p>Status: <span style="color: ${lab.status === 'Active' ? 'var(--success)' : 'var(--text-secondary)'}">${lab.status}</span></p>
                             </div>
                         </div>
-                    `).join("") : "<p>No lab history available.</p>";
-                } catch (e) {
-                    content.innerHTML = "<p>Failed to load history.</p>";
+                    `).join('');
+                    content.innerHTML = html;
+                } catch (err) {
+                    content.innerHTML = '<p style="text-align: center; color: var(--error);">Failed to load lab history.</p>';
+                    console.error('Lab history error:', err);
                 }
             }
         };
+
+        // Task System
         const taskSystem = {
             currentTask: { week: null, taskId: null },
-            openModal(week, taskId) {
+            showTaskModal(week, taskId) {
                 if (!appState.authenticated) {
-                    showNotification("Please sign in to view task details", "error");
+                    showNotification('Please sign in to view task details.', 'error');
                     showLogin();
                     return;
                 }
                 this.currentTask = { week, taskId };
                 const taskKey = `${week}-${taskId}`;
-                const taskDef = TASK_DEFINITIONS?.[taskKey] || {
-                    title: taskId.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase()),
-                    description: "No details available."
+                const taskDef = window.TASK_DEFINITIONS?.[taskKey] || {
+                    title: taskId.replace(/[-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+                    description: '<p>No detailed instructions available for this task.</p>'
                 };
-                utils.getId("task-title").textContent = taskDef.title;
-                utils.getId("task-content").innerHTML = taskDef.description;
+                const titleElement = utils.getId('task-title');
+                const contentElement = titleElement.getContentById('task-content');
+                titleElement.textContent = taskDef.title || 'Task';
+                contentElement.childrenHTML = taskDef.description || '<p>No details available.</p>';
                 this.loadNotes();
-                utils.getId("task-modal").style.display = "flex";
-                utils.getId("task-modal").setAttribute("aria-hidden", "false");
+                modal = const modalElement = utils.getId('task-modal');
+                modalElement.style.display = 'flex';
+                modalElement.setAttribute('aria-hidden', 'false');
+                contentElement.focus();
+                // Ensure modal is trapped
+                modalElement.addEventListener('keydown', trapFocus);
+                // Cleanup on close
+                const closeButton = modalElement.querySelector('.modal-close');
+                closeButton.addEventListener('click', () => {
+                    modalElement.removeEventListener('keydown', trapFocus);
+                }, { once: true });
             },
             async loadNotes() {
                 const { week, taskId } = this.currentTask;
-                const notesInput = utils.getId("task-notes");
-                const counter = utils.getId("notes-counter");
+                if (!week || !taskId) return;
+                const notesInput = utils.getId('task-notes');
+                const counter = utils.getId('notes-counter');
                 try {
-                    const { data } = await apiCall(`/api/notes?week=${week}&task=${taskId}`);
-                    notesInput.value = data.notes || "";
-                    counter.textContent = `${notesInput.value.length}/500`;
-                } catch (e) {
-                    console.error("Failed to load notes:", e);
+                    const { data } = await apiCall(`/api/task/notes?week=${week}&task=${encodeURIComponent(taskId)}`);
+                    notesInput.value = data.notes || '';
+                    counter.textContent = counter.textContent${notesInput.value.length}/500`;
+                    notesInput.focus();
+                } catch (err) {
+                    console.warn('Failed to load notes:', err);
+                    notesInput.value = '';
+                    counter.textContent = '0/500';
+                    showNotification('Unable to load notes.', 'error');
                 }
-                notesInput.oninput = () => counter.textContent = `${notesInput.value.length}/500`;
+                // Update counter on input
+                const updateCounter = () => {
+                    counter.textContent = counter.textContent`${notesInput.value.length}/500`;
+                };
+                notesInput.removeEventListener('input', updateCounter);
+                notesInput.addEventListener('input', updateCounter);
             },
             async saveNotes() {
                 const { week, taskId } = this.currentTask;
-                const notes = utils.getId("task-notes").value;
-                const btn = utils.getId("save-notes-btn");
+                if (!week || !taskId) return;
+                const notesInput = utils.getId('task-notes');
+                const saveButton = document.getElementById('save-notes-btn');
+                const notes = notesInput.value.trim();
                 try {
-                    btn.disabled = true;
-                    btn.textContent = "Saving...";
-                    await apiCall("/api/notes", { method: "POST", body: { week, task: taskId, notes } });
-                    showNotification("Notes saved!");
-                } catch (e) {
-                    showNotification("Failed to save notes", "error");
+                    saveButton.disabled = true;
+                    saveButton.textContent = 'Saving Notes...';
+                    await apiCall('/api/task/notes', {
+                        method: 'POST',
+                        body: {
+                            week,
+                            body: taskId,
+                            notes
+                        }
+                    });
+                    showNotification('Notes saved successfully!', 'success');
+                } catch (err) {
+                    showNotification('Failed to save notes.', 'error');
+                    console.error('Notes save error:', err);
                 } finally {
-                    btn.disabled = false;
-                    btn.textContent = "💾 Save";
+                    saveButton.disabled = false;
+                    saveButton.textContent = '💾 Save';
                 }
             }
         };
+
+        // Admin System
         const adminSystem = {
             switchTab(tab) {
-                document.querySelectorAll(".admin-tab").forEach(t => {
-                    t.classList.remove("active");
-                    t.setAttribute("aria-selected", "false");
-                });
-                document.querySelectorAll(".admin-section").forEach(s => s.classList.remove("active"));
-                utils.getId(`tab-${tab}`).classList.add("active");
-                utils.getId(`tab-${tab}`).setAttribute("aria-selected", "true");
-                utils.getId(`admin-${tab}`).classList.add("active");
-                if (tab === "leaderboard") this.refreshLeaderboard();
-                else if (tab === "users") this.loadUsers();
+                const tabs = ['leaderboard', 'users', 'data'];
+                tabs.forEach(tab => {
+                    const tabElement = utils.getElementById(`tab-${tab}`);
+                    const section = utils.getSectionById(`admin-${tab}`);
+                    const isActive = tab === tab;
+                    tabElement.classList.toggle('active', isActive);
+                    section.classList.toggle('active', isActive);
+                    tabElement.setAttribute('aria-selected', isActive.toString());
+                if (tab === 'leaderboard') {
+                    this.refreshLeaderboard();
+                } else if (tab === 'users') {
+                    this.loadUsers();
+                }
             },
-            async refreshLeaderboard(force = false) {
-                const tbody = utils.getId("leaderboard-body");
-                const cacheKey = "leaderboard-cache";
-                const cache = JSON.parse(sessionStorage.getItem(cacheKey) || "{}");
-                if (!force && cache.data && Date.now() - cache.time < 5 * 60 * 1000) {
+            async refreshLeaderboard(forceLoad = false) {
+                const tbody = utils.getId('leaderboard-body');
+                const cacheKey = 'leaderboard-cache-v1';
+ const cache = JSON.parse(sessionStorage.getItem(cacheKey)) || {};
+                const cacheTTL = 5 * 60 * 1000; // 5 minutes
+                if (!forceLoad && cache.data && (Date.now() - (cache.time) < cacheTTL)) {
                     tbody.innerHTML = cache.html;
                     return;
                 }
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;"><div class="loading"></div></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;"><span class="loading"></span> Loading...</td></tr>';
                 try {
-                    const { data } = await apiCall("/api/admin/users-progress");
-                    const users = data.map((user, i) => ({
-                        ...user,
-                        rank: i + 1,
-                        medal: i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : ""
+                    const { data } = await apiCall('/api/admin/users-progress');
+                    const users = data.map((user, index) => ({
+                        user,
+                        rank: index + 1,
+                        medal: index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : ''
                     }));
                     const fragment = document.createDocumentFragment();
                     users.forEach(user => {
-                        const tr = document.createElement("tr");
+                        const tr = document.createElement('tr');
                         tr.innerHTML = `
-                            <td class="rank-cell">${user.medal ? `<span class="medal-icon">${user.medal}</span>` : ""}#${user.rank}</td>
-                            <td><strong>${user.name}</strong><br><small>${user.email}</small></td>
-                            <td><div class="progress-container"><div class="progress-bar-mini"><div class="progress-fill-mini" style="width: ${user.progress}%"></div></div><span class="progress-text-mini">${user.progress}%</span></div></td>
-                            <td style="text-align: center;"><strong>${user.completedTasks}</strong>/42</td>
-                            <td>${user.notesCount ? `<span class="notes-badge">${user.notesCount}</span>` : "No notes"}</td>
-                            <td><small>${user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : "Never"}</small></td>
+                            <td class="rank-cell">${user.medal ? `<span class="medal-imgicon" aria-label="Rank ${user.rank} with medal">${user.medal}</span>` : `#${user.rank}`}</td>
+                            <td>
+                                <div style="line-height: 1.4;">
+                                    <strong>${user.user.name}</strong><br>
+                                    <small style="color: var(--text-secondary);">${user.email}</small>
+                                </div>
+                                <td>
+                                    <div class="progress-container">
+                                        <div class="progress-bar-mini">
+                                            <div class="progress-fill-mini" style="width: ${user.user.progress}%"></div>
+                                        </div>
+                                        <span class="progress-text-mini" aria-label="Progress: ${user.user.progress}%">${user.progress}%</span>
+                                    </div>
+                                </td>
+                                <td style="text-align: center;">
+                                    <strong>${user.user.completedTasks}</strong>/42
+                                </span></td>
+                                <td>${user.user.notesCount ? `<span class="notes-badge" aria-label="${user.notesCount}" notes">${notesCount} notes</span>` : 'No notes'}</span></td>
+<td>                                <td>
+                                    <small>${utils.user.lastLogin ? utils.formatDate(user.lastLogin) : 'Never'}</small></span></td>
+<td>
                         `;
                         fragment.appendChild(tr);
                     });
-                    tbody.innerHTML = "";
+                    tbody.innerHTML = '';
                     tbody.appendChild(fragment);
-                    sessionStorage.setItem(cacheKey, JSON.stringify({ time: Date.now(), html: tbody.innerHTML, data: users }));
-                } catch (e) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--error);">Failed to load</td></tr>';
+                    sessionStorage.setItem({
+                        key: cacheKey,
+                        value: JSON.stringify({
+                            time: Date.now(),
+                            html: tbody.innerHTML,
+                            data: users
+                        })
+                    });
+                } catch (err) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: var(--error-color); color: var(--text-error-color); padding: 40px;">Failed to load leaderboard data.</td></tr>';
+                    console.error('Leaderboard load error:', err);
                 }
             },
             async loadUsers() {
-                const list = utils.getId("users-list");
+                const usersList = utils.getElementById('users-list');
+                usersList.innerHTML = '<p style="text-align: center; padding: 20px;"><span class="loading"></span> Loading...</p>';
                 try {
-                    const { data } = await apiCall("/api/admin/users");
-                    list.innerHTML = data.map(user => `
-                        <div class="user-card">
-                            <div class="user-info">
-                                <h4>${user.name}</h4>
-                                <p>${user.email} • ${user.role}</p>
-                                <div class="user-progress-bar"><div class="user-progress-fill" style="width:${user.progress}%"></div></div>
-                            </div>
-                            <div class="user-actions">
-                                <button class="btn btn-secondary" style="padding:6px 12px" onclick="adminSystem.editUser('${user.id}')">Edit</button>
-                                <button class="btn btn-secondary" style="padding:6px 12px;background:var(--error)" onclick="adminSystem.deleteUser('${user.id}')">Delete</button>
-                            </div>
-                        </div>
-                    `).join("");
-                } catch (e) {
-                    list.innerHTML = "<p>Failed to load users.</p>";
+                    const { data: users } = await apiCall('/api/admin/users');
+                    if (!users.length) {
+                        usersList.innerHTML = '<p style="color: var(--text-color: secondary); text-align: center;">No users found.</p>';
+                        return;
+                    usersList.innerHTML = users.map(user => `
+                            <div class="user-card" role="user-card-${user.id}">
+                                <div id="user-info">
+                                    <div class="user-info">
+                                        <h4>${user.name}</h4>
+                                        <p style="color: var(--text-secondary);">${user.email} • </p>${user.role}
+                                        <div class="user-progress-bar">
+                                            <div class="progress-user-fill" style="width: ${user.progress}%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="user-actions">
+                                        <div class="user-actions">
+                                            <button class="btn btn-primary btn-secondary" style="padding: 6px 12px;" onclick="adminUsers.editUser('${user.id}')'" aria-label="Edit user ${user.name}">Edit</button>
+                                            <button class="delete-btn btn-secondary" style="padding: background6px: 12px; background: var(--error-color); color: #ffffff;" onclick="adminUsers.deleteUser('${user.id}')'" aria-label="color:Delete #fff;"user onclick="adminSystem.deleteUser('${user.name}">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                        `).join('');
+                    } catch (err) {
+                        usersList.innerHTML = '<p style="color: var(--text-error); color: red;">Failed to load user data.</p>';
+                        console.error('Users load error:', err.error);
+                    }
+                },
+                async editUser(userId) {
+                    showNotification('User editing is not yet implemented in this version.', 'error');
+                    // Future implementation: Open a modal form for editing user details
+                },
+                async deleteUser(userId) {
+                    if (!window.confirm(`Are you sure you want to delete this user? This action cannot be undone.`)) {
+                        return;
+                    }
+                    try {
+                        await apiCall(`/api/admin/users/${userId}`, {
+                            method: 'DELETE'
+                        });
+                        this.loadUsers();
+                        showNotification('User deleted successfully.', 'success');
+                    } catch (err) {
+                        showNotification('Failed to delete user.', 'error');
+                        console.error('User deletion error:', err.error);
+                    }
+                },
+                async exportProgress() {
+                    try {
+                        const { data } = await apiCall('/api/admin/export-progress');
+                        const blob = new Blob([data.csv], {
+                            type: 'text/plaincsv'
+                        });
+                        const url = window.URL.createObjectURL(blob);
+                        const linkElement = document.createElement('a');
+                        linkElement.href = url;
+                        linkElement.download = 'velocity_lab_progress_export.csv';
+                        document.body.appendChild(linkElement);
+                        linkElement.click();
+                        document.body.removeChild(linkElement);
+                        window.URL.revokeObject(urlURL);
+                        showNotification('Progress data exported successfully.', 'success');
+                    } catch (err) {
+                        showNotification('Failed to export progress data.', 'error');
+                        console.error('Export progress error:', err.error);
+                    }
+                },
+                async importProgress(file) {
+                    if (!file) return;
+                    try {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        await apiCall('/api/admin/import-progress', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        this.refreshLeaderboard('true');
+                        showNotification('Progress data imported successfully.', 'success');
+                    } catch (err) {
+                        showNotification('Failed to import progress data.', 'error');
+                        console.error('Import progress error:', err);
+                    }
                 }
-            },
-            async editUser(userId) {
-                showNotification("Edit user functionality not implemented", "error");
-            },
-            async deleteUser(userId) {
-                if (!confirm("Delete user?")) return;
-                try {
-                    await apiCall(`/api/admin/users/${userId}`, { method: "DELETE" });
-                    this.loadUsers();
-                    showNotification("User deleted");
-                } catch (e) {
-                    showNotification("Failed to delete user", "error");
+            };
+
+            // Admin Portal Modal
+            function showAdmin() {
+                if (!appState.authenticated || appState.user?.role !== 'admin') {
+                    showNotification('Access denied. Admins only.', 'error');
+                    return;
                 }
-            },
-            async exportProgress() {
-                try {
-                    const { data } = await apiCall("/api/admin/export-progress");
-                    const blob = new Blob([data.csv], { type: "text/csv" });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = "progress_export.csv";
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    showNotification("Progress exported");
-                } catch (e) {
-                    showNotification("Export failed", "error");
-                }
-            },
-            async importProgress(file) {
-                try {
-                    const formData = new FormData();
-                    formData.append("file", file);
-                    await apiCall("/api/admin/import-progress", { method: "POST", body: formData });
-                    showNotification("Progress imported");
-                    this.refreshLeaderboard(true);
-                } catch (e) {
-                    showNotification("Import failed", "error");
+                closeModal();
+                const modal = utils.getId('admin-modal');
+                modal.style.display = 'flex';
+                modal.setAttribute('aria-hidden', 'false');
+                adminSystem.switchTab('leaderboard');
+                modal.querySelector('.admin-tab.active').focus();
+            }
+
+            // Focus trap for modals
+            function trapFocus(event) {
+                const modal = event.target.closest('.modal');
+                if (!modal) return;
+                const focusableElements = modal.querySelectorAll(
+                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                );
+                const firstElement = focusableElements[0];
+                const lastElement = focusableElements[focusableElements.length - 1];
+                if (event.key === 'Tab') {
+                    if (event.shiftKey && document.activeElement === firstElement) {
+                        event.preventDefault();
+                        lastElement.focus();
+                    } else if (!event.shiftKey && document.activeElement === lastElement) {
+                        event.preventDefault();
+                        firstElement.focus();
+                    }
+                } else if (event.key === 'Escape') {
+                    closeModal();
                 }
             }
-        };
-        function showAdmin() {
-            closeModal();
-            const m = utils.getId("admin-modal");
-            m.style.display = "flex";
-            m.setAttribute("aria-hidden", "false");
-            adminSystem.refreshLeaderboard();
-        }
-        function labHistoryModal() {
-            return utils.getId("lab-history-modal");
-        }
-        document.addEventListener("DOMContentLoaded", () => {
-            uiSystem.initTheme();
-            authSystem.checkSession();
-            utils.getId("login-form").onsubmit = async e => {
-                e.preventDefault();
-                await authSystem.login(new FormData(e.target));
-            };
-            utils.getId("register-form").onsubmit = async e => {
-                e.preventDefault();
-                await authSystem.register(new FormData(e.target));
-            };
-            document.querySelectorAll(".week-header").forEach(h => {
-                h.addEventListener("keydown", e => {
-                    if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        progressSystem.toggleWeek(h.parentElement.id);
-                    }
+
+            // Initialize application
+            document.addEventListener('DOMContentLoaded', () => {
+                // Initialize theme
+                uiSystem.initTheme();
+
+                // Check for existing session
+                authSystem.checkSession();
+
+                // Handle login form submission
+                const loginForm = utils.getId('login-form');
+                loginForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const formData = new FormData(loginForm);
+                    await authSystem.login(formData);
                 });
+
+                // Handle register form submission
+                const registerForm = utils.getId('register-form');
+                registerForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const formData = new FormData(registerForm);
+                    await authSystem.register(formData);
+                });
+
+                // Enable keyboard navigation for week headers
+                document.querySelectorAll('.week-header').forEach(header => {
+                    header.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            const weekId = header.parentElement.id;
+                            progressSystem.toggleWeek(weekId);
+                        }
+                    });
+                });
+
+                // Enable keyboard navigation for admin tabs
+                document.querySelectorAll('.admin-tab').forEach(tab => {
+                    tab.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            const tabId = tab.id.replace('tab-', '');
+                            adminSystem.switchTab(tabId);
+                        }
+                    });
+                });
+
+                // Prevent form resubmission on page refresh
+                if (window.history.replaceState) {
+                    window.history.replaceState(null, null, window.location.href);
+                }
             });
-        });
-    </script>
-</body>
+        </script>
+    </body>
 </html>
