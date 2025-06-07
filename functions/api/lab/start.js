@@ -1,125 +1,118 @@
-// functions/api/lab/start.js
+import crypto from 'crypto';
 
-// Helper function to get user from session
-async function getUserFromSession(request, env) {
+// Helper function to authenticate user
+async function authenticateUser(request, env) {
     const authHeader = request.headers.get('Authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return null;
+    const sessionToken = authHeader?.replace('Bearer ', '');
+    
+    if (!sessionToken) {
+        throw new Error('No session token provided');
     }
     
-    const sessionToken = authHeader.substring(7);
     const sessionData = await env.SESSIONS.get(`session:${sessionToken}`);
-    
     if (!sessionData) {
-        return null;
+        throw new Error('Invalid or expired session');
     }
     
-    return JSON.parse(sessionData);
+    const session = JSON.parse(sessionData);
+    
+    // Check if session is expired
+    if (new Date(session.expiresAt) < new Date()) {
+        await env.SESSIONS.delete(`session:${sessionToken}`);
+        throw new Error('Session expired');
+    }
+    
+    return session;
 }
 
 export async function onRequestPost(context) {
+    const { request, env } = context;
+    
     try {
-        const { request, env } = context;
-        
-        // Get user from session
-        const user = await getUserFromSession(request, env);
-        if (!user) {
-            return new Response(JSON.stringify({
-                success: false,
-                message: 'Unauthorized'
-            }), {
-                status: 401,
-                headers: { 'Content-Type': 'application/json' }
-            });
+        // Set CORS headers
+        const corsHeaders = {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        };
+
+        // Handle preflight request
+        if (request.method === 'OPTIONS') {
+            return new Response(null, { headers: corsHeaders });
         }
+
+        // Authenticate user
+        const session = await authenticateUser(request, env);
         
-        // Generate a unique lab ID
-        const labId = `lab_${Date.now()}_${crypto.randomUUID().substring(0, 8)}`;
-        const currentTime = new Date().toISOString();
+        // Generate lab session ID
+        const labId = `lab_${crypto.randomBytes(8).toString('hex')}`;
+        const startTime = new Date().toISOString();
         
-        // Create lab session data
+        // Lab session data
         const labSession = {
             id: labId,
-            userId: user.userId,
-            userEmail: user.email,
-            userName: user.name,
-            startTime: currentTime,
+            userId: session.userId,
+            userEmail: session.email,
+            userName: session.name,
+            environment: 'Exchange Hybrid Lab',
             status: 'Active',
-            environment: 'Velocity Exchange Hybrid Lab',
+            statusIcon: '🔬',
+            startTime,
             resources: {
-                vms: [
-                    { name: 'DC01', type: 'Domain Controller', status: 'Ready' },
-                    { name: 'DC02', type: 'Secondary DC', status: 'Ready' },
-                    { name: 'EX01', type: 'Exchange Server', status: 'Ready' },
-                    { name: 'CLIENT01', type: 'Windows Client', status: 'Ready' }
-                ],
-                network: {
-                    subnet: '192.168.1.0/24',
-                    gateway: '192.168.1.1',
-                    dns: ['192.168.1.10', '192.168.1.11']
-                }
+                vm1: 'DC01 - Primary Domain Controller',
+                vm2: 'DC02 - Secondary Domain Controller', 
+                vm3: 'EX01 - Exchange Server 2019',
+                vm4: 'CLIENT01 - Windows 10 Client'
             },
-            metadata: {
-                createdAt: currentTime,
-                lastAccessed: currentTime,
-                totalTasks: 42,
-                estimatedDuration: '4 weeks'
+            endpoints: {
+                rdp: `rdp.lab.${labId.split('_')[1]}.velocity.local`,
+                exchange: `exchange.lab.${labId.split('_')[1]}.velocity.local`,
+                owa: `owa.lab.${labId.split('_')[1]}.velocity.local`
             }
         };
-        
-        // Store lab session in KV (using PROGRESS namespace for lab data)
-        const labKey = `lab:${user.email}:${labId}`;
-        await env.PROGRESS.put(labKey, JSON.stringify(labSession));
-        
-        // Update user's lab history
-        const historyKey = `lab_history:${user.email}`;
-        const historyData = await env.PROGRESS.get(historyKey);
-        const history = historyData ? JSON.parse(historyData) : [];
-        
-        // Add new lab to history (keep last 10 labs)
-        history.unshift({
-            id: labId,
-            startTime: currentTime,
-            status: 'Active',
-            environment: 'Exchange Hybrid Lab'
+
+        // Store lab session (24 hour expiry)
+        const labKey = `lab:${session.userId}:${labId}`;
+        await env.SESSIONS.put(labKey, JSON.stringify(labSession), {
+            expirationTtl: 24 * 60 * 60 // 24 hours
         });
-        
-        // Keep only the 10 most recent labs
-        if (history.length > 10) {
-            history.splice(10);
-        }
-        
-        await env.PROGRESS.put(historyKey, JSON.stringify(history));
-        
-        // Return lab session info
+
+        // Store current active lab reference
+        const activeLabKey = `active_lab:${session.userId}`;
+        await env.SESSIONS.put(activeLabKey, labId, {
+            expirationTtl: 24 * 60 * 60 // 24 hours
+        });
+
         return new Response(JSON.stringify({
             success: true,
+            message: 'Lab environment started successfully',
             data: {
-                labId: labId,
+                labId,
                 status: 'Active',
-                environment: 'Velocity Exchange Hybrid Lab',
-                startTime: currentTime,
-                resources: labSession.resources,
-                message: 'Lab environment started successfully! Your virtual machines are ready.',
-                nextSteps: [
-                    'Begin with Week 1: Foundation Setup',
-                    'Start by installing Windows Server 2012 R2',
-                    'Follow the task checklist for guided progress'
-                ]
+                startTime,
+                environment: 'Exchange Hybrid Lab',
+                endpoints: labSession.endpoints
             }
         }), {
-            status: 201,
-            headers: { 'Content-Type': 'application/json' }
+            status: 200,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
-        
+
     } catch (error) {
-        console.error('Start lab error:', error);
+        console.error('Lab start error:', error);
+        
+        const status = error.message.includes('session') ? 401 : 500;
+        const message = error.message.includes('session') ? 'Authentication required' : 'Internal server error';
+        
         return new Response(JSON.stringify({
             success: false,
-            message: 'Failed to start lab environment. Please try again.'
+            message
         }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' }
+            status,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json'
+            }
         });
     }
 }

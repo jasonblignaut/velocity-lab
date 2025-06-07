@@ -5,11 +5,20 @@
   "main": "index.html",
   "scripts": {
     "dev": "wrangler pages dev public --compatibility-date=2025-05-31",
-    "deploy": "wrangler pages deploy public",
+    "deploy": "bash scripts/deploy.sh",
     "build": "echo 'Static site - no build process required'",
     "preview": "wrangler pages dev public --local",
+    "setup": "bash scripts/setup.sh",
     "test": "echo 'No tests configured'",
-    "lint": "echo 'No linting configured'"
+    "lint": "echo 'No linting configured'",
+    "status": "curl -s https://training.velocity.co.za/api/status | jq .",
+    "kv:create": "wrangler kv:namespace create USERS && wrangler kv:namespace create PROGRESS && wrangler kv:namespace create SESSIONS",
+    "kv:list": "wrangler kv:namespace list",
+    "logs": "wrangler pages deployment tail",
+    "clean": "rm -rf .wrangler node_modules package-lock.json && npm install",
+    "validate": "wrangler pages validate public",
+    "env:dev": "wrangler pages dev public --env development",
+    "env:prod": "wrangler pages deploy public --env production"
   },
   "dependencies": {
     "@cloudflare/workers-types": "^4.20241022.0"
@@ -19,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/velocity-lab.git"
+    "url": "https://github.com/velocity-msp/velocity-lab.git"
   },
   "keywords": [
     "exchange",
@@ -30,11 +39,20 @@
     "microsoft-365",
     "cloudflare-pages",
     "workers",
-    "kv-storage"
+    "kv-storage",
+    "msp",
+    "velocity",
+    "sandton"
   ],
-  "author": "Velocity Lab Team",
-  "license": "MIT",
+  "author": "Velocity MSP Team <training@velocity.co.za>",
+  "license": "Proprietary",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "private": true,
+  "homepage": "https://training.velocity.co.za",
+  "bugs": {
+    "url": "https://github.com/velocity-msp/velocity-lab/issues",
+    "email": "training@velocity.co.za"
   }
 }
