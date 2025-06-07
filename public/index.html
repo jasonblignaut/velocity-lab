@@ -664,215 +664,66 @@
             setTimeout(() => notification.classList.remove('show'), 4000);
         }
 
-        // Mock API system for demo purposes (no real backend needed)
+        // API call handler with retry logic for Cloudflare Workers backend
         async function apiCall(endpoint, options = {}) {
-            // Simulate network delay
-            await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 300));
+            const headers = new Headers(options.headers || {});
+            if (appState.sessionToken) {
+                headers.set('Authorization', `Bearer ${appState.sessionToken}`);
+            }
+            headers.set('Accept', 'application/json');
             
+            let body = options.body;
             const method = options.method || 'GET';
-            const body = options.body;
             
-            // Extract form data if present
-            let formData = {};
-            if (body instanceof FormData) {
-                for (let [key, value] of body.entries()) {
-                    if (key !== 'csrf_token') {
-                        formData[key] = value;
-                    }
-                }
-            } else if (body && typeof body === 'object') {
-                formData = body;
-            }
-            
-            // Mock API responses
-            if (endpoint === '/api/users/login' && method === 'POST') {
-                const { email, password } = formData;
-                
-                // Get stored users
-                const users = JSON.parse(localStorage.getItem('velocity_users') || '[]');
-                const user = users.find(u => u.email === email && u.password === password);
-                
-                if (user) {
-                    const sessionToken = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                    return {
-                        success: true,
-                        data: {
-                            name: user.name,
-                            email: user.email,
-                            role: user.role || 'user',
-                            sessionToken
-                        }
-                    };
-                } else {
-                    throw new Error('Invalid email or password');
+            // Handle FormData or convert object to FormData
+            if (method !== 'GET' && !(body instanceof FormData)) {
+                if (body && typeof body === 'object') {
+                    body = new FormData();
+                    Object.entries(options.body || {}).forEach(([key, value]) => {
+                        body.append(key, value);
+                    });
                 }
             }
-            
-            if (endpoint === '/api/users/register' && method === 'POST') {
-                const { name, email, password } = formData;
-                
-                // Get stored users
-                const users = JSON.parse(localStorage.getItem('velocity_users') || '[]');
-                
-                // Check if user already exists
-                if (users.find(u => u.email === email)) {
-                    throw new Error('User with this email already exists');
-                }
-                
-                // Create new user
-                const newUser = {
-                    id: Date.now().toString(),
-                    name,
-                    email,
-                    password,
-                    role: users.length === 0 ? 'admin' : 'user', // First user becomes admin
-                    createdAt: new Date().toISOString()
-                };
-                
-                users.push(newUser);
-                localStorage.setItem('velocity_users', JSON.stringify(users));
-                
-                const sessionToken = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                return {
-                    success: true,
-                    data: {
-                        name: newUser.name,
-                        email: newUser.email,
-                        role: newUser.role,
-                        sessionToken
-                    }
-                };
-            }
-            
-            if (endpoint === '/api/users/logout' && method === 'POST') {
-                return { success: true };
-            }
-            
-            if (endpoint === '/api/user/progress' && method === 'GET') {
-                const userEmail = appState.user?.email;
-                if (userEmail) {
-                    const progress = JSON.parse(localStorage.getItem(`velocity_progress_${userEmail}`) || '{}');
-                    return { success: true, data: progress };
-                }
-                return { success: true, data: {} };
-            }
-            
-            if (endpoint === '/api/user/task' && method === 'POST') {
-                const { week, task, completed } = formData;
-                const userEmail = appState.user?.email;
-                
-                if (userEmail) {
-                    const progress = JSON.parse(localStorage.getItem(`velocity_progress_${userEmail}`) || '{}');
-                    const taskKey = `week${week}-${task}`;
-                    progress[taskKey] = { completed, updatedAt: new Date().toISOString() };
-                    localStorage.setItem(`velocity_progress_${userEmail}`, JSON.stringify(progress));
-                }
-                
-                return { success: true };
-            }
-            
-            if (endpoint.startsWith('/api/task/notes')) {
-                const userEmail = appState.user?.email;
-                if (!userEmail) return { success: true, data: { notes: '' } };
-                
-                if (method === 'GET') {
-                    const notes = JSON.parse(localStorage.getItem(`velocity_notes_${userEmail}`) || '{}');
-                    const params = new URLSearchParams(endpoint.split('?')[1]);
-                    const week = params.get('week');
-                    const task = params.get('task');
-                    const noteKey = `week${week}-${task}`;
-                    return { success: true, data: { notes: notes[noteKey] || '' } };
-                }
-                
-                if (method === 'POST') {
-                    const { week, task, notes } = formData;
-                    const userNotes = JSON.parse(localStorage.getItem(`velocity_notes_${userEmail}`) || '{}');
-                    const noteKey = `week${week}-${task}`;
-                    userNotes[noteKey] = notes;
-                    localStorage.setItem(`velocity_notes_${userEmail}`, JSON.stringify(userNotes));
-                    return { success: true };
-                }
-            }
-            
-            if (endpoint === '/api/lab/start' && method === 'POST') {
-                return { success: true, data: { labId: Date.now() } };
-            }
-            
-            if (endpoint === '/api/lab/history' && method === 'GET') {
-                const userEmail = appState.user?.email;
-                const history = JSON.parse(localStorage.getItem(`velocity_lab_history_${userEmail}`) || '[]');
-                return { success: true, data: history };
-            }
-            
-            // Admin endpoints
-            if (endpoint === '/api/admin/users-progress' && method === 'GET') {
-                const users = JSON.parse(localStorage.getItem('velocity_users') || '[]');
-                const usersWithProgress = users.map(user => {
-                    const progress = JSON.parse(localStorage.getItem(`velocity_progress_${user.email}`) || '{}');
-                    const completedTasks = Object.values(progress).filter(task => task.completed).length;
-                    const progressPercentage = Math.round((completedTasks / 42) * 100);
-                    const notes = JSON.parse(localStorage.getItem(`velocity_notes_${user.email}`) || '{}');
-                    const notesCount = Object.keys(notes).filter(key => notes[key].trim()).length;
+
+            for (let attempt = 1; attempt <= 3; attempt++) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 30000);
                     
-                    return {
-                        name: user.name,
-                        email: user.email,
-                        progress: progressPercentage,
-                        completedTasks,
-                        notesCount,
-                        lastLogin: user.lastLogin || user.createdAt
-                    };
-                }).sort((a, b) => b.completedTasks - a.completedTasks);
-                
-                return { success: true, data: usersWithProgress };
-            }
-            
-            if (endpoint === '/api/admin/users' && method === 'GET') {
-                const users = JSON.parse(localStorage.getItem('velocity_users') || '[]');
-                return { 
-                    success: true, 
-                    data: users.map(u => ({
-                        id: u.id,
-                        name: u.name,
-                        email: u.email,
-                        role: u.role,
-                        progress: 0
-                    }))
-                };
-            }
-            
-            if (endpoint.startsWith('/api/admin/users/') && method === 'DELETE') {
-                const userId = endpoint.split('/').pop();
-                const users = JSON.parse(localStorage.getItem('velocity_users') || '[]');
-                const filteredUsers = users.filter(u => u.id !== userId);
-                localStorage.setItem('velocity_users', JSON.stringify(filteredUsers));
-                return { success: true };
-            }
-            
-            if (endpoint === '/api/admin/export-progress' && method === 'GET') {
-                const users = JSON.parse(localStorage.getItem('velocity_users') || '[]');
-                let csv = 'Name,Email,Progress,Completed Tasks,Notes Count\n';
-                
-                users.forEach(user => {
-                    const progress = JSON.parse(localStorage.getItem(`velocity_progress_${user.email}`) || '{}');
-                    const completedTasks = Object.values(progress).filter(task => task.completed).length;
-                    const notes = JSON.parse(localStorage.getItem(`velocity_notes_${user.email}`) || '{}');
-                    const notesCount = Object.keys(notes).filter(key => notes[key].trim()).length;
-                    const progressPercentage = Math.round((completedTasks / 42) * 100);
+                    const response = await fetch(endpoint, {
+                        method,
+                        headers,
+                        body,
+                        credentials: 'same-origin',
+                        signal: controller.signal
+                    });
                     
-                    csv += `"${user.name}","${user.email}",${progressPercentage},${completedTasks},${notesCount}\n`;
-                });
-                
-                return { success: true, data: { csv } };
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (!data.success) {
+                        throw new Error(data.message || 'Request failed');
+                    }
+                    
+                    return data;
+                } catch (error) {
+                    console.error(`API call attempt ${attempt} failed:`, error);
+                    
+                    if (attempt === 3 || error.name === 'AbortError') {
+                        showNotification(error.message || 'Network error occurred', 'error');
+                        throw error;
+                    }
+                    
+                    // Exponential backoff
+                    await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+                }
             }
-            
-            if (endpoint === '/api/admin/import-progress' && method === 'POST') {
-                // For demo purposes, just return success
-                return { success: true };
-            }
-            
-            // Default fallback
-            throw new Error(`Endpoint ${endpoint} not found`);
         }
 
         // Modal management functions - GLOBAL SCOPE
