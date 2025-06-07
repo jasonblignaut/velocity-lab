@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Velocity Lab</title>
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <script src="/assets/task-definitions.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -75,8 +76,8 @@
         .hidden { display: none !important; }
         #landing {
             min-height: 100vh; display: flex; align-items: center; justify-content: center;
-            text-align: center; padding-top: 56px; background: linear-gradient(135deg, #667eea, #764ba2);
-            color: #fff;
+            text-align: center; padding-top: 56px; background: var(--background);
+            color: var(--text-primary);
         }
         #landing h1 { font-size: clamp(36px, 8vw, 64px); font-weight: 700; margin-bottom: 24px; }
         #landing p { font-size: 18px; opacity: .9; max-width: 600px; margin: 0 auto 32px; }
@@ -250,8 +251,8 @@
                     <button onclick="authSystem.logout()" class="btn btn-secondary" aria-label="Sign Out">Sign Out</button>
                     <select id="theme-selector" class="theme-selector" onchange="uiSystem.changeTheme(this.value)" aria-label="Select Theme">
                         <option value="auto">Auto</option>
-                        <option value="light">Light</option>
-                        <option value="dark">Dark</option>
+                        <option value="light">Light Jedi</option>
+                        <option value="dark">Dark Sith</option>
                     </select>
                 </span>
             </div>
@@ -366,7 +367,7 @@
         <div class="modal-content" style="max-width:800px">
             <div class="modal-header">
                 <h2 class="modal-title" id="task-title"></h2>
-                <button class="modal-close" onclick="closeModal()" aria-label="Close"><svg viewBox="0 0 24 人性:24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
+                <button class="modal-close" onclick="closeModal()" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" /></svg></button>
             </div>
             <div id="task-content"></div>
             <div class="task-notes-section">
@@ -402,10 +403,10 @@
             <div id="admin-leaderboard" class="admin-section active" role="tabpanel" aria-labelledby="tab-leaderboard">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <h3 style="margin: 0;">🏆 Leaderboard</h3>
-                    <button class="btn btn-secondary" onclick="adminSystem.refreshLeaderboard(true)" style="padding: 6px 12px; font-size: 13px;" aria-label="Refresh">🔄 Refresh</button>
+                    <button class="btn btn-secondary" onclick="adminSystem.refreshLeaderboard()" style="padding: 6px 12px; font-size: 13px;" aria-label="Refresh">🔄 Refresh</button>
                 </div>
-                <table class="admin-table leaderboard-table">
-                    <thead><tr><th scope="col">Rank</th><th scope="col">Student</th><th scope="col">Progress</th><th scope="col">Tasks</th><th scope="col">Notes</th><th scope="col">Last Active</th></tr></thead>
+                <table class="admin-table">
+                    <thead><tr><th>Rank</th><th>Student</th><th>Progress</th><th>Tasks</th><th>Notes</th><th>Last Active</th></tr></thead>
                     <tbody id="leaderboard-body"></tbody>
                 </table>
             </div>
@@ -420,10 +421,10 @@
     <div id="notification" class="notification" role="alert"></div>
     <script>
         const tasksByWeek = {
-            1: ["install-server2012", "configure-static-ip", "install-adds-role", "promote-toad", "configure-dns-server", "create-domain-users", "join-vm-domain", "create-hidden-share", "map-drive-gpo", "map-drive-script", "map-drive-powershell", "create-security-group", "restrict-share-access"],
-            2: ["install-second-server", "promote-additional-dc", "install-wsus-role", "configure-wsus-settings", "setup-wsus-gpo", "configure-primary-time", "configure-secondary-time", "test-infrastructure"],
-            3: ["backup-servers", "upgrade-dc1-2016", "upgrade-dc2-2016", "raise-functional-levels", "install-exchange-server", "install-exchange-prereqs", "extend-ad-schema", "install-exchange-2019", "configure-exchange-basic", "create-mailboxes", "test-mailbox-access", "configure-internal-mailflow"],
-            4: ["configure-external-dns", "setup-firewall-rules", "install-ssl-certificates", "configure-external-mailflow", "setup-modern-auth", "prepare-m365-tenant", "install-aad-connect", "run-hybrid-wizard", "configure-hybrid-mailflow", "verify-hybrid-functionality"]
+            1: ["install-server2012", "configure-static-ip", "install-adds-role", "promote-toad", "configure-dns-server", "create-domain-users", "join-vm-domain", "create-hidden-task", "map-drive-gpo", "map-drive-script", "map-drive-powershell", "create-security-group", "restrict-share-task"],
+            2: ["install-second-task", "promote-additional-dc", "install-wsus-role", "configure-wsus-task", "setup-wsus-gpo", "configure-primary-task", "configure-time-task", "test-infrastructure-task"],
+            3: ["backup-tasks", "upgrade-task", "upgrade-second-task", "raise-functional-task", "install-exchange", "install-exchange-prereqs", "extend-ad-task", "install-exchange-task", "configure-exchange-task", "create-mailboxes", "test-mailbox-task", "configure-internal-mailflow"],
+            4: ["configure-external-dns", "setup-firewall-rules", "install-ssl-certificate", "configure-external-task", "setup-modern-task", "prepare-m365-task", "install-aad-connect", "run-hybrid-task", "configure-hybrid-mailflow", "verify-hybrid-task"]
         };
         let appState = { user: null, progress: {}, authenticated: false, sessionToken: null };
         const utils = {
@@ -431,8 +432,8 @@
             show: el => el?.classList.remove("hidden"),
             hide: el => el?.classList.add("hidden"),
             cookies: {
-                get: name => document.cookie.match(`${name}=([^;]*)`)?.[1],
-                set: (name, value, days=7) => document.cookie = `${name}=${value};path=/;Max-Age=${days*86400};SameSite=Strict;${location.protocol === "https:" ? "Secure" : ""}`,
+                get: name => document.cookie.match(`(?:^|;)${name}=([^;]*)`)?.[1],
+                set: (name, value, days=8) => document.cookie = `${name}=${value};path=/;Max-Age=${days*86400};SameSite=Strict;${location.protocol.toLowerCase() === "https:" ? "Secure" : ""}`,
                 delete: name => document.cookie = `${name}=;path=/;Max-Age=0;SameSite=Strict`
             }
         };
@@ -518,7 +519,7 @@
                     uiSystem.showDashboard();
                     await progressSystem.loadProgress();
                     closeModal();
-                    showNotification(`Welcome back, ${name}!`);
+                    showNotification("Welcome back, " + name + "!");
                 } catch (e) {
                     showNotification(e.message || "Login failed", "error");
                 }
@@ -534,7 +535,7 @@
                     uiSystem.showDashboard();
                     await progressSystem.loadProgress();
                     closeModal();
-                    showNotification(`Welcome, ${name}!`);
+                    showNotification("Welcome, " + name + "!");
                 } catch (e) {
                     showNotification(e.message || "Registration failed", "error");
                 }
@@ -578,7 +579,7 @@
             },
             showLabHistory() {
                 closeModal();
-                const m = utils.getId("lab-history-modal");
+                const m = labHistoryModal();
                 m.style.display = "flex";
                 m.setAttribute("aria-hidden", "false");
                 labSystem.loadHistory();
@@ -722,6 +723,11 @@
         const taskSystem = {
             currentTask: { week: null, taskId: null },
             openModal(week, taskId) {
+                if (!appState.authenticated) {
+                    showNotification("Please sign in to view task details", "error");
+                    showLogin();
+                    return;
+                }
                 this.currentTask = { week, taskId };
                 const taskKey = `${week}-${taskId}`;
                 const taskDef = TASK_DEFINITIONS?.[taskKey] || {
@@ -802,7 +808,7 @@
                             <td><div class="progress-container"><div class="progress-bar-mini"><div class="progress-fill-mini" style="width: ${user.progress}%"></div></div><span class="progress-text-mini">${user.progress}%</span></div></td>
                             <td style="text-align: center;"><strong>${user.completedTasks}</strong>/42</td>
                             <td>${user.notesCount ? `<span class="notes-badge">${user.notesCount}</span>` : "No notes"}</td>
-                            <td><small>${user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : "Never"}</small></span></div></td>
+                            <td><small>${user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : "Never"}</small></td>
                         `;
                         fragment.appendChild(tr);
                     });
@@ -881,15 +887,9 @@
             m.setAttribute("aria-hidden", "false");
             adminSystem.refreshLeaderboard();
         }
-        const TASK_DEFINITIONS = Object.entries(tasksByWeek).reduce((acc, [week, tasks]) => {
-            tasks.forEach(task => {
-                acc[`${week}-${task}`] = {
-                    title: task.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase()),
-                    description: `<p>Complete the task: ${task.replace(/-/g, " ")}.</p>`
-                };
-            });
-            return acc;
-        }, {});
+        function labHistoryModal() {
+            return utils.getId("lab-history-modal");
+        }
         document.addEventListener("DOMContentLoaded", () => {
             uiSystem.initTheme();
             authSystem.checkSession();
