@@ -1,4 +1,21 @@
-<!DOCTYPE html>
+showLanding() {
+                utils.hide(utils.getId('dashboard'));
+                utils.show(utils.getId('landing'));
+                utils.hide(utils.getId('user-menu'));
+                utils.show(utils.getId('auth-buttons'));
+                
+                const labButton = utils.getId('lab-env-button');
+                if (labButton) labButton.classList.remove('authenticated');
+                
+                // Update mobile menu
+                utils.show(utils.getId('mobile-auth-buttons'));
+                utils.hide(utils.getId('mobile-user-menu'));
+                utils.hide(utils.getId('mobile-lab-section'));
+                utils.hide(utils.getId('mobile-admin-section'));
+                utils.hide(utils.getId('mobile-signout-section'));
+                
+                document.body.style.overflow = 'auto';
+            },<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -86,8 +103,7 @@
         
         /* Enhanced Logo */
         .logo {
-            display: flex; align-items: center; gap: var(--spacing-sm);
-            font-weight: 700; font-size: 18px; color: var(--text-primary);
+            display: flex; align-items: center;
         }
         .logo img { 
             height: 32px; width: auto; transition: var(--transition-bounce); 
@@ -97,6 +113,64 @@
         
         /* Enhanced Navigation */
         .nav-right { display: flex; align-items: center; gap: var(--spacing-sm); }
+        
+        /* Mobile Navigation */
+        .mobile-menu-button {
+            display: none; width: 40px; height: 40px; border: none; background: var(--surface);
+            border-radius: var(--radius-lg); cursor: pointer; transition: var(--transition);
+            box-shadow: var(--shadow-light); position: relative; overflow: hidden;
+        }
+        .mobile-menu-button:hover { background: var(--surface-secondary); transform: scale(1.05); }
+        
+        .hamburger {
+            width: 18px; height: 2px; background: var(--text-primary); position: relative;
+            margin: 0 auto; transition: var(--transition);
+        }
+        .hamburger::before, .hamburger::after {
+            content: ''; position: absolute; width: 18px; height: 2px; background: var(--text-primary);
+            transition: var(--transition); left: 0;
+        }
+        .hamburger::before { top: -6px; }
+        .hamburger::after { top: 6px; }
+        
+        .mobile-menu-button.active .hamburger { background: transparent; }
+        .mobile-menu-button.active .hamburger::before { transform: rotate(45deg); top: 0; }
+        .mobile-menu-button.active .hamburger::after { transform: rotate(-45deg); top: 0; }
+        
+        .mobile-nav {
+            position: absolute; top: 100%; right: 0; background: var(--surface-elevated);
+            border: 1px solid var(--border); border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-heavy); min-width: 280px; z-index: 1001;
+            opacity: 0; visibility: hidden; transform: translateY(-10px) scale(0.95);
+            transition: var(--transition); overflow: hidden; max-height: 80vh;
+            overflow-y: auto;
+        }
+        .mobile-nav.show { 
+            opacity: 1; visibility: visible; transform: translateY(0) scale(1); 
+        }
+        
+        .mobile-nav-section {
+            padding: var(--spacing-md); border-bottom: 1px solid var(--border-light);
+        }
+        .mobile-nav-section:last-child { border-bottom: none; }
+        .mobile-nav-section h3 {
+            font-size: 14px; font-weight: 700; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: var(--spacing-sm);
+        }
+        
+        .mobile-nav-item {
+            display: flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm);
+            cursor: pointer; border-radius: var(--radius-md); transition: var(--transition);
+            margin-bottom: var(--spacing-xs); font-size: 14px; color: var(--text-primary);
+        }
+        .mobile-nav-item:hover { background: var(--surface-secondary); }
+        .mobile-nav-item:last-child { margin-bottom: 0; }
+        
+        /* Lab Environment Button in Navbar */
+        .lab-env-button {
+            display: none; /* Hidden until authenticated */
+        }
+        .lab-env-button.authenticated { display: inline-flex; }
         
         /* Enhanced Buttons */
         .btn {
@@ -180,6 +254,12 @@
             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%228%22%20viewBox%3D%220%200%2012%208%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M1%201L6%206L11%201%22%20stroke%3D%22%239CA3AF%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E');
         }
         
+        @media (max-width: 968px) {
+            .nav-right > *:not(.mobile-menu-button) { display: none; }
+            .mobile-menu-button { display: flex; align-items: center; justify-content: center; }
+            .lab-env-button.authenticated { display: none; } /* Hide in mobile, show in dropdown */
+        }
+        
         /* Enhanced Utility Classes */
         .hidden { display: none !important; }
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
@@ -209,7 +289,7 @@
             animation: fadeInUp 0.8s var(--ease-out-quart) 0.2s both;
         }
         .landing-actions { 
-            display: flex; gap: var(--spacing-md); justify-content: center; flex-wrap: wrap;
+            display: flex; gap: var(--spacing-md); justify-content: center; align-items: center; flex-wrap: wrap;
             animation: fadeInUp 0.8s var(--ease-out-quart) 0.4s both;
         }
         
@@ -335,13 +415,18 @@
             gap: var(--spacing-md); padding: 0 var(--spacing-lg); 
         }
         
-        /* Enhanced Task Items */
+        /* Enhanced Task Items with Subtask Support */
         .task-item {
             background: var(--surface-secondary); border-radius: var(--radius-lg); 
             padding: var(--spacing-md); cursor: pointer; transition: var(--transition); 
-            border: 1px solid var(--border-light); display: flex; align-items: flex-start; gap: var(--spacing-md);
-            position: relative; overflow: hidden;
+            border: 1px solid var(--border-light); position: relative; overflow: hidden;
+            flex-direction: column; align-items: stretch; gap: var(--spacing-sm);
         }
+        
+        .task-main {
+            display: flex; align-items: flex-start; gap: var(--spacing-md);
+        }
+        
         .task-item::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
             background: linear-gradient(90deg, var(--primary), var(--success)); 
@@ -357,6 +442,39 @@
             box-shadow: 0 0 0 1px rgba(52,199,89,.1);
         }
         .task-item.completed::before { transform: scaleX(1); background: var(--success); }
+        
+        /* Subtasks */
+        .subtasks-container {
+            margin-top: var(--spacing-sm); padding-top: var(--spacing-sm);
+            border-top: 1px solid var(--border-light); display: none;
+        }
+        .task-item.has-subtasks .subtasks-container { display: block; }
+        
+        .subtask-item {
+            display: flex; align-items: flex-start; gap: var(--spacing-sm);
+            padding: var(--spacing-xs) 0; font-size: 13px; line-height: 1.4;
+        }
+        
+        .subtask-checkbox {
+            width: 16px; height: 16px; border: 2px solid var(--border); border-radius: var(--radius-sm);
+            cursor: pointer; appearance: none; position: relative; transition: var(--transition);
+            flex-shrink: 0; margin-top: 2px;
+        }
+        .subtask-checkbox:hover { border-color: var(--primary); }
+        .subtask-checkbox:checked { 
+            background: var(--primary); border-color: var(--primary); 
+        }
+        .subtask-checkbox:checked::after {
+            content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: #fff; font-size: 10px; font-weight: bold;
+        }
+        
+        .subtask-label {
+            flex: 1; color: var(--text-secondary); cursor: pointer;
+        }
+        .subtask-item.completed .subtask-label {
+            text-decoration: line-through; opacity: 0.7;
+        }
         
         /* Enhanced Task Checkbox */
         .task-checkbox {
@@ -757,31 +875,104 @@
         <nav class="container">
             <div class="logo">
                 <img src="/assets/Velocity-Logo.png" alt="Velocity Lab Logo" aria-label="Velocity Lab">
-                <span>Velocity Lab</span>
             </div>
             <div class="nav-right">
                 <span id="auth-buttons">
                     <button onclick="showLogin()" class="btn btn-secondary" aria-label="Sign In">
                         <span>Sign In</span>
                     </button>
-                    <button onclick="showRegister()" class="btn btn-primary" aria-label="Register">
+                    <button onclick="showRegister()" class="btn btn-primary" aria-label="Get Started">
                         <span>Get Started</span>
                     </button>
                 </span>
                 <span id="user-menu" class="hidden">
                     <span id="user-name" style="margin-right: var(--spacing-sm); font-weight: 600; color: var(--text-primary);"></span>
+                    <button id="lab-env-button" class="btn btn-primary lab-env-button" onclick="uiSystem.toggleLabDropdown()" aria-haspopup="true" aria-expanded="false">
+                        <span>🚀 Lab Environment ▼</span>
+                    </button>
                     <button id="admin-button" class="btn btn-admin hidden" onclick="showAdmin()" aria-label="Admin Portal">
-                        <span>Admin Portal</span>
+                        <span>👑 Admin</span>
                     </button>
                     <button onclick="authSystem.logout()" class="btn btn-secondary" aria-label="Sign Out">
                         <span>Sign Out</span>
                     </button>
                     <select id="theme-selector" class="theme-selector" onchange="uiSystem.changeTheme(this.value)" aria-label="Select Theme">
-                        <option value="auto">Auto</option>
-                        <option value="light">Light</option>
-                        <option value="dark">Dark</option>
+                        <option value="auto">🌓 Auto</option>
+                        <option value="light">🌅 Light (Jedi)</option>
+                        <option value="dark">🌙 Dark (Sith)</option>
                     </select>
                 </span>
+                
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-button" onclick="uiSystem.toggleMobileMenu()" aria-label="Menu" aria-expanded="false">
+                    <div class="hamburger"></div>
+                </button>
+                
+                <!-- Mobile Navigation -->
+                <div class="mobile-nav" id="mobile-nav" role="menu">
+                    <div id="mobile-auth-section" class="mobile-nav-section">
+                        <h3>Account</h3>
+                        <div id="mobile-auth-buttons">
+                            <div class="mobile-nav-item" onclick="showLogin(); uiSystem.closeMobileMenu()" role="menuitem">
+                                👤 <span>Sign In</span>
+                            </div>
+                            <div class="mobile-nav-item" onclick="showRegister(); uiSystem.closeMobileMenu()" role="menuitem">
+                                🚀 <span>Get Started</span>
+                            </div>
+                        </div>
+                        <div id="mobile-user-menu" class="hidden">
+                            <div class="mobile-nav-item" style="pointer-events: none; opacity: 0.7;">
+                                👋 <span id="mobile-user-name">User</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="mobile-lab-section" class="mobile-nav-section hidden">
+                        <h3>Lab Environment</h3>
+                        <div class="mobile-nav-item" onclick="labSystem.startNew(); uiSystem.closeMobileMenu()" role="menuitem">
+                            🚀 <span>Start Fresh Lab</span>
+                        </div>
+                        <div class="mobile-nav-item" onclick="uiSystem.showLabHistory(); uiSystem.closeMobileMenu()" role="menuitem">
+                            📅 <span>Lab History</span>
+                        </div>
+                    </div>
+                    
+                    <div id="mobile-admin-section" class="mobile-nav-section hidden">
+                        <h3>Administration</h3>
+                        <div class="mobile-nav-item" onclick="showAdmin(); uiSystem.closeMobileMenu()" role="menuitem">
+                            👑 <span>Admin Portal</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mobile-nav-section">
+                        <h3>Settings</h3>
+                        <div class="mobile-nav-item" onclick="uiSystem.changeTheme('auto'); uiSystem.closeMobileMenu()" role="menuitem">
+                            🌓 <span>Auto Theme</span>
+                        </div>
+                        <div class="mobile-nav-item" onclick="uiSystem.changeTheme('light'); uiSystem.closeMobileMenu()" role="menuitem">
+                            🌅 <span>Light (Jedi)</span>
+                        </div>
+                        <div class="mobile-nav-item" onclick="uiSystem.changeTheme('dark'); uiSystem.closeMobileMenu()" role="menuitem">
+                            🌙 <span>Dark (Sith)</span>
+                        </div>
+                    </div>
+                    
+                    <div id="mobile-signout-section" class="mobile-nav-section hidden">
+                        <div class="mobile-nav-item" onclick="authSystem.logout(); uiSystem.closeMobileMenu()" role="menuitem" style="color: var(--error);">
+                            👋 <span>Sign Out</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lab Dropdown (for desktop) -->
+                <div class="lab-dropdown" id="lab-dropdown" role="menu">
+                    <div class="lab-dropdown-item" onclick="labSystem.startNew(); uiSystem.closeLabDropdown()" role="menuitem">
+                        🚀 <span>Start Fresh Lab Environment</span>
+                    </div>
+                    <div class="lab-dropdown-item" onclick="uiSystem.showLabHistory(); uiSystem.closeLabDropdown()" role="menuitem">
+                        📅 <span>View Lab History</span>
+                    </div>
+                </div>
             </div>
         </nav>
     </header>
@@ -793,10 +984,10 @@
                 <p>Embark on a comprehensive 4-week journey with 42 hands-on tasks to build a complete Exchange Hybrid lab environment, from Domain Controllers to Microsoft 365 integration.</p>
                 <div class="landing-actions">
                     <button class="btn btn-primary" onclick="showRegister()" aria-label="Start Your Journey">
-                        <span>Start Your Journey</span>
+                        <span>🚀 Start Your Journey</span>
                     </button>
                     <button class="btn btn-secondary" onclick="showLogin()" aria-label="Sign In">
-                        <span>Sign In</span>
+                        <span>👤 Sign In</span>
                     </button>
                 </div>
             </div>
@@ -832,17 +1023,7 @@
                         </div>
                     </div>
                     <div class="lab-button-container">
-                        <button class="btn btn-primary" onclick="uiSystem.toggleLabDropdown()" aria-haspopup="true" aria-expanded="false">
-                            <span>Lab Environment ▼</span>
-                        </button>
-                        <div class="lab-dropdown" id="lab-dropdown" role="menu">
-                            <div class="lab-dropdown-item" onclick="labSystem.startNew(); uiSystem.closeLabDropdown()" role="menuitem">
-                                🚀 <span>Start Fresh Lab Environment</span>
-                            </div>
-                            <div class="lab-dropdown-item" onclick="uiSystem.showLabHistory(); uiSystem.closeLabDropdown()" role="menuitem">
-                                📅 <span>View Lab History</span>
-                            </div>
-                        </div>
+                        <!-- Lab Environment button moved to navbar -->
                     </div>
                 </div>
 
@@ -1518,16 +1699,61 @@
                 utils.hide(utils.getId('auth-buttons'));
                 
                 const userName = utils.getId('user-name');
+                const mobileUserName = utils.getId('mobile-user-name');
+                const labButton = utils.getId('lab-env-button');
+                
                 userName.textContent = appState.user?.name || '';
                 userName.setAttribute('aria-label', `Logged in as ${appState.user.name}`);
+                
+                if (mobileUserName) mobileUserName.textContent = appState.user?.name || '';
+                if (labButton) labButton.classList.add('authenticated');
+                
+                // Update mobile menu
+                utils.hide(utils.getId('mobile-auth-buttons'));
+                utils.show(utils.getId('mobile-user-menu'));
+                utils.show(utils.getId('mobile-lab-section'));
+                utils.show(utils.getId('mobile-signout-section'));
+                
+                if (appState.user?.role === 'admin') {
+                    utils.show(utils.getId('mobile-admin-section'));
+                }
+                
                 document.body.style.overflow = 'auto';
+            },
+            
+            toggleMobileMenu() {
+                const mobileNav = utils.getId('mobile-nav');
+                const button = document.querySelector('.mobile-menu-button');
+                const isExpanded = mobileNav.classList.toggle('show');
+                
+                button.setAttribute('aria-expanded', isExpanded.toString());
+                button.classList.toggle('active', isExpanded);
+                
+                if (isExpanded) {
+                    const handleClickOutside = (event) => {
+                        if (!mobileNav.contains(event.target) && !button.contains(event.target)) {
+                            this.closeMobileMenu();
+                            document.removeEventListener('mousedown', handleClickOutside);
+                        }
+                    };
+                    document.addEventListener('mousedown', handleClickOutside);
+                }
+            },
+            
+            closeMobileMenu() {
+                const mobileNav = utils.getId('mobile-nav');
+                const button = document.querySelector('.mobile-menu-button');
+                mobileNav.classList.remove('show');
+                button.setAttribute('aria-expanded', 'false');
+                button.classList.remove('active');
             },
             
             toggleLabDropdown() {
                 const dropdown = utils.getId('lab-dropdown');
-                const button = document.querySelector('.lab-button-container .btn');
-                const isExpanded = dropdown.classList.toggle('show');
+                const button = utils.getId('lab-env-button');
+                if (!dropdown || !button) return;
                 
+                const isExpanded = dropdown.classList.toggle('show');
                 button.setAttribute('aria-expanded', isExpanded.toString());
                 
                 if (isExpanded) {
@@ -1544,9 +1770,9 @@
             
             closeLabDropdown() {
                 const dropdown = utils.getId('lab-dropdown');
-                const button = document.querySelector('.lab-button-container .btn');
-                dropdown.classList.remove('show');
-                button.setAttribute('aria-expanded', 'false');
+                const button = utils.getId('lab-env-button');
+                if (dropdown) dropdown.classList.remove('show');
+                if (button) button.setAttribute('aria-expanded', 'false');
             },
             
             showLabHistory() {
@@ -1572,26 +1798,17 @@
                     localStorage.setItem('theme', theme);
                 }
                 
-                utils.getId('theme-selector').value = theme;
+                const themeSelector = utils.getId('theme-selector');
+                if (themeSelector) themeSelector.value = theme;
             },
             
             initTheme() {
-                const savedTheme = localStorage.getItem('theme');
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                
-                if (savedTheme) {
-                    this.changeTheme(savedTheme);
-                } else if (prefersDark) {
-                    this.changeTheme('dark');
-                } else {
-                    this.changeTheme('light');
-                }
-                
-                utils.getId('theme-selector').value = savedTheme || 'auto';
+                const savedTheme = localStorage.getItem('theme') || 'auto';
+                this.changeTheme(savedTheme);
                 
                 // Listen for system theme changes
                 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                    if (!localStorage.getItem('theme')) {
+                    if (!localStorage.getItem('theme') || localStorage.getItem('theme') === 'auto') {
                         this.changeTheme('auto');
                     }
                 });
@@ -1723,24 +1940,34 @@
                     const taskElement = document.createElement('div');
                     taskElement.className = `task-item ${task.completed ? 'completed' : ''}`;
                     taskElement.style.animationDelay = `${index * 0.05}s`;
+                    
+                    // Check if task has subtasks
+                    const hasSubtasks = taskDef.description.includes('subtask-container');
+                    if (hasSubtasks) {
+                        taskElement.classList.add('has-subtasks');
+                    }
+                    
                     taskElement.innerHTML = `
-                        <input type="checkbox" 
-                               class="task-checkbox" 
-                               id="task-${weekNumber}-${taskId}" 
-                               ${task.completed ? 'checked' : ''} 
-                               onchange="progressSystem.toggleTask('${weekNumber}', '${taskId}', this.checked)" 
-                               aria-label="Toggle completion of ${utils.sanitizeHtml(taskDef.title)}">
-                        <label for="task-${weekNumber}-${taskId}" class="task-content">
-                            <div class="task-title">${utils.sanitizeHtml(taskDef.title)}</div>
-                            <div class="task-description">${utils.sanitizeHtml(taskDef.description.replace(/<[^>]*>/g, '').substring(0, 100))}...</div>
-                        </label>
+                        <div class="task-main">
+                            <input type="checkbox" 
+                                   class="task-checkbox" 
+                                   id="task-${weekNumber}-${taskId}" 
+                                   ${task.completed ? 'checked' : ''} 
+                                   onchange="progressSystem.toggleTask('${weekNumber}', '${taskId}', this.checked)" 
+                                   aria-label="Toggle completion of ${utils.sanitizeHtml(taskDef.title)}">
+                            <label for="task-${weekNumber}-${taskId}" class="task-content">
+                                <div class="task-title">${utils.sanitizeHtml(taskDef.title)}</div>
+                                <div class="task-description">${utils.sanitizeHtml(taskDef.description.replace(/<[^>]*>/g, '').substring(0, 100))}...</div>
+                            </label>
+                        </div>
+                        ${hasSubtasks ? this.generateSubtasks(taskKey, taskDef) : ''}
                     `;
                     
                     taskElement.setAttribute('role', 'button');
                     taskElement.setAttribute('tabindex', '0');
                     
                     const handleClick = (event) => {
-                        if (!event.target.matches('input[type="checkbox"]')) {
+                        if (!event.target.matches('input[type="checkbox"]') && !event.target.closest('.subtasks-container')) {
                             taskSystem.showTaskModal(weekNumber, taskId);
                         }
                     };
@@ -1760,6 +1987,82 @@
                 
                 if (grid) {
                     grid.appendChild(fragment);
+                }
+            },
+            
+            generateSubtasks(taskKey, taskDef) {
+                // Extract subtasks from task definition HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = taskDef.description;
+                const subtaskContainer = tempDiv.querySelector('.subtask-container');
+                
+                if (!subtaskContainer) return '';
+                
+                const subtaskItems = subtaskContainer.querySelectorAll('.subtask-item');
+                if (!subtaskItems.length) return '';
+                
+                const subtasksHtml = Array.from(subtaskItems).map((item, index) => {
+                    const stepNumber = index + 1;
+                    const subtaskId = `${taskKey}-subtask-${stepNumber}`;
+                    const labelText = item.querySelector('label')?.textContent || `Subtask ${stepNumber}`;
+                    const isCompleted = appState.progress[subtaskId]?.completed || false;
+                    
+                    return `
+                        <div class="subtask-item ${isCompleted ? 'completed' : ''}">
+                            <input type="checkbox" 
+                                   class="subtask-checkbox" 
+                                   id="${subtaskId}" 
+                                   ${isCompleted ? 'checked' : ''}
+                                   onchange="progressSystem.toggleSubtask('${taskKey}', ${stepNumber}, this.checked)"
+                                   data-task="${taskKey}"
+                                   data-step="${stepNumber}">
+                            <label for="${subtaskId}" class="subtask-label">
+                                ${utils.sanitizeHtml(labelText)}
+                            </label>
+                        </div>
+                    `;
+                }).join('');
+                
+                return `<div class="subtasks-container">${subtasksHtml}</div>`;
+            },
+            
+            async toggleSubtask(taskKey, stepNumber, completed) {
+                const subtaskId = `${taskKey}-subtask-${stepNumber}`;
+                
+                // Update subtask state
+                appState.progress[subtaskId] = {
+                    completed,
+                    updatedAt: new Date().toISOString()
+                };
+                
+                // Check if all subtasks are completed
+                const allSubtasks = document.querySelectorAll(`input[data-task="${taskKey}"][data-step]`);
+                const completedSubtasks = Array.from(allSubtasks).filter(checkbox => checkbox.checked);
+                
+                // Auto-complete main task if all subtasks are done
+                if (allSubtasks.length > 0 && completedSubtasks.length === allSubtasks.length) {
+                    const [week, taskId] = taskKey.split('-').slice(0, 2);
+                    const weekNumber = week.replace('week', '');
+                    const mainTaskCheckbox = document.getElementById(`task-${weekNumber}-${taskId.substring(0)}`);
+                    
+                    if (mainTaskCheckbox && !mainTaskCheckbox.checked) {
+                        mainTaskCheckbox.checked = true;
+                        await this.toggleTask(weekNumber, taskKey.replace(`week${weekNumber}-`, ''), true);
+                    }
+                }
+                
+                // Update UI
+                const subtaskItem = document.getElementById(subtaskId)?.closest('.subtask-item');
+                if (subtaskItem) {
+                    subtaskItem.classList.toggle('completed', completed);
+                }
+                
+                // Save progress (you might want to add this to your API)
+                try {
+                    // For now, just store locally - you can add API call later
+                    localStorage.setItem(`subtask_${subtaskId}`, JSON.stringify({ completed, updatedAt: new Date().toISOString() }));
+                } catch (err) {
+                    console.warn('Failed to save subtask progress:', err);
                 }
             },
             
@@ -2476,13 +2779,23 @@
 
             // Enhanced click outside handlers
             document.addEventListener('click', (event) => {
-                const dropdown = utils.getId('lab-dropdown');
-                const button = document.querySelector('.lab-button-container .btn');
+                const labDropdown = utils.getId('lab-dropdown');
+                const labButton = utils.getId('lab-env-button');
+                const mobileNav = utils.getId('mobile-nav');
+                const mobileButton = document.querySelector('.mobile-menu-button');
                 
-                if (dropdown?.classList.contains('show') && 
-                    !dropdown.contains(event.target) && 
-                    !button?.contains(event.target)) {
+                // Close lab dropdown
+                if (labDropdown?.classList.contains('show') && 
+                    !labDropdown.contains(event.target) && 
+                    !labButton?.contains(event.target)) {
                     uiSystem.closeLabDropdown();
+                }
+                
+                // Close mobile menu
+                if (mobileNav?.classList.contains('show') && 
+                    !mobileNav.contains(event.target) && 
+                    !mobileButton?.contains(event.target)) {
+                    uiSystem.closeMobileMenu();
                 }
             });
 
