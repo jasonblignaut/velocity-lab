@@ -1348,7 +1348,7 @@
                 this.show(message, 'error');
             },
             info(message) {
-                console.log('ℹ️ Info:', message);
+                console.log(ℹ️ Info:', message);
                 this.show(message, 'info');
             },
             show(message, type) {
@@ -1789,10 +1789,14 @@
                     });
                     
                     if (response.ok) {
-                        const result = await response.json();
-                        if (result.success) {
-                            appState.labHistory = result.data || [];
-                            return;
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('application/json')) {
+                            const result = await response.json();
+                            if (result.success) {
+                                appState.labHistory = result.data || [];
+                                console.log('✅ Lab history loaded from API');
+                                return;
+                            }
                         }
                     }
                 }
@@ -1810,16 +1814,16 @@
                     console.log('✅ Lab history loaded from local storage');
                 } else {
                     appState.labHistory = [];
-                    console.log('🆕 Starting with empty lab history');
                 }
                 
             } catch (error) {
-                console.warn('Failed to load lab history from API, using local storage:', error);
+                console.warn('Lab history API unavailable, using local storage');
                 // Try global first, then local
                 if (!loadLabHistoryFromGlobal()) {
                     const localHistory = localStorage.getItem(`labHistory_${appState.user?.email}`);
                     appState.labHistory = localHistory ? JSON.parse(localHistory) : [];
                 }
+                console.log('✅ Lab history loaded from local storage');
             }
         }
 
