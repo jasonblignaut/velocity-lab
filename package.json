@@ -1,58 +1,27 @@
 {
   "name": "velocity-lab",
   "version": "1.0.0",
-  "description": "Exchange Hybrid Lab Tracking System - 42 tasks over 4 weeks covering Windows Server, Active Directory, Exchange Server 2019, and Microsoft 365 integration",
-  "main": "index.html",
+  "description": "Exchange Hybrid Migration Training Platform with Apple-inspired UI and Unifi Cloud theming",
+  "type": "module",
   "scripts": {
-    "dev": "wrangler pages dev public --compatibility-date=2025-05-31",
-    "deploy": "bash scripts/deploy.sh",
-    "build": "echo 'Static site - no build process required'",
-    "preview": "wrangler pages dev public --local",
-    "setup": "bash scripts/setup.sh",
-    "test": "echo 'No tests configured'",
-    "lint": "echo 'No linting configured'",
-    "status": "curl -s https://training.velocity.co.za/api/status | jq .",
-    "kv:create": "wrangler kv:namespace create USERS && wrangler kv:namespace create PROGRESS && wrangler kv:namespace create SESSIONS",
-    "kv:list": "wrangler kv:namespace list",
-    "logs": "wrangler pages deployment tail",
-    "clean": "rm -rf .wrangler node_modules package-lock.json && npm install",
-    "validate": "wrangler pages validate public",
-    "env:dev": "wrangler pages dev public --env development",
-    "env:prod": "wrangler pages deploy public --env production"
-  },
-  "dependencies": {
-    "@cloudflare/workers-types": "^4.20241022.0"
-  },
-  "devDependencies": {
-    "wrangler": "^3.60.3"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/velocity-msp/velocity-lab.git"
+    "dev": "wrangler pages dev ./public --kv VELOCITY_USERS --kv VELOCITY_PROGRESS --kv VELOCITY_SESSIONS --kv VELOCITY_LABS",
+    "deploy": "wrangler pages deploy ./public",
+    "preview": "wrangler pages dev ./public --local --kv VELOCITY_USERS --kv VELOCITY_PROGRESS --kv VELOCITY_SESSIONS --kv VELOCITY_LABS"
   },
   "keywords": [
     "exchange",
     "hybrid",
-    "lab",
     "training",
-    "active-directory",
-    "microsoft-365",
-    "cloudflare-pages",
-    "workers",
-    "kv-storage",
-    "msp",
-    "velocity",
-    "sandton"
+    "cloudflare",
+    "pages",
+    "functions",
+    "apple-ui",
+    "unifi-cloud"
   ],
-  "author": "Velocity MSP Team <training@velocity.co.za>",
-  "license": "Proprietary",
+  "author": "Velocity Lab",
+  "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
   },
-  "private": true,
-  "homepage": "https://training.velocity.co.za",
-  "bugs": {
-    "url": "https://github.com/velocity-msp/velocity-lab/issues",
-    "email": "training@velocity.co.za"
-  }
-}
+  "devDependencies": {
+    "wrangler": "^3.0.0"
