@@ -24,6 +24,7 @@ export async function onRequestPost(context) {
     const remember = formData.get('remember') === 'on';
     
     console.log('Login attempt for email:', email);
+    console.log('Password provided:', password ? '***PRESENT***' : 'MISSING');
     
     // Validate required fields
     if (!email || !password) {
@@ -55,25 +56,61 @@ export async function onRequestPost(context) {
     
     if (!userData) {
       console.log('User not found in KV');
+      
+      // DEBUG: Let's see what keys actually exist
+      const allKeys = await usersKV.list({ prefix: 'user:' });
+      console.log('Available user keys in KV:', allKeys.keys.map(k => k.name));
+      
       return createErrorResponse('Invalid email or password', 401);
     }
     
     let user;
     try {
       user = JSON.parse(userData);
-      console.log('User data parsed successfully. Has password:', !!user.hashedPassword);
+      console.log('User data parsed successfully');
+      console.log('User structure keys:', Object.keys(user));
+      console.log('User has password field:', !!user.password);
+      console.log('User has hashedPassword field:', !!user.hashedPassword);
       console.log('User role:', user.role);
       console.log('User name:', user.name);
+      
+      // DEBUG: Show the actual stored password format (first 10 chars only for security)
+      if (user.password) {
+        console.log('Stored password (first 10 chars):', user.password.substring(0, 10) + '...');
+      }
+      if (user.hashedPassword) {
+        console.log('Stored hashedPassword (first 10 chars):', user.hashedPassword.substring(0, 10) + '...');
+      }
+      
     } catch (parseError) {
       console.error('Failed to parse user data:', parseError);
       return createErrorResponse('Invalid user data format', 500);
     }
     
-    // Verify password
-    const hashedInputPassword = await hashPassword(password);
-    console.log('Password hashes match:', hashedInputPassword === user.hashedPassword);
+    // Try different password verification methods
+    let passwordMatch = false;
     
-    if (hashedInputPassword !== user.hashedPassword) {
+    // Method 1: Direct comparison (plain text)
+    if (user.password && user.password === password) {
+      console.log('✅ Password match: Direct comparison (plain text)');
+      passwordMatch = true;
+    }
+    
+    // Method 2: Hashed comparison  
+    if (!passwordMatch && user.hashedPassword) {
+      const hashedInputPassword = await hashPassword(password);
+      console.log('Input password hashed to (first 10 chars):', hashedInputPassword.substring(0, 10) + '...');
+      
+      if (hashedInputPassword === user.hashedPassword) {
+        console.log('✅ Password match: Hashed comparison');
+        passwordMatch = true;
+      }
+    }
+    
+    // Method 3: Try other common hash formats if needed
+    if (!passwordMatch) {
+      console.log('❌ No password match found with any method');
+      console.log('Tried methods: direct comparison, hashed comparison');
       return createErrorResponse('Invalid email or password', 401);
     }
     
@@ -83,10 +120,10 @@ export async function onRequestPost(context) {
     
     // Create session object
     const session = {
-      userId: user.id,
+      userId: user.id || user.email, // fallback to email if no id
       email: user.email,
       name: user.name,
-      role: user.role,
+      role: user.role || 'user',
       createdAt: new Date().toISOString(),
       lastActivity: new Date().toISOString(),
       rememberMe: remember
@@ -121,7 +158,7 @@ export async function onRequestPost(context) {
     return createResponse({
       name: user.name,
       email: user.email,
-      role: user.role,
+      role: user.role || 'user',
       sessionToken: sessionToken
     }, true, `Welcome back, ${user.name}! 🎉`);
     
