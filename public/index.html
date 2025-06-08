@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Velocity Lab - Exchange Hybrid Training</title>
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     
     <style>
         /* Apple White + Unifi Cloud Color Scheme */
@@ -47,7 +47,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('/VelocityBackground.jpg') center/cover no-repeat;
+            background: url('/assets/VelocityBackground.jpg') center/cover no-repeat;
             opacity: 0.05;
             z-index: -1;
         }
@@ -73,7 +73,7 @@
         .logo {
             width: 50px;
             height: 50px;
-            background: url('/Velocity-Logo.png') center/contain no-repeat;
+            background: url('/assets/Velocity-Logo.png') center/contain no-repeat;
             cursor: pointer;
         }
 
@@ -499,84 +499,6 @@
             line-height: 1.5;
         }
 
-        /* Task Modal */
-        .task-modal-content {
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .task-header {
-            margin-bottom: 1.5rem;
-        }
-
-        .task-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .subtask-container {
-            margin: 1rem 0;
-        }
-
-        .subtask-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 0.8rem;
-            padding: 0.5rem;
-            border-radius: 6px;
-            transition: background-color 0.2s ease;
-        }
-
-        .subtask-item:hover {
-            background: var(--surface);
-        }
-
-        .subtask-checkbox {
-            margin-right: 0.8rem;
-            margin-top: 0.2rem;
-            cursor: pointer;
-        }
-
-        .subtask-checkbox:checked + label {
-            text-decoration: line-through;
-            opacity: 0.6;
-        }
-
-        .notes-section {
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border);
-        }
-
-        .notes-textarea {
-            width: 100%;
-            min-height: 100px;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            resize: vertical;
-            font-family: inherit;
-            font-size: 14px;
-        }
-
-        .notes-counter {
-            text-align: right;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-top: 0.5rem;
-        }
-
-        /* Quick Actions */
-        .quick-actions {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-        }
-
         /* User Menu */
         .user-menu {
             position: relative;
@@ -637,14 +559,6 @@
 
         .user-menu-item:hover {
             background: var(--surface-hover);
-        }
-
-        .user-menu-item:first-child {
-            border-radius: 8px 8px 0 0;
-        }
-
-        .user-menu-item:last-child {
-            border-radius: 0 0 8px 8px;
         }
 
         /* Mobile Responsive Design */
@@ -751,18 +665,6 @@
                 margin: auto;
             }
 
-            .task-modal-content {
-                max-height: 85vh;
-            }
-
-            /* Mobile quick actions */
-            .quick-actions {
-                gap: 0.5rem;
-                flex-direction: column;
-                max-width: 300px;
-                margin: 2rem auto;
-            }
-
             .btn {
                 font-size: 0.9rem;
                 padding: 10px 16px;
@@ -863,6 +765,15 @@
         .hidden {
             display: none !important;
         }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
     </style>
 </head>
 <body>
@@ -891,7 +802,7 @@
                 <span>▼</span>
             </button>
             <div class="user-menu-dropdown" id="userMenuDropdown">
-                <button class="user-menu-item" onclick="showLabHistory()">🔬 Lab History</button>
+                <button class="user-menu-item" onclick="startLabEnvironment()">🚀 Start Lab Environment</button>
                 <button class="user-menu-item" onclick="showAdminPanel()" id="adminButton" style="display: none;">👑 Admin Panel</button>
                 <button class="user-menu-item" onclick="logout()">🚪 Sign Out</button>
             </div>
@@ -954,9 +865,6 @@
         <div class="quick-actions">
             <button class="btn btn-primary" onclick="startLabEnvironment()">
                 🚀 Start Lab Environment
-            </button>
-            <button class="btn btn-secondary" onclick="showLabHistory()">
-                🔬 Lab History
             </button>
         </div>
 
@@ -1022,30 +930,6 @@
         </div>
     </div>
 
-    <!-- Task Modal -->
-    <div class="modal" id="taskModal">
-        <div class="modal-content task-modal-content">
-            <button class="modal-close" onclick="closeTaskModal()">&times;</button>
-            <div id="taskContent">
-                <!-- Task content will be populated by JavaScript -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Lab History Modal -->
-    <div class="modal" id="labHistoryModal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('labHistoryModal')">&times;</button>
-            <div class="modal-header">
-                <h2>🔬 Lab Environment History</h2>
-                <p style="color: var(--text-secondary);">Your previous lab sessions</p>
-            </div>
-            <div id="labHistoryContent">
-                <!-- Lab history will be populated by JavaScript -->
-            </div>
-        </div>
-    </div>
-
     <!-- Admin Panel Modal -->
     <div class="modal" id="adminModal">
         <div class="modal-content" style="max-width: 800px;">
@@ -1061,22 +945,22 @@
     </div>
 
     <!-- Load Task Definitions -->
-    <script src="/task-definitions.js"></script>
+    <script src="/assets/task-definitions.js"></script>
 
     <script>
         // Global application state
         const appState = {
             user: null,
             sessionToken: null,
-            progress: {},
-            currentTask: null
+            progress: {}
         };
 
-        // API configuration
-        const API_BASE = window.location.origin + '/api';
+        // API configuration - try relative paths first, fallback to absolute
+        const API_BASE = '/api';
 
         // Initialize application
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, checking session...');
             checkExistingSession();
             setupMobileMenuHandlers();
         });
@@ -1101,7 +985,6 @@
             hamburger.classList.toggle('active');
             mobileMenu.classList.toggle('active');
             
-            // Update mobile menu items based on auth state
             updateMobileMenuItems();
         }
 
@@ -1117,7 +1000,6 @@
             const mobileMenuItems = document.getElementById('mobileMenuItems');
             
             if (appState.user) {
-                // Authenticated user menu
                 let adminItem = '';
                 if (appState.user.role === 'admin') {
                     adminItem = '<button class="mobile-menu-item" onclick="showAdminPanel(); closeMobileMenu();">👑 Admin Panel</button>';
@@ -1128,12 +1010,10 @@
                         Welcome, ${appState.user.name}
                     </div>
                     <button class="mobile-menu-item" onclick="startLabEnvironment(); closeMobileMenu();">🚀 Start Lab Environment</button>
-                    <button class="mobile-menu-item" onclick="showLabHistory(); closeMobileMenu();">🔬 Lab History</button>
                     ${adminItem}
                     <button class="mobile-menu-item" onclick="logout(); closeMobileMenu();">🚪 Sign Out</button>
                 `;
             } else {
-                // Guest user menu
                 mobileMenuItems.innerHTML = `
                     <button class="mobile-menu-item secondary" onclick="showSignInModal(); closeMobileMenu();">👤 Sign In</button>
                     <button class="mobile-menu-item primary" onclick="showRegisterModal(); closeMobileMenu();">🚀 Get Started</button>
@@ -1143,10 +1023,8 @@
 
         function goHome() {
             if (appState.user) {
-                // If logged in, stay on dashboard
                 return;
             } else {
-                // If not logged in, ensure welcome screen is shown
                 showWelcomeScreen();
             }
         }
@@ -1155,6 +1033,7 @@
         async function checkExistingSession() {
             const token = localStorage.getItem('sessionToken');
             if (token) {
+                console.log('Found session token, validating...');
                 appState.sessionToken = token;
                 try {
                     await loadUserProgress();
@@ -1165,6 +1044,7 @@
                     showWelcomeScreen();
                 }
             } else {
+                console.log('No session token found');
                 showWelcomeScreen();
             }
         }
@@ -1181,12 +1061,21 @@
                 messageEl.innerHTML = '';
                 
                 const formData = new FormData(form);
+                
+                console.log('Attempting registration...');
                 const response = await fetch(`${API_BASE}/users/register`, {
                     method: 'POST',
                     body: formData
                 });
                 
+                console.log('Registration response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const result = await response.json();
+                console.log('Registration result:', result);
                 
                 if (result.success) {
                     appState.user = result.data;
@@ -1204,7 +1093,7 @@
                 }
             } catch (error) {
                 console.error('Registration error:', error);
-                messageEl.innerHTML = `<div class="message error">Registration failed. Please try again.</div>`;
+                messageEl.innerHTML = `<div class="message error">Registration failed: ${error.message}</div>`;
             } finally {
                 submitBtn.classList.remove('loading');
             }
@@ -1221,12 +1110,24 @@
                 messageEl.innerHTML = '';
                 
                 const formData = new FormData(form);
+                
+                console.log('Attempting sign in...');
                 const response = await fetch(`${API_BASE}/users/login`, {
                     method: 'POST',
                     body: formData
                 });
                 
+                console.log('Sign in response status:', response.status);
+                console.log('Sign in response headers:', Object.fromEntries(response.headers.entries()));
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Sign in error response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`);
+                }
+                
                 const result = await response.json();
+                console.log('Sign in result:', result);
                 
                 if (result.success) {
                     appState.user = result.data;
@@ -1244,7 +1145,7 @@
                 }
             } catch (error) {
                 console.error('Sign in error:', error);
-                messageEl.innerHTML = `<div class="message error">Sign in failed. Please try again.</div>`;
+                messageEl.innerHTML = `<div class="message error">Sign in failed: ${error.message}</div>`;
             } finally {
                 submitBtn.classList.remove('loading');
             }
@@ -1275,13 +1176,21 @@
         // Progress management
         async function loadUserProgress() {
             try {
+                console.log('Loading user progress...');
                 const response = await fetch(`${API_BASE}/user/progress`, {
                     headers: {
                         'Authorization': `Bearer ${appState.sessionToken}`
                     }
                 });
                 
+                console.log('Progress response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const result = await response.json();
+                console.log('Progress result:', result);
                 
                 if (result.success) {
                     appState.progress = result.data || {};
@@ -1292,82 +1201,6 @@
             } catch (error) {
                 console.error('Failed to load progress:', error);
                 throw error;
-            }
-        }
-
-        async function updateTaskProgress(week, task, completed) {
-            try {
-                const formData = new FormData();
-                formData.append('week', week);
-                formData.append('task', task);
-                formData.append('completed', completed.toString());
-                
-                const response = await fetch(`${API_BASE}/user/task`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${appState.sessionToken}`
-                    },
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    // Update local state
-                    const taskKey = `week${week}-${task}`;
-                    appState.progress[taskKey] = {
-                        completed: completed,
-                        updatedAt: new Date().toISOString()
-                    };
-                    updateProgressDisplay();
-                } else {
-                    throw new Error(result.message);
-                }
-            } catch (error) {
-                console.error('Failed to update task progress:', error);
-                alert('Failed to save progress. Please try again.');
-            }
-        }
-
-        // Task notes management
-        async function loadTaskNotes(week, task) {
-            try {
-                const response = await fetch(`${API_BASE}/task/notes?week=${week}&task=${task}`, {
-                    headers: {
-                        'Authorization': `Bearer ${appState.sessionToken}`
-                    }
-                });
-                
-                const result = await response.json();
-                return result.success ? result.data.notes : '';
-            } catch (error) {
-                console.error('Failed to load task notes:', error);
-                return '';
-            }
-        }
-
-        async function saveTaskNotes(week, task, notes) {
-            try {
-                const formData = new FormData();
-                formData.append('week', week);
-                formData.append('task', task);
-                formData.append('notes', notes);
-                
-                const response = await fetch(`${API_BASE}/task/notes`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${appState.sessionToken}`
-                    },
-                    body: formData
-                });
-                
-                const result = await response.json();
-                if (!result.success) {
-                    throw new Error(result.message);
-                }
-            } catch (error) {
-                console.error('Failed to save task notes:', error);
-                alert('Failed to save notes. Please try again.');
             }
         }
 
@@ -1392,50 +1225,6 @@
                 console.error('Failed to start lab:', error);
                 alert('Failed to start lab environment. Please try again.');
             }
-        }
-
-        async function showLabHistory() {
-            try {
-                const response = await fetch(`${API_BASE}/lab/history`, {
-                    headers: {
-                        'Authorization': `Bearer ${appState.sessionToken}`
-                    }
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    displayLabHistory(result.data);
-                } else {
-                    alert(`Failed to load lab history: ${result.message}`);
-                }
-            } catch (error) {
-                console.error('Failed to load lab history:', error);
-                alert('Failed to load lab history. Please try again.');
-            }
-        }
-
-        function displayLabHistory(labs) {
-            const content = document.getElementById('labHistoryContent');
-            
-            if (labs.length === 0) {
-                content.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No lab history yet. Start your first lab environment!</p>';
-            } else {
-                content.innerHTML = labs.map(lab => `
-                    <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                            <span style="font-weight: 600;">${lab.statusIcon} ${lab.environment}</span>
-                            <span style="color: var(--text-secondary); font-size: 0.9rem;">Session #${lab.sessionNumber}</span>
-                        </div>
-                        <div style="color: var(--text-secondary); font-size: 0.9rem;">
-                            Started: ${new Date(lab.startTime).toLocaleString()}<br>
-                            Status: ${lab.status}
-                        </div>
-                    </div>
-                `).join('');
-            }
-            
-            showModal('labHistoryModal');
         }
 
         // Admin functions
@@ -1555,7 +1344,7 @@
                 const progressPercentage = Math.round((completedTasks / week.tasks) * 100);
                 
                 return `
-                    <div class="week-card" onclick="showWeekTasks(${weekNum})">
+                    <div class="week-card">
                         <div class="week-header">
                             <div class="week-title">${week.title}</div>
                             <div class="week-tasks">${completedTasks}/${week.tasks} tasks</div>
@@ -1592,95 +1381,10 @@
             }
         }
 
-        function showWeekTasks(weekNum) {
-            const weekTasks = Object.keys(window.TASK_DEFINITIONS).filter(taskKey => 
-                taskKey.startsWith(`week${weekNum}-`)
-            );
-            
-            if (weekTasks.length > 0) {
-                // For now, show the first task of the week
-                showTaskModal(weekNum, weekTasks[0].replace(`week${weekNum}-`, ''));
-            }
-        }
-
-        async function showTaskModal(week, taskId) {
-            const taskKey = `week${week}-${taskId}`;
-            const taskDef = window.TASK_DEFINITIONS[taskKey];
-            
-            if (!taskDef) {
-                alert('Task definition not found');
-                return;
-            }
-            
-            appState.currentTask = { week, taskId, taskKey };
-            
-            // Load existing notes
-            const existingNotes = await loadTaskNotes(week, taskId);
-            
-            const content = document.getElementById('taskContent');
-            content.innerHTML = `
-                <div class="task-header">
-                    <h2 class="task-title">${taskDef.title}</h2>
-                </div>
-                <div class="task-description">
-                    ${taskDef.description}
-                </div>
-                <div class="notes-section">
-                    <h3>📝 Personal Notes</h3>
-                    <textarea class="notes-textarea" id="taskNotes" placeholder="Add your notes, observations, or troubleshooting steps here..." maxlength="500">${existingNotes}</textarea>
-                    <div class="notes-counter">
-                        <span id="notesCount">${existingNotes.length}</span>/500 characters
-                    </div>
-                    <button class="btn btn-primary" onclick="saveCurrentTaskNotes()" style="margin-top: 1rem;">💾 Save Notes</button>
-                </div>
-            `;
-            
-            // Add event listeners
-            const notesTextarea = document.getElementById('taskNotes');
-            const notesCount = document.getElementById('notesCount');
-            
-            notesTextarea.addEventListener('input', function() {
-                notesCount.textContent = this.value.length;
-            });
-            
-            // Add checkbox event listeners
-            const checkboxes = content.querySelectorAll('.subtask-checkbox');
-            checkboxes.forEach(checkbox => {
-                const stepNum = checkbox.getAttribute('data-step');
-                const isCompleted = appState.progress[taskKey]?.completed || false;
-                checkbox.checked = isCompleted;
-                
-                checkbox.addEventListener('change', function() {
-                    updateTaskProgress(week, taskId, this.checked);
-                });
-            });
-            
-            showModal('taskModal');
-        }
-
-        async function saveCurrentTaskNotes() {
-            if (!appState.currentTask) return;
-            
-            const notes = document.getElementById('taskNotes').value;
-            const { week, taskId } = appState.currentTask;
-            
-            try {
-                await saveTaskNotes(week, taskId, notes);
-                alert('✅ Notes saved successfully!');
-            } catch (error) {
-                console.error('Failed to save notes:', error);
-            }
-        }
-
-        function closeTaskModal() {
-            closeModal('taskModal');
-            appState.currentTask = null;
-        }
-
         // Modal management
         function showModal(modalId) {
             document.getElementById(modalId).classList.add('active');
-            closeMobileMenu(); // Close mobile menu when showing modal
+            closeMobileMenu();
         }
 
         function closeModal(modalId) {
@@ -1716,6 +1420,15 @@
             if (userMenu && !userMenu.contains(event.target) && dropdown.classList.contains('active')) {
                 dropdown.classList.remove('active');
             }
+        });
+
+        // Error logging for debugging
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error, e.filename, e.lineno);
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e.reason);
         });
     </script>
 </body>
