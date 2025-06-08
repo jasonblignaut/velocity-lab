@@ -1935,7 +1935,7 @@
                     <button class="mobile-menu-item" onclick="startLabEnvironment(); closeMobileMenu();">🚀 Start New Lab</button>
                     <button class="mobile-menu-item" onclick="showLabHistoryModal(); closeMobileMenu();">📊 Lab History</button>
                     ${adminItem}
-                    <button class="mobile-menu-item" onclick="toggleMobileThemeMenu()" id="mobileThemeToggle">
+                    <button class="mobile-menu-item" onclick="toggleMobileThemeMenu(event)" id="mobileThemeToggle">
                         🎨 Theme ▶
                     </button>
                     <button class="mobile-menu-item" onclick="logout(); closeMobileMenu();">🚪 Sign Out</button>
@@ -1948,9 +1948,11 @@
             }
         }
 
-        function toggleMobileThemeMenu() {
-            // Close mobile menu first
-            closeMobileMenu();
+        function toggleMobileThemeMenu(event) {
+            // Prevent the mobile menu from closing
+            if (event) {
+                event.stopPropagation();
+            }
             
             // Check if theme submenu already exists
             let existingSubmenu = document.getElementById('mobileThemeSubmenu');
