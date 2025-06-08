@@ -25,6 +25,7 @@
             --shadow-heavy: rgba(0, 0, 0, 0.15);
             --jedi-glow: #00ff88;
             --sith-glow: #ff0066;
+            --bg-secondary: #f0f0f5;
         }
 
         [data-theme="dark"] {
@@ -42,6 +43,7 @@
             --danger: #ff453a;
             --shadow: rgba(255, 255, 255, 0.1);
             --shadow-heavy: rgba(255, 255, 255, 0.2);
+            --bg-secondary: #2a2a2a;
         }
 
         * {
@@ -59,7 +61,7 @@
             transition: all 0.3s ease;
         }
 
-        /* Background Image */
+        /* Background Image - Fixed to show in both themes */
         body::before {
             content: '';
             position: fixed;
@@ -68,8 +70,12 @@
             width: 100%;
             height: 100%;
             background: url('/assets/VelocityBackground.jpg') center/cover no-repeat;
-            opacity: 0.05;
+            opacity: 0.08;
             z-index: -1;
+        }
+
+        [data-theme="dark"] body::before {
+            opacity: 0.05;
         }
 
         /* Header */
@@ -100,73 +106,6 @@
             height: 80px;
             background: url('/assets/Velocity-Logo.png') center/contain no-repeat;
             cursor: pointer;
-        }
-
-        /* Theme Toggle */
-        .theme-toggle {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-right: 1rem;
-        }
-
-        .theme-switch {
-            position: relative;
-            display: inline-block;
-            width: 120px;
-            height: 34px;
-        }
-
-        .theme-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .theme-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, var(--jedi-glow), #00ff88);
-            transition: .4s;
-            border-radius: 34px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 8px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .theme-slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 50px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 26px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-
-        input:checked + .theme-slider {
-            background: linear-gradient(45deg, var(--sith-glow), #ff0066);
-        }
-
-        input:checked + .theme-slider:before {
-            transform: translateX(56px);
-        }
-
-        .theme-label {
-            color: white;
-            font-size: 10px;
-            z-index: 1;
-            position: relative;
         }
 
         /* Desktop Navigation */
@@ -259,6 +198,83 @@
 
         .mobile-menu-item.secondary {
             border: 1px solid var(--border);
+        }
+
+        /* Theme Toggle in Dropdown */
+        .theme-toggle-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            color: var(--text);
+            border: none;
+            background: none;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .theme-toggle-item:hover {
+            background: var(--surface-hover);
+        }
+
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 24px;
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .theme-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, var(--jedi-glow), #00ff88);
+            transition: .4s;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4px;
+            font-size: 8px;
+            font-weight: 600;
+        }
+
+        .theme-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 26px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 18px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        input:checked + .theme-slider {
+            background: linear-gradient(45deg, var(--sith-glow), #ff0066);
+        }
+
+        input:checked + .theme-slider:before {
+            transform: translateX(28px);
+        }
+
+        .theme-label {
+            color: white;
+            font-size: 7px;
+            z-index: 1;
+            position: relative;
         }
 
         .btn {
@@ -388,6 +404,10 @@
             animation: modalSlideIn 0.3s ease;
         }
 
+        .modal-content.large {
+            max-width: 800px;
+        }
+
         @keyframes modalSlideIn {
             from { transform: scale(0.9); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
@@ -418,6 +438,49 @@
 
         .modal-close:hover {
             background: var(--surface-hover);
+        }
+
+        /* Task Detail Modal */
+        .task-detail-content {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 1rem 0;
+        }
+
+        .subtask-container {
+            margin: 1rem 0;
+        }
+
+        .subtask-item {
+            display: flex;
+            align-items: flex-start;
+            margin: 0.75rem 0;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .subtask-item:hover {
+            background: var(--surface-hover);
+        }
+
+        .subtask-checkbox {
+            margin-right: 0.75rem;
+            margin-top: 0.25rem;
+            cursor: pointer;
+        }
+
+        .subtask-item label {
+            cursor: pointer;
+            line-height: 1.4;
+        }
+
+        .subtask-item.completed {
+            opacity: 0.7;
+        }
+
+        .subtask-item.completed label {
+            text-decoration: line-through;
         }
 
         /* Form Styles */
@@ -629,6 +692,7 @@
             border-radius: 8px;
             margin-bottom: 0.5rem;
             transition: all 0.2s ease;
+            cursor: pointer;
         }
 
         .task-item:hover {
@@ -664,6 +728,23 @@
 
         .task-item.completed .task-title {
             text-decoration: line-through;
+        }
+
+        .task-detail-btn {
+            margin-left: 1rem;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+        .task-item:hover .task-detail-btn {
+            opacity: 1;
         }
 
         /* User Menu */
@@ -792,26 +873,6 @@
                 display: flex;
                 position: absolute;
                 right: 1rem;
-            }
-
-            .theme-toggle {
-                position: absolute;
-                left: 1rem;
-                margin: 0;
-            }
-
-            .theme-switch {
-                width: 80px;
-                height: 28px;
-            }
-
-            .theme-slider:before {
-                width: 36px;
-                height: 20px;
-            }
-
-            input:checked + .theme-slider:before {
-                transform: translateX(36px);
             }
 
             .user-menu {
@@ -1027,17 +1088,6 @@
 <body data-theme="light">
     <!-- Header -->
     <div class="header" id="header">
-        <!-- Theme Toggle -->
-        <div class="theme-toggle" id="themeToggle">
-            <label class="theme-switch">
-                <input type="checkbox" id="themeToggleInput" onchange="toggleTheme()">
-                <span class="theme-slider">
-                    <span class="theme-label">Light</span>
-                    <span class="theme-label">Dark</span>
-                </span>
-            </label>
-        </div>
-
         <!-- Logo only (no text) -->
         <div class="logo" onclick="goHome()"></div>
         
@@ -1063,6 +1113,16 @@
             <div class="user-menu-dropdown" id="userMenuDropdown">
                 <button class="user-menu-item" onclick="startLabEnvironment()">🚀 Start Lab Environment</button>
                 <button class="user-menu-item" onclick="showAdminPanel()" id="adminButton" style="display: none;">👑 Admin Panel</button>
+                <div class="theme-toggle-item" onclick="event.stopPropagation()">
+                    <span>🎨 Theme</span>
+                    <label class="theme-switch">
+                        <input type="checkbox" id="themeToggleInput" onchange="toggleTheme()">
+                        <span class="theme-slider">
+                            <span class="theme-label">Light</span>
+                            <span class="theme-label">Dark</span>
+                        </span>
+                    </label>
+                </div>
                 <button class="user-menu-item" onclick="logout()">🚪 Sign Out</button>
             </div>
         </div>
@@ -1194,6 +1254,19 @@
                 <button type="submit" class="btn btn-primary form-submit">Create Account</button>
                 <div id="registerMessage"></div>
             </form>
+        </div>
+    </div>
+
+    <!-- Task Detail Modal -->
+    <div class="modal" id="taskDetailModal">
+        <div class="modal-content large">
+            <button class="modal-close" onclick="closeModal('taskDetailModal')">&times;</button>
+            <div class="modal-header">
+                <h2 id="taskDetailTitle">Task Details</h2>
+            </div>
+            <div class="task-detail-content" id="taskDetailContent">
+                <!-- Task details will be populated by JavaScript -->
+            </div>
         </div>
     </div>
 
@@ -1329,7 +1402,10 @@
         function loadTheme() {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.body.setAttribute('data-theme', savedTheme);
-            document.getElementById('themeToggleInput').checked = savedTheme === 'dark';
+            const themeInput = document.getElementById('themeToggleInput');
+            if (themeInput) {
+                themeInput.checked = savedTheme === 'dark';
+            }
         }
 
         // Authentication system (matching old working code exactly)
@@ -1436,11 +1512,22 @@
             setupFormHandlers();
         });
 
-        // Load task definitions from task-definitions.js
+        // Load task definitions from task-definitions.js (Fixed to use window.TASK_DEFINITIONS)
         function loadTaskDefinitions() {
-            if (typeof taskDefinitions !== 'undefined') {
-                appState.tasks = taskDefinitions;
-                console.log('Task definitions loaded:', taskDefinitions.length, 'tasks');
+            if (typeof window !== 'undefined' && window.TASK_DEFINITIONS) {
+                // Convert object to array format
+                appState.tasks = [];
+                Object.keys(window.TASK_DEFINITIONS).forEach(taskId => {
+                    const task = window.TASK_DEFINITIONS[taskId];
+                    appState.tasks.push({
+                        id: taskId,
+                        title: task.title,
+                        description: task.description || 'No description available',
+                        week: parseInt(taskId.split('-')[0].replace('week', '')) || 1,
+                        category: task.category || 'General'
+                    });
+                });
+                console.log('Task definitions loaded:', appState.tasks.length, 'tasks');
             } else {
                 console.warn('Task definitions not loaded from task-definitions.js');
                 // Fallback task structure
@@ -1732,6 +1819,16 @@
                     </div>
                     <button class="mobile-menu-item" onclick="startLabEnvironment(); closeMobileMenu();">🚀 Start Lab Environment</button>
                     ${adminItem}
+                    <div class="theme-toggle-item" onclick="event.stopPropagation(); closeMobileMenu();">
+                        <span>🎨 Theme</span>
+                        <label class="theme-switch">
+                            <input type="checkbox" ${document.body.getAttribute('data-theme') === 'dark' ? 'checked' : ''} onchange="toggleTheme()">
+                            <span class="theme-slider">
+                                <span class="theme-label">Light</span>
+                                <span class="theme-label">Dark</span>
+                            </span>
+                        </label>
+                    </div>
                     <button class="mobile-menu-item" onclick="logout(); closeMobileMenu();">🚪 Sign Out</button>
                 `;
             } else {
@@ -1832,6 +1929,37 @@
             showModal('adminModal');
         }
 
+        // Task detail functionality
+        function showTaskDetail(taskId) {
+            const taskDefinition = window.TASK_DEFINITIONS && window.TASK_DEFINITIONS[taskId];
+            
+            if (taskDefinition) {
+                document.getElementById('taskDetailTitle').textContent = taskDefinition.title;
+                document.getElementById('taskDetailContent').innerHTML = taskDefinition.description;
+                
+                // Add event listeners for subtask checkboxes
+                setTimeout(() => {
+                    const subtaskCheckboxes = document.querySelectorAll('.subtask-checkbox');
+                    subtaskCheckboxes.forEach(checkbox => {
+                        checkbox.addEventListener('change', function() {
+                            const step = this.getAttribute('data-step');
+                            const subtaskItem = this.closest('.subtask-item');
+                            
+                            if (this.checked) {
+                                subtaskItem.classList.add('completed');
+                            } else {
+                                subtaskItem.classList.remove('completed');
+                            }
+                        });
+                    });
+                }, 100);
+                
+                showModal('taskDetailModal');
+            } else {
+                notificationSystem.error('Task details not available');
+            }
+        }
+
         // UI state management
         function showWelcomeScreen() {
             document.getElementById('welcomeScreen').classList.remove('hidden');
@@ -1896,15 +2024,17 @@
                             ${week.tasks.map(task => {
                                 const isCompleted = appState.progress[task.id] && appState.progress[task.id].completed;
                                 return `
-                                    <div class="task-item ${isCompleted ? 'completed' : ''}">
+                                    <div class="task-item ${isCompleted ? 'completed' : ''}" onclick="event.stopPropagation()">
                                         <input type="checkbox" class="task-checkbox" 
                                                ${isCompleted ? 'checked' : ''} 
-                                               onchange="toggleTaskCompletion('${task.id}')"
-                                               onclick="event.stopPropagation()">
-                                        <div class="task-content">
+                                               onchange="toggleTaskCompletion('${task.id}')">
+                                        <div class="task-content" onclick="showTaskDetail('${task.id}')">
                                             <div class="task-title">${task.title}</div>
-                                            <div class="task-description">${task.description}</div>
+                                            <div class="task-description">Click to view step-by-step instructions</div>
                                         </div>
+                                        <button class="task-detail-btn" onclick="showTaskDetail('${task.id}')">
+                                            View Details
+                                        </button>
                                     </div>
                                 `;
                             }).join('')}
