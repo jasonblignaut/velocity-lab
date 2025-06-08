@@ -953,27 +953,295 @@
         const appState = {
             user: null,
             sessionToken: null,
-            progress: {}
+            progress: {},
+            authenticated: false
         };
 
-        // API configuration - try relative paths first, fallback to absolute
+        // API configuration
         const API_BASE = '/api';
+
+        // Utility functions for cookies (matching old working code)
+        const utils = {
+            cookies: {
+                set(name, value) {
+                    const expires = new Date();
+                    expires.setTime(expires.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days
+                    document.cookie = `${name}=${value}; expires=${expires.toUTCString()}; path=/`;
+                },
+                get(name) {
+                    const nameEQ = name + "=";
+                    const ca = document.cookie.split(';');
+                    for(let i = 0; i < ca.length; i++) {
+                        let c = ca[i];
+                        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+                    }
+                    return null;
+                },
+                delete(name) {
+                    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                }
+            },
+            getId(id) {
+                return document.getElementById(id);
+            }
+        };
+
+        // API call function (matching old working code)
+        const api = {
+            async call(url, options = {}) {
+                const response = await fetch(url, {
+                    method: options.method || 'GET',
+                    body: options.body,
+                    headers: {
+                        ...options.headers
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.message || 'API call failed');
+                }
+                
+                return result;
+            }
+        };
+
+        // Notification system
+        const notificationSystem = {
+            success(message) {
+                console.log('✅ Success:', message);
+                this.show(message, 'success');
+            },
+            error(message) {
+                console.log('❌ Error:', message);
+                this.show(message, 'error');
+            },
+            info(message) {
+                console.log('ℹ️ Info:', message);
+                this.show(message, 'info');
+            },
+            show(message, type) {
+                // Simple alert for now - you can enhance this later
+                if (type === 'error') {
+                    alert('Error: ' + message);
+                } else {
+                    alert(message);
+                }
+            }
+        };
+
+        // Authentication system (matching old working code exactly)
+        const authSystem = {
+            async login(formData) {
+                try {
+                    const { data } = await api.call('/api/users/login', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const { name, role, email, sessionToken } = data;
+                    
+                    utils.cookies.set('user', JSON.stringify({ name, role, email }));
+                    utils.cookies.set('session', sessionToken);
+                    
+                    appState.user = { name, role, email };
+                    appState.sessionToken = sessionToken;
+                    appState.authenticated = true;
+                    
+                    if (role === 'admin') {
+                        document.getElementById('adminButton').style.display = 'block';
+                    }
+                    
+                    showDashboard();
+                    await loadUserProgress();
+                    closeModal();
+                    notificationSystem.success(`Welcome back, ${name}! 🎉`);
+                } catch (err) {
+                    notificationSystem.error(err.message || 'Login failed. Please check your credentials.');
+                }
+            },
+            
+            async register(formData) {
+                try {
+                    const { data } = await api.call('/api/users/register', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const { name, email, role, sessionToken } = data;
+                    
+                    utils.cookies.set('user', JSON.stringify({ name, email, role }));
+                    utils.cookies.set('session', sessionToken);
+                    
+                    appState.user = { name, email, role };
+                    appState.sessionToken = sessionToken;
+                    appState.authenticated = true;
+                    
+                    if (role === 'admin') {
+                        document.getElementById('adminButton').style.display = 'block';
+                    }
+                    
+                    showDashboard();
+                    await loadUserProgress();
+                    closeModal();
+                    notificationSystem.success(`Welcome to Velocity Lab, ${name}! 🚀`);
+                } catch (err) {
+                    notificationSystem.error(err.message || 'Registration failed. Please try again.');
+                }
+            },
+            
+            async logout() {
+                try {
+                    await api.call('/api/users/logout', { method: 'POST' });
+                } catch (err) {
+                    console.error('Logout API call failed:', err);
+                }
+                
+                utils.cookies.delete('user');
+                utils.cookies.delete('session');
+                
+                appState.user = null;
+                appState.progress = {};
+                appState.authenticated = false;
+                appState.sessionToken = null;
+                
+                document.getElementById('adminButton').style.display = 'none';
+                showWelcomeScreen();
+                notificationSystem.info('Signed out successfully');
+            }
+        };
 
         // Initialize application
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, checking session...');
             checkExistingSession();
             setupMobileMenuHandlers();
+            setupFormHandlers();
         });
+
+        // Check for existing session using cookies (matching old code)
+        function checkExistingSession() {
+            const userCookie = utils.cookies.get('user');
+            const sessionCookie = utils.cookies.get('session');
+            
+            if (userCookie && sessionCookie) {
+                try {
+                    appState.user = JSON.parse(userCookie);
+                    appState.sessionToken = sessionCookie;
+                    appState.authenticated = true;
+                    
+                    console.log('Found existing session for:', appState.user.name);
+                    showDashboard();
+                    loadUserProgress();
+                } catch (error) {
+                    console.error('Session validation failed:', error);
+                    utils.cookies.delete('user');
+                    utils.cookies.delete('session');
+                    showWelcomeScreen();
+                }
+            } else {
+                console.log('No existing session found');
+                showWelcomeScreen();
+            }
+        }
+
+        // Form handlers (matching old working code)
+        function setupFormHandlers() {
+            const loginForm = utils.getId('signInForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const formData = new FormData(loginForm);
+                    const email = formData.get('email');
+                    const password = formData.get('password');
+                    
+                    if (!email || !password) {
+                        notificationSystem.error('Please fill in all required fields.');
+                        return;
+                    }
+                    
+                    await authSystem.login(formData);
+                });
+            }
+
+            const registerForm = utils.getId('registerForm');
+            if (registerForm) {
+                registerForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const formData = new FormData(registerForm);
+                    const name = formData.get('name');
+                    const email = formData.get('email');
+                    const password = formData.get('password');
+                    
+                    if (!name || !email || !password) {
+                        notificationSystem.error('Please fill in all required fields.');
+                        return;
+                    }
+                    
+                    if (password.length < 8) {
+                        notificationSystem.error('Password must be at least 8 characters long.');
+                        return;
+                    }
+                    
+                    await authSystem.register(formData);
+                });
+            }
+        }
+
+        // Legacy form submission handlers (for compatibility)
+        async function handleSignIn(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            await authSystem.login(formData);
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            await authSystem.register(formData);
+        }
+
+        // Logout function
+        async function logout() {
+            await authSystem.logout();
+        }
+
+        // Progress management
+        async function loadUserProgress() {
+            try {
+                console.log('Loading user progress...');
+                const response = await fetch(`${API_BASE}/user/progress`, {
+                    headers: {
+                        'Authorization': `Bearer ${appState.sessionToken}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    appState.progress = result.data || {};
+                    updateProgressDisplay();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Failed to load progress:', error);
+            }
+        }
 
         // Mobile menu functionality
         function setupMobileMenuHandlers() {
-            // Close mobile menu when clicking outside
             document.addEventListener('click', function(event) {
                 const mobileMenu = document.getElementById('mobileMenu');
                 const hamburger = document.getElementById('hamburger');
                 
-                if (!mobileMenu.contains(event.target) && !hamburger.contains(event.target)) {
+                if (mobileMenu && hamburger && !mobileMenu.contains(event.target) && !hamburger.contains(event.target)) {
                     closeMobileMenu();
                 }
             });
@@ -1000,7 +1268,7 @@
         function updateMobileMenuItems() {
             const mobileMenuItems = document.getElementById('mobileMenuItems');
             
-            if (appState.user) {
+            if (appState.authenticated && appState.user) {
                 let adminItem = '';
                 if (appState.user.role === 'admin') {
                     adminItem = '<button class="mobile-menu-item" onclick="showAdminPanel(); closeMobileMenu();">👑 Admin Panel</button>';
@@ -1023,185 +1291,10 @@
         }
 
         function goHome() {
-            if (appState.user) {
+            if (appState.authenticated) {
                 return;
             } else {
                 showWelcomeScreen();
-            }
-        }
-
-        // Check for existing session on page load
-        async function checkExistingSession() {
-            const token = localStorage.getItem('sessionToken');
-            if (token) {
-                console.log('Found session token, validating...');
-                appState.sessionToken = token;
-                try {
-                    await loadUserProgress();
-                    showDashboard();
-                } catch (error) {
-                    console.error('Session validation failed:', error);
-                    localStorage.removeItem('sessionToken');
-                    showWelcomeScreen();
-                }
-            } else {
-                console.log('No session token found');
-                showWelcomeScreen();
-            }
-        }
-
-        // Authentication functions
-        async function handleRegister(event) {
-            event.preventDefault();
-            const form = event.target;
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const messageEl = document.getElementById('registerMessage');
-            
-            try {
-                submitBtn.classList.add('loading');
-                messageEl.innerHTML = '';
-                
-                const formData = new FormData(form);
-                
-                console.log('Attempting registration...');
-                const response = await fetch(`${API_BASE}/users/register`, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                console.log('Registration response status:', response.status);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const result = await response.json();
-                console.log('Registration result:', result);
-                
-                if (result.success) {
-                    appState.user = result.data;
-                    appState.sessionToken = result.data.sessionToken;
-                    localStorage.setItem('sessionToken', appState.sessionToken);
-                    
-                    messageEl.innerHTML = `<div class="message success">${result.message}</div>`;
-                    
-                    setTimeout(() => {
-                        closeModal('registerModal');
-                        loadUserProgress().then(() => showDashboard());
-                    }, 1500);
-                } else {
-                    messageEl.innerHTML = `<div class="message error">${result.message}</div>`;
-                }
-            } catch (error) {
-                console.error('Registration error:', error);
-                messageEl.innerHTML = `<div class="message error">Registration failed: ${error.message}</div>`;
-            } finally {
-                submitBtn.classList.remove('loading');
-            }
-        }
-
-        async function handleSignIn(event) {
-            event.preventDefault();
-            const form = event.target;
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const messageEl = document.getElementById('signInMessage');
-            
-            try {
-                submitBtn.classList.add('loading');
-                messageEl.innerHTML = '';
-                
-                const formData = new FormData(form);
-                
-                console.log('Attempting sign in...');
-                const response = await fetch(`${API_BASE}/users/login`, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                console.log('Sign in response status:', response.status);
-                console.log('Sign in response headers:', Object.fromEntries(response.headers.entries()));
-                
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Sign in error response:', errorText);
-                    throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`);
-                }
-                
-                const result = await response.json();
-                console.log('Sign in result:', result);
-                
-                if (result.success) {
-                    appState.user = result.data;
-                    appState.sessionToken = result.data.sessionToken;
-                    localStorage.setItem('sessionToken', appState.sessionToken);
-                    
-                    messageEl.innerHTML = `<div class="message success">${result.message}</div>`;
-                    
-                    setTimeout(() => {
-                        closeModal('signInModal');
-                        loadUserProgress().then(() => showDashboard());
-                    }, 1000);
-                } else {
-                    messageEl.innerHTML = `<div class="message error">${result.message}</div>`;
-                }
-            } catch (error) {
-                console.error('Sign in error:', error);
-                messageEl.innerHTML = `<div class="message error">Sign in failed: ${error.message}</div>`;
-            } finally {
-                submitBtn.classList.remove('loading');
-            }
-        }
-
-        async function logout() {
-            try {
-                if (appState.sessionToken) {
-                    await fetch(`${API_BASE}/users/logout`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${appState.sessionToken}`
-                        }
-                    });
-                }
-            } catch (error) {
-                console.error('Logout error:', error);
-            } finally {
-                // Clear local state
-                appState.user = null;
-                appState.sessionToken = null;
-                appState.progress = {};
-                localStorage.removeItem('sessionToken');
-                showWelcomeScreen();
-            }
-        }
-
-        // Progress management
-        async function loadUserProgress() {
-            try {
-                console.log('Loading user progress...');
-                const response = await fetch(`${API_BASE}/user/progress`, {
-                    headers: {
-                        'Authorization': `Bearer ${appState.sessionToken}`
-                    }
-                });
-                
-                console.log('Progress response status:', response.status);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const result = await response.json();
-                console.log('Progress result:', result);
-                
-                if (result.success) {
-                    appState.progress = result.data || {};
-                    updateProgressDisplay();
-                } else {
-                    throw new Error(result.message);
-                }
-            } catch (error) {
-                console.error('Failed to load progress:', error);
-                throw error;
             }
         }
 

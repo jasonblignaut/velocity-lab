@@ -1,33 +1,51 @@
 // functions/api/user/progress.js
-// User Progress Data Endpoint for Velocity Lab
+// User Progress Endpoint for Velocity Lab
 
-import { 
-  createResponse, 
-  createErrorResponse, 
-  requireAuth,
-  getUserProgress 
-} from '../../_middleware.js';
+import { createResponse, createErrorResponse } from '../../_middleware.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
   
   try {
-    // Require authentication
-    const session = await requireAuth(request, env);
+    // Get session token from Authorization header
+    const authHeader = request.headers.get('Authorization');
+    const sessionToken = authHeader?.replace('Bearer ', '');
     
-    // Get user progress from KV storage
-    const progressData = await getUserProgress(session.userId, env);
-    
-    // Return progress data (tasks object or empty object if no progress exists)
-    return createResponse(progressData.tasks || {}, true, 'Progress loaded successfully');
-    
-  } catch (error) {
-    console.error('Progress load error:', error);
-    
-    if (error.message === 'Authentication required') {
-      return createErrorResponse('Please sign in to view your progress', 401);
+    if (!sessionToken) {
+      return createErrorResponse('Authorization required', 401);
     }
     
-    return createErrorResponse('Failed to load progress data', 500);
+    // Try different KV binding names
+    let sessionsKV = env.VELOCITY_SESSIONS || env.velocity_sessions || env.sessions;
+    let progressKV = env.VELOCITY_PROGRESS || env.velocity_progress || env.progress;
+    
+    if (!sessionsKV) {
+      return createErrorResponse('Database configuration error', 500);
+    }
+    
+    // Validate session
+    const sessionData = await sessionsKV.get(sessionToken);
+    if (!sessionData) {
+      return createErrorResponse('Invalid or expired session', 401);
+    }
+    
+    const session = JSON.parse(sessionData);
+    const userId = session.userId;
+    
+    // Get user progress
+    let userProgress = {};
+    if (progressKV) {
+      const progressData = await progressKV.get(`progress:${userId}`);
+      if (progressData) {
+        userProgress = JSON.parse(progressData);
+      }
+    }
+    
+    // Return user progress data
+    return createResponse(userProgress, true, 'Progress loaded successfully');
+    
+  } catch (error) {
+    console.error('Progress loading error:', error);
+    return createErrorResponse('Failed to load progress', 500);
   }
 }

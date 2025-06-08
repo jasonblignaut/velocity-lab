@@ -1,87 +1,71 @@
 // functions/api/lab/start.js
 // Lab Environment Start Endpoint for Velocity Lab
 
-import { 
-  createResponse, 
-  createErrorResponse, 
-  requireAuth,
-  generateToken 
-} from '../../_middleware.js';
+import { createResponse, createErrorResponse, generateToken } from '../../_middleware.js';
 
 export async function onRequestPost(context) {
   const { request, env } = context;
   
   try {
-    // Require authentication
-    const session = await requireAuth(request, env);
+    // Get session token from Authorization header
+    const authHeader = request.headers.get('Authorization');
+    const sessionToken = authHeader?.replace('Bearer ', '');
     
-    // Generate unique lab session ID
-    const labId = `lab_${Date.now()}_${generateToken().substring(0, 8)}`;
-    
-    // Get user's existing labs to determine session number
-    const userLabsKey = `user_labs:${session.userId}`;
-    const existingLabsData = await env.VELOCITY_LABS.get(userLabsKey);
-    const existingLabs = existingLabsData ? JSON.parse(existingLabsData) : [];
-    
-    // Create new lab session object
-    const newLab = {
-      id: labId,
-      userId: session.userId,
-      userEmail: session.email,
-      userName: session.name,
-      environment: 'Exchange Hybrid Lab',
-      status: 'Active',
-      statusIcon: '🚀',
-      startTime: new Date().toISOString(),
-      lastActivity: new Date().toISOString(),
-      sessionNumber: existingLabs.length + 1
-    };
-    
-    // Add new lab to user's lab list
-    const updatedLabs = [newLab, ...existingLabs]; // Most recent first
-    
-    // Keep only last 10 lab sessions per user
-    if (updatedLabs.length > 10) {
-      updatedLabs.splice(10);
+    if (!sessionToken) {
+      return createErrorResponse('Authorization required', 401);
     }
     
-    // Save updated lab list for user
-    await env.VELOCITY_LABS.put(userLabsKey, JSON.stringify(updatedLabs));
+    // Try different KV binding names
+    let sessionsKV = env.VELOCITY_SESSIONS || env.velocity_sessions || env.sessions;
+    let labsKV = env.VELOCITY_LABS || env.velocity_labs || env.labs;
     
-    // Also save individual lab record for global admin access
-    await env.VELOCITY_LABS.put(labId, JSON.stringify(newLab));
+    if (!sessionsKV) {
+      return createErrorResponse('Database configuration error', 500);
+    }
     
-    // Update user's last active time
-    try {
-      const userData = await env.VELOCITY_USERS.get(`user:${session.email}`);
-      if (userData) {
-        const user = JSON.parse(userData);
-        const updatedUser = {
-          ...user,
-          lastActive: new Date().toISOString()
-        };
-        await env.VELOCITY_USERS.put(`user:${session.email}`, JSON.stringify(updatedUser));
+    // Validate session
+    const sessionData = await sessionsKV.get(sessionToken);
+    if (!sessionData) {
+      return createErrorResponse('Invalid or expired session', 401);
+    }
+    
+    const session = JSON.parse(sessionData);
+    const userId = session.userId;
+    const userName = session.name;
+    
+    // Generate lab ID
+    const labId = generateToken().substring(0, 8).toUpperCase();
+    
+    // Get or create lab session counter
+    let sessionNumber = 1;
+    if (labsKV) {
+      const userLabData = await labsKV.get(`labs:${userId}`);
+      if (userLabData) {
+        const labData = JSON.parse(userLabData);
+        sessionNumber = (labData.sessionCount || 0) + 1;
       }
-    } catch (error) {
-      console.warn('Failed to update user last active time:', error);
-      // Don't fail lab start if this fails
+      
+      // Save updated lab data
+      const labData = {
+        userId: userId,
+        userName: userName,
+        sessionCount: sessionNumber,
+        lastLabId: labId,
+        lastStarted: new Date().toISOString()
+      };
+      
+      await labsKV.put(`labs:${userId}`, JSON.stringify(labData));
     }
     
+    // Return success response
     return createResponse({
       labId: labId,
-      sessionNumber: newLab.sessionNumber,
-      startTime: newLab.startTime,
-      environment: newLab.environment,
-      status: newLab.status
-    }, true, '🚀 New lab environment started successfully!');
+      sessionNumber: sessionNumber,
+      userName: userName
+    }, true, `Lab environment started successfully! 🚀`);
     
   } catch (error) {
     console.error('Lab start error:', error);
-    
-    if (error.message === 'Authentication required') {
-      return createErrorResponse('Please sign in to start a lab environment', 401);
-    }
-    
-    return createErrorResponse('Failed to start lab environment. Please try again.', 500);
+    return createErrorResponse('Failed to start lab environment', 500);
   }
 }

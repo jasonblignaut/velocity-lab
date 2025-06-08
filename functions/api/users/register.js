@@ -5,22 +5,24 @@ import {
   createResponse, 
   createErrorResponse, 
   isValidEmail, 
-  isValidPassword, 
   sanitizeInput, 
   hashPassword, 
-  generateToken, 
-  getUserByEmail 
+  generateToken 
 } from '../../_middleware.js';
 
 export async function onRequestPost(context) {
   const { request, env } = context;
   
   try {
+    console.log('=== REGISTRATION DEBUG START ===');
+    
     // Parse form data
     const formData = await request.formData();
     const name = sanitizeInput(formData.get('name'));
     const email = sanitizeInput(formData.get('email'));
     const password = formData.get('password');
+    
+    console.log('Registration attempt for:', name, email);
     
     // Validate required fields
     if (!name || !email || !password) {
@@ -32,20 +34,24 @@ export async function onRequestPost(context) {
       return createErrorResponse('Please enter a valid email address', 400);
     }
     
-    // Validate password strength
-    if (!isValidPassword(password)) {
+    // Validate password length
+    if (password.length < 8) {
       return createErrorResponse('Password must be at least 8 characters long', 400);
-    }
-    
-    // Validate name length
-    if (name.length < 2 || name.length > 50) {
-      return createErrorResponse('Name must be between 2 and 50 characters', 400);
     }
     
     const emailLower = email.toLowerCase();
     
+    // Try different KV binding names
+    let usersKV = env.VELOCITY_USERS || env.velocity_users || env.users;
+    let sessionsKV = env.VELOCITY_SESSIONS || env.velocity_sessions || env.sessions;
+    
+    if (!usersKV) {
+      console.error('No users KV binding found');
+      return createErrorResponse('Database configuration error', 500);
+    }
+    
     // Check if user already exists
-    const existingUser = await getUserByEmail(emailLower, env);
+    const existingUser = await usersKV.get(`user:${emailLower}`);
     if (existingUser) {
       return createErrorResponse('An account with this email already exists', 409);
     }
@@ -57,59 +63,54 @@ export async function onRequestPost(context) {
     const userId = generateToken();
     const sessionToken = generateToken();
     
-    // Determine user role (first user becomes admin)
-    const userKeys = await env.VELOCITY_USERS.list({ prefix: 'user:' });
-    const role = userKeys.keys.length === 0 ? 'admin' : 'user';
-    
     // Create user object
     const user = {
       id: userId,
       name: name,
       email: emailLower,
-      role: role,
       hashedPassword: hashedPassword,
+      role: 'user', // Default role
       createdAt: new Date().toISOString(),
       lastActive: new Date().toISOString(),
       isActive: true
     };
     
+    // Save user to KV storage
+    await usersKV.put(`user:${emailLower}`, JSON.stringify(user));
+    console.log('User saved to KV');
+    
     // Create session object
     const session = {
-      userId: userId,
-      email: emailLower,
-      name: name,
-      role: role,
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
       createdAt: new Date().toISOString(),
-      lastActivity: new Date().toISOString()
+      lastActivity: new Date().toISOString(),
+      rememberMe: false
     };
     
-    // Save user to KV storage
-    await env.VELOCITY_USERS.put(`user:${emailLower}`, JSON.stringify(user));
+    // Save session to KV storage (24 hour expiration)
+    if (sessionsKV) {
+      await sessionsKV.put(sessionToken, JSON.stringify(session), {
+        expirationTtl: 24 * 60 * 60 // 24 hours
+      });
+      console.log('Session saved to KV');
+    }
     
-    // Save session to KV storage with 30-day expiration
-    const sessionExpirationTTL = 30 * 24 * 60 * 60; // 30 days in seconds
-    await env.VELOCITY_SESSIONS.put(sessionToken, JSON.stringify(session), {
-      expirationTtl: sessionExpirationTTL
-    });
+    console.log('=== REGISTRATION SUCCESS ===');
     
-    // Initialize empty progress for new user
-    await env.VELOCITY_PROGRESS.put(`progress:${userId}`, JSON.stringify({
-      userId: userId,
-      tasks: {},
-      createdAt: new Date().toISOString(),
-      lastUpdated: new Date().toISOString()
-    }));
-    
-    // Return success response with user data and session token
+    // Return success response matching old working format
     return createResponse({
       name: user.name,
       email: user.email,
       role: user.role,
       sessionToken: sessionToken
-    }, true, 'Account created successfully! Welcome to Velocity Lab! 🚀');
+    }, true, `Welcome to Velocity Lab, ${user.name}! 🚀`);
     
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('=== REGISTRATION ERROR ===');
+    console.error('Registration error details:', error);
     return createErrorResponse('Registration failed. Please try again.', 500);
   }
 }

@@ -1,86 +1,51 @@
 // functions/api/admin/users-progress.js
-// Admin Users Progress Leaderboard Endpoint for Velocity Lab
+// Admin Users Progress Endpoint for Velocity Lab
 
-import { 
-  createResponse, 
-  createErrorResponse, 
-  requireAdmin 
-} from '../../_middleware.js';
+import { createResponse, createErrorResponse } from '../../_middleware.js';
 
 export async function onRequestGet(context) {
   const { request, env } = context;
   
   try {
-    // Require admin authentication
-    await requireAdmin(request, env);
+    // Get session token from Authorization header
+    const authHeader = request.headers.get('Authorization');
+    const sessionToken = authHeader?.replace('Bearer ', '');
     
-    // Get all users from KV storage
-    const userKeys = await env.VELOCITY_USERS.list({ prefix: 'user:' });
-    const users = [];
-    
-    // Fetch user data and progress for each user
-    for (const key of userKeys.keys) {
-      try {
-        const userData = await env.VELOCITY_USERS.get(key.name);
-        if (!userData) continue;
-        
-        const user = JSON.parse(userData);
-        
-        // Skip inactive users
-        if (!user.isActive) continue;
-        
-        // Get user progress
-        const progressData = await env.VELOCITY_PROGRESS.get(`progress:${user.id}`);
-        const progress = progressData ? JSON.parse(progressData) : { tasks: {} };
-        
-        // Calculate completed tasks (total is 42 based on task definitions)
-        const tasks = progress.tasks || {};
-        const completedTasks = Object.values(tasks).filter(task => task.completed).length;
-        const progressPercentage = Math.round((completedTasks / 42) * 100);
-        
-        // Check if user has any notes
-        const notesKeys = await env.VELOCITY_PROGRESS.list({ prefix: `notes:${user.id}:` });
-        const hasNotes = notesKeys.keys.length > 0;
-        
-        // Add user to results
-        users.push({
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          completedTasks: completedTasks,
-          progressPercentage: progressPercentage,
-          hasNotes: hasNotes,
-          lastActive: user.lastActive,
-          createdAt: user.createdAt
-        });
-        
-      } catch (error) {
-        console.warn(`Failed to process user ${key.name}:`, error);
-        // Continue processing other users
-      }
+    if (!sessionToken) {
+      return createErrorResponse('Authorization required', 401);
     }
     
-    // Sort users by progress percentage (descending), then by completed tasks, then by creation date
-    users.sort((a, b) => {
-      if (b.progressPercentage !== a.progressPercentage) {
-        return b.progressPercentage - a.progressPercentage;
-      }
-      if (b.completedTasks !== a.completedTasks) {
-        return b.completedTasks - a.completedTasks;
-      }
-      return new Date(a.createdAt) - new Date(b.createdAt); // Earlier users rank higher if tied
-    });
+    // Try different KV binding names
+    let sessionsKV = env.VELOCITY_SESSIONS || env.velocity_sessions || env.sessions;
+    let usersKV = env.VELOCITY_USERS || env.velocity_users || env.users;
+    let progressKV = env.VELOCITY_PROGRESS || env.velocity_progress || env.progress;
     
-    return createResponse(users, true, 'Users progress loaded successfully');
+    if (!sessionsKV || !usersKV) {
+      return createErrorResponse('Database configuration error', 500);
+    }
     
-  } catch (error) {
-    console.error('Admin users progress error:', error);
+    // Validate session and check admin role
+    const sessionData = await sessionsKV.get(sessionToken);
+    if (!sessionData) {
+      return createErrorResponse('Invalid or expired session', 401);
+    }
     
-    if (error.message === 'Authentication required' || error.message === 'Admin access required') {
+    const session = JSON.parse(sessionData);
+    if (session.role !== 'admin') {
       return createErrorResponse('Admin access required', 403);
     }
     
-    return createErrorResponse('Failed to load users progress', 500);
-  }
-}
+    // Get all users
+    const usersList = await usersKV.list({ prefix: 'user:' });
+    const users = [];
+    
+    // Process each user
+    for (const key of usersList.keys) {
+      try {
+        const userData = await usersKV.get(key.name);
+        if (userData) {
+          const user = JSON.parse(userData);
+          
+          // Get user progress
+          let completedTasks = 0;
+          let h
