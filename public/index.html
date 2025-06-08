@@ -1938,6 +1938,14 @@
                     <button class="mobile-menu-item" onclick="toggleMobileThemeMenu(event)" id="mobileThemeToggle">
                         🎨 Theme ▶
                     </button>
+                    <div id="mobileThemeOptions" style="display: none; padding-left: 1rem; background: var(--bg-secondary);">
+                        <button class="mobile-menu-item" onclick="setTheme('light'); closeMobileMenu();" style="background: var(--bg-secondary); font-size: 0.9rem;">
+                            🌟 Light Jedi
+                        </button>
+                        <button class="mobile-menu-item" onclick="setTheme('dark'); closeMobileMenu();" style="background: var(--bg-secondary); font-size: 0.9rem;">
+                            ⚡ Dark Sith
+                        </button>
+                    </div>
                     <button class="mobile-menu-item" onclick="logout(); closeMobileMenu();">🚪 Sign Out</button>
                 `;
             } else {
@@ -1949,38 +1957,23 @@
         }
 
         function toggleMobileThemeMenu(event) {
-            // Prevent the mobile menu from closing
             if (event) {
                 event.stopPropagation();
+                event.preventDefault();
             }
             
-            // Check if theme submenu already exists
-            let existingSubmenu = document.getElementById('mobileThemeSubmenu');
-            if (existingSubmenu) {
-                existingSubmenu.remove();
-                return;
+            const themeOptions = document.getElementById('mobileThemeOptions');
+            const themeToggle = document.getElementById('mobileThemeToggle');
+            
+            if (themeOptions && themeToggle) {
+                if (themeOptions.style.display === 'none') {
+                    themeOptions.style.display = 'block';
+                    themeToggle.innerHTML = '🎨 Theme ▼';
+                } else {
+                    themeOptions.style.display = 'none';
+                    themeToggle.innerHTML = '🎨 Theme ▶';
+                }
             }
-            
-            // Create theme submenu
-            const themeSubmenu = document.createElement('div');
-            themeSubmenu.id = 'mobileThemeSubmenu';
-            themeSubmenu.className = 'mobile-theme-submenu';
-            
-            themeSubmenu.innerHTML = `
-                <button class="mobile-menu-item" onclick="setTheme('light'); closeMobileThemeMenu();" style="border-radius: 8px 8px 0 0 !important;">
-                    🌟 Light Jedi
-                </button>
-                <button class="mobile-menu-item" onclick="setTheme('dark'); closeMobileThemeMenu();" style="border-radius: 0 0 8px 8px !important;">
-                    ⚡ Dark Sith
-                </button>
-            `;
-            
-            document.body.appendChild(themeSubmenu);
-            
-            // Auto-close after 5 seconds
-            setTimeout(() => {
-                closeMobileThemeMenu();
-            }, 5000);
         }
 
         function closeMobileThemeMenu() {
