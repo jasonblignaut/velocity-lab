@@ -1274,6 +1274,20 @@
             tasks: [] // Will be populated from task-definitions.js
         };
 
+        // Password visibility toggle
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const button = input.nextElementSibling;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.innerHTML = '&#128064;'; // closed eye
+            } else {
+                input.type = 'password';
+                button.innerHTML = '&#128065;'; // open eye
+            }
+        }
+
         // API configuration
         const API_BASE = '/api';
 
@@ -1348,7 +1362,7 @@
                 this.show(message, 'error');
             },
             info(message) {
-                console.log(ℹ️ Info:', message);
+                console.log('ℹ️ Info:', message);
                 this.show(message, 'info');
             },
             show(message, type) {
@@ -1378,20 +1392,6 @@
                 }, 5000);
             }
         };
-
-        // Password visibility toggle
-        function togglePasswordVisibility(inputId) {
-            const input = document.getElementById(inputId);
-            const button = input.nextElementSibling;
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                button.innerHTML = '&#128064;'; // closed eye
-            } else {
-                input.type = 'password';
-                button.innerHTML = '&#128065;'; // open eye
-            }
-        }
 
         // Theme management
         function setTheme(theme) {
