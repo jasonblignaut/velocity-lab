@@ -6,18 +6,19 @@ compatibility_date = "2025-05-31"
 [[kv_namespaces]]
 binding = "VELOCITY_USERS"
 id = "92065323806e46ff89949262ba803008"
-
+preview_id = "92065323806e46ff89949262ba803008"
 
 [[kv_namespaces]]
 binding = "VELOCITY_PROGRESS"
 id = "72beb3bc668347b584984bc61aed9492"
-
+preview_id = "72beb3bc668347b584984bc61aed9492"
 
 [[kv_namespaces]]
 binding = "VELOCITY_SESSIONS"
 id = "b71b2efbc3d54f88bd0d0ef37d5ab995"
+preview_id = "b71b2efbc3d54f88bd0d0ef37d5ab995"
 
 [[kv_namespaces]]
 binding = "VELOCITY_LABS"
 id = "6279d496fa8442d8804380268a5e643d"
-
+preview_id = "6279d496fa8442d8804380268a5e643d"
