@@ -326,18 +326,18 @@
         .welcome-notification {
             position: absolute;
             top: 100px;
-            right: 2rem;
+            left: 2rem;
             background: var(--primary);
             color: white;
             padding: 1rem 1.5rem;
             border-radius: 12px;
             box-shadow: 0 8px 25px var(--shadow-heavy);
             max-width: 300px;
-            animation: slideInRight 0.5s ease;
+            animation: slideInLeft 0.5s ease;
         }
 
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
 
@@ -1071,7 +1071,7 @@
                 <span>▼</span>
             </button>
             <div class="user-menu-dropdown" id="userMenuDropdown">
-                <button class="user-menu-item" onclick="startLabEnvironment()">🚀 Start Lab Environment</button>
+                <button class="user-menu-item" onclick="startLabEnvironment()">🚀 Start New Lab</button>
                 <button class="user-menu-item" onclick="showLabHistoryModal()" id="labHistoryButton">📊 Lab History</button>
                 <button class="user-menu-item" onclick="showAdminPanel()" id="adminButton" style="display: none;">👑 Admin Panel</button>
                 <div class="theme-menu-item">
@@ -1169,8 +1169,8 @@
                     <div style="position: relative;">
                         <input type="password" class="form-input" id="signInPassword" name="password" required>
                         <button type="button" onclick="togglePasswordVisibility('signInPassword')" 
-                                style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary);">
-                            👁️
+                                style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary); font-family: Arial, sans-serif;">
+                            &#128065;
                         </button>
                     </div>
                 </div>
@@ -1208,8 +1208,8 @@
                     <div style="position: relative;">
                         <input type="password" class="form-input" id="registerPassword" name="password" required>
                         <button type="button" onclick="togglePasswordVisibility('registerPassword')" 
-                                style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary);">
-                            👁️
+                                style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary); font-family: Arial, sans-serif;">
+                            &#128065;
                         </button>
                     </div>
                 </div>
@@ -1248,7 +1248,7 @@
 
     <!-- Admin Panel Modal -->
     <div class="modal" id="adminModal">
-        <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
             <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
             <div class="modal-header">
                 <h2>👑 Admin Panel</h2>
@@ -1386,10 +1386,10 @@
             
             if (input.type === 'password') {
                 input.type = 'text';
-                button.textContent = '🙈';
+                button.innerHTML = '&#128064;'; // closed eye
             } else {
                 input.type = 'password';
-                button.textContent = '👁️';
+                button.innerHTML = '&#128065;'; // open eye
             }
         }
 
@@ -1410,9 +1410,9 @@
             
             // Show notification
             if (theme === 'light') {
-                notificationSystem.success('🌟 Light Jedi theme activated! May the Force be with you.');
+                notificationSystem.success('🌟 Light Jedi theme activated!');
             } else {
-                notificationSystem.success('⚡ Dark Sith theme activated! Embrace the power of the dark side.');
+                notificationSystem.success('⚡ Dark Sith theme activated!');
             }
         }
 
@@ -1907,9 +1907,19 @@
         function closeMobileMenu() {
             const hamburger = document.getElementById('hamburger');
             const mobileMenu = document.getElementById('mobileMenu');
+            const mobileThemeSubmenu = document.getElementById('mobileThemeSubmenu');
+            const mobileThemeToggle = document.getElementById('mobileThemeToggle');
             
             hamburger.classList.remove('active');
             mobileMenu.classList.remove('active');
+            
+            // Close theme submenu if open
+            if (mobileThemeSubmenu) {
+                mobileThemeSubmenu.style.display = 'none';
+            }
+            if (mobileThemeToggle) {
+                mobileThemeToggle.innerHTML = '🎨 Theme ▶';
+            }
         }
 
         function updateMobileMenuItems() {
@@ -1925,11 +1935,18 @@
                     <div style="padding: 0.5rem 1rem; text-align: center; color: var(--text-secondary); font-size: 0.9rem; border-bottom: 1px solid var(--border); margin-bottom: 0.5rem;">
                         Welcome, ${appState.user.name}
                     </div>
-                    <button class="mobile-menu-item" onclick="startLabEnvironment(); closeMobileMenu();">🚀 Start Lab Environment</button>
+                    <button class="mobile-menu-item" onclick="startLabEnvironment(); closeMobileMenu();">🚀 Start New Lab</button>
                     <button class="mobile-menu-item" onclick="showLabHistoryModal(); closeMobileMenu();">📊 Lab History</button>
                     ${adminItem}
-                    <button class="mobile-menu-item" onclick="setTheme('light'); closeMobileMenu();">🌟 Light Jedi Theme</button>
-                    <button class="mobile-menu-item" onclick="setTheme('dark'); closeMobileMenu();">⚡ Dark Sith Theme</button>
+                    <div class="mobile-theme-container" style="position: relative;">
+                        <button class="mobile-menu-item" onclick="toggleMobileThemeMenu()" id="mobileThemeToggle">
+                            🎨 Theme ▶
+                        </button>
+                        <div class="mobile-theme-submenu" id="mobileThemeSubmenu" style="display: none; position: absolute; left: 100%; top: 0; background: var(--background); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 25px var(--shadow-heavy); min-width: 150px; z-index: 1001;">
+                            <button class="mobile-menu-item" onclick="setTheme('light'); closeMobileMenu();" style="border-radius: 8px 8px 0 0;">🌟 Light Jedi</button>
+                            <button class="mobile-menu-item" onclick="setTheme('dark'); closeMobileMenu();" style="border-radius: 0 0 8px 8px;">⚡ Dark Sith</button>
+                        </div>
+                    </div>
                     <button class="mobile-menu-item" onclick="logout(); closeMobileMenu();">🚪 Sign Out</button>
                 `;
             } else {
@@ -1937,6 +1954,19 @@
                     <button class="mobile-menu-item secondary" onclick="showSignInModal(); closeMobileMenu();">👤 Sign In</button>
                     <button class="mobile-menu-item primary" onclick="showRegisterModal(); closeMobileMenu();">🚀 Get Started</button>
                 `;
+            }
+        }
+
+        function toggleMobileThemeMenu() {
+            const submenu = document.getElementById('mobileThemeSubmenu');
+            const toggle = document.getElementById('mobileThemeToggle');
+            
+            if (submenu.style.display === 'none') {
+                submenu.style.display = 'block';
+                toggle.innerHTML = '🎨 Theme ▼';
+            } else {
+                submenu.style.display = 'none';
+                toggle.innerHTML = '🎨 Theme ▶';
             }
         }
 
@@ -2000,7 +2030,7 @@
                 }
                 
                 // Fallback success message
-                notificationSystem.success(`🚀 New Lab Environment Started!\n\nLab ID: ${newSession.labId}\nSession #${newSession.session}\n\n🔄 All progress reset - Ready for fresh start!\n\nComplete all 42 tasks to finish this lab session.`);
+                notificationSystem.success(`🚀 New Lab Started!\n\nLab ID: ${newSession.labId}\nSession #${newSession.session}\n\n🔄 Progress reset - Ready for fresh start!\n\nComplete all 42 tasks to finish this lab.`);
                 
             } catch (error) {
                 console.error('Failed to start lab:', error);
@@ -2016,44 +2046,114 @@
                     <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
                         <div style="font-size: 3rem; margin-bottom: 1rem;">🚀</div>
                         <p>No lab sessions yet!</p>
-                        <p style="margin-top: 0.5rem;">Click "Start Lab Environment" to begin your first training session.</p>
+                        <p style="margin-top: 0.5rem;">Click "Start New Lab" to begin your first training session.</p>
                     </div>
                 `;
             } else {
-                content.innerHTML = `
-                    <div style="margin-bottom: 1rem; color: var(--text-secondary);">
-                        <strong>Total Sessions: ${appState.labHistory.length}</strong>
+                // Filter buttons
+                const filterButtons = `
+                    <div style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        <button onclick="filterLabHistory('week')" class="lab-filter-btn" data-filter="week" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last Week</button>
+                        <button onclick="filterLabHistory('month')" class="lab-filter-btn" data-filter="month" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last 30 Days</button>
+                        <button onclick="filterLabHistory('quarter')" class="lab-filter-btn" data-filter="quarter" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last 3 Months</button>
+                        <button onclick="filterLabHistory('halfyear')" class="lab-filter-btn" data-filter="halfyear" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last 6 Months</button>
+                        <button onclick="filterLabHistory('year')" class="lab-filter-btn" data-filter="year" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last Year</button>
+                        <button onclick="filterLabHistory('lifetime')" class="lab-filter-btn active" data-filter="lifetime" style="padding: 0.5rem 1rem; border: 1px solid var(--primary); border-radius: 6px; background: var(--primary); color: white; cursor: pointer; font-size: 0.8rem;">Lifetime</button>
                     </div>
-                    ${appState.labHistory.map(session => {
-                        const statusIcon = session.status === 'completed' ? '✅' : '🚀';
-                        const statusText = session.status === 'completed' ? 'Completed' : 'Started';
-                        const statusColor = session.status === 'completed' ? 'var(--success)' : 'var(--primary)';
-                        
-                        return `
-                            <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                    <span style="font-weight: 600;">${statusIcon} Session ${session.session}</span>
-                                    <span style="color: ${statusColor}; font-weight: 600;">${statusText}</span>
-                                </div>
-                                <div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
-                                    Lab ID: ${session.labId} • ${new Date(session.date).toLocaleDateString()}
-                                </div>
-                                ${session.tasksCompleted ? 
-                                    `<div style="color: var(--success); font-size: 0.8rem;">Tasks: ${session.tasksCompleted}/${session.totalTasks}</div>` : 
-                                    '<div style="color: var(--text-secondary); font-size: 0.8rem;">Tasks: In Progress</div>'
-                                }
-                                ${session.completedAt ? 
-                                    `<div style="color: var(--text-secondary); font-size: 0.75rem;">Completed: ${new Date(session.completedAt).toLocaleString()}</div>` : 
-                                    session.startedAt ? 
-                                    `<div style="color: var(--text-secondary); font-size: 0.75rem;">Started: ${new Date(session.startedAt).toLocaleString()}</div>` : ''
-                                }
-                            </div>
-                        `;
-                    }).reverse().join('')}
+                `;
+                
+                content.innerHTML = filterButtons + `
+                    <div style="margin-bottom: 1rem; color: var(--text-secondary);">
+                        <strong>Total Sessions: <span id="filteredCount">${appState.labHistory.length}</span></strong>
+                    </div>
+                    <div id="labHistoryContent">
+                        ${generateLabHistoryHTML(appState.labHistory)}
+                    </div>
                 `;
             }
             
             showModal('labHistoryModal');
+        }
+
+        function filterLabHistory(period) {
+            const now = new Date();
+            let filteredHistory = appState.labHistory;
+            
+            if (period !== 'lifetime') {
+                const cutoffDate = new Date();
+                switch(period) {
+                    case 'week':
+                        cutoffDate.setDate(now.getDate() - 7);
+                        break;
+                    case 'month':
+                        cutoffDate.setDate(now.getDate() - 30);
+                        break;
+                    case 'quarter':
+                        cutoffDate.setMonth(now.getMonth() - 3);
+                        break;
+                    case 'halfyear':
+                        cutoffDate.setMonth(now.getMonth() - 6);
+                        break;
+                    case 'year':
+                        cutoffDate.setFullYear(now.getFullYear() - 1);
+                        break;
+                }
+                
+                filteredHistory = appState.labHistory.filter(session => 
+                    new Date(session.date) >= cutoffDate
+                );
+            }
+            
+            // Update active button
+            document.querySelectorAll('.lab-filter-btn').forEach(btn => {
+                btn.style.background = 'var(--surface)';
+                btn.style.color = 'var(--text)';
+                btn.style.border = '1px solid var(--border)';
+            });
+            
+            const activeBtn = document.querySelector(`[data-filter="${period}"]`);
+            if (activeBtn) {
+                activeBtn.style.background = 'var(--primary)';
+                activeBtn.style.color = 'white';
+                activeBtn.style.border = '1px solid var(--primary)';
+            }
+            
+            // Update content
+            document.getElementById('filteredCount').textContent = filteredHistory.length;
+            document.getElementById('labHistoryContent').innerHTML = generateLabHistoryHTML(filteredHistory);
+        }
+
+        function generateLabHistoryHTML(history) {
+            if (history.length === 0) {
+                return '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">No sessions found for this period.</div>';
+            }
+            
+            return history.map(session => {
+                const statusIcon = session.status === 'completed' ? '✅' : '🚀';
+                const statusText = session.status === 'completed' ? 'Completed' : 'Started';
+                const statusColor = session.status === 'completed' ? 'var(--success)' : 'var(--primary)';
+                
+                return `
+                    <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 600;">${statusIcon} Session ${session.session}</span>
+                            <span style="color: ${statusColor}; font-weight: 600;">${statusText}</span>
+                        </div>
+                        <div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                            Lab ID: ${session.labId} • ${new Date(session.date).toLocaleDateString()}
+                        </div>
+                        ${session.tasksCompleted ? 
+                            `<div style="color: var(--success); font-size: 0.8rem;">Tasks: ${session.tasksCompleted}/${session.totalTasks}</div>` : 
+                            '<div style="color: var(--text-secondary); font-size: 0.8rem;">Tasks: In Progress</div>'
+                        }
+                        ${session.completedAt ? 
+                            `<div style="color: var(--text-secondary); font-size: 0.75rem;">Completed: ${new Date(session.completedAt).toLocaleString()}</div>` : 
+                            session.startedAt ? 
+                            `<div style="color: var(--text-secondary); font-size: 0.75rem;">Started: ${new Date(session.startedAt).toLocaleString()}</div>` : ''
+                        }
+                    </div>
+                `;
+            }).reverse().join('');
         }
 
         // Admin functions
@@ -2100,10 +2200,18 @@
                     };
                 });
                 
+                // Sort by completed labs first, then by progress percentage
+                usersWithLabData.sort((a, b) => {
+                    if (a.completedLabs !== b.completedLabs) {
+                        return b.completedLabs - a.completedLabs; // More completed labs first
+                    }
+                    return b.progressPercentage - a.progressPercentage; // Higher percentage first
+                });
+                
                 content.innerHTML = `
                     <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
-                        <strong>Total Users: ${users.length}</strong>
-                        <small style="color: var(--text-secondary);">📊 Progress & Lab Statistics</small>
+                        <strong>Leaderboard - ${users.length} Users</strong>
+                        <small style="color: var(--text-secondary);">📊 Sorted by Labs Completed & Progress</small>
                     </div>
                     ${usersWithLabData.map((user, index) => {
                         const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
