@@ -1796,6 +1796,37 @@
             await authSystem.logout();
         }
 
+        // Modal management functions
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+            }
+            closeMobileMenu();
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        function showSignInModal() {
+            showModal('signInModal');
+        }
+
+        function showRegisterModal() {
+            showModal('registerModal');
+        }
+
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('active');
+            }
+        }
+
         // Progress management with fallback
         async function loadUserProgress() {
             try {
