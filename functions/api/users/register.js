@@ -1,5 +1,5 @@
 // functions/api/users/register.js
-// User Registration Endpoint for Velocity Lab
+// User Registration Endpoint for Velocity Lab - FIXED FOR FORMDATA
 
 import { 
   createResponse, 
@@ -10,7 +10,6 @@ import {
   isValidEmail,
   sanitizeString,
   checkRateLimit,
-  parseRequestJSON,
   logActivity
 } from '../../_middleware.js';
 
@@ -26,33 +25,39 @@ export async function onRequestPost(context) {
       return createErrorResponse('Too many registration attempts. Please try again later.', 429);
     }
     
-    // Parse request body
-    const userData = await parseRequestJSON(request);
+    // Parse FormData instead of JSON
+    const formData = await request.formData();
+    
+    // Extract fields from FormData
+    const name = formData.get('name');
+    const email = formData.get('email');
+    const password = formData.get('password');
+    const remember = formData.get('remember');
     
     // Validate required fields
-    if (!userData.name || !userData.email || !userData.password) {
+    if (!name || !email || !password) {
       return createErrorResponse('Name, email, and password are required', 400);
     }
     
     // Sanitize and validate input
-    const name = sanitizeString(userData.name, 100);
-    const email = userData.email.toLowerCase().trim();
-    const password = userData.password;
+    const cleanName = sanitizeString(name, 100);
+    const cleanEmail = email.toLowerCase().trim();
+    const cleanPassword = password;
     
-    if (name.length < 2) {
+    if (cleanName.length < 2) {
       return createErrorResponse('Name must be at least 2 characters long', 400);
     }
     
-    if (!isValidEmail(email)) {
+    if (!isValidEmail(cleanEmail)) {
       return createErrorResponse('Please enter a valid email address', 400);
     }
     
-    if (password.length < 8) {
+    if (cleanPassword.length < 8) {
       return createErrorResponse('Password must be at least 8 characters long', 400);
     }
     
     // Check if user already exists
-    const existingUser = await getUserByEmail(env, email);
+    const existingUser = await getUserByEmail(env, cleanEmail);
     if (existingUser) {
       return createErrorResponse('An account with this email already exists', 409);
     }
@@ -61,7 +66,7 @@ export async function onRequestPost(context) {
     const userRole = await determineUserRole(env);
     
     // Hash password
-    const passwordHash = await hashPassword(password);
+    const passwordHash = await hashPassword(cleanPassword);
     
     // Generate user ID
     const userId = generateUserId();
@@ -69,8 +74,8 @@ export async function onRequestPost(context) {
     // Create user object
     const newUser = {
       id: userId,
-      name,
-      email,
+      name: cleanName,
+      email: cleanEmail,
       passwordHash,
       role: userRole,
       createdAt: new Date().toISOString(),
@@ -86,11 +91,11 @@ export async function onRequestPost(context) {
     await updateUsersIndex(env, userId);
     
     // Create session
-    const rememberMe = Boolean(userData.rememberMe);
+    const rememberMe = Boolean(remember === 'on' || remember === 'true' || remember === true);
     const sessionToken = await createSession(env, userId, rememberMe);
     
     logActivity('users/register', userId, 'POST', { 
-      email, 
+      email: cleanEmail, 
       role: userRole,
       rememberMe 
     });
@@ -108,7 +113,7 @@ export async function onRequestPost(context) {
   } catch (error) {
     console.error('Registration error:', error);
     
-    if (error.message.includes('JSON')) {
+    if (error.message.includes('FormData')) {
       return createErrorResponse('Invalid request data format', 400);
     }
     

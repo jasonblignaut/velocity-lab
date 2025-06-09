@@ -1,5 +1,5 @@
 // functions/api/users/login.js
-// User Login Endpoint for Velocity Lab
+// User Login Endpoint for Velocity Lab - FIXED FOR FORMDATA
 
 import { 
   createResponse, 
@@ -8,7 +8,6 @@ import {
   createSession,
   isValidEmail,
   checkRateLimit,
-  parseRequestJSON,
   updateUserActivity,
   logActivity
 } from '../../_middleware.js';
@@ -25,24 +24,29 @@ export async function onRequestPost(context) {
       return createErrorResponse('Too many login attempts. Please try again later.', 429);
     }
     
-    // Parse request body
-    const loginData = await parseRequestJSON(request);
+    // Parse FormData instead of JSON
+    const formData = await request.formData();
+    
+    // Extract fields from FormData
+    const email = formData.get('email');
+    const password = formData.get('password');
+    const remember = formData.get('remember');
     
     // Validate required fields
-    if (!loginData.email || !loginData.password) {
+    if (!email || !password) {
       return createErrorResponse('Email and password are required', 400);
     }
     
     // Sanitize input
-    const email = loginData.email.toLowerCase().trim();
-    const password = loginData.password;
+    const cleanEmail = email.toLowerCase().trim();
+    const cleanPassword = password;
     
-    if (!isValidEmail(email)) {
+    if (!isValidEmail(cleanEmail)) {
       return createErrorResponse('Please enter a valid email address', 400);
     }
     
     // Get user by email
-    const user = await getUserByEmail(env, email);
+    const user = await getUserByEmail(env, cleanEmail);
     
     if (!user) {
       // Use generic error message to prevent email enumeration
@@ -55,28 +59,28 @@ export async function onRequestPost(context) {
     }
     
     // Verify password
-    const passwordValid = await verifyPassword(password, user.passwordHash);
+    const passwordValid = await verifyPassword(cleanPassword, user.passwordHash);
     
     if (!passwordValid) {
       // Log failed login attempt
-      logActivity('users/login', user.id, 'FAILED_LOGIN', { email, ip: clientIP });
+      logActivity('users/login', user.id, 'FAILED_LOGIN', { email: cleanEmail, ip: clientIP });
       
       // Additional rate limiting per user email
-      const userRateLimitKey = `login_user:${email}`;
+      const userRateLimitKey = `login_user:${cleanEmail}`;
       await checkRateLimit(env, userRateLimitKey, 5, 30); // 5 attempts per 30 minutes per email
       
       return createErrorResponse('Invalid email or password', 401);
     }
     
     // Create session
-    const rememberMe = Boolean(loginData.remember);
+    const rememberMe = Boolean(remember === 'on' || remember === 'true' || remember === true);
     const sessionToken = await createSession(env, user.id, rememberMe);
     
     // Update user's last activity
     await updateUserActivity(env, user.id);
     
     logActivity('users/login', user.id, 'LOGIN_SUCCESS', { 
-      email, 
+      email: cleanEmail, 
       rememberMe,
       ip: clientIP 
     });
@@ -94,7 +98,7 @@ export async function onRequestPost(context) {
   } catch (error) {
     console.error('Login error:', error);
     
-    if (error.message.includes('JSON')) {
+    if (error.message.includes('FormData')) {
       return createErrorResponse('Invalid request data format', 400);
     }
     

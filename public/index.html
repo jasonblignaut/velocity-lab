@@ -1462,23 +1462,13 @@
             document.body.setAttribute('data-theme', savedTheme);
         }
 
-        // Authentication system (sending JSON with proper headers)
+        // Authentication system (back to FormData - matching fixed backend)
         const authSystem = {
             async login(formData) {
                 try {
-                    // Convert FormData to JSON object
-                    const loginData = {
-                        email: formData.get('email'),
-                        password: formData.get('password'),
-                        remember: formData.get('remember') === 'on'
-                    };
-                    
                     const { data } = await api.call('/api/users/login', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(loginData)
+                        body: formData  // Send FormData directly
                     });
                     
                     const { name, role, email, sessionToken } = data;
@@ -1511,20 +1501,9 @@
             
             async register(formData) {
                 try {
-                    // Convert FormData to JSON object
-                    const registerData = {
-                        name: formData.get('name'),
-                        email: formData.get('email'),
-                        password: formData.get('password'),
-                        rememberMe: formData.get('remember') === 'on'  // ← Fixed: rememberMe instead of remember
-                    };
-                    
                     const { data } = await api.call('/api/users/register', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(registerData)
+                        body: formData  // Send FormData directly
                     });
                     
                     const { name, email, role, sessionToken } = data;
