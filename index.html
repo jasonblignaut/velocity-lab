@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velocity Lab - Exchange Hybrid Training</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    
+    <style>
+        /* Apple White + Unifi Cloud Color Scheme with Dark Mode */
+        :root {
+            --primary: #00a8ff;
+            --primary-hover: #0093e6;
+            --secondary: #f8f9fa;
+            --background: #ffffff;
+            --surface: #f8f9fa;
+            --surface-hover: #e9ecef;
+            --text: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --border: #d2d2d7;
+            --success: #34c759;
+            --warning: #ff9500;
+            --danger: #ff3b30;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-heavy: rgba(0, 0, 0, 0.15);
+            --jedi-glow: #00ff88;
+            --sith-glow: #ff0066;
+            --bg-secondary: #f0f0f5;
+        }
+
+        [data-theme="dark"] {
+            --primary: #00a8ff;
+            --primary-hover: #0093e6;
+            --secondary: #1e1e1e;
+            --background: #000000;
+            --surface: #1e1e1e;
+            --surface-hover: #2e2e2e;
+            --text: #ffffff;
+            --text-secondary: #a1a1a6;
+            --border: #2e3e3e;
+            --success: #30d158;
+            --warning: #ff9f0a;
+            --danger: #ff453a;
+            --shadow: rgba(255, 255, 0.1);
+            --shadow-heavy: rgba(255, 255, 255, 0.2);
+            --bg-secondary: #2a2a2a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Background Image */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('/assets/images/VelocityBackground.jpg') center/cover no-repeat;
+            opacity: 0.08;
+            z-index: -1;
+        }
+
+        [data-theme="dark"] body::before {
+            opacity: 0.05;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
+            transition: background-color 0.3s ease, border-bottom 0.3s ease;
+        }
+
+        [data-theme="dark"] .header {
+            background: rgba(0, 0, 0, 0.95);
+        }
+
+        /* Logo */
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: url('/assets/images/Velocity-Logo.png') center/contain no-repeat;
+            cursor: pointer;
+        }
+
+        [data-theme="dark"] .logo {
+            filter: brightness(1.2);
+        }
+
+        /* Desktop Navigation */
+        .header-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .hamburger:hover {
+            background-color: var(--surface-hover-bg);
+        }
+
+        .hamburger span {
+            width: 24px;
+            height: 2px;
+            background: var(--text);
+            margin: 3px 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            border-radius: 1px;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(2) {
+            transform: none;
+            opacity: 1;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        /* Mobile Menu Overlay */
+        .mobile-menu {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+            z-index: 999;
+            padding: 1rem;
+        }
+
+        [data-theme="dark"] .mobile-menu {
+            background: rgba(0, 0, 0, 0.98);
+        }
+
+        .mobile-menu.active {
+            transform: translateY(0);
+        }
+
+        .mobile-menu-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .mobile-menu-item {
+            padding: 12px 16px;
+            text-align: center;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .mobile-menu-item:hover, .mobile-menu-item.primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .mobile-menu-item.secondary {
+            border: 1px solid var(--border);
+        }
+
+        /* Theme Menu */
+        .theme-menu-item {
+            position: relative;
+        }
+
+        .theme-menu-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            color: var(--text);
+            border: none;
+            background: none;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .theme-menu-toggle:hover {
+            background-color: var(--surface-hover-bg);
+        }
+
+        .theme-submenu {
+            position: absolute;
+            right: 100%;
+            top: 0;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 8px 25px var(--shadow-heavy);
+            min-width: 150px;
+            z-index: 1001;
+            display: none;
+        }
+
+        .theme-menu-item:hover .theme-submenu {
+            display: block;
+            animation: dropdownSlide 0.2s ease;
+        }
+
+        .theme-option {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .theme-option:hover {
+            background-color: var(--surface-hover-bg);
+        }
+
+        .theme-option.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .theme-option.jedi:hover {
+            background: linear-gradient(45deg, var(--jedi-glow), #00ff88);
+            color: white;
+        }
+
+        .theme-option.sith:hover {
+            background: linear-gradient(45deg, var(--sith-glow), #ff0066);
+            color: white;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--surface-hover-bg);
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .welcome-notification {
+            position: absolute;
+            top: 100px;
+            left: 2rem;
+            background: var(--primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px var(--shadow-heavy);
+            max-width: 300px;
+            animation: slideInLeft 0.5s ease;
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .welcome-title {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--text), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+        }
+
+        .welcome-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-large {
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 12px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--background);
+            border-radius: 16px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px var(--shadow-heavy);
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        .modal-content.large {
+            max-width: 800px;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 4px;
+            border-radius: 6px;
+        }
+
+        .modal-close:hover {
+            background-color: var(--surface-hover-bg);
+        }
+
+        /* Task Detail Modal */
+        .task-detail-content {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 1rem 0;
+        }
+
+        .subtask-container {
+            margin: 1rem 0;
+        }
+
+        .subtask-item {
+            display: flex;
+            align-items: flex-start;
+            margin: 0.75rem 0;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .subtask-item:hover {
+            background-color: var(--surface-hover-bg);
+        }
+
+        .subtask-checkbox {
+            margin-right: 0.75rem;
+            margin-top: 0.25rem;
+            cursor: pointer;
+        }
+
+        .subtask-item label {
+            cursor: pointer;
+            line-height: 1.4;
+        }
+
+        .subtask-item.completed {
+            opacity: 0.7;
+        }
+
+        .subtask-item.completed label {
+            text-decoration: line-through;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--background);
+            color: var(--text);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 168, 255, 0.1);
+        }
+
+        .form-checkbox {
+            margin-right: 8px;
+        }
+
+        .form-submit {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        /* Main Dashboard */
+        .main-content {
+            margin-top: 70px;
+            padding: 2rem;
+            min-height: calc(100vh - 70px);
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .dashboard-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Progress Ring */
+        .progress-section {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .progress-ring {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .progress-ring svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .progress-ring-bg {
+            fill: none;
+            stroke: var(--surface);
+            stroke-width: 8;
+        }
+
+        .progress-ring-fill {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dasharray 0.5s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .progress-percentage {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .progress-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Week Cards */
+        .weeks-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .week-card {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px var(--shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+
+        .week-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--shadow-heavy);
+        }
+
+        .week-card.expanded {
+            cursor: default;
+        }
+
+        .week-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .week-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .week-tasks {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .week-progress {
+            height: 6px;
+            background: var(--surface);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .week-progress-fill {
+            height: 100%;
+            background: var(--success);
+            transition: width 0.5s ease;
+        }
+
+        .week-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .expand-icon {
+            transition: transform 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .week-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Task List */
+        .task-list {
+            display: none;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+        }
+
+        .week-card.expanded .task-list {
+            display: block;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .task-item:hover {
+            background-color: var(--surface-hover-bg);
+        }
+
+        .task-checkbox {
+            margin-right: 1rem;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+
+        .task-description {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .task-item.completed {
+            opacity: 0.7;
+        }
+
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+        }
+
+        .task-detail-btn {
+            margin-left: 1rem;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+        .task-item:hover .task-detail-btn {
+            opacity: 1;
+        }
+
+        /* User Menu */
+        .user-menu {
+            position: relative;
+        }
+
+        .user-menu-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text);
+            transition: background-color 0.2s ease;
+        }
+
+        .user-menu-toggle:hover {
+            background-color: var(--surface-hover-bg);
+        }
+
+        .user-menu-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 8px 25px var(--shadow-heavy);
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .user-menu-dropdown.active {
+            display: block;
+            animation: dropdownSlide 0.2s ease;
+        }
+
+        @keyframes dropdownSlide {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-menu-item {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            text-decoration: none;
+        }
+
+        .user-menu-item:hover {
+            background-color: var(--surface-hover-bg);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 1rem;
+                justify-content: center;
+                position: relative;
+            }
+
+            .logo {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 100px;
+                height: 100px;
+            }
+
+            .header-buttons {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+                position: absolute;
+                right: 1rem;
+            }
+
+            .user-menu {
+                display: none;
+            }
+
+            .welcome-screen {
+                padding: 1rem;
+            }
+
+            .welcome-notification {
+                position: static;
+                margin-bottom: 2rem;
+                max-width: none;
+            }
+
+            .welcome-title {
+                font-size: 2.5rem;
+            }
+
+            .welcome-buttons {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .btn-large {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .main-content {
+                padding: 1rem;
+                margin-top: 70px;
+            }
+
+            .dashboard-title {
+                font-size: 2rem;
+            }
+
+            .dashboard-subtitle {
+                font-size: 1rem;
+            }
+
+            .progress-ring {
+                width: 150px;
+                height: 150px;
+            }
+
+            .progress-percentage {
+                font-size: 1.5rem;
+            }
+
+            .weeks-container {
+                gap: 1rem;
+            }
+
+            .week-card {
+                padding: 1rem;
+            }
+
+            .week-title {
+                font-size: 1.1rem;
+            }
+
+            .modal {
+                padding: 1rem;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+            }
+
+            .btn {
+                font-size: 0.9rem;
+                padding: 10px 16px;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                height: 60px;
+                padding: 0 0.75rem;
+            }
+
+            .main-content {
+                margin-top: 60px;
+                padding: 0.75rem;
+            }
+
+            .mobile-menu {
+                top: 60px;
+            }
+
+            .logo {
+                width: 90px;
+                height: 90px;
+            }
+
+            .welcome-title {
+                font-size: 2rem;
+            }
+
+            .modal {
+                padding: 0.5rem;
+            }
+
+            .modal-content {
+                padding: 1rem;
+            }
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            margin: -8px 0 0 -8px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Messages */
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 1rem 0;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(52, 199, 89, 0.2);
+        }
+
+        .message.error {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(255, 59, 48, 0.2);
+        }
+
+        /* Hidden Elements */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 90px;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px var(--shadow);
+            z-index: 3000;
+            animation: slideInRight 0.3s ease;
+            max-width: 350px;
+        }
+
+        .notification.success {
+            background: var(--success);
+            color: white;
+        }
+
+        .notification.error {
+            background: var(--danger);
+            color: white;
+        }
+
+        .notification.info {
+            background: var(--primary);
+            color: white;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <!-- Header -->
+    <div class="header" id="header">
+        <div class="logo" onclick="goHome()"></div>
+        <div class="header-buttons" id="headerButtons">
+            <button class="btn btn-secondary" onclick="showSignInModal()">Sign In</button>
+            <button class="btn btn-primary" onclick="showRegisterModal()">Get Started</button>
+        </div>
+        <div class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="user-menu hidden" id="userMenu">
+            <button class="user-menu-toggle" onclick="toggleUserMenu()">
+                <span id="userName">User</span>
+                <span>▼</span>
+            </button>
+            <div class="user-menu-dropdown" id="userMenuDropdown">
+                <button class="user-menu-item" onclick="startLabEnvironment()">🚀 Start New Lab</button>
+                <button class="user-menu-item" onclick="showLabHistoryModal()">📊 Lab History</button>
+                <button class="user-menu-item" onclick="showAdminPanel()" id="adminButton" style="display: none;">👑 Admin Panel</button>
+                <div class="theme-menu-item">
+                    <button class="theme-menu-toggle">
+                        <span>🎨 Theme</span>
+                        <span>▶</span>
+                    </button>
+                    <div class="theme-submenu">
+                        <button class="theme-option jedi" onclick="setTheme('light')">🌟 Light Jedi</button>
+                        <button class="theme-option sith active" onclick="setTheme('dark')">⚡ Dark Sith</button>
+                    </div>
+                </div>
+                <button class="user-menu-item" onclick="logout()">🚪 Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-items" id="mobileMenuItems"></div>
+    </div>
+
+    <!-- Welcome Screen -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-notification">
+            👋 Welcome to Velocity Lab! Sign in to access your Exchange Hybrid training journey.
+        </div>
+        <h1 class="welcome-title">Master Exchange Hybrid</h1>
+        <p class="welcome-subtitle">
+            Embark on a comprehensive 4-week journey with 42 hands-on tasks to build
+            a complete Exchange Hybrid lab environment, from Domain Controllers to
+            Microsoft 365 integration.
+        </p>
+        <div class="welcome-buttons">
+            <button class="btn btn-secondary btn-large" onclick="showSignInModal()">👤 Sign In</button>
+            <button class="btn btn-primary btn-large" onclick="showRegisterModal()">🚗 Get Started</button>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div class="main-content hidden" id="mainContent">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Your Exchange Hybrid Journey</h1>
+            <p class="dashboard-subtitle">Track your progress through 42 hands-on tasks across 4 comprehensive weeks</p>
+        </div>
+        <div class="progress-section">
+            <div class="progress-ring">
+                <svg viewBox="0 0 120 120">
+                    <circle class="progress-ring-bg" cx="60" cy="60" r="54"/>
+                    <circle class="progress-ring-fill" cx="60" cy="60" r="54" stroke-dasharray="0 339.292" id="progressRing"/>
+                </svg>
+                <div class="progress-text">
+                    <div class="progress-percentage" id="progressPercentage">0%</div>
+                    <div class="progress-label">Complete</div>
+                </div>
+            </div>
+        </div>
+        <div class="weeks-container" id="weeksContainer"></div>
+    </div>
+
+    <!-- Sign In Modal -->
+    <div class="modal" id="signInModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('signInModal')">×</button>
+            <div class="modal-header">
+                <h2>Sign In</h2>
+                <p style="color: var(--text-secondary);">Welcome back to your training journey</p>
+            </div>
+            <form id="signInForm">
+                <div class="form-group">
+                    <label class="form-label" for="signInEmail">Email</label>
+                    <input type="email" class="form-input" id="signInEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="signInPassword">Password</label>
+                    <div style="position: relative;">
+                        <input type="password" class="form-input" id="signInPassword" name="password" required>
+                        <button type="button" onclick="togglePasswordVisibility('signInPassword')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary); font-family: Arial, sans-serif;">👁</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center;">
+                        <input type="checkbox" class="form-checkbox" name="remember">
+                        <span>Remember me for 30 days</span>
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary form-submit">Sign In</button>
+                <div id="signInMessage" class="message hidden"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('registerModal')">×</button>
+            <div class="modal-header">
+                <h2>Create Account</h2>
+                <p style="color: var(--text-secondary);">Start your Exchange Hybrid journey today</p>
+            </div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label class="form-label" for="registerName">Full Name</label>
+                    <input type="text" class="form-input" id="registerName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="registerEmail">Email</label>
+                    <input type="email" class="form-input" id="registerEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="registerPassword">Password</label>
+                    <div style="position: relative;">
+                        <input type="password" class="form-input" id="registerPassword" name="password" required>
+                        <button type="button" onclick="togglePasswordVisibility('registerPassword')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary); font-family: Arial, sans-serif;">👁</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center;">
+                        <input type="checkbox" class="form-checkbox" name="remember">
+                        <span>Remember me for 30 days</span>
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary form-submit">Create Account</button>
+                <div id="registerMessage" class="message hidden"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Detail Modal -->
+    <div class="modal" id="taskDetailModal">
+        <div class="modal-content large">
+            <button class="modal-close" onclick="closeModal('taskDetailModal')">×</button>
+            <div class="modal-header">
+                <h2 id="taskDetailTitle">Task Details</h2>
+            </div>
+            <div class="task-detail-content" id="taskDetailContent"></div>
+        </div>
+    </div>
+
+    <!-- Lab History Modal -->
+    <div class="modal" id="labHistoryModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('labHistoryModal')">×</button>
+            <div class="modal-header">
+                <h2>📊 Lab History</h2>
+                <p style="color: var(--text-secondary);">Your training progress timeline</p>
+            </div>
+            <div id="labHistoryModalContent"></div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Modal -->
+    <div class="modal" id="adminModal">
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+            <button class="modal-close" onclick="closeModal('adminModal')">×</button>
+            <div class="modal-header">
+                <h2>👑 Admin Panel</h2>
+                <p style="color: var(--text-secondary);">User progress leaderboard</p>
+            </div>
+            <div id="adminContent"></div>
+        </div>
+    </div>
+
+    <!-- Load Task Definitions -->
+    <script src="/assets/task-definitions.js"></script>
+
+    <script>
+        // Global application state
+        const appState = {
+            user: null,
+            sessionToken: null,
+            progress: {},
+            authenticated: false,
+            labHistory: [],
+            tasks: [],
+            isWelcomeShown: false,
+            shownNotifications: new Set()
+        };
+
+        // API configuration
+        const API_BASE = '/api/users';
+
+        // Utility functions
+        const utils = {
+            getId(id) {
+                return document.getElementById(id);
+            },
+            showElement(id) {
+                const el = utils.getId(id);
+                if (el) el.classList.remove('hidden');
+            },
+            hideElement(id) {
+                const el = utils.getId(id);
+                if (el) el.classList.add('hidden');
+            },
+            setText(id, text) {
+                const el = utils.getId(id);
+                if (el) el.textContent = text;
+            },
+            clearForm(id) {
+                const form = utils.getId(id);
+                if (form) form.reset();
+            },
+            showMessage(id, text, type) {
+                const msg = utils.getId(id);
+                if (msg) {
+                    msg.textContent = text;
+                    msg.className = `message ${type}`;
+                    msg.classList.remove('hidden');
+                    setTimeout(() => msg.classList.add('hidden'), 5000);
+                }
+            }
+        };
+
+        // Notification system
+        const notificationSystem = {
+            notifications: [],
+            show(message, type) {
+                const notificationId = `${type}:${message}`;
+                if (appState.shownNotifications.has(notificationId)) return;
+                if (message.includes('Welcome') && appState.isWelcomeShown) return;
+
+                appState.shownNotifications.add(notificationId);
+                if (message.includes('Welcome')) appState.isWelcomeShown = true;
+
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                const offset = this.notifications.length * 80;
+                notification.style.top = `${90 + offset}px`;
+
+                document.body.appendChild(notification);
+                this.notifications.push(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                    const index = this.notifications.indexOf(notification);
+                    if (index > -1) {
+                        this.notifications.splice(index, 1);
+                        this.notifications.forEach((notif, i) => {
+                            notif.style.top = `${90 + (i * 80)}px`;
+                        });
+                    }
+                    appState.shownNotifications.delete(notificationId);
+                }, 5000);
+            },
+            success(message) {
+                console.log('✅ Success:', message);
+                this.show(message, 'success');
+            },
+            error(message) {
+                console.log('❌ Error:', message);
+                this.show(message, 'error');
+            },
+            info(message) {
+                console.log('ℹ️ Info:', message);
+                this.show(message, 'info');
+            },
+            clearShownNotifications() {
+                appState.shownNotifications.clear();
+                appState.isWelcomeShown = false;
+            }
+        };
+
+        // API call function
+        const api = {
+            async call(endpoint, options = {}) {
+                try {
+                    const headers = {
+                        ...options.headers,
+                        'Authorization': appState.sessionToken ? `Bearer ${appState.sessionToken}` : undefined
+                    };
+
+                    const response = await fetch(`${API_BASE}/${endpoint}`, {
+                        method: options.method || 'GET',
+                        headers,
+                        body: options.body
+                    });
+
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new Error(`API returned non-JSON response: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            throw new Error(result.message || 'Unauthorized access. Please check credentials.');
+                        } else if (response.status === 429) {
+                            throw new Error('Too many attempts. Please wait before trying again.');
+                        }
+                        throw new Error(result.message || 'API call failed');
+                    } else {
+                        return result.data;
+                    }
+
+                } catch (error) {
+                    console.error('API call failed:', error);
+                    throw error;
+                }
+            }
+        };
+
+        // Authentication system
+        const authSystem = {
+            async login(formData) {
+                try {
+                    const submitButton = utils.getId('signInForm').id.querySelector('button[type="submit"]');
+                    submitButton.disabled = true;
+                    submitButton.classList.add('loading');
+
+                    const data = await api.call(method='POST', endpoint='login', body=formData);
+                    appState.user = { name: data.name, email: data.email, role: data.role };
+                    appState.sessionToken = data.sessionToken;
+                    appState.authenticated = true;
+
+                    sessionStorage.setItem('sessionToken', JSON.stringify(data.sessionToken));
+                    sessionStorage.setItem('user', JSON.stringify(appState.user));
+
+                    if (data.role === 'admin') {
+                        utils.showElement('show-adminButton');
+                    }
+
+                        await showDashboard('success', `Welcome back, ${data.name}! 🎉`);
+                    await loadUserProgress();
+                    await loadLabHistory();
+                    closeModal('signInModal');
+                    utils.clearForm('signInForm');
+                } catch (error) {
+                    utils.showMessage('signInMessage', error.message || 'Invalid email or password', 'error');
+                } finally {
+                    const button = utils.getId('signInForm').querySelector('button[type="submit"]');
+                    button.disabled = false;
+                    button.classList.remove('loading');
+                }
+            },
+            async register(formData) {
+                try {
+                    const submitButton = utils.getId('registerForm').querySelector('button[type="submit"]');
+                    submitButton.disabled = true;
+                    submitButton.classList.add('loading');
+
+                    const data = await api.call('register', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    appState.user = { name: data.name, email: data.email, role: data.role || 'user' };
+                    appState.sessionToken = data.sessionToken;
+                    appState.authenticated = true;
+
+                    sessionStorage.setItem('sessionToken', JSON.stringify(data.sessionToken));
+                    sessionStorage.setItem('user', JSON.stringify(appState.user));
+
+                    if (data.role === 'admin') {
+                        utils.showElement('adminButton');
+                    }
+
+                    showDashboard('success', `Welcome to Velocity Lab, ${data.name}! 🚗`);
+                    await loadUserProgress();
+                    await loadLabHistory();
+                    closeModal('registerModal');
+                    utils.clearForm('registerForm');
+                } catch (error) {
+                    utils.showMessage('registerMessage', error.message || 'Registration failed. Please try again.', 'error');
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('loading');
+                }
+            },
+            async logout() {
+                try {
+                    if (appState.sessionToken) {
+                        await api.call('logout', {
+                            method: 'POST'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Logout failed:', error);
+                }
+
+                sessionStorage.clear();
+                appState.user = {};
+                appState.progress = {};
+                appState.sessionToken = null;
+                appState.authenticated = false;
+                appState.labHistory = [];
+                notificationSystem.clearShownNotifications();
+                utils.hideElement('adminButton');
+                showWelcomeScreen();
+                notificationSystem.info('Signed out successfully.');
+            },
+            async checkSession() {
+                try {
+                    const token = sessionStorage.getItem('sessionToken');
+                    if (!token) {
+                        return false;
+                    }
+                    const data = await api.call('login', {});
+                    appState.user = data;
+                    appState.sessionToken = token;
+                    appState.authenticated = true;
+                    appState.isWelcomeShown = true;
+                    if (data.role === 'admin') {
+                        utils.showElement('adminButton');
+                    }
+                    return true;
+                } catch (error) {
+                    console.warn('Session check failed:', error);
+                    sessionStorage.clear();
+                    return false;
+                }
+            }
+        };
+
+        // Theme management
+        window.setTheme = function(theme) {
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+
+            const themeOptions = document.querySelectorAll('.theme-option');
+            themeOptions.forEach(opt => {
+                option.classList.remove('active');
+                if ((theme === 'light' && option.classList.contains('active')) || 
+                    (theme === 'dark' && option.classList.contains('sith'))) {
+                    option.classList.add('active');
+                }
+            });
+
+            notificationSystem.success(theme === 'light' ? '🌟 Light Jedi theme activated!' : '⚡ Dark Sith theme activated!');
+        };
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.setAttribute('data-theme', savedTheme);
+
+            const themeOptions = document.querySelectorAll('.theme-option');
+            themeOptions.forEach(option => {
+                option.classList.remove('active');
+                if ((savedTheme === 'light' && option.classList.contains('light')) || 
+                    (savedTheme === 'dark' && option.classList.contains('sith'))) {
+                    option.classList.add('active');
+                }
+            });
+        }
+
+        // Modal management
+        window.showModal = function(modalId) {
+            utils.showElement(modalId);
+            closeMobileMenu();
+        };
+
+        window.closeModal = function(modalId) {
+            utils.hideElement(modalId);
+        };
+
+        window.showSignInModal = function() {
+            showModal('signInModal');
+        };
+
+        window.showRegisterModal = function() {
+            showModal('registerModal');
+        };
+
+        window.toggleUserMenu = function() {
+            const dropdown = utils.getId('userMenuDropdown');
+            if (dropdown) dropdown.classList.toggle('active');
+        };
+
+        // Form handlers
+        window.togglePasswordVisibility = function(inputId) {
+            const input = document.getElementById(inputId');
+            const button = input.nextElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.innerHTML = '👁';
+            } else {
+                input.type = 'password';
+                button.innerHTML = '👁';
+            }
+        };
+
+        function setupFormHandlers() {
+            const loginForm = utils.getId('signInForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const formData = new FormData(loginForm);
+                    const email = formData.get('email').trim().toLowerCase();
+                    const password = formData.get('password').trim();
+                    if (!email || !password) {
+                        notificationSystem.error('Please fill in all required fields.');
+                        return;
+                    }
+                    await authSystem.login(formData);
+                });
+            }
+
+            const registerForm = utils.getId('registerForm');
+            if (registerForm) {
+                registerForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const formData = new FormData(registerForm);
+                    const name = formData.get('name').trim();
+                    const email = formData.get('email').trim().toLowerCase();
+                    const password = formData.get('password').trim();
+                    if (!name || !email || !password) {
+                        notificationSystem.error('Please fill in all required fields.');
+                        return;
+                    }
+                    if (password.length < 6) {
+                        notificationSystem.error('Password must be at least 6 characters long.');
+                        return;
+                    }
+                    await authSystem.register(formData);
+                });
+            }
+        }
+
+        // Navigation
+        window.goHome = function() {
+            if (appState.authenticated) {
+                showDashboard();
+            } else {
+                showWelcomeScreen();
+            }
+        };
+
+        window.toggleMobileMenu = function() {
+            const hamburger = utils.getId('hamburger');
+            const mobileMenu = utils.getId('mobileMenu');
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            updateMobileMenu();
+        };
+
+        function closeMobileMenu() {
+            const hamburger = utils.getId('hamburger');
+            const mobileMenu = utils.getId('mobileMenu');
+            if (hamburger && mobileMenu) {
+                hamburger.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            }
+            const mobileThemeOptions = utils.getId('mobileThemeOptions');
+            if (mobileThemeOptions) mobileThemeOptions.style.display = 'none';
+        }
+
+        function updateMobileMenu() {
+            const mobileMenuItems = utils.getId('mobileMenuItems');
+            if (!mobileMenuItems) return;
+
+            if (appState.authenticated && appState.user) {
+                const adminItem = appState.user.role === 'admin' ? '<button class="mobile-menu-item" onclick="showAdminPanel(); closeMobileMenu();">👑 Admin Panel</button>' : '';
+                mobileMenuItems.innerHTML = `
+                    <div style="padding: 0.5rem 1rem; text-align: center; color: var(--text-secondary); font-size: 0.9rem; border-bottom: 1px solid var(--border); margin-bottom: 0.5rem;">
+                        Welcome, ${appState.user.name}
+                    </div>
+                    <button class="mobile-menu-item" onclick="startLab(); closeMobileMenu();">🚗 Start New Lab</button>
+                    <button class="mobile-menu-item" onclick="showLabHistoryModal(); closeMobileMenu();">📗 Lab History</button>
+                    ${adminItem}
+                    <button class="mobile-menu-item" id="mobileThemeToggle" onclick="toggleMobileThemeMenu(event)">🎨 Theme ▶</button>
+                    <div id="mobileThemeOptions" style="display: none; padding-left: 1rem; background: var(--bg-secondary);">
+                        <button class="mobile-menu-item" onclick="setTheme('light'); closeMobileMenu();" style="background: var(--bg-secondary); font-size: 0.9rem;">🌟 Light Jedi</button>
+                        <button class="mobile-menu-item" onclick="setTheme('dark'); closeMobileMenu();" style="background: var(--bg-secondary); font-size: 0.9rem;">⚡ Dark Sith</button>
+                    </div>
+                    <button class="mobile-menu-item" onclick="logout(); closeMobileMenu();">🚪 Sign Out</button>
+                `;
+            } else {
+                mobileMenuItems.innerHTML = `
+                    <button class="mobile-menu-item secondary" onclick="showSignInModal(); closeMobileMenu();">👤 Sign In</button>
+                    <button class="mobile-menu-item primary" onclick="showRegisterModal(); closeMobileMenu();">🚗 Get Started</button>
+                `;
+            }
+        }
+
+        window.toggleMobileThemeMenu = function(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            const themeOptions = document.getElementById('mobileThemeOptions');
+            const themeToggle = document.getElementById('mobileThemeToggle');
+            if (themeOptions && themeToggle) {
+                if (themeOptions.style.display === 'none') {
+                    themeOptions.style.display = 'block';
+                    themeToggle.innerHTML = '🎨 Theme ▼';
+                } else {
+                    themeOptions.style.display = 'none';
+                    themeToggle.innerHTML = '🎨 Theme ▶';
+                }
+            }
+        };
+
+        // Task management
+        function loadTaskDefinitions() {
+            if (window.TASK_DEFINITIONS) {
+                appState.tasks = Object.keys(window.TASKSDEFINITIONS).map(taskId => ({
+                    id: taskId,
+                    title: window.TASKSDEFINITIONS[taskId].title,
+                    description: window.TASKSDEFINITIONS[taskId].description || 'No description available',
+                    week: parseInt(taskId.split('-')[0].replace('week', '')) || 1,
+                    category: window.TASKSDEFINITIONS[taskId].category || 'General'
+                }));
+                console.log('✅ Task definitions loaded:', appState.tasks.length);
+            } else {
+                console.warn('⚠ Task definitions not loaded, using fallback');
+                appState.tasks = generateFallbackTasks();
+            }
+        }
+
+        function generateFallbackTasks() {
+            const weeks = [
+                { title: 'Foundation Setup', tasks: [
+                    'Install Windows Server', 'Configure Domain Controller', 'Create Organizational Units', 
+                    'Add Domain Users', 'Configure DNS', 'Setup DHCP', 'Join Clients', 
+                    'Test Authentication', 'Configure GPOs', 'Setup Security Groups', 
+                    'Configure File Shares', 'Verify Network Services'
+                ]},
+                { title: 'Exchange On-Premises', tasks: [
+                    'Install Exchange Server', 'Configure Exchange Org', 'Create Mailboxes', 
+                    'Setup Distribution Groups', 'Configure Public Folders', 'Setup OWA', 
+                    'Configure SMTP', 'Setup Routing', 'Configure Anti-Spam', 'Test Mail Flow'
+                ]},
+                { title: 'Microsoft 365 Setup', tasks: [
+                    'Create M365 Tenant', 'Configure Domain', 'Setup Exchange Online', 
+                    'Create Cloud Users', 'Configure Licensing', 'Setup Teams', 
+                    'Configure SharePoint', 'Setup OneDrive', 'Configure Compliance', 'Test Cloud'
+                ]},
+                { title: 'Hybrid Configuration', tasks: [
+                    'Install Azure AD Connect', 'Configure Sync', 'Setup Hybrid Exchange', 
+                    'Configure Mail Flow', 'Test Hybrid', 'Migrate Mailbox', 
+                    'Configure Hybrid Features', 'Setup SSO', 'Test UX', 'Document'
+                ]}
+            ];
+
+            const tasks = [];
+            weeks.forEach((week, weekIdx) => {
+                week.tasks.forEach((task, idx) => {
+                    tasks.push({
+                        id: `week${weekIdx + 1}-task${idx + 1}`,
+                        week: weekIdx + 1,
+                        title: task,
+                        description: `Complete ${task} for Week ${weekIdx + 1}`,
+                        category: week.title
+                    });
+                });
+            });
+            return tasks;
+        }
+
+        window.showTaskDetail = function(taskId) {
+            const task = window.TASKSDEFINITIONS && window.TASKS(taskId);
+            if (task) {
+                utils.setText('taskDetailTitle', task.title);
+                if (!appState.progress[taskId]) {
+                    appState.progress[taskId] = { completed: false, subtasks: {}, notes: '' };
+                }
+                const progress = appState.progress[taskId];
+                const notesSection = `
+                    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                        <h4 style="margin-bottom: 1rem; color: var(--text);">📝 Notes</h4>
+                        <textarea id="taskNotes_${taskId}" placeholder="Add notes..." style="width: 100%; min-height: 100px; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; background: var(--background); color: var(--text); resize: vertical;" onchange="saveTaskNotes('${taskId}')">${progress.notes || ''}</textarea>
+                    </div>
+                `;
+                const subtaskContent = task.subtasks && task.subtasks.length > 0 ? `
+                    <div class="subtask-container">
+                        <h4 style="margin-bottom: 1rem; color: var(--text);">✅ Subtasks</h4>
+                        ${task.subtasks.map((subtask, idx) => `
+                            <div class="subtask-item ${progress.subtasks[subtask.id]?.completed ? 'completed' : ''}">
+                                <input type="checkbox" class="subtask-checkbox" id="subtask_${taskId}_${subtask.id}" ${progress.subtasks[subtask.id]?.completed ? 'checked' : ''} onchange="updateSubtask('${taskId}', '${subtask.id}', this.checked)">
+                                <label for="subtask_${taskId}_${subtask.id}">${subtask.description}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : '';
+                utils.getId('taskDetailContent').innerHTML = `
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">${task.description || 'No description available.'}</p>
+                    ${subtaskContent}
+                    ${notesSection}
+                `;
+                showModal('taskDetailModal');
+            } else {
+                notificationSystem.error('Task details not found.');
+            }
+        };
+
+        window.saveTaskNotes = function(taskId) {
+            const notes = utils.getId(`taskNotes_${taskId}`)?.value || '';
+            appState.progress[taskId].notes = notes;
+            saveUserProgress();
+        };
+
+        window.updateSubtask = function(taskId, subtaskId, completed) {
+            if (!appState.progress[taskId]) {
+                appState.progress[taskId] = { completed: false, subtasks: {}, notes: '' };
+            }
+            appState.progress[taskId].subtasks[subtaskId] = { completed };
+            const task = window.TASK_DEFINITIONS?.[taskId];
+            if (task?.subtasks) {
+                const allSubtasksCompleted = task.subtasks.every(st => appState.progress[taskId].subtasks[st.id]?.completed);
+                appState.progress[taskId].completed = allSubtasksCompleted;
+            }
+            saveUserProgress();
+            updateProgressUI();
+            renderWeeks();
+        };
+
+        // Progress management
+        async function loadUserProgress() {
+            try {
+                const localProgress = JSON.parse(localStorage.getItem('userProgress') || '{}');
+                appState.progress = localProgress;
+
+                try {
+                    const serverProgress = await api.call('progress');
+                    if (serverProgress && typeof serverProgress === 'object') {
+                        appState.progress = { ...localProgress, ...serverProgress };
+                        localStorage.setItem('userProgress', JSON.stringify(appState.progress));
+                    }
+                } catch (error) {
+                    console.warn('⚠ Server progress fetch failed, using local progress:', error);
+                }
+
+                updateProgressUI();
+                renderWeeks();
+            } catch (error) {
+                console.error('Failed to load progress:', error);
+                notificationSystem.error('Unable to load progress. Using local data.');
+            }
+        }
+
+        function saveUserProgress() {
+            localStorage.setItem('userProgress', JSON.stringify(appState.progress));
+            if (appState.authenticated) {
+                try {
+                    api.call('progress', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(appState.progress)
+                    });
+                } catch (error) {
+                    console.warn('⚠ Failed to sync progress with server:', error);
+                }
+            }
+            updateProgressUI();
+            renderWeeks();
+        }
+
+        function updateProgressUI() {
+            const totalTasks = appState.tasks.length;
+            const completedTasks = Object.values(appState.progress).filter(p => p.completed).length;
+            const percentage = totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            const circumference = 339.292; // 2 * π * 54 (radius from SVG)
+            const dashArray = (percentage / 100) * circumference;
+            const progressRing = utils.getId('progressRing');
+            if (progressRing) {
+                progressRing.setAttribute('stroke-dasharray', `${dashArray} ${circumference}`);
+            }
+            utils.setText('progressPercentage', `${percentage}%`);
+        }
+
+        // Dashboard rendering
+        function showDashboard(type, message) {
+            if (message) notificationSystem[type || 'info'](message);
+            utils.hideElement('welcomeScreen');
+            utils.showElement('mainContent');
+            utils.hideElement('headerButtons');
+            utils.showElement('userMenu');
+            if (appState.user?.name) {
+                utils.setText('userName', appState.user.name);
+            }
+            updateMobileMenu();
+            renderWeeks();
+        }
+
+        function showWelcomeScreen() {
+            utils.showElement('welcomeScreen');
+            utils.hideElement('mainContent');
+            utils.showElement('headerButtons');
+            utils.hideElement('userMenu');
+            updateMobileMenu();
+        }
+
+        function renderWeeks() {
+            const weeksContainer = utils.getId('weeksContainer');
+            if (!weeksContainer) return;
+
+            const weeks = Array.from({ length: 4 }, (_, i) => i + 1);
+            weeksContainer.innerHTML = weeks.map(week => {
+                const weekTasks = appState.tasks.filter(task => task.week === week);
+                const completedTasks = weekTasks.filter(task => appState.progress[task.id]?.completed).length;
+                const progress = weekTasks.length ? (completedTasks / weekTasks.length) * 100 : 0;
+
+                return `
+                    <div class="week-card" id="week${week}" onclick="toggleWeek(${week}, event)">
+                        <div class="week-header">
+                            <div>
+                                <div class="week-title">Week ${week}: ${weekTasks[0]?.category || 'Setup'}</div>
+                                <div class="week-tasks">${completedTasks} of ${weekTasks.length} tasks complete</div>
+                            </div>
+                            <span class="expand-icon">▼</span>
+                        </div>
+                        <div class="week-progress">
+                            <div class="week-progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                        <div class="week-description">
+                            ${getWeekDescription(week)}
+                        </div>
+                        <div class="task-list" id="taskList${week}">
+                            ${weekTasks.map(task => `
+                                <div class="task-item ${appState.progress[task.id]?.completed ? 'completed' : ''}">
+                                    <input type="checkbox" class="task-checkbox" id="task_${task.id}" ${appState.progress[task.id]?.completed ? 'checked' : ''} onchange="updateTask('${task.id}', this.checked)">
+                                    <div class="task-content">
+                                        <div class="task-title">${task.title}</div>
+                                        <div class="task-description">${task.description}</div>
+                                    </div>
+                                    <button class="task-detail-btn" onclick="showTaskDetail('${task.id}'); event.stopPropagation();">Details</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getWeekDescription(week) {
+            const descriptions = {
+                1: 'Set up the core infrastructure, including Domain Controllers and network services.',
+                2: 'Deploy and configure Exchange Server on-premises.',
+                3: 'Configure Microsoft 365 and integrate cloud services.',
+                4: 'Establish a hybrid Exchange environment with Azure AD Connect.'
+            };
+            return descriptions[week] || `Week ${week} of your Exchange Hybrid journey.`;
+        }
+
+        window.toggleWeek = function(week, event) {
+            const weekCard = utils.getId(`week${week}`);
+            const taskList = utils.getId(`taskList${week}`);
+            if (!weekCard || !taskList) return;
+            if (event.target.closest('.task-item') || event.target.closest('.task-detail-btn')) return;
+            weekCard.classList.toggle('expanded');
+        };
+
+        window.updateTask = function(taskId, completed) {
+            if (!appState.progress[taskId]) {
+                appState.progress[taskId] = { completed: false, subtasks: {}, notes: '' };
+            }
+            appState.progress[taskId].completed = completed;
+            saveUserProgress();
+        };
+
+        // Lab management
+        window.startLabEnvironment = function() {
+            notificationSystem.info('Starting a new lab environment...');
+            // Placeholder for lab environment setup
+            setTimeout(() => {
+                appState.labHistory.push({
+                    id: `lab-${Date.now()}`,
+                    date: new Date().toISOString(),
+                    tasksCompleted: Object.values(appState.progress).filter(p => p.completed).length,
+                    notes: 'New lab environment started.'
+                });
+                saveLabHistory();
+                notificationSystem.success('New lab environment started successfully! 🚀');
+            }, 1000);
+        };
+
+        async function loadLabHistory() {
+            try {
+                const localHistory = JSON.parse(localStorage.getItem('labHistory') || '[]');
+                appState.labHistory = localHistory;
+
+                try {
+                    const serverHistory = await api.call('history');
+                    if (Array.isArray(serverHistory)) {
+                        appState.labHistory = [...new Set([...localHistory, ...serverHistory].map(h => h.id))].map(id => {
+                            return [...localHistory, ...serverHistory].find(h => h.id === id);
+                        });
+                        localStorage.setItem('labHistory', JSON.stringify(appState.labHistory));
+                    }
+                } catch (error) {
+                    console.warn('⚠ Server lab history fetch failed, using local history:', error);
+                }
+            } catch (error) {
+                console.error('Failed to load lab history:', error);
+                notificationSystem.error('Unable to load lab history.');
+            }
+        }
+
+        function saveLabHistory() {
+            localStorage.setItem('labHistory', JSON.stringify(appState.labHistory));
+            if (appState.authenticated) {
+                try {
+                    api.call('history', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(appState.labHistory)
+                    });
+                } catch (error) {
+                    console.warn('⚠ Failed to sync lab history with server:', error);
+                }
+            }
+        }
+
+        window.showLabHistoryModal = function() {
+            const content = utils.getId('labHistoryModalContent');
+            if (!content) return;
+            content.innerHTML = appState.labHistory.length > 0 ? `
+                ${appState.labHistory.map(history => `
+                    <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem;">
+                        <div style="font-weight: 500; color: var(--text); margin-bottom: 0.5rem;">
+                            Lab Session: ${new Date(history.date).toLocaleString()}
+                        </div>
+                        <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                            Tasks Completed: ${history.tasksCompleted} | Notes: ${history.notes || 'None'}
+                        </div>
+                    </div>
+                `).join('')}
+            ` : '<p style="color: var(--text-secondary); text-align: center;">No lab history available.</p>';
+            showModal('labHistoryModal');
+        };
+
+        // Admin panel
+        window.showAdminPanel = function() {
+            const content = utils.getId('adminContent');
+            if (!content) return;
+            if (appState.user?.role !== 'admin') {
+                notificationSystem.error('Access denied. Admin privileges required.');
+                return;
+            }
+            content.innerHTML = '<p style="text-align: center;">Loading user progress...</p>';
+            showModal('adminModal');
+            try {
+                api.call('users-progress').then(data => {
+                    if (Array.isArray(data) && data.length > 0) {
+                        content.innerHTML = `
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid var(--border);">
+                                        <th style="padding: 1rem; text-align: left;">User</th>
+                                        <th style="padding: 1rem; text-align: left;">Progress</th>
+                                        <th style="padding: 1rem; text-align: left;">Last Active</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.map(user => `
+                                        <tr style="border-bottom: 1px solid var(--border);">
+                                            <td style="padding: 1rem;">${user.name} (${user.email})</td>
+                                            <td style="padding: 1rem;">${user.progress?.completed || 0}/${appState.tasks.length} tasks</td>
+                                            <td style="padding: 1rem;">${user.lastActive ? new Date(user.lastActive).toLocaleString() : 'N/A'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                    } else {
+                        content.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">No user progress data available.</p>';
+                    }
+                }).catch(error => {
+                    console.error('Failed to load admin data:', error);
+                    content.innerHTML = `
+                        <p style="color: var(--text-secondary); text-align: center;">Unable to load user progress. Showing local data.</p>
+                        ${Object.keys(appState.progress).length > 0 ? `
+                            <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px;">
+                                <div style="font-weight: 500; color: var(--text); margin-bottom: 0.5rem;">
+                                    Current User: ${appState.user?.name || 'Unknown'}
+                                </div>
+                                <div style="color: var(--text-secondary);">
+                                    Completed Tasks: ${Object.values(appState.progress).filter(p => p.completed).length}/${appState.tasks.length}
+                                </div>
+                            </div>
+                        ` : '<p style="color: var(--text-secondary); text-align: center;">No local progress data.</p>'}
+                    `;
+                });
+            } catch (error) {
+                console.error('Admin panel error:', error);
+                notificationSystem.error('Failed to load admin panel.');
+            }
+        };
+
+        window.logout = function() {
+            authSystem.logout();
+        };
+
+        // Initialize application
+        async function init() {
+            loadTheme();
+            loadTaskDefinitions();
+            setupFormHandlers();
+            updateMobileMenu();
+            const isAuthenticated = await authSystem.checkSession();
+            if (isAuthenticated) {
+                await loadUserProgress();
+                await loadLabHistory();
+                showDashboard('info', `Welcome back, ${appState.user.name}! 🎉`);
+            } else {
+                showWelcomeScreen();
+            }
+        }
+
+        // Start application
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
