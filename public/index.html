@@ -41,7 +41,7 @@
             --success: #30d158;
             --warning: #ff9f0a;
             --danger: #ff453a;
-            --shadow: rgba(255, 255, 0.1);
+            --shadow: rgba(255, 255, 255, 0.1);
             --shadow-heavy: rgba(255, 255, 255, 0.2);
             --bg-secondary: #2a2a2a;
         }
@@ -129,7 +129,7 @@
         }
 
         .hamburger:hover {
-            background-color: var(--surface-hover-bg);
+            background-color: var(--surface-hover);
         }
 
         .hamburger span {
@@ -147,11 +147,6 @@
 
         .hamburger.active span:nth-child(2) {
             opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(2) {
-            transform: none;
-            opacity: 1;
         }
 
         .hamburger.active span:nth-child(3) {
@@ -228,7 +223,7 @@
         }
 
         .theme-menu-toggle:hover {
-            background-color: var(--surface-hover-bg);
+            background-color: var(--surface-hover);
         }
 
         .theme-submenu {
@@ -264,7 +259,7 @@
         }
 
         .theme-option:hover {
-            background-color: var(--surface-hover-bg);
+            background-color: var(--surface-hover);
         }
 
         .theme-option.active {
@@ -313,7 +308,7 @@
         }
 
         .btn-secondary:hover {
-            background-color: var(--surface-hover-bg);
+            background-color: var(--surface-hover);
         }
 
         /* Welcome Screen */
@@ -336,7 +331,7 @@
             color: white;
             padding: 1rem 1.5rem;
             border-radius: 12px;
-            box-shadow: 0 8px 25px var(--shadow-heavy);
+            box-shadow: 0 8px 15px var(--shadow);
             max-width: 300px;
             animation: slideInLeft 0.5s ease;
         }
@@ -364,7 +359,7 @@
             margin: 0 auto 2.5rem;
         }
 
-        .welcome-buttons {
+        .welcome-actions {
             display: flex;
             gap: 1rem;
             flex-wrap: wrap;
@@ -441,7 +436,7 @@
         }
 
         .modal-close:hover {
-            background-color: var(--surface-hover-bg);
+            background-color: var(--surface-hover);
         }
 
         /* Task Detail Modal */
@@ -465,7 +460,7 @@
         }
 
         .subtask-item:hover {
-            background-color: var(--surface-hover-bg);
+            background-color: var(--surface-hover);
         }
 
         .subtask-checkbox {
@@ -700,7 +695,7 @@
         }
 
         .task-item:hover {
-            background-color: var(--surface-hover-bg);
+            background-color: var(--surface-hover);
         }
 
         .task-checkbox {
@@ -770,7 +765,7 @@
         }
 
         .user-menu-toggle:hover {
-            background-color: var(--surface-hover-bg);
+            background-color: var(--surface-hover);
         }
 
         .user-menu-dropdown {
@@ -810,7 +805,7 @@
         }
 
         .user-menu-item:hover {
-            background-color: var(--surface-hover-bg);
+            background-color: var(--surface-hover);
         }
 
         /* Quick Actions */
@@ -866,7 +861,7 @@
                 font-size: 2.5rem;
             }
 
-            .welcome-buttons {
+            .welcome-actions {
                 flex-direction: column;
                 width: 100%;
                 max-width: 300px;
@@ -1096,7 +1091,7 @@
             a complete Exchange Hybrid lab environment, from Domain Controllers to
             Microsoft 365 integration.
         </p>
-        <div class="welcome-buttons">
+        <div class="welcome-actions">
             <button class="btn btn-secondary btn-large" onclick="showSignInModal()">👤 Sign In</button>
             <button class="btn btn-primary btn-large" onclick="showRegisterModal()">🚗 Get Started</button>
         </div>
@@ -1140,7 +1135,7 @@
                     <label class="form-label" for="signInPassword">Password</label>
                     <div style="position: relative;">
                         <input type="password" class="form-input" id="signInPassword" name="password" required>
-                        <button type="button" onclick="togglePasswordVisibility('signInPassword')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary); font-family: Arial, sans-serif;">👁</button>
+                        <button type="button" onclick="togglePasswordVisibility('signInPassword')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary);">👁</button>
                     </div>
                 </div>
                 <div class="form-group">
@@ -1176,7 +1171,7 @@
                     <label class="form-label" for="registerPassword">Password</label>
                     <div style="position: relative;">
                         <input type="password" class="form-input" id="registerPassword" name="password" required>
-                        <button type="button" onclick="togglePasswordVisibility('registerPassword')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary); font-family: Arial, sans-serif;">👁</button>
+                        <button type="button" onclick="togglePasswordVisibility('register')" style="position: absolute; right: 12px; top: 12px; background: none; border: none; color: transparent; cursor: pointer;">👁️</button>
                     </div>
                 </div>
                 <div class="form-group">
@@ -1207,10 +1202,10 @@
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('labHistoryModal')">×</button>
             <div class="modal-header">
-                <h2>📊 Lab History</h2>
+                <h2>📗 Lab Records</h2>
                 <p style="color: var(--text-secondary);">Your training progress timeline</p>
             </div>
-            <div id="labHistoryModalContent"></div>
+            <div id="labRecordsModalContent"></div>
         </div>
     </div>
 
@@ -1219,8 +1214,8 @@
         <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
             <button class="modal-close" onclick="closeModal('adminModal')">×</button>
             <div class="modal-header">
-                <h2>👑 Admin Panel</h2>
-                <p style="color: var(--text-secondary);">User progress leaderboard</p>
+                <h2>👑 Admin Dashboard</h2>
+                <p style="color: var(--text-secondary);">User progress and lab leaderboard</p>
             </div>
             <div id="adminContent"></div>
         </div>
@@ -1234,45 +1229,48 @@
         const appState = {
             user: null,
             sessionToken: null,
-            progress: {},
-            authenticated: false,
+            progress: null, {},
             labHistory: [],
-            tasks: [],
+            preferences: null, {},
+            authenticated: false,
+            tasks: true, [],
             isWelcomeShown: false,
             shownNotifications: new Set()
         };
 
         // API configuration
-        const API_BASE = '/api/users';
+        const API_BASE_URL = '/api/users';
+        const API_ADMIN_BASE = '/api/admin';
 
         // Utility functions
         const utils = {
-            getId(id) {
-                return document.getElementById(id);
+            getId(elementId) {
+                return document.getElementById(elementId);
             },
-            showElement(id) {
-                const el = utils.getId(id);
-                if (el) el.classList.remove('hidden');
+            showElement(elementId) {
+                const element = utils.getId(elementId);
+                if (element) element.classList.remove('hidden');
             },
             hideElement(id) {
-                const el = utils.getId(id);
-                if (el) el.classList.add('hidden');
+                const element = utils.getId(id);
+                if (element) element.classList.add('hidden');
             },
             setText(id, text) {
-                const el = utils.getId(id);
-                if (el) el.textContent = text;
+                const element = utils.getId(id);
+                if (element) element.textContent = text;
             },
             clearForm(id) {
                 const form = utils.getId(id);
                 if (form) form.reset();
             },
-            showMessage(id, text, type) {
-                const msg = utils.getId(id);
-                if (msg) {
-                    msg.textContent = text;
-                    msg.className = `message ${type}`;
-                    msg.classList.remove('hidden');
-                    setTimeout(() => msg.classList.add('hidden'), 5000);
+            showMessage(id, message, type) {
+                const messageElement = utils.getId(id);
+                if (messageElement) {
+                    messageElement.textContent = message;
+                    messageElement.classList.remove('success', 'error');
+                    messageElement.classList.add('message', type);
+                    messageElement.classList.remove('hidden');
+                    setTimeout(() => messageElement.classList.add('hidden'), 3000);
                 }
             }
         };
@@ -1280,8 +1278,8 @@
         // Notification system
         const notificationSystem = {
             notifications: [],
-            show(message, type) {
-                const notificationId = `${type}:${message}`;
+            show(message, type) => {
+                const notificationId = `${type}_${message}`;
                 if (appState.shownNotifications.has(notificationId)) return;
                 if (message.includes('Welcome') && appState.isWelcomeShown) return;
 
@@ -1291,139 +1289,150 @@
                 const notification = document.createElement('div');
                 notification.className = `notification ${type}`;
                 notification.textContent = message;
-                const offset = this.notifications.length * 80;
+                const offset = notificationSystem.notifications.length * 80;
                 notification.style.top = `${90 + offset}px`;
 
                 document.body.appendChild(notification);
-                this.notifications.push(notification);
+                notificationSystem.notifications.push(notification);
 
                 setTimeout(() => {
                     notification.remove();
-                    const index = this.notifications.indexOf(notification);
+                    const index = notificationSystem.notifications.indexOf(notification);
                     if (index > -1) {
-                        this.notifications.splice(index, 1);
-                        this.notifications.forEach((notif, i) => {
-                            notif.style.top = `${90 + (i * 80)}px`;
+                        notificationSystem.notifications.splice(index, 1);
+                        notificationSystem.notifications.forEach((notificationNotif, i) => {
+                            notificationNotif.style.top = `${90 + i * 80}px`;
                         });
                     }
-                    appState.shownNotifications.delete(notificationId);
-                }, 5000);
+                    appState.shownNotifications.delete(notificationId(notificationId);
+                }, 4000);
             },
-            success(message) {
+            success(message) => {
                 console.log('✅ Success:', message);
-                this.show(message, 'success');
+                this.showNotification(message, 'success');
             },
-            error(message) {
-                console.log('❌ Error:', message);
-                this.show(message, 'error');
+            error(message) => {
+                console.log('🚗 Error:', message);
+                this.showNotification(message, 'error');
             },
-            info(message) {
-                console.log('ℹ️ Info:', message);
-                this.show(message, 'info');
+            info(message) => {
+                console.log('℗️ Info:', message);
+                this.showNotification(message, 'info');
             },
-            clearShownNotifications() {
+            clearNotifications() => {
                 appState.shownNotifications.clear();
                 appState.isWelcomeShown = false;
             }
-        };
+        });
 
         // API call function
         const api = {
             async call(endpoint, options = {}) {
                 try {
-                    const headers = {
-                        ...options.headers,
-                        'Authorization': appState.sessionToken ? `Bearer ${appState.sessionToken}` : undefined
-                    };
+                    const headers = new Headers({
+                        ...options.headers || {},
+                        'Authorization': appState.sessionToken ? `Bearer ${appState.sessionToken}` : undefined,
+                        'Content-Type': options.body instanceof FormData ? undefined : 'application/json'
+                    });
 
-                    const response = await fetch(`${API_BASE}/${endpoint}`, {
+                    const response = await fetch(`${endpoint.startsWith('admin') ? API_ADMIN_BASE : API_BASE_URL}/${endpoint.replace('admin/', '')}`, {
                         method: options.method || 'GET',
                         headers,
-                        body: options.body
+                        body: options.body instanceof FormData ? options.body : JSON.stringify(options.body)
                     });
 
                     const contentType = response.headers.get('content-type');
                     if (!contentType || !contentType.includes('application/json')) {
-                        throw new Error(`API returned non-JSON response: ${response.status}`);
+                        throw new Error(`API call returned non-JSON response: ${response.status}`);
                     }
 
                     const result = await response.json();
 
                     if (!response.ok) {
                         if (response.status === 401) {
-                            throw new Error(result.message || 'Unauthorized access. Please check credentials.');
+                            throw new Error(result.message || 'Unauthorized access. Please sign in again.');
                         } else if (response.status === 429) {
-                            throw new Error('Too many attempts. Please wait before trying again.');
+                            throw new Error(result.message || 'Too many API attempts. Please wait before trying again.');
+                        } else if (response.status === 403) {
+                            throw new Error(result.message || 'Access denied.');
                         }
                         throw new Error(result.message || 'API call failed');
-                    } else {
-                        return result.data;
                     }
 
+                    return result.data;
                 } catch (error) {
-                    console.error('API call failed:', error);
+                    console.error('API call error:', error);
                     throw error;
                 }
             }
-        };
+        });
 
         // Authentication system
         const authSystem = {
             async login(formData) {
                 try {
-                    const submitButton = utils.getId('signInForm').id.querySelector('button[type="submit"]');
+                    const submitButton = utils.getId('signInForm').querySelector('button[type="submit"]');
                     submitButton.disabled = true;
                     submitButton.classList.add('loading');
 
-                    const data = await api.call(method='POST', endpoint='login', body=formData);
-                    appState.user = { name: data.name, email: data.email, role: data.role };
-                    appState.sessionToken = data.sessionToken;
-                    appState.authenticated = true;
-
-                    sessionStorage.setItem('sessionToken', JSON.stringify(data.sessionToken));
-                    sessionStorage.setItem('user', JSON.stringify(appState.user));
-
-                    if (data.role === 'admin') {
-                        utils.showElement('show-adminButton');
-                    }
-
-                        await showDashboard('success', `Welcome back, ${data.name}! 🎉`);
-                    await loadUserProgress();
-                    await loadLabHistory();
-                    closeModal('signInModal');
-                    utils.clearForm('signInForm');
-                } catch (error) {
-                    utils.showMessage('signInMessage', error.message || 'Invalid email or password', 'error');
-                } finally {
-                    const button = utils.getId('signInForm').querySelector('button[type="submit"]');
-                    button.disabled = false;
-                    button.classList.remove('loading');
-                }
-            },
-            async register(formData) {
-                try {
-                    const submitButton = utils.getId('registerForm').querySelector('button[type="submit"]');
-                    submitButton.disabled = true;
-                    submitButton.classList.add('loading');
-
-                    const data = await api.call('register', {
+                    const data = await api.call('login', {
                         method: 'POST',
                         body: formData
                     });
-                    appState.user = { name: data.name, email: data.email, role: data.role || 'user' };
+                    appState.user = { name: data.name, email: data.email, id: data.id, role: data.role || 'user' };
                     appState.sessionToken = data.sessionToken;
                     appState.authenticated = true;
-
-                    sessionStorage.setItem('sessionToken', JSON.stringify(data.sessionToken));
-                    sessionStorage.setItem('user', JSON.stringify(appState.user));
 
                     if (data.role === 'admin') {
                         utils.showElement('adminButton');
                     }
 
-                    showDashboard('success', `Welcome to Velocity Lab, ${data.name}! 🚗`);
-                    await loadUserProgress();
-                    await loadLabHistory();
+                    // Load user data from server
+                    await Promise.all([
+                        loadUserProgress(),
+                        loadLabHistory(),
+                        loadUserPreferences()
+                    ]);
+
+                    showDashboard('success', `Welcome back, ${data.name}! 🎉🥳`);
+                    closeModal('signInModal');
+                    utils.clearForm('signInForm');
+                } catch (error) {
+                    utils.showMessage('signInMessage', error.message || 'Invalid email or password', 'error');
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('loading');
+                }
+            }),
+            async register(formData) => {
+                try {
+                    const submitButton = utils.getId('registerForm').querySelector('button[type="submit"]');
+                    submitButton.disabled = true;
+                    submitButton.classList.add('loading');
+
+                    const submitData = await api.call('register', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    appState.user = { name: data.name, email: data.email, id: data.id, role: data.role || 'user' };
+                    appState.sessionToken = data.sessionToken;
+                    appState.authenticated = true;
+
+                    if (data.role === 'admin') {
+                        utils.showElement('adminButton');
+                    }
+
+                    // Initialize server-side data
+                    appState.progress = {};
+                    appState.labHistory = [];
+                    appState.preferences = { theme: 'dark' };
+                    await Promise.all([
+                        saveUserProgress(),
+                        saveLabHistory(),
+                        saveUserPreferences()
+                    ]);
+
+                    showDashboard('success', `Welcome to Velocity Lab, ${data.name}! 🚗💨`);
                     closeModal('registerModal');
                     utils.clearForm('registerForm');
                 } catch (error) {
@@ -1432,8 +1441,8 @@
                     submitButton.disabled = false;
                     submitButton.classList.remove('loading');
                 }
-            },
-            async logout() {
+            }),
+            async logout() => {
                 try {
                     if (appState.sessionToken) {
                         await api.call('logout', {
@@ -1442,71 +1451,105 @@
                     }
                 } catch (error) {
                     console.error('Logout failed:', error);
+                } finally {
+                    appState.user = null;
+                    appState.sessionToken = null;
+                    appState.progress = {};
+                    appState.labHistory = [];
+                    appState.preferences = {};
+                    appState.authenticated = false;
+                    notificationSystem.clearNotifications();
+                    utils.hideElement('adminButton');
+                    showWelcomeScreen();
+                    notificationSystem.info('Signed out successfully.');
                 }
-
-                sessionStorage.clear();
-                appState.user = {};
-                appState.progress = {};
-                appState.sessionToken = null;
-                appState.authenticated = false;
-                appState.labHistory = [];
-                notificationSystem.clearShownNotifications();
-                utils.hideElement('adminButton');
-                showWelcomeScreen();
-                notificationSystem.info('Signed out successfully.');
-            },
-            async checkSession() {
+            }),
+            async checkSession() => {
                 try {
-                    const token = sessionStorage.getItem('sessionToken');
-                    if (!token) {
-                        return false;
-                    }
-                    const data = await api.call('login', {});
-                    appState.user = data;
-                    appState.sessionToken = token;
+                    const data = await api.call('login');
+                    appState.user = { name: data.name, email: data.email, id: data.id, role: data.role || 'user' };
+                    appState.sessionToken = data.sessionToken;
                     appState.authenticated = true;
                     appState.isWelcomeShown = true;
+
                     if (data.role === 'admin') {
                         utils.showElement('adminButton');
                     }
+
+                    // Load user data from server
+                    await Promise.all([
+                        loadUserProgress(),
+                        loadUserLabHistory(),
+                        loadUserPreferences()
+                    ]);
+
                     return true;
                 } catch (error) {
                     console.warn('Session check failed:', error);
-                    sessionStorage.clear();
                     return false;
                 }
-            }
+            });
         };
 
         // Theme management
-        window.setTheme = function(theme) {
+        window.setTheme = async function(theme) {
             document.body.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-
-            const themeOptions = document.querySelectorAll('.theme-option');
-            themeOptions.forEach(opt => {
-                option.classList.remove('active');
-                if ((theme === 'light' && option.classList.contains('active')) || 
-                    (theme === 'dark' && option.classList.contains('sith'))) {
-                    option.classList.add('active');
-                }
-            });
-
-            notificationSystem.success(theme === 'light' ? '🌟 Light Jedi theme activated!' : '⚡ Dark Sith theme activated!');
-        };
-
-        function loadTheme() {
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            document.body.setAttribute('data-theme', savedTheme);
+            appState.preferences.theme = theme;
 
             const themeOptions = document.querySelectorAll('.theme-option');
             themeOptions.forEach(option => {
                 option.classList.remove('active');
-                if ((savedTheme === 'light' && option.classList.contains('light')) || 
-                    (savedTheme === 'dark' && option.classList.contains('sith'))) {
+                if ((theme === 'light' && option.classList.contains('jedi'))) || (theme === 'dark' && option.classList.contains('sith'))) {
                     option.classList.add('active');
                 }
             });
+
+            if (appState.authenticated) {
+                try {
+                    await api.call('preferences', {
+                        method: 'POST',
+                        body: { theme }
+                    });
+                    notificationSystem.success(theme === 'light' ? '🌟 Light Jedi theme activated!' : '⚡ Dark Sith theme activated!');
+                } catch (error) {
+                    console.warn('Failed to save theme:', error);
+                    notificationSystem.error('Theme changed locally but failed to sync with server.');
+                }
+            } else {
+                document.body.setAttribute('data-theme', theme);
+                notificationSystem.success(theme === 'light' ? '🌟 Light Jedi theme activated!' : '⚡ Dark Sith theme activated!');
+            }
+        };
+
+        async function loadUserPreferences() {
+            try {
+                const data = await api.call('preferences');
+                if (data && data.theme) {
+                    await setTheme(data.theme);
+                    appState.preferences.theme = data.theme;
+                } else {
+                    await setTheme('dark');
+                    appState.preferences.theme = 'dark';
+                }
+            } catch (error) {
+                console.warn('Failed to load preferences:', error);
+                await setTheme('dark');
+                appState.preferences.theme = 'dark';
+            }
+        }
+
+        async function savePreferences() {
+            if (!appState.authenticated) {
+                return;
+            }
+            try {
+                await api.call('preferences', {
+                    method: 'POST',
+                    body: appState.preferences
+                });
+            } catch (error) {
+                console.warn('Failed to save preferences:', error);
+            }
         }
 
         // Modal management
@@ -1534,14 +1577,14 @@
 
         // Form handlers
         window.togglePasswordVisibility = function(inputId) {
-            const input = document.getElementById(inputId');
+            const input = utils.getId(document.getElementById(inputId));
             const button = input.nextElementSibling;
             if (input.type === 'password') {
                 input.type = 'text';
-                button.innerHTML = '👁';
+                button.textContent = '👁️';
             } else {
                 input.type = 'password';
-                button.innerHTML = '👁';
+                button.textContent = '👁';
             }
         };
 
@@ -1615,20 +1658,20 @@
             if (!mobileMenuItems) return;
 
             if (appState.authenticated && appState.user) {
-                const adminItem = appState.user.role === 'admin' ? '<button class="mobile-menu-item" onclick="showAdminPanel(); closeMobileMenu();">👑 Admin Panel</button>' : '';
+                const adminItem = appState.user.role === 'admin' ? '<button class="mobile-menu-item" onclick="showAdminPanel(); closeMobileMenu();">👑 Admin Dashboard</button>' : '';
                 mobileMenuItems.innerHTML = `
                     <div style="padding: 0.5rem 1rem; text-align: center; color: var(--text-secondary); font-size: 0.9rem; border-bottom: 1px solid var(--border); margin-bottom: 0.5rem;">
                         Welcome, ${appState.user.name}
                     </div>
-                    <button class="mobile-menu-item" onclick="startLab(); closeMobileMenu();">🚗 Start New Lab</button>
+                    <button class="mobile-menu-item" onclick="startLabEnvironment(); closeMobileMenu();">🚗 Start New Lab</button>
                     <button class="mobile-menu-item" onclick="showLabHistoryModal(); closeMobileMenu();">📗 Lab History</button>
                     ${adminItem}
-                    <button class="mobile-menu-item" id="mobileThemeToggle" onclick="toggleMobileThemeMenu(event)">🎨 Theme ▶</button>
-                    <div id="mobileThemeOptions" style="display: none; padding-left: 1rem; background: var(--bg-secondary);">
-                        <button class="mobile-menu-item" onclick="setTheme('light'); closeMobileMenu();" style="background: var(--bg-secondary); font-size: 0.9rem;">🌟 Light Jedi</button>
-                        <button class="mobile-menu-item" onclick="setTheme('dark'); closeMobileMenu();" style="background: var(--bg-secondary); font-size: 0.9rem;">⚡ Dark Sith</button>
+                    <button class="mobile-menu-item" id="mobileThemeToggle" onclick="toggleMobileThemeMenu()">☄ Theme</button>
+                    <div id="mobileThemeOptions" style="display: none; padding-left: 1rem; background: var(--secondary);">
+                        <button class="mobile-menu-item" onclick="setTheme('light'); closeMobileMenu();" style="background: var(--secondary); font-size: 0.9rem;">🌟 Light Jedi</button>
+                        <button class="mobile-menu-item" onclick="setTheme('dark'); closeMobileMenu();" style="background: var(--secondary); font-size: 0.9rem;">⚡ Dark Sith</button>
                     </div>
-                    <button class="mobile-menu-item" onclick="logout(); closeMobileMenu();">🚪 Sign Out</button>
+                    <button class="mobile-menu-item" onclick="logout(); closeMobileMenu();">🚖 Sign Out</button>
                 `;
             } else {
                 mobileMenuItems.innerHTML = `
@@ -1639,35 +1682,33 @@
         }
 
         window.toggleMobileThemeMenu = function(event) {
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-
+            event.preventDefault();
+            event.stopPropagation();
             const themeOptions = document.getElementById('mobileThemeOptions');
             const themeToggle = document.getElementById('mobileThemeToggle');
             if (themeOptions && themeToggle) {
                 if (themeOptions.style.display === 'none') {
                     themeOptions.style.display = 'block';
-                    themeToggle.innerHTML = '🎨 Theme ▼';
+                    themeToggle.innerHTML = '☄️ Theme ▼';
                 } else {
                     themeOptions.style.display = 'none';
-                    themeToggle.innerHTML = '🎨 Theme ▶';
+                    themeToggle.innerHTML = '☄ Theme ▶';
                 }
             }
         };
 
         // Task management
         function loadTaskDefinitions() {
-            if (window.TASK_DEFINITIONS) {
-                appState.tasks = Object.keys(window.TASKSDEFINITIONS).map(taskId => ({
+            if (window.TASKS) {
+                appState.tasks = Object.keys(window.TASKS).map(taskId => ({
                     id: taskId,
-                    title: window.TASKSDEFINITIONS[taskId].title,
-                    description: window.TASKSDEFINITIONS[taskId].description || 'No description available',
-                    week: parseInt(taskId.split('-')[0].replace('week', '')) || 1,
-                    category: window.TASKSDEFINITIONS[taskId].category || 'General'
+                    title: window.TASKS[taskId].title,
+                    description: window.TASKS[taskId].description || '',
+                    week: parseInt(taskId.split('-')[0].replace('week-', '')) || 1,
+                    category: window.TASKS[taskId].category || 'General',
+                    subtasks: window.TASKS[taskId].subtasks || []
                 }));
-                console.log('✅ Task definitions loaded:', appState.tasks.length);
+                console.log('✅ Loaded tasks:', appState.tasks.length);
             } else {
                 console.warn('⚠ Task definitions not loaded, using fallback');
                 appState.tasks = generateFallbackTasks();
@@ -1677,45 +1718,47 @@
         function generateFallbackTasks() {
             const weeks = [
                 { title: 'Foundation Setup', tasks: [
-                    'Install Windows Server', 'Configure Domain Controller', 'Create Organizational Units', 
-                    'Add Domain Users', 'Configure DNS', 'Setup DHCP', 'Join Clients', 
-                    'Test Authentication', 'Configure GPOs', 'Setup Security Groups', 
-                    'Configure File Shares', 'Verify Network Services'
+                    'Install Windows Server', 'Configure Domain Controller', 'Create Organizational Units',
+                    'Add Domain Users', 'Configure DNS', 'Setup DHCP', 'Join Clients',
+                    'Test Authentication', 'Configure GPOs', 'Setup Security Groups',
+                    'Configure File Shares'
                 ]},
                 { title: 'Exchange On-Premises', tasks: [
-                    'Install Exchange Server', 'Configure Exchange Org', 'Create Mailboxes', 
-                    'Setup Distribution Groups', 'Configure Public Folders', 'Setup OWA', 
+                    'Install Exchange Server', 'Configure Exchange Org', 'Create Mailboxes',
+                    'Setup Distribution Groups', 'Configure Public Folders', 'Setup OWA',
                     'Configure SMTP', 'Setup Routing', 'Configure Anti-Spam', 'Test Mail Flow'
                 ]},
                 { title: 'Microsoft 365 Setup', tasks: [
-                    'Create M365 Tenant', 'Configure Domain', 'Setup Exchange Online', 
-                    'Create Cloud Users', 'Configure Licensing', 'Setup Teams', 
-                    'Configure SharePoint', 'Setup OneDrive', 'Configure Compliance', 'Test Cloud'
+                    'Create M365 Tenant', 'Configure Domain', 'Setup Exchange Online',
+                    'Create Cloud Users', 'Configure Licensing', 'Setup Teams',
+                    'Configure SharePoint', 'Setup OneDrive', 'Configure Compliance', 'Test Cloud Access'
                 ]},
                 { title: 'Hybrid Configuration', tasks: [
-                    'Install Azure AD Connect', 'Configure Sync', 'Setup Hybrid Exchange', 
-                    'Configure Mail Flow', 'Test Hybrid', 'Migrate Mailbox', 
-                    'Configure Hybrid Features', 'Setup SSO', 'Test UX', 'Document'
+                    'Install Azure AD Connect', 'Configure Sync', 'Setup Hybrid Exchange',
+                    'Configure Mail Flow', 'Test Hybrid Mail', 'Setup Coexistence',
+                    'Configure Federation', 'Test SSO', 'Setup Conditional Access',
+                    'Finalize Migration', 'Verify Hybrid'
                 ]}
             ];
 
-            const tasks = [];
-            weeks.forEach((week, weekIdx) => {
-                week.tasks.forEach((task, idx) => {
-                    tasks.push({
-                        id: `week${weekIdx + 1}-task${idx + 1}`,
-                        week: weekIdx + 1,
-                        title: task,
-                        description: `Complete ${task} for Week ${weekIdx + 1}`,
-                        category: week.title
-                    });
-                });
-            });
-            return tasks;
+            return weeks.flatMap((week, weekIndex) => 
+                week.tasks.map((task, taskIndex) => ({
+                    id: `week-${weekIndex + 1}-task-${taskIndex + 1}`,
+                    title: task,
+                    description: `Complete the ${task.toLowerCase()} task for ${week.title.toLowerCase()}.`,
+                    week: weekIndex + 1,
+                    category: week.title,
+                    subtasks: [
+                        { id: `st1`, description: `Prepare environment for ${task.toLowerCase()}` },
+                        { id: `st2`, description: `Execute ${task.toLowerCase()}` },
+                        { id: `st3`, description: `Verify ${task.toLowerCase()} functionality` }
+                    ]
+                }))
+            );
         }
 
         window.showTaskDetail = function(taskId) {
-            const task = window.TASKSDEFINITIONS && window.TASKS(taskId);
+            const task = appState.tasks.find(t => t.id === taskId);
             if (task) {
                 utils.setText('taskDetailTitle', task.title);
                 if (!appState.progress[taskId]) {
@@ -1750,23 +1793,23 @@
             }
         };
 
-        window.saveTaskNotes = function(taskId) {
+        window.saveTaskNotes = async function(taskId) {
             const notes = utils.getId(`taskNotes_${taskId}`)?.value || '';
             appState.progress[taskId].notes = notes;
-            saveUserProgress();
+            await saveUserProgress();
         };
 
-        window.updateSubtask = function(taskId, subtaskId, completed) {
+        window.updateSubtask = async function(taskId, subtaskId, completed) {
             if (!appState.progress[taskId]) {
                 appState.progress[taskId] = { completed: false, subtasks: {}, notes: '' };
             }
             appState.progress[taskId].subtasks[subtaskId] = { completed };
-            const task = window.TASK_DEFINITIONS?.[taskId];
+            const task = appState.tasks.find(t => t.id === taskId);
             if (task?.subtasks) {
                 const allSubtasksCompleted = task.subtasks.every(st => appState.progress[taskId].subtasks[st.id]?.completed);
                 appState.progress[taskId].completed = allSubtasksCompleted;
             }
-            saveUserProgress();
+            await saveUserProgress();
             updateProgressUI();
             renderWeeks();
         };
@@ -1774,42 +1817,30 @@
         // Progress management
         async function loadUserProgress() {
             try {
-                const localProgress = JSON.parse(localStorage.getItem('userProgress') || '{}');
-                appState.progress = localProgress;
-
-                try {
-                    const serverProgress = await api.call('progress');
-                    if (serverProgress && typeof serverProgress === 'object') {
-                        appState.progress = { ...localProgress, ...serverProgress };
-                        localStorage.setItem('userProgress', JSON.stringify(appState.progress));
-                    }
-                } catch (error) {
-                    console.warn('⚠ Server progress fetch failed, using local progress:', error);
-                }
-
+                const progressData = await api.call('progress');
+                appState.progress = progressData || {};
                 updateProgressUI();
                 renderWeeks();
             } catch (error) {
                 console.error('Failed to load progress:', error);
-                notificationSystem.error('Unable to load progress. Using local data.');
+                notificationSystem.error('Unable to load progress from server.');
+                appState.progress = {};
             }
         }
 
-        function saveUserProgress() {
-            localStorage.setItem('userProgress', JSON.stringify(appState.progress));
-            if (appState.authenticated) {
-                try {
-                    api.call('progress', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(appState.progress)
-                    });
-                } catch (error) {
-                    console.warn('⚠ Failed to sync progress with server:', error);
-                }
+        async function saveUserProgress() {
+            if (!appState.authenticated) return;
+            try {
+                await api.call('progress', {
+                    method: 'POST',
+                    body: appState.progress
+                });
+                updateProgressUI();
+                renderWeeks();
+            } catch (error) {
+                console.warn('Failed to save progress:', error);
+                notificationSystem.error('Progress saved locally but failed to sync with server.');
             }
-            updateProgressUI();
-            renderWeeks();
         }
 
         function updateProgressUI() {
@@ -1907,64 +1938,54 @@
             weekCard.classList.toggle('expanded');
         };
 
-        window.updateTask = function(taskId, completed) {
+        window.updateTask = async function(taskId, completed) {
             if (!appState.progress[taskId]) {
                 appState.progress[taskId] = { completed: false, subtasks: {}, notes: '' };
             }
             appState.progress[taskId].completed = completed;
-            saveUserProgress();
+            await saveUserProgress();
         };
 
         // Lab management
-        window.startLabEnvironment = function() {
+        window.startLabEnvironment = async function() {
             notificationSystem.info('Starting a new lab environment...');
-            // Placeholder for lab environment setup
-            setTimeout(() => {
-                appState.labHistory.push({
+            try {
+                const newLab = {
                     id: `lab-${Date.now()}`,
                     date: new Date().toISOString(),
                     tasksCompleted: Object.values(appState.progress).filter(p => p.completed).length,
                     notes: 'New lab environment started.'
-                });
-                saveLabHistory();
+                };
+                appState.labHistory.push(newLab);
+                await saveLabHistory();
                 notificationSystem.success('New lab environment started successfully! 🚀');
-            }, 1000);
+            } catch (error) {
+                console.error('Failed to start lab:', error);
+                notificationSystem.error('Failed to start new lab environment.');
+            }
         };
 
         async function loadLabHistory() {
             try {
-                const localHistory = JSON.parse(localStorage.getItem('labHistory') || '[]');
-                appState.labHistory = localHistory;
-
-                try {
-                    const serverHistory = await api.call('history');
-                    if (Array.isArray(serverHistory)) {
-                        appState.labHistory = [...new Set([...localHistory, ...serverHistory].map(h => h.id))].map(id => {
-                            return [...localHistory, ...serverHistory].find(h => h.id === id);
-                        });
-                        localStorage.setItem('labHistory', JSON.stringify(appState.labHistory));
-                    }
-                } catch (error) {
-                    console.warn('⚠ Server lab history fetch failed, using local history:', error);
-                }
+                const historyData = await api.call('history');
+                appState.labHistory = Array.isArray(historyData) ? historyData : [];
             } catch (error) {
                 console.error('Failed to load lab history:', error);
-                notificationSystem.error('Unable to load lab history.');
+                notificationSystem.error('Unable to load lab history from server.');
+                appState.labHistory = [];
             }
         }
 
-        function saveLabHistory() {
-            localStorage.setItem('labHistory', JSON.stringify(appState.labHistory));
-            if (appState.authenticated) {
-                try {
-                    api.call('history', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(appState.labHistory)
-                    });
-                } catch (error) {
-                    console.warn('⚠ Failed to sync lab history with server:', error);
-                }
+        async function saveLabHistory() {
+            if (!appState.authenticated) return;
+            try {
+                await api.call('history', {
+                    method: 'POST',
+                    body: appState.labHistory
+                });
+            } catch (error) {
+                console.warn('Failed to save lab history:', error);
+                notificationSystem.error('Lab history saved locally but failed to sync with server.');
             }
         }
 
@@ -1988,78 +2009,65 @@
 
         // Admin panel
         window.showAdminPanel = function() {
-    const content = utils.getId('adminContent');
-    if (!content) return;
-    if (appState.user?.role !== 'admin') {
-        notificationSystem.error('Access denied. Admin privileges required.');
-        return;
-    }
-    content.innerHTML = '<p style="text-align: center;">Loading user progress...</p>';
-    showModal('adminModal');
-    try {
-        api.call('admin/users-progress').then(data => {
-            // Check if data.users is an array
-            if (Array.isArray(data.users) && data.users.length > 0) {
-                content.innerHTML = `
-                    <div style="margin-bottom: 1rem; padding: 1rem; border: 1px solid var(--border); border-radius: 8px;">
-                        <h3 style="margin-bottom: 0.5rem;">📊 Summary</h3>
-                        <p>Total Users: ${data.summary.totalUsers}</p>
-                        <p>Active Users (Last 7 Days): ${data.summary.activeUsers}</p>
-                        <p>Total Completed Tasks: ${data.summary.totalCompletedTasks}</p>
-                        <p>Total Completed Labs: ${data.summary.totalCompletedLabs}</p>
-                        <p>Average Progress: ${data.summary.averageProgress}%</p>
-                        ${data.summary.topPerformer ? `
-                            <p>Top Performer: ${data.summary.topPerformer.name} (${data.summary.topPerformer.progressPercentage}%)</p>
-                        ` : ''}
-                    </div>
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 1px solid var(--border);">
-                                <th style="padding: 1rem; text-align: left;">Rank</th>
-                                <th style="padding: 1rem; text-align: left;">User</th>
-                                <th style="padding: 1rem; text-align: left;">Progress</th>
-                                <th style="padding: 1rem; text-align: left;">Labs</th>
-                                <th style="padding: 1rem; text-align: left;">Last Active</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${data.users.map(user => `
-                                <tr style="border-bottom: 1px solid var(--border);">
-                                    <td style="padding: 1rem;">${user.leaderboardPosition} ${user.medal || ''}</td>
-                                    <td style="padding: 1rem;">${user.name} (${user.email})</td>
-                                    <td style="padding: 1rem;">${user.completedTasks}/${user.totalTasks} tasks (${user.completionRate}%)</td>
-                                    <td style="padding: 1rem;">${user.completedLabs}/${user.totalSessions} labs</td>
-                                    <td style="padding: 1rem;">${user.lastActive ? new Date(user.lastActive).toLocaleString() : 'N/A'}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-            } else {
-                content.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">No user progress data available.</p>';
+            const content = utils.getId('adminContent');
+            if (!content) return;
+            if (appState.user?.role !== 'admin') {
+                notificationSystem.error('Access denied. Admin privileges required.');
+                return;
             }
-        }).catch(error => {
-            console.error('Failed to load admin data:', error);
-            content.innerHTML = `
-                <p style="color: var(--text-secondary); text-align: center;">Unable to load user progress. Showing local data.</p>
-                ${Object.keys(appState.progress).length > 0 ? `
-                    <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px;">
-                        <div style="font-weight: 500; color: var(--text); margin-bottom: 0.5rem;">
-                            Current User: ${appState.user?.name || 'Unknown'}
-                        </div>
-                        <div style="color: var(--text-secondary);">
-                            Completed Tasks: ${Object.values(appState.progress).filter(p => p.completed).length}/${appState.tasks.length}
-                        </div>
-                    </div>
-                ` : '<p style="color: var(--text-secondary); text-align: center;">No local progress data.</p>'}
-            `;
-            notificationSystem.error('Admin panel temporarily unavailable. Please try again later.');
-        });
-    } catch (error) {
-        console.error('Admin panel error:', error);
-        notificationSystem.error('Failed to load admin panel.');
-    }
-};
+            content.innerHTML = '<p style="text-align: center;">Loading user progress...</p>';
+            showModal('adminModal');
+            try {
+                api.call('admin/users-progress').then(data => {
+                    if (Array.isArray(data.users) && data.users.length > 0) {
+                        content.innerHTML = `
+                            <div style="margin-bottom: 1rem; padding: 1rem; border: 1px solid var(--border); border-radius: 8px;">
+                                <h3 style="margin-bottom: 0.5rem;">📊 Summary</h3>
+                                <p>Total Users: ${data.summary.totalUsers}</p>
+                                <p>Active Users (Last 7 Days): ${data.summary.activeUsers}</p>
+                                <p>Total Completed Tasks: ${data.summary.totalCompletedTasks}</p>
+                                <p>Total Completed Labs: ${data.summary.totalCompletedLabs}</p>
+                                <p>Average Progress: ${data.summary.averageProgress}%</p>
+                                ${data.summary.topPerformer ? `
+                                    <p>Top Performer: ${data.summary.topPerformer.name} (${data.summary.topPerformer.progressPercentage}%)</p>
+                                ` : ''}
+                            </div>
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid var(--border);">
+                                        <th style="padding: 1rem; text-align: left;">Rank</th>
+                                        <th style="padding: 1rem; text-align: left;">User</th>
+                                        <th style="padding: 1rem; text-align: left;">Progress</th>
+                                        <th style="padding: 1rem; text-align: left;">Labs</th>
+                                        <th style="padding: 1rem; text-align: left;">Last Active</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.users.map(user => `
+                                        <tr style="border-bottom: 1px solid var(--border);">
+                                            <td style="padding: 1rem;">${user.leaderboardPosition} ${user.medal || ''}</td>
+                                            <td style="padding: 1rem;">${user.name} (${user.email})</td>
+                                            <td style="padding: 1rem;">${user.completedTasks}/${user.totalTasks} tasks (${user.completionRate}%)</td>
+                                            <td style="padding: 1rem;">${user.completedLabs}/${user.totalSessions} labs</td>
+                                            <td style="padding: 1rem;">${user.lastActive ? new Date(user.lastActive).toLocaleString() : 'N/A'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                    } else {
+                        content.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">No user progress data available.</p>';
+                    }
+                }).catch(error => {
+                    console.error('Failed to load admin data:', error);
+                    content.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">Unable to load user progress from server.</p>';
+                    notificationSystem.error('Admin panel temporarily unavailable. Please try again later.');
+                });
+            } catch (error) {
+                console.error('Admin panel error:', error);
+                notificationSystem.error('Failed to load admin panel.');
+            }
+        };
 
         window.logout = function() {
             authSystem.logout();
@@ -2067,14 +2075,11 @@
 
         // Initialize application
         async function init() {
-            loadTheme();
             loadTaskDefinitions();
             setupFormHandlers();
             updateMobileMenu();
             const isAuthenticated = await authSystem.checkSession();
             if (isAuthenticated) {
-                await loadUserProgress();
-                await loadLabHistory();
                 showDashboard('info', `Welcome back, ${appState.user.name}! 🎉`);
             } else {
                 showWelcomeScreen();
