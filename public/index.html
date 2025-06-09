@@ -599,10 +599,10 @@
 
         /* Week Cards */
         .weeks-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 1.5rem;
-            max-width: 1400px;
+            max-width: 800px;
             margin: 0 auto;
         }
 
@@ -896,7 +896,7 @@
             }
 
             .weeks-container {
-                grid-template-columns: 1fr;
+                flex-direction: column;
                 gap: 1rem;
             }
 
@@ -1085,10 +1085,10 @@
                         <span>▶</span>
                     </button>
                     <div class="theme-submenu">
-                        <button class="theme-option jedi ${document.body.getAttribute('data-theme') === 'light' ? 'active' : ''}" onclick="setTheme('light')">
+                        <button class="theme-option jedi" onclick="setTheme('light')">
                             🌟 Light Jedi
                         </button>
-                        <button class="theme-option sith ${document.body.getAttribute('data-theme') === 'dark' ? 'active' : ''}" onclick="setTheme('dark')">
+                        <button class="theme-option sith active" onclick="setTheme('dark')">
                             ⚡ Dark Sith
                         </button>
                     </div>
@@ -1508,14 +1508,19 @@
                     
                     const { name, email, role, sessionToken } = data;
                     
-                    utils.cookies.set('user', JSON.stringify({ name, email, role }));
+                    // Ensure new users are not automatically assigned admin role
+                    // Admin role should only be assigned manually by existing admins
+                    const userRole = role === 'admin' ? 'user' : role || 'user';
+                    
+                    utils.cookies.set('user', JSON.stringify({ name, email, role: userRole }));
                     utils.cookies.set('session', sessionToken);
                     
-                    appState.user = { name, email, role };
+                    appState.user = { name, email, role: userRole };
                     appState.sessionToken = sessionToken;
                     appState.authenticated = true;
                     
-                    if (role === 'admin') {
+                    // Only show admin button if user is actually admin (should not happen for new registrations)
+                    if (userRole === 'admin') {
                         const adminBtn = document.getElementById('adminButton');
                         if (adminBtn) adminBtn.style.display = 'block';
                     }
@@ -2292,6 +2297,12 @@
             }).join('');
         }
 
+        function getCurrentLabProgress() {
+            const totalTasks = 42;
+            const completedTasks = Object.values(appState.progress).filter(task => task.completed).length;
+            return { completedTasks, totalTasks };
+        }
+
         // Task detail functionality
         function showTaskDetail(taskId) {
             const taskDefinition = window.TASK_DEFINITIONS && window.TASK_DEFINITIONS[taskId];
@@ -2609,47 +2620,6 @@
             }
         }
 
-        // Close modals and menus when clicking outside
-        document.addEventListener('click', function(event) {
-            // Close modals when clicking outside
-            const modals = document.querySelectorAll('.modal.active');
-            modals.forEach(modal => {
-                if (event.target === modal) {
-                    modal.classList.remove('active');
-                }
-            });
-            
-            // Close user menu when clicking outside
-            const userMenu = document.getElementById('userMenu');
-            const dropdown = document.getElementById('userMenuDropdown');
-            if (userMenu && dropdown && !userMenu.contains(event.target) && dropdown.classList.contains('active')) {
-                dropdown.classList.remove('active');
-            }
-        });
-
-        // Error logging for debugging
-        window.addEventListener('error', function(e) {
-            console.error('Global error:', e.error, e.filename, e.lineno);
-        });
-
-        window.addEventListener('unhandledrejection', function(e) {
-            console.error('Unhandled promise rejection:', e.reason);
-        });
-    </script>
-</body>
-</html> ${new Date(session.startedAt).toLocaleString()}</div>` : ''
-                        }
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function getCurrentLabProgress() {
-            const totalTasks = 42;
-            const completedTasks = Object.values(appState.progress).filter(task => task.completed).length;
-            return { completedTasks, totalTasks };
-        }
-
         // Admin functions
         async function showAdminPanel() {
             try {
@@ -2863,4 +2833,36 @@
                         ${session.completedAt ? 
                             `<div style="color: var(--text-secondary); font-size: 0.75rem;">Completed: ${new Date(session.completedAt).toLocaleString()}</div>` : 
                             session.startedAt ? 
-                            `<div style="color: var(--text-secondary); font-size: 0.75rem;">Started:
+                            `<div style="color: var(--text-secondary); font-size: 0.75rem;">Started: ${new Date(session.startedAt).toLocaleString()}</div>` : ''
+                        }
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Close modals and menus when clicking outside
+        document.addEventListener('click', function(event) {
+            // Close modals when clicking outside
+            const modals = document.querySelectorAll('.modal.active');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+            
+            // Close user menu when clicking outside
+            const userMenu = document.getElementById('userMenu');
+            const dropdown = document.getElementById('userMenuDropdown');
+            if (userMenu && dropdown && !userMenu.contains(event.target) && dropdown.classList.contains('active')) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Error logging for debugging
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error, e.filename, e.lineno);
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e.reason);
+        });
