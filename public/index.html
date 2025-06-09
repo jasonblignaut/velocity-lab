@@ -1278,8 +1278,8 @@
             shownNotifications: new Set() // Track shown notifications to prevent duplicates
         };
 
-        // Password visibility toggle
-        function togglePasswordVisibility(inputId) {
+        // Make all HTML-called functions globally available
+        window.togglePasswordVisibility = function(inputId) {
             const input = document.getElementById(inputId);
             const button = input.nextElementSibling;
             
@@ -1290,7 +1290,409 @@
                 input.type = 'password';
                 button.innerHTML = '&#128065;'; // open eye
             }
-        }
+        };
+
+        window.setTheme = function(theme) {
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            
+            // Update active states in desktop menu
+            const themeOptions = document.querySelectorAll('.theme-option');
+            themeOptions.forEach(option => {
+                option.classList.remove('active');
+                if ((theme === 'light' && option.classList.contains('jedi')) || 
+                    (theme === 'dark' && option.classList.contains('sith'))) {
+                    option.classList.add('active');
+                }
+            });
+            
+            // Show notification
+            if (theme === 'light') {
+                notificationSystem.success('🌟 Light Jedi theme activated!');
+            } else {
+                notificationSystem.success('⚡ Dark Sith theme activated!');
+            }
+        };
+
+        window.handleSignIn = async function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            await authSystem.login(formData);
+        };
+
+        window.handleRegister = async function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            await authSystem.register(formData);
+        };
+
+        window.logout = async function() {
+            await authSystem.logout();
+        };
+
+        window.goHome = function() {
+            if (appState.authenticated) {
+                return;
+            } else {
+                showWelcomeScreen();
+            }
+        };
+
+        window.toggleMobileMenu = function() {
+            const hamburger = document.getElementById('hamburger');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            
+            updateMobileMenuItems();
+        };
+
+        window.startLabEnvironment = async function() {
+            try {
+                // Reset all progress when starting new lab
+                appState.progress = {};
+                saveProgressToLocal();
+                updateProgressDisplay();
+                
+                // Add a new lab session entry
+                const today = new Date().toISOString().split('T')[0];
+                const newSession = {
+                    session: appState.labHistory.length + 1,
+                    date: today,
+                    status: 'started',
+                    labId: `LAB${String(appState.labHistory.length + 1).padStart(3, '0')}`,
+                    startedAt: new Date().toISOString()
+                };
+                
+                // Check if already started today
+                const todaySession = appState.labHistory.find(session => 
+                    session.date === today && session.status === 'started'
+                );
+                
+                if (!todaySession) {
+                    appState.labHistory.push(newSession);
+                    saveLabHistoryToLocal();
+                    saveLabHistoryToGlobal(); // For cross-device persistence
+                }
+                
+                // Try to call the API if available
+                try {
+                    const response = await fetch(`${API_BASE}/lab/start`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${appState.sessionToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(newSession)
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            notificationSystem.success('New lab started!');
+                            return;
+                        }
+                    }
+                } catch (apiError) {
+                    console.warn('Lab start API failed, continuing with local tracking:', apiError);
+                }
+                
+                // Fallback success message
+                notificationSystem.success('New lab started!');
+                
+            } catch (error) {
+                console.error('Failed to start lab:', error);
+                notificationSystem.error('Failed to start lab environment. Please try again.');
+            }
+        };
+
+        window.showLabHistoryModal = function() {
+            const content = document.getElementById('labHistoryModalContent');
+            
+            if (appState.labHistory.length === 0) {
+                content.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🚀</div>
+                        <p>No lab sessions yet!</p>
+                        <p style="margin-top: 0.5rem;">Click "Start New Lab" to begin your first training session.</p>
+                    </div>
+                `;
+            } else {
+                // Filter buttons
+                const filterButtons = `
+                    <div style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        <button onclick="filterLabHistory('week')" class="lab-filter-btn" data-filter="week" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last Week</button>
+                        <button onclick="filterLabHistory('month')" class="lab-filter-btn" data-filter="month" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last 30 Days</button>
+                        <button onclick="filterLabHistory('quarter')" class="lab-filter-btn" data-filter="quarter" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last 3 Months</button>
+                        <button onclick="filterLabHistory('halfyear')" class="lab-filter-btn" data-filter="halfyear" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last 6 Months</button>
+                        <button onclick="filterLabHistory('year')" class="lab-filter-btn" data-filter="year" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last Year</button>
+                        <button onclick="filterLabHistory('lifetime')" class="lab-filter-btn active" data-filter="lifetime" style="padding: 0.5rem 1rem; border: 1px solid var(--primary); border-radius: 6px; background: var(--primary); color: white; cursor: pointer; font-size: 0.8rem;">Lifetime</button>
+                    </div>
+                `;
+                
+                content.innerHTML = filterButtons + `
+                    <div style="margin-bottom: 1rem; color: var(--text-secondary);">
+                        <strong>Total Sessions: <span id="filteredCount">${appState.labHistory.length}</span></strong>
+                    </div>
+                    <div id="labHistoryContent">
+                        ${generateLabHistoryHTML(appState.labHistory)}
+                    </div>
+                `;
+            }
+            
+            showModal('labHistoryModal');
+        };
+
+        window.showAdminPanel = async function() {
+            try {
+                // Check if user is admin
+                if (!appState.user || appState.user.role !== 'admin') {
+                    notificationSystem.error('Admin access required');
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/admin/users-progress`, {
+                    headers: {
+                        'Authorization': `Bearer ${appState.sessionToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                // Check if response is actually JSON before parsing
+                const contentType = response.headers.get('content-type');
+                if (!response.ok || !contentType || !contentType.includes('application/json')) {
+                    console.warn(`Admin API unavailable (${response.status}), showing fallback`);
+                    showAdminPanelFallback();
+                    return;
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayAdminPanel(result.data);
+                } else {
+                    notificationSystem.error(`Failed to load admin data: ${result.message}`);
+                }
+            } catch (error) {
+                console.error('Failed to load admin data:', error);
+                notificationSystem.error('Admin panel temporarily unavailable. Please try again later.');
+                // Show fallback admin panel
+                showAdminPanelFallback();
+            }
+        };
+
+        window.filterLabHistory = function(period) {
+            const now = new Date();
+            let filteredHistory = appState.labHistory;
+            
+            if (period !== 'lifetime') {
+                const cutoffDate = new Date();
+                switch(period) {
+                    case 'week':
+                        cutoffDate.setDate(now.getDate() - 7);
+                        break;
+                    case 'month':
+                        cutoffDate.setDate(now.getDate() - 30);
+                        break;
+                    case 'quarter':
+                        cutoffDate.setMonth(now.getMonth() - 3);
+                        break;
+                    case 'halfyear':
+                        cutoffDate.setMonth(now.getMonth() - 6);
+                        break;
+                    case 'year':
+                        cutoffDate.setFullYear(now.getFullYear() - 1);
+                        break;
+                }
+                
+                filteredHistory = appState.labHistory.filter(session => 
+                    new Date(session.date) >= cutoffDate
+                );
+            }
+            
+            // Update active button
+            document.querySelectorAll('.lab-filter-btn').forEach(btn => {
+                btn.style.background = 'var(--surface)';
+                btn.style.color = 'var(--text)';
+                btn.style.border = '1px solid var(--border)';
+            });
+            
+            const activeBtn = document.querySelector(`[data-filter="${period}"]`);
+            if (activeBtn) {
+                activeBtn.style.background = 'var(--primary)';
+                activeBtn.style.color = 'white';
+                activeBtn.style.border = '1px solid var(--primary)';
+            }
+            
+            // Update content
+            document.getElementById('filteredCount').textContent = filteredHistory.length;
+            document.getElementById('labHistoryContent').innerHTML = generateLabHistoryHTML(filteredHistory);
+        };
+
+        window.showTaskDetail = function(taskId) {
+            const taskDefinition = window.TASK_DEFINITIONS && window.TASK_DEFINITIONS[taskId];
+            
+            if (taskDefinition) {
+                document.getElementById('taskDetailTitle').textContent = taskDefinition.title;
+                
+                // Get or create task progress
+                if (!appState.progress[taskId]) {
+                    appState.progress[taskId] = {
+                        completed: false,
+                        subtasks: {},
+                        notes: ''
+                    };
+                }
+                
+                const taskProgress = appState.progress[taskId];
+                
+                // Create task detail content with notes section
+                const notesSection = `
+                    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                        <h4 style="margin-bottom: 1rem; color: var(--text);">📝 Your Notes</h4>
+                        <textarea 
+                            id="taskNotes_${taskId}" 
+                            placeholder="Add your notes, observations, or troubleshooting steps here..."
+                            style="width: 100%; min-height: 100px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--background); color: var(--text); font-family: inherit; resize: vertical;"
+                            onchange="saveTaskNotes('${taskId}')"
+                        >${taskProgress.notes || ''}</textarea>
+                        <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);">
+                            💡 Tip: Document any issues, solutions, or key learnings for future reference
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('taskDetailContent').innerHTML = taskDefinition.description + notesSection;
+                
+                // Add event listeners for subtask checkboxes
+                setTimeout(() => {
+                    const subtaskCheckboxes = document.querySelectorAll('.subtask-checkbox');
+                    subtaskCheckboxes.forEach(checkbox => {
+                        const step = checkbox.getAttribute('data-step');
+                        
+                        // Set checkbox state from saved progress
+                        if (taskProgress.subtasks && taskProgress.subtasks[step]) {
+                            checkbox.checked = taskProgress.subtasks[step].completed;
+                            const subtaskItem = checkbox.closest('.subtask-item');
+                            if (checkbox.checked) {
+                                subtaskItem.classList.add('completed');
+                            }
+                        }
+                        
+                        checkbox.addEventListener('change', function() {
+                            handleSubtaskChange(taskId, step, this.checked);
+                        });
+                    });
+                }, 100);
+                
+                showModal('taskDetailModal');
+            } else {
+                notificationSystem.error('Task details not available');
+            }
+        };
+
+        window.saveTaskNotes = function(taskId) {
+            const notesTextarea = document.getElementById(`taskNotes_${taskId}`);
+            if (notesTextarea && appState.progress[taskId]) {
+                appState.progress[taskId].notes = notesTextarea.value;
+                saveProgressToLocal();
+                console.log('📝 Notes saved for task:', taskId);
+            }
+        };
+
+        window.toggleTaskCompletion = async function(taskId) {
+            try {
+                // Initialize task progress if not exists
+                if (!appState.progress[taskId]) {
+                    appState.progress[taskId] = {
+                        completed: false,
+                        subtasks: {},
+                        notes: ''
+                    };
+                }
+                
+                const isCompleted = appState.progress[taskId].completed;
+                
+                // Update local state
+                appState.progress[taskId].completed = !isCompleted;
+                appState.progress[taskId].completedAt = !isCompleted ? new Date().toISOString() : null;
+                
+                // Save to local storage
+                saveProgressToLocal();
+                
+                // Update UI immediately
+                updateProgressDisplay();
+                
+                // Check if lab is now completed
+                checkLabCompletion();
+                
+                // TODO: Save to backend
+                // await saveTaskProgress(taskId, appState.progress[taskId]);
+                
+            } catch (error) {
+                console.error('Failed to toggle task completion:', error);
+                notificationSystem.error('Failed to save progress. Please try again.');
+            }
+        };
+
+        window.toggleWeekExpansion = function(weekNum) {
+            const weekCards = document.querySelectorAll('.week-card');
+            const targetCard = weekCards[weekNum - 1];
+            
+            if (targetCard) {
+                targetCard.classList.toggle('expanded');
+            }
+        };
+
+        window.toggleMobileThemeMenu = function(event) {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            
+            const themeOptions = document.getElementById('mobileThemeOptions');
+            const themeToggle = document.getElementById('mobileThemeToggle');
+            
+            if (themeOptions && themeToggle) {
+                if (themeOptions.style.display === 'none') {
+                    themeOptions.style.display = 'block';
+                    themeToggle.innerHTML = '🎨 Theme ▼';
+                } else {
+                    themeOptions.style.display = 'none';
+                    themeToggle.innerHTML = '🎨 Theme ▶';
+                }
+            }
+        };
+
+        window.showUserLabHistory = function(userName, userEmail) {
+            const globalHistory = JSON.parse(localStorage.getItem('globalLabHistory') || '{}');
+            const userLabHistory = globalHistory[userEmail] || JSON.parse(localStorage.getItem(`labHistory_${userEmail}`)) || [];
+            
+            const content = document.getElementById('adminContent');
+            
+            content.innerHTML = `
+                <div style="margin-bottom: 1rem;">
+                    <button onclick="showAdminPanel()" style="background: var(--surface); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; color: var(--text); margin-bottom: 1rem;">
+                        ← Back to User List
+                    </button>
+                    <h3 style="margin: 0;">${userName}'s Lab History</h3>
+                    <p style="color: var(--text-secondary); margin: 0.5rem 0;">📧 ${userEmail}</p>
+                </div>
+                
+                ${userLabHistory.length === 0 ? `
+                    <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🚀</div>
+                        <p>No lab sessions found for this user.</p>
+                    </div>
+                ` : `
+                    <div style="margin-bottom: 1rem; color: var(--text-secondary);">
+                        <strong>Total Sessions: ${userLabHistory.length}</strong>
+                    </div>
+                    ${generateUserLabHistoryHTML(userLabHistory)}
+                `}
+            `;
+        };
 
         // API configuration
         const API_BASE = '/api';
@@ -1434,29 +1836,7 @@
             }
         };
 
-        // Theme management
-        function setTheme(theme) {
-            document.body.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-            
-            // Update active states in desktop menu
-            const themeOptions = document.querySelectorAll('.theme-option');
-            themeOptions.forEach(option => {
-                option.classList.remove('active');
-                if ((theme === 'light' && option.classList.contains('jedi')) || 
-                    (theme === 'dark' && option.classList.contains('sith'))) {
-                    option.classList.add('active');
-                }
-            });
-            
-            // Show notification
-            if (theme === 'light') {
-                notificationSystem.success('🌟 Light Jedi theme activated!');
-            } else {
-                notificationSystem.success('⚡ Dark Sith theme activated!');
-            }
-        }
-
+        // Theme management - keep the original functions
         function loadTheme() {
             const savedTheme = localStorage.getItem('theme') || 'dark';
             document.body.setAttribute('data-theme', savedTheme);
@@ -1762,54 +2142,38 @@
             }
         }
 
-        // Legacy form submission handlers (for compatibility)
-        async function handleSignIn(event) {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            await authSystem.login(formData);
-        }
+        // Legacy form submission handlers are now handled by window.handleSignIn and window.handleRegister above
 
-        async function handleRegister(event) {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            await authSystem.register(formData);
-        }
-
-        // Logout function
-        async function logout() {
-            await authSystem.logout();
-        }
-
-        // Modal management functions
-        function showModal(modalId) {
+        // Modal management functions - Ensure global scope
+        window.showModal = function(modalId) {
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.add('active');
             }
             closeMobileMenu();
-        }
+        };
 
-        function closeModal(modalId) {
+        window.closeModal = function(modalId) {
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.remove('active');
             }
-        }
+        };
 
-        function showSignInModal() {
+        window.showSignInModal = function() {
             showModal('signInModal');
-        }
+        };
 
-        function showRegisterModal() {
+        window.showRegisterModal = function() {
             showModal('registerModal');
-        }
+        };
 
-        function toggleUserMenu() {
+        window.toggleUserMenu = function() {
             const dropdown = document.getElementById('userMenuDropdown');
             if (dropdown) {
                 dropdown.classList.toggle('active');
             }
-        }
+        };
 
         // Progress management with fallback
         async function loadUserProgress() {
@@ -2049,26 +2413,6 @@
             }
         }
 
-        function toggleMobileThemeMenu(event) {
-            if (event) {
-                event.stopPropagation();
-                event.preventDefault();
-            }
-            
-            const themeOptions = document.getElementById('mobileThemeOptions');
-            const themeToggle = document.getElementById('mobileThemeToggle');
-            
-            if (themeOptions && themeToggle) {
-                if (themeOptions.style.display === 'none') {
-                    themeOptions.style.display = 'block';
-                    themeToggle.innerHTML = '🎨 Theme ▼';
-                } else {
-                    themeOptions.style.display = 'none';
-                    themeToggle.innerHTML = '🎨 Theme ▶';
-                }
-            }
-        }
-
         function closeMobileThemeMenu() {
             const existingSubmenu = document.getElementById('mobileThemeSubmenu');
             if (existingSubmenu) {
@@ -2076,158 +2420,7 @@
             }
         }
 
-        function goHome() {
-            if (appState.authenticated) {
-                return;
-            } else {
-                showWelcomeScreen();
-            }
-        }
-
-        // Lab environment functions
-        async function startLabEnvironment() {
-            try {
-                // Reset all progress when starting new lab
-                appState.progress = {};
-                saveProgressToLocal();
-                updateProgressDisplay();
-                
-                // Add a new lab session entry
-                const today = new Date().toISOString().split('T')[0];
-                const newSession = {
-                    session: appState.labHistory.length + 1,
-                    date: today,
-                    status: 'started',
-                    labId: `LAB${String(appState.labHistory.length + 1).padStart(3, '0')}`,
-                    startedAt: new Date().toISOString()
-                };
-                
-                // Check if already started today
-                const todaySession = appState.labHistory.find(session => 
-                    session.date === today && session.status === 'started'
-                );
-                
-                if (!todaySession) {
-                    appState.labHistory.push(newSession);
-                    saveLabHistoryToLocal();
-                    saveLabHistoryToGlobal(); // For cross-device persistence
-                }
-                
-                // Try to call the API if available
-                try {
-                    const response = await fetch(`${API_BASE}/lab/start`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${appState.sessionToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(newSession)
-                    });
-                    
-                    if (response.ok) {
-                        const result = await response.json();
-                        if (result.success) {
-                            notificationSystem.success('New lab started!');
-                            return;
-                        }
-                    }
-                } catch (apiError) {
-                    console.warn('Lab start API failed, continuing with local tracking:', apiError);
-                }
-                
-                // Fallback success message
-                notificationSystem.success('New lab started!');
-                
-            } catch (error) {
-                console.error('Failed to start lab:', error);
-                notificationSystem.error('Failed to start lab environment. Please try again.');
-            }
-        }
-
-        function showLabHistoryModal() {
-            const content = document.getElementById('labHistoryModalContent');
-            
-            if (appState.labHistory.length === 0) {
-                content.innerHTML = `
-                    <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">🚀</div>
-                        <p>No lab sessions yet!</p>
-                        <p style="margin-top: 0.5rem;">Click "Start New Lab" to begin your first training session.</p>
-                    </div>
-                `;
-            } else {
-                // Filter buttons
-                const filterButtons = `
-                    <div style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                        <button onclick="filterLabHistory('week')" class="lab-filter-btn" data-filter="week" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last Week</button>
-                        <button onclick="filterLabHistory('month')" class="lab-filter-btn" data-filter="month" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last 30 Days</button>
-                        <button onclick="filterLabHistory('quarter')" class="lab-filter-btn" data-filter="quarter" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last 3 Months</button>
-                        <button onclick="filterLabHistory('halfyear')" class="lab-filter-btn" data-filter="halfyear" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last 6 Months</button>
-                        <button onclick="filterLabHistory('year')" class="lab-filter-btn" data-filter="year" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last Year</button>
-                        <button onclick="filterLabHistory('lifetime')" class="lab-filter-btn active" data-filter="lifetime" style="padding: 0.5rem 1rem; border: 1px solid var(--primary); border-radius: 6px; background: var(--primary); color: white; cursor: pointer; font-size: 0.8rem;">Lifetime</button>
-                    </div>
-                `;
-                
-                content.innerHTML = filterButtons + `
-                    <div style="margin-bottom: 1rem; color: var(--text-secondary);">
-                        <strong>Total Sessions: <span id="filteredCount">${appState.labHistory.length}</span></strong>
-                    </div>
-                    <div id="labHistoryContent">
-                        ${generateLabHistoryHTML(appState.labHistory)}
-                    </div>
-                `;
-            }
-            
-            showModal('labHistoryModal');
-        }
-
-        function filterLabHistory(period) {
-            const now = new Date();
-            let filteredHistory = appState.labHistory;
-            
-            if (period !== 'lifetime') {
-                const cutoffDate = new Date();
-                switch(period) {
-                    case 'week':
-                        cutoffDate.setDate(now.getDate() - 7);
-                        break;
-                    case 'month':
-                        cutoffDate.setDate(now.getDate() - 30);
-                        break;
-                    case 'quarter':
-                        cutoffDate.setMonth(now.getMonth() - 3);
-                        break;
-                    case 'halfyear':
-                        cutoffDate.setMonth(now.getMonth() - 6);
-                        break;
-                    case 'year':
-                        cutoffDate.setFullYear(now.getFullYear() - 1);
-                        break;
-                }
-                
-                filteredHistory = appState.labHistory.filter(session => 
-                    new Date(session.date) >= cutoffDate
-                );
-            }
-            
-            // Update active button
-            document.querySelectorAll('.lab-filter-btn').forEach(btn => {
-                btn.style.background = 'var(--surface)';
-                btn.style.color = 'var(--text)';
-                btn.style.border = '1px solid var(--border)';
-            });
-            
-            const activeBtn = document.querySelector(`[data-filter="${period}"]`);
-            if (activeBtn) {
-                activeBtn.style.background = 'var(--primary)';
-                activeBtn.style.color = 'white';
-                activeBtn.style.border = '1px solid var(--primary)';
-            }
-            
-            // Update content
-            document.getElementById('filteredCount').textContent = filteredHistory.length;
-            document.getElementById('labHistoryContent').innerHTML = generateLabHistoryHTML(filteredHistory);
-        }
+        // Lab environment and other complex functions are now handled by window assignments above
 
         function generateLabHistoryHTML(history) {
             if (history.length === 0) {
@@ -2303,69 +2496,6 @@
             return { completedTasks, totalTasks };
         }
 
-        // Task detail functionality
-        function showTaskDetail(taskId) {
-            const taskDefinition = window.TASK_DEFINITIONS && window.TASK_DEFINITIONS[taskId];
-            
-            if (taskDefinition) {
-                document.getElementById('taskDetailTitle').textContent = taskDefinition.title;
-                
-                // Get or create task progress
-                if (!appState.progress[taskId]) {
-                    appState.progress[taskId] = {
-                        completed: false,
-                        subtasks: {},
-                        notes: ''
-                    };
-                }
-                
-                const taskProgress = appState.progress[taskId];
-                
-                // Create task detail content with notes section
-                const notesSection = `
-                    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
-                        <h4 style="margin-bottom: 1rem; color: var(--text);">📝 Your Notes</h4>
-                        <textarea 
-                            id="taskNotes_${taskId}" 
-                            placeholder="Add your notes, observations, or troubleshooting steps here..."
-                            style="width: 100%; min-height: 100px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--background); color: var(--text); font-family: inherit; resize: vertical;"
-                            onchange="saveTaskNotes('${taskId}')"
-                        >${taskProgress.notes || ''}</textarea>
-                        <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);">
-                            💡 Tip: Document any issues, solutions, or key learnings for future reference
-                        </div>
-                    </div>
-                `;
-                
-                document.getElementById('taskDetailContent').innerHTML = taskDefinition.description + notesSection;
-                
-                // Add event listeners for subtask checkboxes
-                setTimeout(() => {
-                    const subtaskCheckboxes = document.querySelectorAll('.subtask-checkbox');
-                    subtaskCheckboxes.forEach(checkbox => {
-                        const step = checkbox.getAttribute('data-step');
-                        
-                        // Set checkbox state from saved progress
-                        if (taskProgress.subtasks && taskProgress.subtasks[step]) {
-                            checkbox.checked = taskProgress.subtasks[step].completed;
-                            const subtaskItem = checkbox.closest('.subtask-item');
-                            if (checkbox.checked) {
-                                subtaskItem.classList.add('completed');
-                            }
-                        }
-                        
-                        checkbox.addEventListener('change', function() {
-                            handleSubtaskChange(taskId, step, this.checked);
-                        });
-                    });
-                }, 100);
-                
-                showModal('taskDetailModal');
-            } else {
-                notificationSystem.error('Task details not available');
-            }
-        }
-
         function handleSubtaskChange(taskId, step, isCompleted) {
             // Initialize subtasks if not exists
             if (!appState.progress[taskId].subtasks) {
@@ -2428,15 +2558,6 @@
             
             // Save progress
             saveProgressToLocal();
-        }
-
-        function saveTaskNotes(taskId) {
-            const notesTextarea = document.getElementById(`taskNotes_${taskId}`);
-            if (notesTextarea && appState.progress[taskId]) {
-                appState.progress[taskId].notes = notesTextarea.value;
-                saveProgressToLocal();
-                console.log('📝 Notes saved for task:', taskId);
-            }
         }
 
         // UI state management
@@ -2538,50 +2659,6 @@
             });
             
             return weeks;
-        }
-
-        function toggleWeekExpansion(weekNum) {
-            const weekCards = document.querySelectorAll('.week-card');
-            const targetCard = weekCards[weekNum - 1];
-            
-            if (targetCard) {
-                targetCard.classList.toggle('expanded');
-            }
-        }
-
-        async function toggleTaskCompletion(taskId) {
-            try {
-                // Initialize task progress if not exists
-                if (!appState.progress[taskId]) {
-                    appState.progress[taskId] = {
-                        completed: false,
-                        subtasks: {},
-                        notes: ''
-                    };
-                }
-                
-                const isCompleted = appState.progress[taskId].completed;
-                
-                // Update local state
-                appState.progress[taskId].completed = !isCompleted;
-                appState.progress[taskId].completedAt = !isCompleted ? new Date().toISOString() : null;
-                
-                // Save to local storage
-                saveProgressToLocal();
-                
-                // Update UI immediately
-                updateProgressDisplay();
-                
-                // Check if lab is now completed
-                checkLabCompletion();
-                
-                // TODO: Save to backend
-                // await saveTaskProgress(taskId, appState.progress[taskId]);
-                
-            } catch (error) {
-                console.error('Failed to toggle task completion:', error);
-                notificationSystem.error('Failed to save progress. Please try again.');
-            }
         }
 
         function getWeekProgress(weekNum) {
@@ -2863,6 +2940,32 @@
             console.error('Global error:', e.error, e.filename, e.lineno);
         });
 
+        // Close modals and menus when clicking outside
+        document.addEventListener('click', function(event) {
+            // Close modals when clicking outside
+            const modals = document.querySelectorAll('.modal.active');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+            
+            // Close user menu when clicking outside
+            const userMenu = document.getElementById('userMenu');
+            const dropdown = document.getElementById('userMenuDropdown');
+            if (userMenu && dropdown && !userMenu.contains(event.target) && dropdown.classList.contains('active')) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Error logging for debugging
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error, e.filename, e.lineno);
+        });
+
         window.addEventListener('unhandledrejection', function(e) {
             console.error('Unhandled promise rejection:', e.reason);
         });
+    </script>
+</body>
+</html>
