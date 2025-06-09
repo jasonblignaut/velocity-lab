@@ -1,8 +1,6 @@
 // functions/_middleware.js
 // Core middleware and utilities for Velocity Lab API
 
-import { createHash } from 'crypto';
-
 // CORS Headers for all API responses
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -139,7 +137,7 @@ export async function requireAdmin(request, env) {
   return session;
 }
 
-// Hash password using Web Crypto API
+// Hash password using Web Crypto API (Cloudflare compatible)
 export async function hashPassword(password) {
   const encoder = new TextEncoder();
   const data = encoder.encode(password + 'velocity_lab_salt_2025'); // Add salt
@@ -154,14 +152,14 @@ export async function verifyPassword(password, hash) {
   return passwordHash === hash;
 }
 
-// Generate secure session token
+// Generate secure session token using Web Crypto API
 export function generateSessionToken() {
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
   return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
-// Generate user ID
+// Generate user ID using Web Crypto API
 export function generateUserId() {
   const array = new Uint8Array(16);
   crypto.getRandomValues(array);
@@ -256,18 +254,6 @@ export async function createSession(env, userId, rememberMe = false) {
 export async function deleteSession(env, sessionToken) {
   const sessionKey = `session:${sessionToken}`;
   await env.VELOCITY_SESSIONS.delete(sessionKey);
-}
-
-// Get all user sessions (for cleanup)
-export async function getUserSessions(env, userId) {
-  try {
-    // List all sessions (this is expensive, so we'll use a prefix scan if needed)
-    // For now, we'll rely on TTL cleanup
-    return [];
-  } catch (error) {
-    console.error('Failed to get user sessions:', error);
-    return [];
-  }
 }
 
 // Update user last activity
