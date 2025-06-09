@@ -1462,13 +1462,23 @@
             document.body.setAttribute('data-theme', savedTheme);
         }
 
-        // Authentication system (matching old working code exactly)
+        // Authentication system (sending JSON with proper headers)
         const authSystem = {
             async login(formData) {
                 try {
+                    // Convert FormData to JSON object
+                    const loginData = {
+                        email: formData.get('email'),
+                        password: formData.get('password'),
+                        remember: formData.get('remember') === 'on'
+                    };
+                    
                     const { data } = await api.call('/api/users/login', {
                         method: 'POST',
-                        body: formData
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(loginData)
                     });
                     
                     const { name, role, email, sessionToken } = data;
@@ -1501,9 +1511,20 @@
             
             async register(formData) {
                 try {
+                    // Convert FormData to JSON object
+                    const registerData = {
+                        name: formData.get('name'),
+                        email: formData.get('email'),
+                        password: formData.get('password'),
+                        rememberMe: formData.get('remember') === 'on'  // ← Fixed: rememberMe instead of remember
+                    };
+                    
                     const { data } = await api.call('/api/users/register', {
                         method: 'POST',
-                        body: formData
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(registerData)
                     });
                     
                     const { name, email, role, sessionToken } = data;
