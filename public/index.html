@@ -373,7 +373,7 @@
             border-radius: 12px;
         }
 
-        /* Modal Styles */
+        /* Modern Apple-style Modal */
         .modal {
             display: none;
             position: fixed;
@@ -381,7 +381,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.8);
             z-index: 2000;
             padding: 2rem;
             overflow-y: auto;
@@ -393,26 +393,253 @@
             justify-content: center;
         }
 
+        /* Apple-style Modal Content */
         .modal-content {
-            background: var(--background);
-            border-radius: 16px;
-            padding: 2rem;
+            background: #1a1a1a;
+            border-radius: 20px;
+            padding: 0;
             width: 100%;
             max-width: 400px;
-            box-shadow: 0 20px 40px var(--shadow-heavy);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             position: relative;
-            animation: modalSlideIn 0.3s ease;
+            animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
         }
 
         .modal-content.large {
             max-width: 800px;
+            background: var(--background);
+        }
+
+        /* Apple-style signin has dark background */
+        .apple-modal {
+            background: #1a1a1a;
+            color: white;
         }
 
         @keyframes modalSlideIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+            from { 
+                transform: scale(0.8) translateY(60px); 
+                opacity: 0; 
+            }
+            to { 
+                transform: scale(1) translateY(0); 
+                opacity: 1; 
+            }
         }
 
+        /* Colorful dots pattern like Apple */
+        .dots-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: #1a1a1a;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dots-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            opacity: 0.8;
+        }
+
+        /* Create the circular pattern of dots */
+        .dot:nth-child(1) { background: #ff6b6b; transform: rotate(0deg) translateX(80px); }
+        .dot:nth-child(2) { background: #4ecdc4; transform: rotate(18deg) translateX(80px); }
+        .dot:nth-child(3) { background: #45b7d1; transform: rotate(36deg) translateX(80px); }
+        .dot:nth-child(4) { background: #96ceb4; transform: rotate(54deg) translateX(80px); }
+        .dot:nth-child(5) { background: #feca57; transform: rotate(72deg) translateX(80px); }
+        .dot:nth-child(6) { background: #ff9ff3; transform: rotate(90deg) translateX(80px); }
+        .dot:nth-child(7) { background: #54a0ff; transform: rotate(108deg) translateX(80px); }
+        .dot:nth-child(8) { background: #5f27cd; transform: rotate(126deg) translateX(80px); }
+        .dot:nth-child(9) { background: #00d2d3; transform: rotate(144deg) translateX(80px); }
+        .dot:nth-child(10) { background: #ff6348; transform: rotate(162deg) translateX(80px); }
+        .dot:nth-child(11) { background: #ff9757; transform: rotate(180deg) translateX(80px); }
+        .dot:nth-child(12) { background: #747d8c; transform: rotate(198deg) translateX(80px); }
+        .dot:nth-child(13) { background: #7bed9f; transform: rotate(216deg) translateX(80px); }
+        .dot:nth-child(14) { background: #70a1ff; transform: rotate(234deg) translateX(80px); }
+        .dot:nth-child(15) { background: #dda0dd; transform: rotate(252deg) translateX(80px); }
+        .dot:nth-child(16) { background: #ff7675; transform: rotate(270deg) translateX(80px); }
+        .dot:nth-child(17) { background: #fdcb6e; transform: rotate(288deg) translateX(80px); }
+        .dot:nth-child(18) { background: #6c5ce7; transform: rotate(306deg) translateX(80px); }
+        .dot:nth-child(19) { background: #a29bfe; transform: rotate(324deg) translateX(80px); }
+        .dot:nth-child(20) { background: #fd79a8; transform: rotate(342deg) translateX(80px); }
+
+        /* Velocity logo in the center */
+        .modal-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: url('/assets/Velocity-Logo.png') center/contain no-repeat;
+            filter: brightness(1.2);
+            z-index: 10;
+        }
+
+        /* Modal content area */
+        .modal-body {
+            padding: 140px 40px 40px;
+            text-align: center;
+        }
+
+        .apple-modal .modal-body {
+            color: white;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        .modal-subtitle {
+            color: #a1a1a6;
+            margin-bottom: 32px;
+            font-size: 17px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease;
+            z-index: 20;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Form Styles for Apple Modal */
+        .apple-form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .apple-form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #a1a1a6;
+            font-size: 15px;
+        }
+
+        .apple-form-input {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid #3a3a3c;
+            border-radius: 12px;
+            font-size: 17px;
+            background: #2c2c2e;
+            color: white;
+            transition: border-color 0.2s ease;
+        }
+
+        .apple-form-input:focus {
+            outline: none;
+            border-color: #0a84ff;
+            box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
+        }
+
+        .apple-form-input::placeholder {
+            color: #6d6d70;
+        }
+
+        /* Password field with arrow */
+        .password-field {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #a1a1a6;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+        }
+
+        .password-toggle:hover {
+            color: white;
+        }
+
+        .apple-checkbox-container {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .apple-checkbox {
+            width: 18px;
+            height: 18px;
+            margin-right: 12px;
+            accent-color: #0a84ff;
+        }
+
+        .apple-checkbox-label {
+            color: #a1a1a6;
+            font-size: 15px;
+        }
+
+        .apple-submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: #0a84ff;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 8px;
+        }
+
+        .apple-submit-btn:hover {
+            background: #0056b3;
+        }
+
+        .apple-submit-btn:disabled {
+            background: #3a3a3c;
+            cursor: not-allowed;
+        }
+
+        /* Non-Apple modals keep original styling */
         .modal-header {
             text-align: center;
             margin-bottom: 1.5rem;
@@ -421,23 +648,6 @@
         .modal-header h2 {
             font-size: 1.5rem;
             margin-bottom: 0.5rem;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-secondary);
-            padding: 4px;
-            border-radius: 6px;
-        }
-
-        .modal-close:hover {
-            background: var(--surface-hover);
         }
 
         /* Task Detail Modal */
@@ -913,8 +1123,12 @@
             }
 
             .modal-content {
-                padding: 1.5rem;
+                padding: 0;
                 margin: auto;
+            }
+
+            .modal-body {
+                padding: 120px 24px 32px;
             }
 
             .btn {
@@ -957,7 +1171,11 @@
             }
 
             .modal-content {
-                padding: 1rem;
+                border-radius: 16px;
+            }
+
+            .modal-body {
+                padding: 100px 20px 28px;
             }
         }
 
@@ -1056,7 +1274,7 @@
         <!-- Logo only (no text) -->
         <div class="logo" onclick="goHome()"></div>
         
-        <!-- Desktop Navigation -->
+        <!-- Desktop Navigation - Always shows both Sign In and Get Started -->
         <div class="header-buttons" id="headerButtons">
             <button class="btn btn-secondary" onclick="showSignInModal()">Sign In</button>
             <button class="btn btn-primary" onclick="showRegisterModal()">Get Started</button>
@@ -1105,7 +1323,7 @@
         </div>
     </div>
 
-    <!-- Welcome Screen -->
+    <!-- Welcome Screen - Only Sign In button -->
     <div class="welcome-screen" id="welcomeScreen">
         <div class="welcome-notification">
             👋 Welcome to Velocity Lab! Sign in to access your Exchange Hybrid training journey.
@@ -1119,11 +1337,8 @@
         </p>
         
         <div class="welcome-buttons">
-            <button class="btn btn-secondary btn-large" onclick="showSignInModal()">
+            <button class="btn btn-primary btn-large" onclick="showSignInModal()">
                 👤 Sign In
-            </button>
-            <button class="btn btn-primary btn-large" onclick="showRegisterModal()">
-                🚀 Get Started
             </button>
         </div>
     </div>
@@ -1156,71 +1371,132 @@
         </div>
     </div>
 
-    <!-- Sign In Modal -->
+    <!-- Apple-style Sign In Modal -->
     <div class="modal" id="signInModal">
-        <div class="modal-content">
+        <div class="modal-content apple-modal">
             <button class="modal-close" onclick="closeModal('signInModal')">&times;</button>
-            <div class="modal-header">
-                <h2>Sign In</h2>
-                <p style="color: var(--text-secondary);">Welcome back to your training journey</p>
+            
+            <!-- Colorful dots pattern -->
+            <div class="dots-pattern">
+                <div class="dots-container">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <div class="modal-logo"></div>
             </div>
-            <form id="signInForm">
-                <div class="form-group">
-                    <label class="form-label" for="signInEmail">Email</label>
-                    <input type="email" class="form-input" id="signInEmail" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="signInPassword">Password</label>
-                    <div style="position: relative;">
-                        <input type="password" class="form-input" id="signInPassword" name="password" required>
-                        <button type="button" onclick="togglePasswordVisibility('signInPassword')" 
-                                style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary); font-family: Arial, sans-serif;">
-                            &#128065;
-                        </button>
+            
+            <div class="modal-body">
+                <h2 class="modal-title">Sign in with Velocity Lab</h2>
+                <p class="modal-subtitle">Welcome back to your training journey</p>
+                
+                <form id="signInForm">
+                    <div class="apple-form-group">
+                        <label class="apple-form-label" for="signInEmail">Email or Phone Number</label>
+                        <input type="email" class="apple-form-input" id="signInEmail" name="email" 
+                               placeholder="asusautomation@icloud.com" required>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label style="display: flex; align-items: center;">
-                        <input type="checkbox" class="form-checkbox" name="remember">
-                        <span>Remember me for 30 days</span>
-                    </label>
-                </div>
-                <button type="submit" class="btn btn-primary form-submit">Sign In</button>
-                <div id="signInMessage"></div>
-            </form>
+                    
+                    <div class="apple-form-group">
+                        <label class="apple-form-label" for="signInPassword">Password</label>
+                        <div class="password-field">
+                            <input type="password" class="apple-form-input" id="signInPassword" name="password" required>
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('signInPassword')">
+                                →
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="apple-checkbox-container">
+                        <input type="checkbox" class="apple-checkbox" name="remember" id="rememberMe">
+                        <label class="apple-checkbox-label" for="rememberMe">Remember me for 30 days</label>
+                    </div>
+                    
+                    <button type="submit" class="apple-submit-btn">Sign In</button>
+                    <div id="signInMessage"></div>
+                </form>
+            </div>
         </div>
     </div>
 
-    <!-- Register Modal -->
+    <!-- Apple-style Register Modal -->
     <div class="modal" id="registerModal">
-        <div class="modal-content">
+        <div class="modal-content apple-modal">
             <button class="modal-close" onclick="closeModal('registerModal')">&times;</button>
-            <div class="modal-header">
-                <h2>Create Account</h2>
-                <p style="color: var(--text-secondary);">Start your Exchange Hybrid journey today</p>
+            
+            <!-- Colorful dots pattern -->
+            <div class="dots-pattern">
+                <div class="dots-container">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <div class="modal-logo"></div>
             </div>
-            <form id="registerForm">
-                <div class="form-group">
-                    <label class="form-label" for="registerName">Full Name</label>
-                    <input type="text" class="form-input" id="registerName" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="registerEmail">Email</label>
-                    <input type="email" class="form-input" id="registerEmail" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="registerPassword">Password</label>
-                    <div style="position: relative;">
-                        <input type="password" class="form-input" id="registerPassword" name="password" required>
-                        <button type="button" onclick="togglePasswordVisibility('registerPassword')" 
-                                style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary); font-family: Arial, sans-serif;">
-                            &#128065;
-                        </button>
+            
+            <div class="modal-body">
+                <h2 class="modal-title">Create Velocity Lab Account</h2>
+                <p class="modal-subtitle">Start your Exchange Hybrid journey today</p>
+                
+                <form id="registerForm">
+                    <div class="apple-form-group">
+                        <label class="apple-form-label" for="registerName">Full Name</label>
+                        <input type="text" class="apple-form-input" id="registerName" name="name" required>
                     </div>
-                </div>
-                <button type="submit" class="btn btn-primary form-submit">Create Account</button>
-                <div id="registerMessage"></div>
-            </form>
+                    
+                    <div class="apple-form-group">
+                        <label class="apple-form-label" for="registerEmail">Email</label>
+                        <input type="email" class="apple-form-input" id="registerEmail" name="email" required>
+                    </div>
+                    
+                    <div class="apple-form-group">
+                        <label class="apple-form-label" for="registerPassword">Password</label>
+                        <div class="password-field">
+                            <input type="password" class="apple-form-input" id="registerPassword" name="password" required>
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('registerPassword')">
+                                →
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="apple-submit-btn">Create Account</button>
+                    <div id="registerMessage"></div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -1284,7 +1560,7 @@
         // API configuration
         const API_BASE = '/api';
 
-        // Utility functions for cookies and DOM manipulation
+        // Utility functions for cookies and DOM manipulation - NO localStorage
         const utils = {
             cookies: {
                 set(name, value) {
@@ -1311,7 +1587,7 @@
             }
         };
 
-        // API call function - simplified for Cloudflare KV backend with debugging
+        // API call function - Cloudflare KV backend only, no localStorage fallback
         const api = {
             async call(url, options = {}) {
                 try {
@@ -1443,7 +1719,7 @@
             }
         };
 
-        // Authentication system - simplified for Cloudflare KV backend
+        // Authentication system - KV backend only
         const authSystem = {
             async login(formData) {
                 try {
@@ -1454,7 +1730,7 @@
                         throw new Error('Please fill in all required fields.');
                     }
 
-                    console.log('🔄 Attempting login with Cloudflare backend...');
+                    console.log('🔄 Attempting login with Cloudflare KV backend...');
                     
                     // Call Cloudflare KV backend directly
                     const { data } = await api.call('/api/users/login', {
@@ -1462,7 +1738,7 @@
                         body: formData  // Send FormData directly to match backend expectations
                     });
                     
-                    console.log('✅ Login successful with Cloudflare backend');
+                    console.log('✅ Login successful with Cloudflare KV backend');
                     
                     const { name, role, email: userEmail, sessionToken } = data;
                     
@@ -1507,7 +1783,7 @@
                         throw new Error('Password must be at least 8 characters long.');
                     }
 
-                    console.log('🔄 Attempting registration with Cloudflare backend...');
+                    console.log('🔄 Attempting registration with Cloudflare KV backend...');
                     
                     // Call Cloudflare KV backend directly
                     const { data } = await api.call('/api/users/register', {
@@ -1515,7 +1791,7 @@
                         body: formData  // Send FormData directly to match backend expectations
                     });
                     
-                    console.log('✅ Registration successful with Cloudflare backend');
+                    console.log('✅ Registration successful with Cloudflare KV backend');
                     
                     const { name: userName, email: userEmail, role, sessionToken } = data;
                     
@@ -1579,6 +1855,75 @@
                 if (adminBtn) adminBtn.style.display = 'none';
                 showWelcomeScreen();
                 notificationSystem.info('Signed out successfully');
+            }
+        };
+
+        // Theme management with KV backend sync
+        const themeSystem = {
+            async setTheme(theme) {
+                document.body.setAttribute('data-theme', theme);
+                
+                // Try to save to KV backend
+                try {
+                    if (appState.sessionToken) {
+                        await api.call('/api/user/preferences', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${appState.sessionToken}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ theme: theme })
+                        });
+                        console.log('✅ Theme preference saved to KV backend');
+                    }
+                } catch (error) {
+                    console.warn('Failed to save theme to backend, using client-side only:', error);
+                    // Fallback to cookie for persistence
+                    utils.cookies.set('theme', theme);
+                }
+                
+                // Update active states in desktop menu
+                const themeOptions = document.querySelectorAll('.theme-option');
+                themeOptions.forEach(option => {
+                    option.classList.remove('active');
+                    if ((theme === 'light' && option.classList.contains('jedi')) || 
+                        (theme === 'dark' && option.classList.contains('sith'))) {
+                        option.classList.add('active');
+                    }
+                });
+                
+                // Show notification
+                if (theme === 'light') {
+                    notificationSystem.success('🌟 Light Jedi theme activated!');
+                } else {
+                    notificationSystem.success('⚡ Dark Sith theme activated!');
+                }
+            },
+
+            async loadTheme() {
+                try {
+                    // Try to load from KV backend first
+                    if (appState.sessionToken) {
+                        const response = await api.call('/api/user/preferences', {
+                            headers: {
+                                'Authorization': `Bearer ${appState.sessionToken}`
+                            }
+                        });
+                        
+                        if (response.success && response.data.theme) {
+                            document.body.setAttribute('data-theme', response.data.theme);
+                            console.log('✅ Theme loaded from KV backend:', response.data.theme);
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Failed to load theme from backend, using default:', error);
+                }
+                
+                // Fallback to cookie
+                const savedTheme = utils.cookies.get('theme') || 'dark';
+                document.body.setAttribute('data-theme', savedTheme);
+                console.log('✅ Theme loaded from cookie:', savedTheme);
             }
         };
 
@@ -1687,146 +2032,123 @@
             return tasks;
         }
 
-        // Progress management with Cloudflare KV backend
+        // Progress management with KV backend only
         async function loadUserProgress() {
             try {
                 if (!appState.sessionToken) {
                     console.warn('No session token available');
-                    loadProgressFromLocal(); // Fallback to local for offline work
+                    appState.progress = {};
+                    updateProgressDisplay();
                     return;
                 }
 
                 console.log('🔄 Loading progress from Cloudflare KV...');
-                const response = await fetch(`${API_BASE}/user/progress`, {
+                const response = await api.call(`${API_BASE}/user/progress`, {
                     headers: {
                         'Authorization': `Bearer ${appState.sessionToken}`
                     }
                 });
                 
-                // Check if response is actually JSON before parsing
-                const contentType = response.headers.get('content-type');
-                if (!response.ok || !contentType || !contentType.includes('application/json')) {
-                    console.warn(`Progress API unavailable (${response.status}), using local storage`);
-                    loadProgressFromLocal();
-                    return;
-                }
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    appState.progress = result.data || {};
-                    saveProgressToLocal(); // Sync to local for offline work
+                if (response.success) {
+                    appState.progress = response.data || {};
                     console.log('✅ Progress loaded from Cloudflare KV');
                 } else {
-                    console.warn('API returned error, using local storage:', result.message);
-                    loadProgressFromLocal();
+                    console.warn('API returned error:', response.message);
+                    appState.progress = {};
                 }
             } catch (error) {
-                console.warn('Progress API unavailable, using local storage for offline work');
-                loadProgressFromLocal();
+                console.warn('Progress API unavailable:', error);
+                appState.progress = {};
             }
             
             updateProgressDisplay();
             checkLabCompletion();
         }
 
-        function loadProgressFromLocal() {
-            const localProgress = localStorage.getItem(`progress_${appState.user?.email}`);
-            if (localProgress) {
-                appState.progress = JSON.parse(localProgress);
-                console.log('✅ Progress loaded from local storage');
-            } else {
-                appState.progress = {};
-                console.log('🆕 Starting with empty progress');
-            }
-        }
-
-        function saveProgressToLocal() {
-            if (appState.user?.email) {
-                localStorage.setItem(`progress_${appState.user.email}`, JSON.stringify(appState.progress));
-                console.log('💾 Progress saved to local storage');
-            }
-        }
-
-        // Lab history management with Cloudflare KV backend
-        async function loadLabHistory() {
+        async function saveUserProgress(taskId, taskProgress) {
             try {
-                // Try to load from Cloudflare KV first
-                if (appState.sessionToken) {
-                    console.log('🔄 Loading lab history from Cloudflare KV...');
-                    const response = await fetch(`${API_BASE}/user/lab-history`, {
-                        headers: {
-                            'Authorization': `Bearer ${appState.sessionToken}`
-                        }
-                    });
-                    
-                    if (response.ok) {
-                        const contentType = response.headers.get('content-type');
-                        if (contentType && contentType.includes('application/json')) {
-                            const result = await response.json();
-                            if (result.success) {
-                                appState.labHistory = result.data || [];
-                                saveLabHistoryToLocal(); // Sync to local for offline work
-                                console.log('✅ Lab history loaded from Cloudflare KV');
-                                return;
-                            }
-                        }
-                    }
-                }
-                
-                // Try global storage first (cross-device persistence)
-                if (loadLabHistoryFromGlobal()) {
-                    console.log('✅ Lab history loaded from global storage');
+                if (!appState.sessionToken) {
+                    console.warn('No session token, cannot save progress');
                     return;
                 }
+
+                console.log(`🔄 Saving progress for task ${taskId} to Cloudflare KV...`);
+                const response = await api.call(`${API_BASE}/user/progress`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${appState.sessionToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        taskId: taskId,
+                        progress: taskProgress
+                    })
+                });
                 
-                // Fallback to local storage
-                const localHistory = localStorage.getItem(`labHistory_${appState.user?.email}`);
-                if (localHistory) {
-                    appState.labHistory = JSON.parse(localHistory);
-                    console.log('✅ Lab history loaded from local storage');
+                if (response.success) {
+                    console.log('✅ Progress saved to Cloudflare KV');
                 } else {
+                    console.warn('Failed to save progress:', response.message);
+                }
+            } catch (error) {
+                console.warn('Progress save failed:', error);
+            }
+        }
+
+        // Lab history management with KV backend only
+        async function loadLabHistory() {
+            try {
+                if (!appState.sessionToken) {
+                    console.warn('No session token available');
+                    appState.labHistory = [];
+                    return;
+                }
+
+                console.log('🔄 Loading lab history from Cloudflare KV...');
+                const response = await api.call(`${API_BASE}/user/lab-history`, {
+                    headers: {
+                        'Authorization': `Bearer ${appState.sessionToken}`
+                    }
+                });
+                
+                if (response.success) {
+                    appState.labHistory = response.data || [];
+                    console.log('✅ Lab history loaded from Cloudflare KV');
+                } else {
+                    console.warn('API returned error:', response.message);
                     appState.labHistory = [];
                 }
-                
             } catch (error) {
-                console.warn('Lab history API unavailable, using local storage for offline work');
-                // Try global first, then local
-                if (!loadLabHistoryFromGlobal()) {
-                    const localHistory = localStorage.getItem(`labHistory_${appState.user?.email}`);
-                    appState.labHistory = localHistory ? JSON.parse(localHistory) : [];
+                console.warn('Lab history API unavailable:', error);
+                appState.labHistory = [];
+            }
+        }
+
+        async function saveLabHistory(newSession) {
+            try {
+                if (!appState.sessionToken) {
+                    console.warn('No session token, cannot save lab history');
+                    return;
                 }
-                console.log('✅ Lab history loaded from local storage');
-            }
-        }
 
-        function saveLabHistoryToLocal() {
-            if (appState.user?.email) {
-                localStorage.setItem(`labHistory_${appState.user.email}`, JSON.stringify(appState.labHistory));
-            }
-        }
-
-        function saveLabHistoryToGlobal() {
-            // Save to global storage for cross-device persistence
-            if (appState.user?.email) {
-                const globalHistory = JSON.parse(localStorage.getItem('globalLabHistory') || '{}');
-                globalHistory[appState.user.email] = appState.labHistory;
-                localStorage.setItem('globalLabHistory', JSON.stringify(globalHistory));
-            }
-        }
-
-        function loadLabHistoryFromGlobal() {
-            // Load from global storage for cross-device access
-            if (appState.user?.email) {
-                const globalHistory = JSON.parse(localStorage.getItem('globalLabHistory') || '{}');
-                if (globalHistory[appState.user.email]) {
-                    appState.labHistory = globalHistory[appState.user.email];
-                    // Also save to user-specific storage
-                    saveLabHistoryToLocal();
-                    return true;
+                console.log('🔄 Saving lab history to Cloudflare KV...');
+                const response = await api.call(`${API_BASE}/user/lab-history`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${appState.sessionToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newSession)
+                });
+                
+                if (response.success) {
+                    console.log('✅ Lab history saved to Cloudflare KV');
+                } else {
+                    console.warn('Failed to save lab history:', response.message);
                 }
+            } catch (error) {
+                console.warn('Lab history save failed:', error);
             }
-            return false;
         }
 
         function checkLabCompletion() {
@@ -1851,8 +2173,7 @@
                     };
                     
                     appState.labHistory.push(completionEntry);
-                    saveLabHistoryToLocal();
-                    saveLabHistoryToGlobal(); // Save to global storage
+                    saveLabHistory(completionEntry);
                     
                     notificationSystem.success('🎉 Lab completed successfully!');
                 }
@@ -1877,17 +2198,20 @@
                     showDashboard();
                     loadUserProgress();
                     loadLabHistory();
+                    themeSystem.loadTheme();
                 } catch (error) {
                     console.error('Session validation failed:', error);
                     utils.cookies.delete('user');
                     utils.cookies.delete('session');
                     notificationSystem.clearShownNotifications();
                     showWelcomeScreen();
+                    themeSystem.loadTheme();
                 }
             } else {
                 console.log('No existing session found');
                 notificationSystem.clearShownNotifications();
                 showWelcomeScreen();
+                themeSystem.loadTheme();
             }
         }
 
@@ -1943,33 +2267,15 @@
             
             if (input.type === 'password') {
                 input.type = 'text';
-                button.innerHTML = '&#128064;'; // closed eye
+                button.innerHTML = '←'; // left arrow when showing
             } else {
                 input.type = 'password';
-                button.innerHTML = '&#128065;'; // open eye
+                button.innerHTML = '→'; // right arrow when hidden
             }
         };
 
         window.setTheme = function(theme) {
-            document.body.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-            
-            // Update active states in desktop menu
-            const themeOptions = document.querySelectorAll('.theme-option');
-            themeOptions.forEach(option => {
-                option.classList.remove('active');
-                if ((theme === 'light' && option.classList.contains('jedi')) || 
-                    (theme === 'dark' && option.classList.contains('sith'))) {
-                    option.classList.add('active');
-                }
-            });
-            
-            // Show notification
-            if (theme === 'light') {
-                notificationSystem.success('🌟 Light Jedi theme activated!');
-            } else {
-                notificationSystem.success('⚡ Dark Sith theme activated!');
-            }
+            themeSystem.setTheme(theme);
         };
 
         window.logout = async function() {
@@ -1998,7 +2304,6 @@
             try {
                 // Reset all progress when starting new lab
                 appState.progress = {};
-                saveProgressToLocal();
                 updateProgressDisplay();
                 
                 // Add a new lab session entry
@@ -2018,35 +2323,9 @@
                 
                 if (!todaySession) {
                     appState.labHistory.push(newSession);
-                    saveLabHistoryToLocal();
-                    saveLabHistoryToGlobal(); // For cross-device persistence
+                    await saveLabHistory(newSession);
                 }
                 
-                // Try to call the Cloudflare KV API if available
-                try {
-                    console.log('🔄 Starting lab session in Cloudflare KV...');
-                    const response = await fetch(`${API_BASE}/lab/start`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${appState.sessionToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(newSession)
-                    });
-                    
-                    if (response.ok) {
-                        const result = await response.json();
-                        if (result.success) {
-                            console.log('✅ Lab session started in Cloudflare KV');
-                            notificationSystem.success('New lab started!');
-                            return;
-                        }
-                    }
-                } catch (apiError) {
-                    console.warn('Lab start API failed, continuing with local tracking:', apiError);
-                }
-                
-                // Fallback success message
                 notificationSystem.success('New lab started!');
                 
             } catch (error) {
@@ -2101,28 +2380,18 @@
                 }
 
                 console.log('🔄 Loading admin data from Cloudflare KV...');
-                const response = await fetch(`${API_BASE}/admin/users-progress`, {
+                const response = await api.call(`${API_BASE}/admin/users-progress`, {
                     headers: {
                         'Authorization': `Bearer ${appState.sessionToken}`,
                         'Content-Type': 'application/json'
                     }
                 });
                 
-                // Check if response is actually JSON before parsing
-                const contentType = response.headers.get('content-type');
-                if (!response.ok || !contentType || !contentType.includes('application/json')) {
-                    console.warn(`Admin API unavailable (${response.status}), showing fallback`);
-                    showAdminPanelFallback();
-                    return;
-                }
-                
-                const result = await response.json();
-                
-                if (result.success) {
+                if (response.success) {
                     console.log('✅ Admin data loaded from Cloudflare KV');
-                    displayAdminPanel(result.data);
+                    displayAdminPanel(response.data);
                 } else {
-                    notificationSystem.error(`Failed to load admin data: ${result.message}`);
+                    notificationSystem.error(`Failed to load admin data: ${response.message}`);
                 }
             } catch (error) {
                 console.error('Failed to load admin data:', error);
@@ -2247,35 +2516,8 @@
             if (notesTextarea && appState.progress[taskId]) {
                 appState.progress[taskId].notes = notesTextarea.value;
                 appState.progress[taskId].lastUpdated = new Date().toISOString();
-                saveProgressToLocal();
+                saveUserProgress(taskId, appState.progress[taskId]);
                 console.log('📝 Notes saved for task:', taskId);
-                
-                // Try to sync to Cloudflare KV backend
-                (async () => {
-                    try {
-                        console.log(`🔄 Syncing task notes ${taskId} to Cloudflare KV...`);
-                        const response = await fetch(`${API_BASE}/user/progress`, {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `Bearer ${appState.sessionToken}`,
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                taskId: taskId,
-                                progress: appState.progress[taskId]
-                            })
-                        });
-                        
-                        if (response.ok) {
-                            const result = await response.json();
-                            if (result.success) {
-                                console.log('✅ Task notes synced to Cloudflare KV');
-                            }
-                        }
-                    } catch (syncError) {
-                        console.warn('Notes sync failed, continuing with local storage:', syncError);
-                    }
-                })();
             }
         };
 
@@ -2297,39 +2539,14 @@
                 appState.progress[taskId].completedAt = !isCompleted ? new Date().toISOString() : null;
                 appState.progress[taskId].lastUpdated = new Date().toISOString();
                 
-                // Save to local storage for offline work
-                saveProgressToLocal();
+                // Save to KV backend
+                await saveUserProgress(taskId, appState.progress[taskId]);
                 
                 // Update UI immediately
                 updateProgressDisplay();
                 
                 // Check if lab is now completed
                 checkLabCompletion();
-                
-                // Try to sync to Cloudflare KV backend
-                try {
-                    console.log(`🔄 Syncing task ${taskId} to Cloudflare KV...`);
-                    const response = await fetch(`${API_BASE}/user/progress`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${appState.sessionToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            taskId: taskId,
-                            progress: appState.progress[taskId]
-                        })
-                    });
-                    
-                    if (response.ok) {
-                        const result = await response.json();
-                        if (result.success) {
-                            console.log('✅ Task progress synced to Cloudflare KV');
-                        }
-                    }
-                } catch (syncError) {
-                    console.warn('Progress sync failed, continuing with local storage:', syncError);
-                }
                 
             } catch (error) {
                 console.error('Failed to toggle task completion:', error);
@@ -2367,39 +2584,9 @@
         };
 
         window.showUserLabHistory = function(userName, userEmail) {
-            const globalHistory = JSON.parse(localStorage.getItem('globalLabHistory') || '{}');
-            const userLabHistory = globalHistory[userEmail] || JSON.parse(localStorage.getItem(`labHistory_${userEmail}`)) || [];
-            
-            const content = document.getElementById('adminContent');
-            
-            content.innerHTML = `
-                <div style="margin-bottom: 1rem;">
-                    <button onclick="showAdminPanel()" style="background: var(--surface); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; color: var(--text); margin-bottom: 1rem;">
-                        ← Back to User List
-                    </button>
-                    <h3 style="margin: 0;">${userName}'s Lab History</h3>
-                    <p style="color: var(--text-secondary); margin: 0.5rem 0;">📧 ${userEmail}</p>
-                </div>
-                
-                ${userLabHistory.length === 0 ? `
-                    <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">🚀</div>
-                        <p>No lab sessions found for this user.</p>
-                    </div>
-                ` : `
-                    <div style="margin-bottom: 1rem; color: var(--text-secondary);">
-                        <strong>Total Sessions: ${userLabHistory.length}</strong>
-                    </div>
-                    ${generateUserLabHistoryHTML(userLabHistory)}
-                `}
-            `;
+            // This would need KV backend implementation for cross-user access
+            notificationSystem.info('User lab history requires backend implementation');
         };
-
-        // Theme management - keep the original functions
-        function loadTheme() {
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            document.body.setAttribute('data-theme', savedTheme);
-        }
 
         // Mobile menu functionality
         function setupMobileMenuHandlers() {
@@ -2411,16 +2598,6 @@
                     closeMobileMenu();
                 }
             });
-        }
-
-        function toggleMobileMenu() {
-            const hamburger = document.getElementById('hamburger');
-            const mobileMenu = document.getElementById('mobileMenu');
-            
-            hamburger.classList.toggle('active');
-            mobileMenu.classList.toggle('active');
-            
-            updateMobileMenuItems();
         }
 
         function closeMobileMenu() {
@@ -2612,8 +2789,8 @@
                 updateProgressDisplay();
             }
             
-            // Save progress
-            saveProgressToLocal();
+            // Save progress to KV backend
+            saveUserProgress(taskId, appState.progress[taskId]);
         }
 
         // UI state management
@@ -2628,7 +2805,7 @@
         function showDashboard() {
             document.getElementById('welcomeScreen').classList.add('hidden');
             document.getElementById('mainContent').classList.remove('hidden');
-            document.getElementById('headerButtons').classList.add('hidden');
+            document.getElementById('headerButtons').classList.remove('hidden'); // Keep both buttons in header
             document.getElementById('userMenu').classList.remove('hidden');
             
             // Update user info
@@ -2767,26 +2944,10 @@
             if (users.length === 0) {
                 content.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No users found.</p>';
             } else {
-                // Calculate lab counts for each user using global storage
-                const globalHistory = JSON.parse(localStorage.getItem('globalLabHistory') || '{}');
-                const usersWithLabData = users.map(user => {
-                    const labHistory = globalHistory[user.email] || JSON.parse(localStorage.getItem(`labHistory_${user.email}`)) || [];
-                    const completedLabs = labHistory.filter(lab => lab.status === 'completed').length;
-                    const totalSessions = labHistory.length;
-                    
-                    return {
-                        ...user,
-                        completedLabs,
-                        totalSessions,
-                        labHistory,
-                        lastLabDate: labHistory.length > 0 ? labHistory[labHistory.length - 1].date : null
-                    };
-                });
-                
-                // Sort by completed labs first, then by progress percentage
-                usersWithLabData.sort((a, b) => {
-                    if (a.completedLabs !== b.completedLabs) {
-                        return b.completedLabs - a.completedLabs; // More completed labs first
+                // Sort by completed tasks and progress percentage
+                users.sort((a, b) => {
+                    if (a.completedTasks !== b.completedTasks) {
+                        return b.completedTasks - a.completedTasks; // More completed tasks first
                     }
                     return b.progressPercentage - a.progressPercentage; // Higher percentage first
                 });
@@ -2794,15 +2955,14 @@
                 content.innerHTML = `
                     <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
                         <strong>Leaderboard - ${users.length} Users</strong>
-                        <small style="color: var(--text-secondary);">📊 Sorted by Labs Completed & Progress</small>
+                        <small style="color: var(--text-secondary);">📊 Sorted by Progress</small>
                     </div>
-                    ${usersWithLabData.map((user, index) => {
+                    ${users.map((user, index) => {
                         const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
                         return `
                             <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                    <span style="font-weight: 600; cursor: pointer; color: var(--primary); text-decoration: underline;" 
-                                          onclick="showUserLabHistory('${user.name}', '${user.email}')">${medal} ${user.name}</span>
+                                    <span style="font-weight: 600;">${medal} ${user.name}</span>
                                     <span style="color: var(--success); font-weight: 600;">${user.progressPercentage}%</span>
                                 </div>
                                 <div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
@@ -2817,20 +2977,14 @@
                                         <div style="font-size: 0.75rem; color: var(--text-secondary);">Tasks Done</div>
                                     </div>
                                     <div style="text-align: center; background: var(--bg-secondary); padding: 0.5rem; border-radius: 6px;">
-                                        <div style="font-weight: 600; color: var(--success);">${user.completedLabs}</div>
+                                        <div style="font-weight: 600; color: var(--success);">${user.completedLabs || 0}</div>
                                         <div style="font-size: 0.75rem; color: var(--text-secondary);">Labs Completed</div>
                                     </div>
                                 </div>
                                 <div style="color: var(--text-secondary); font-size: 0.8rem; display: flex; justify-content: space-between;">
                                     <span>${user.hasNotes ? '📝 Has notes' : 'No notes'}</span>
-                                    <span>Sessions: ${user.totalSessions}</span>
                                     <span>Last: ${user.lastActive ? new Date(user.lastActive).toLocaleDateString() : 'Never'}</span>
                                 </div>
-                                ${user.lastLabDate ? `
-                                    <div style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 0.25rem;">
-                                        🔬 Last lab: ${new Date(user.lastLabDate).toLocaleDateString()}
-                                    </div>
-                                ` : ''}
                             </div>
                         `;
                     }).join('')}
@@ -2838,66 +2992,6 @@
             }
             
             showModal('adminModal');
-        }
-
-        function generateUserLabHistoryHTML(history) {
-            // Sort history with newest first, but in-progress labs at the very top
-            const sortedHistory = [...history].sort((a, b) => {
-                // In-progress labs go to top
-                if (a.status === 'started' && b.status !== 'started') return -1;
-                if (b.status === 'started' && a.status !== 'started') return 1;
-                
-                // Otherwise sort by date (newest first)
-                return new Date(b.date) - new Date(a.date);
-            });
-            
-            // Number completed labs sequentially (Lab 1, Lab 2, etc.)
-            const completedLabs = history.filter(lab => lab.status === 'completed')
-                .sort((a, b) => new Date(a.date) - new Date(b.date)); // Oldest first for numbering
-            
-            let labNumberMap = {};
-            completedLabs.forEach((lab, index) => {
-                labNumberMap[lab.labId] = index + 1;
-            });
-            
-            return sortedHistory.map(session => {
-                const isInProgress = session.status === 'started';
-                const statusIcon = session.status === 'completed' ? '✅' : '🚀';
-                const statusText = session.status === 'completed' ? 'Completed' : 'In Progress';
-                const statusColor = session.status === 'completed' ? 'var(--success)' : 'var(--primary)';
-                
-                // Lab title
-                let labTitle;
-                if (isInProgress) {
-                    labTitle = `${statusIcon} Current Lab`;
-                } else {
-                    const labNumber = labNumberMap[session.labId];
-                    labTitle = `${statusIcon} Lab ${labNumber}`;
-                }
-                
-                return `
-                    <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                            <span style="font-weight: 600;">${labTitle}</span>
-                            <span style="color: ${statusColor}; font-weight: 600;">${statusText}</span>
-                        </div>
-                        <div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
-                            Lab ID: ${session.labId} • ${new Date(session.date).toLocaleDateString()}
-                        </div>
-                        ${session.tasksCompleted ? 
-                            `<div style="color: var(--success); font-size: 0.8rem;">Tasks: ${session.tasksCompleted}/${session.totalTasks}</div>` : 
-                            isInProgress ?
-                            '<div style="color: var(--primary); font-size: 0.8rem;">Tasks: In Progress</div>' :
-                            '<div style="color: var(--success); font-size: 0.8rem;">Tasks: 42/42</div>'
-                        }
-                        ${session.completedAt ? 
-                            `<div style="color: var(--text-secondary); font-size: 0.75rem;">Completed: ${new Date(session.completedAt).toLocaleString()}</div>` : 
-                            session.startedAt ? 
-                            `<div style="color: var(--text-secondary); font-size: 0.75rem;">Started: ${new Date(session.startedAt).toLocaleString()}</div>` : ''
-                        }
-                    </div>
-                `;
-            }).join('');
         }
 
         // Modal management functions - Ensure global scope
@@ -2934,7 +3028,6 @@
         // Initialize application
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, checking session...');
-            loadTheme();
             loadTaskDefinitions();
             checkExistingSession();
             setupMobileMenuHandlers();
