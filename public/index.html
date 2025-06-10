@@ -428,8 +428,8 @@
             }
         }
 
-        /* Colorful dots pattern like Apple */
-        .dots-pattern {
+        /* Clean header with logo */
+        .modal-header-clean {
             position: absolute;
             top: 0;
             left: 0;
@@ -442,53 +442,12 @@
             justify-content: center;
         }
 
-        .dots-container {
-            position: relative;
-            width: 200px;
-            height: 200px;
-        }
-
-        .dot {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            opacity: 0.8;
-        }
-
-        /* Create the circular pattern of dots */
-        .dot:nth-child(1) { background: #ff6b6b; transform: rotate(0deg) translateX(80px); }
-        .dot:nth-child(2) { background: #4ecdc4; transform: rotate(18deg) translateX(80px); }
-        .dot:nth-child(3) { background: #45b7d1; transform: rotate(36deg) translateX(80px); }
-        .dot:nth-child(4) { background: #96ceb4; transform: rotate(54deg) translateX(80px); }
-        .dot:nth-child(5) { background: #feca57; transform: rotate(72deg) translateX(80px); }
-        .dot:nth-child(6) { background: #ff9ff3; transform: rotate(90deg) translateX(80px); }
-        .dot:nth-child(7) { background: #54a0ff; transform: rotate(108deg) translateX(80px); }
-        .dot:nth-child(8) { background: #5f27cd; transform: rotate(126deg) translateX(80px); }
-        .dot:nth-child(9) { background: #00d2d3; transform: rotate(144deg) translateX(80px); }
-        .dot:nth-child(10) { background: #ff6348; transform: rotate(162deg) translateX(80px); }
-        .dot:nth-child(11) { background: #ff9757; transform: rotate(180deg) translateX(80px); }
-        .dot:nth-child(12) { background: #747d8c; transform: rotate(198deg) translateX(80px); }
-        .dot:nth-child(13) { background: #7bed9f; transform: rotate(216deg) translateX(80px); }
-        .dot:nth-child(14) { background: #70a1ff; transform: rotate(234deg) translateX(80px); }
-        .dot:nth-child(15) { background: #dda0dd; transform: rotate(252deg) translateX(80px); }
-        .dot:nth-child(16) { background: #ff7675; transform: rotate(270deg) translateX(80px); }
-        .dot:nth-child(17) { background: #fdcb6e; transform: rotate(288deg) translateX(80px); }
-        .dot:nth-child(18) { background: #6c5ce7; transform: rotate(306deg) translateX(80px); }
-        .dot:nth-child(19) { background: #a29bfe; transform: rotate(324deg) translateX(80px); }
-        .dot:nth-child(20) { background: #fd79a8; transform: rotate(342deg) translateX(80px); }
-
-        /* Velocity logo in the center */
+        /* Velocity logo in the center - bigger */
         .modal-logo {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
+            width: 80px;
+            height: 80px;
             background: url('/assets/Velocity-Logo.png') center/contain no-repeat;
             filter: brightness(1.2);
-            z-index: 10;
         }
 
         /* Modal content area */
@@ -571,7 +530,7 @@
             color: #6d6d70;
         }
 
-        /* Password field with arrow */
+        /* Password field with styled arrow button */
         .password-field {
             position: relative;
         }
@@ -581,21 +540,33 @@
             right: 16px;
             top: 50%;
             transform: translateY(-50%);
-            background: none;
+            background: #0a84ff;
             border: none;
-            color: #a1a1a6;
+            color: white;
             cursor: pointer;
-            font-size: 16px;
-            padding: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
         }
 
         .password-toggle:hover {
-            color: white;
+            background: #0056b3;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .password-toggle.sign-in-mode {
+            background: #34c759;
+        }
+
+        .password-toggle.sign-in-mode:hover {
+            background: #28a745;
         }
 
         .apple-checkbox-container {
@@ -614,29 +585,6 @@
         .apple-checkbox-label {
             color: #a1a1a6;
             font-size: 15px;
-        }
-
-        .apple-submit-btn {
-            width: 100%;
-            padding: 16px;
-            background: #0a84ff;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            margin-top: 8px;
-        }
-
-        .apple-submit-btn:hover {
-            background: #0056b3;
-        }
-
-        .apple-submit-btn:disabled {
-            background: #3a3a3c;
-            cursor: not-allowed;
         }
 
         /* Non-Apple modals keep original styling */
@@ -1376,30 +1324,8 @@
         <div class="modal-content apple-modal">
             <button class="modal-close" onclick="closeModal('signInModal')">&times;</button>
             
-            <!-- Colorful dots pattern -->
-            <div class="dots-pattern">
-                <div class="dots-container">
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                </div>
+            <!-- Clean header with logo -->
+            <div class="modal-header-clean">
                 <div class="modal-logo"></div>
             </div>
             
@@ -1411,14 +1337,14 @@
                     <div class="apple-form-group">
                         <label class="apple-form-label" for="signInEmail">Email or Phone Number</label>
                         <input type="email" class="apple-form-input" id="signInEmail" name="email" 
-                               placeholder="asusautomation@icloud.com" required>
+                               placeholder="Email or Username" required>
                     </div>
                     
                     <div class="apple-form-group">
                         <label class="apple-form-label" for="signInPassword">Password</label>
                         <div class="password-field">
                             <input type="password" class="apple-form-input" id="signInPassword" name="password" required>
-                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('signInPassword')">
+                            <button type="submit" class="password-toggle sign-in-mode" title="Sign In">
                                 →
                             </button>
                         </div>
@@ -1429,7 +1355,6 @@
                         <label class="apple-checkbox-label" for="rememberMe">Remember me for 30 days</label>
                     </div>
                     
-                    <button type="submit" class="apple-submit-btn">Sign In</button>
                     <div id="signInMessage"></div>
                 </form>
             </div>
@@ -1441,30 +1366,8 @@
         <div class="modal-content apple-modal">
             <button class="modal-close" onclick="closeModal('registerModal')">&times;</button>
             
-            <!-- Colorful dots pattern -->
-            <div class="dots-pattern">
-                <div class="dots-container">
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                </div>
+            <!-- Clean header with logo -->
+            <div class="modal-header-clean">
                 <div class="modal-logo"></div>
             </div>
             
@@ -1487,13 +1390,12 @@
                         <label class="apple-form-label" for="registerPassword">Password</label>
                         <div class="password-field">
                             <input type="password" class="apple-form-input" id="registerPassword" name="password" required>
-                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('registerPassword')">
+                            <button type="submit" class="password-toggle sign-in-mode" title="Create Account">
                                 →
                             </button>
                         </div>
                     </div>
                     
-                    <button type="submit" class="apple-submit-btn">Create Account</button>
                     <div id="registerMessage"></div>
                 </form>
             </div>
@@ -2805,8 +2707,8 @@
         function showDashboard() {
             document.getElementById('welcomeScreen').classList.add('hidden');
             document.getElementById('mainContent').classList.remove('hidden');
-            document.getElementById('headerButtons').classList.remove('hidden'); // Keep both buttons in header
-            document.getElementById('userMenu').classList.remove('hidden');
+            document.getElementById('headerButtons').classList.add('hidden'); // Hide Sign In/Get Started buttons
+            document.getElementById('userMenu').classList.remove('hidden'); // Show user menu
             
             // Update user info
             const userNameEl = document.getElementById('userName');
