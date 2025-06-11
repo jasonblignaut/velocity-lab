@@ -9,6 +9,7 @@
     <meta name="application-name" content="Velocity Lab">
     <meta name="apple-mobile-web-app-title" content="Velocity Lab">
     <meta name="description" content="Comprehensive Exchange Hybrid training with 42 hands-on tasks across 4 weeks">
+    <meta name="theme-color" content="#00a8ff">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
@@ -57,19 +58,32 @@
             --bg-secondary: #f0f0f5;
         }
 
-        /* ADDITIONAL MOBILE OVERRIDE - Force hide on ALL mobile devices */
-        @media (max-width: 768px), (max-device-width: 768px), (orientation: portrait) {
-            .header-buttons,
-            #headerButtons,
-            .header .header-buttons,
-            .header-buttons .btn,
-            #headerButtons .btn,
-            .header .header-buttons .btn,
-            .btn-secondary,
-            .btn-primary,
-            .user-menu,
-            #userMenu,
-            .header .user-menu {
+        /* ULTIMATE MOBILE OVERRIDE - Nuclear option with maximum specificity */
+        @media screen and (max-width: 768px), 
+               screen and (max-device-width: 768px), 
+               (orientation: portrait),
+               (pointer: coarse) and (hover: none) {
+            /* Target ALL possible button selectors with maximum specificity */
+            html body .header .header-buttons,
+            html body #header #headerButtons,
+            html body .header-buttons,
+            html body #headerButtons,
+            html body .header .btn,
+            html body .header .btn-primary,
+            html body .header .btn-secondary,
+            html body .btn-primary:not(.welcome-buttons .btn-primary),
+            html body .btn-secondary:not(.welcome-buttons .btn-secondary),
+            html body .header > .btn,
+            html body .header > div > .btn,
+            html body .header .user-menu,
+            html body #userMenu,
+            html body .header #userMenu,
+            html body .user-menu-toggle,
+            html body .user-menu-dropdown,
+            /* Target any button that might appear in header */
+            html body .header button:not(.hamburger):not(#hamburger),
+            html body .header a.btn,
+            html body .header div:not(.logo):not(.hamburger) {
                 display: none !important;
                 visibility: hidden !important;
                 opacity: 0 !important;
@@ -78,31 +92,60 @@
                 top: -99999px !important;
                 width: 0 !important;
                 height: 0 !important;
+                max-width: 0 !important;
+                max-height: 0 !important;
                 overflow: hidden !important;
                 pointer-events: none !important;
                 z-index: -9999 !important;
+                clip: rect(0,0,0,0) !important;
+                border: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
             }
             
-            /* Ensure only hamburger and logo are visible on mobile */
-            .header > * {
+            /* Ensure only hamburger and logo are visible */
+            html body .header {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                padding: 0 1rem !important;
+            }
+            
+            html body .header > * {
                 display: none !important;
             }
             
-            .header .logo,
-            .header .hamburger,
-            .header #hamburger {
+            html body .header .logo,
+            html body .header .hamburger,
+            html body .header #hamburger {
                 display: flex !important;
+                position: absolute !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                width: auto !important;
+                height: auto !important;
+                left: auto !important;
+                top: auto !important;
+                z-index: 10 !important;
+                pointer-events: all !important;
+            }
+            
+            html body .header .logo {
+                left: 50% !important;
+                transform: translateX(-50%) !important;
                 position: absolute !important;
             }
             
-            .header .logo {
-                left: 50% !important;
-                transform: translateX(-50%) !important;
+            html body .header .hamburger,
+            html body .header #hamburger {
+                right: 1rem !important;
+                position: absolute !important;
             }
             
-            .header .hamburger,
-            .header #hamburger {
-                right: 1rem !important;
+            /* Ensure header doesn't have weird gaps */
+            html body .header::before,
+            html body .header::after {
+                display: none !important;
             }
         }
 
@@ -1134,14 +1177,6 @@
                 height: 100px;
             }
 
-            /* Simple mobile hide - backup to DOM removal */
-            .header-buttons,
-            #headerButtons,
-            .user-menu,
-            #userMenu {
-                display: none !important;
-            }
-
             .hamburger {
                 display: flex;
                 position: absolute;
@@ -1305,31 +1340,6 @@
             .logo {
                 width: 90px;
                 height: 90px;
-            }
-
-            /* SUPER AGGRESSIVE HIDE on smallest screens */
-            .header-buttons,
-            #headerButtons,
-            .header .header-buttons,
-            .header-buttons *,
-            #headerButtons *,
-            .user-menu,
-            #userMenu,
-            .header .user-menu,
-            .user-menu *,
-            #userMenu *,
-            .header .user-menu * {
-                display: none !important;
-                visibility: hidden !important;
-                opacity: 0 !important;
-                position: fixed !important;
-                left: -99999px !important;
-                top: -99999px !important;
-                width: 0 !important;
-                height: 0 !important;
-                overflow: hidden !important;
-                pointer-events: none !important;
-                z-index: -9999 !important;
             }
 
             .welcome-title {
@@ -3144,20 +3154,8 @@
             if (headerButtons) headerButtons.classList.remove('hidden');
             if (userMenu) userMenu.classList.add('hidden');
             
-            // FORCE HIDE header buttons on mobile regardless of state (mobile uses welcome screen buttons)
-            if (window.innerWidth <= 768) {
-                if (headerButtons) {
-                    headerButtons.style.display = 'none';
-                }
-                if (userMenu) {
-                    userMenu.style.display = 'none';
-                }
-            } else {
-                // Desktop - show header buttons normally
-                if (headerButtons) {
-                    headerButtons.style.display = '';
-                }
-            }
+            // Force re-apply mobile hiding rules
+            enforceHeaderButtonsHiding();
             
             closeMobileMenu();
             updateMobileMenuItems(); // Update mobile menu for unauthenticated state
@@ -3174,15 +3172,8 @@
             if (headerButtons) headerButtons.classList.add('hidden'); // Hide Sign In/Get Started buttons
             if (userMenu) userMenu.classList.remove('hidden'); // Show user menu (desktop only due to CSS)
             
-            // FORCE HIDE header buttons on mobile regardless of state
-            if (window.innerWidth <= 768) {
-                if (headerButtons) {
-                    headerButtons.style.display = 'none';
-                }
-                if (userMenu) {
-                    userMenu.style.display = 'none';
-                }
-            }
+            // Force re-apply mobile hiding rules
+            enforceHeaderButtonsHiding();
             
             // Update user info
             const userNameEl = document.getElementById('userName');
@@ -3200,6 +3191,34 @@
             updateProgressDisplay();
             closeMobileMenu();
             updateMobileMenuItems(); // Ensure mobile menu shows authenticated state
+        }
+
+        // NEW FUNCTION: Aggressively enforce header button hiding on mobile
+        function enforceHeaderButtonsHiding() {
+            // Check if we're on mobile
+            if (window.innerWidth <= 768 || window.matchMedia("(max-width: 768px)").matches || 
+                ('ontouchstart' in window) || (navigator.maxTouchPoints > 0)) {
+                
+                // Target all possible header button elements
+                const selectors = [
+                    '#headerButtons',
+                    '.header-buttons',
+                    '#userMenu',
+                    '.user-menu',
+                    '.header .btn',
+                    '.header button:not(.hamburger):not(#hamburger)',
+                    '.header > div:not(.logo):not(.hamburger)'
+                ];
+                
+                selectors.forEach(selector => {
+                    const elements = document.querySelectorAll(selector);
+                    elements.forEach(el => {
+                        if (el && !el.classList.contains('logo') && !el.classList.contains('hamburger') && el.id !== 'hamburger') {
+                            el.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; position: fixed !important; left: -99999px !important; top: -99999px !important; width: 0 !important; height: 0 !important; pointer-events: none !important;';
+                        }
+                    });
+                });
+            }
         }
 
         function generateWeekCards() {
@@ -3461,34 +3480,34 @@
             }
         };
 
-        // Mobile button removal function
-        function removeMobileHeaderButtons() {
-            if (window.innerWidth <= 768) {
-                const headerButtons = document.getElementById('headerButtons');
-                const userMenu = document.getElementById('userMenu');
-                
-                if (headerButtons) {
-                    headerButtons.remove();
-                    console.log('🗑️ Removed header buttons on mobile');
-                }
-                if (userMenu && !appState.authenticated) {
-                    userMenu.remove();
-                    console.log('🗑️ Removed user menu on mobile');
-                }
-            }
-        }
-
         // Initialize application
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, checking session...');
-            
-            // FIRST THING: Remove mobile buttons immediately
-            removeMobileHeaderButtons();
-            
             loadTaskDefinitions();
             checkExistingSession();
             setupMobileMenuHandlers();
             setupFormHandlers();
+            
+            // Enforce header button hiding on initial load
+            enforceHeaderButtonsHiding();
+            
+            // Add resize listener to enforce hiding when viewport changes
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    enforceHeaderButtonsHiding();
+                }, 250);
+            });
+            
+            // Add scroll listener to ensure buttons stay hidden during scroll
+            let scrollTimer;
+            window.addEventListener('scroll', function() {
+                clearTimeout(scrollTimer);
+                scrollTimer = setTimeout(function() {
+                    enforceHeaderButtonsHiding();
+                }, 100);
+            });
             
             // Handle PWA shortcut actions
             const urlParams = new URLSearchParams(window.location.search);
@@ -3517,19 +3536,6 @@
                         console.log('ℹ️ PWA Service Worker not available (optional):', error.message);
                     });
             }
-        });
-
-        // Handle window resize and device rotation
-        window.addEventListener('resize', function() {
-            // Remove buttons if we're now in mobile view
-            removeMobileHeaderButtons();
-        });
-
-        // Also check on orientation change for mobile devices
-        window.addEventListener('orientationchange', function() {
-            setTimeout(() => {
-                removeMobileHeaderButtons();
-            }, 100);
         });
 
         // Close modals and menus when clicking outside
