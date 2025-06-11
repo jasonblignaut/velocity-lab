@@ -68,24 +68,6 @@ export async function onRequestPost(context) {
             }
         }
         
-        const today = new Date().toISOString().split('T')[0];
-        
-        // Check if there's already a lab started today
-        const todayStartedLab = labHistory.find(session => 
-            session.date === today && session.status === 'started'
-        );
-        
-        if (todayStartedLab) {
-            console.log('⚠️ Lab session already started today');
-            return new Response(JSON.stringify({
-                success: false,
-                message: 'You already have a lab session started today.'
-            }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-        
         // Get current user progress to check if current lab is completed
         const currentProgressRaw = await env.VELOCITY_PROGRESS.get(`progress:${sessionData.userId}`);
         let currentProgress = {};
@@ -103,21 +85,37 @@ export async function onRequestPost(context) {
         const totalTasks = 42;
         const isCurrentLabCompleted = completedTasks === totalTasks;
         
-        // Mark current lab as completed if all tasks are done
+        console.log(`📊 Current progress: ${completedTasks}/${totalTasks} tasks completed`);
+        
+        // Find the current active lab (status = 'started')
+        const currentActiveLab = labHistory.find(lab => lab.status === 'started');
+        
+        // If there's an active lab and it's completed, mark it as completed
         let previousLabCompleted = false;
-        if (labHistory.length > 0 && isCurrentLabCompleted) {
-            const currentLab = labHistory.find(lab => lab.status === 'started');
-            if (currentLab) {
-                currentLab.status = 'completed';
-                currentLab.completedAt = new Date().toISOString();
-                currentLab.tasksCompleted = completedTasks;
-                currentLab.totalTasks = totalTasks;
-                previousLabCompleted = true;
-                console.log('✅ Previous lab marked as completed');
-            }
+        if (currentActiveLab && isCurrentLabCompleted) {
+            console.log('✅ Marking current lab as completed');
+            currentActiveLab.status = 'completed';
+            currentActiveLab.completedAt = new Date().toISOString();
+            currentActiveLab.tasksCompleted = completedTasks;
+            currentActiveLab.totalTasks = totalTasks;
+            previousLabCompleted = true;
+        }
+        
+        // If there's still an active lab that's not completed, don't allow starting a new one
+        const stillActiveLab = labHistory.find(lab => lab.status === 'started');
+        if (stillActiveLab && !isCurrentLabCompleted) {
+            console.log('⚠️ Active lab found that is not completed');
+            return new Response(JSON.stringify({
+                success: false,
+                message: 'Please complete your current lab before starting a new one.'
+            }), {
+                status: 400,
+                headers: { 'Content-Type': 'application/json' }
+            });
         }
         
         // Create new lab session
+        const today = new Date().toISOString().split('T')[0];
         const newLabSession = {
             session: labHistory.length + 1,
             date: today,
@@ -131,6 +129,7 @@ export async function onRequestPost(context) {
         
         // Add new session to history
         labHistory.push(newLabSession);
+        console.log('✅ Adding new lab session:', newLabSession.labId);
         
         // Reset user progress when starting new lab
         console.log('🔄 Resetting user progress for new lab...');

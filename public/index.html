@@ -1585,7 +1585,7 @@
         // API configuration
         const API_BASE = '/api';
 
-        // Utility functions for cookies and DOM manipulation - NO localStorage
+        // Utility functions for cookies and DOM manipulation - NO localStorage for auth
         const utils = {
             cookies: {
                 set(name, value) {
@@ -1612,7 +1612,7 @@
             }
         };
 
-        // API call function - with localStorage fallback when backend unavailable
+        // API call function - ONLY KV backend for auth, localStorage fallback only for progress data
         const api = {
             async call(url, options = {}) {
                 try {
@@ -1645,7 +1645,7 @@
                     if (!contentType || !contentType.includes('application/json')) {
                         // If we get HTML response, it means backend isn't deployed
                         if (contentType && contentType.includes('text/html')) {
-                            console.warn('⚠️ Backend API not deployed, using localStorage fallback');
+                            console.warn('⚠️ Backend API not deployed');
                             throw new Error('BACKEND_NOT_AVAILABLE');
                         }
                         
@@ -1750,7 +1750,7 @@
             }
         };
 
-        // Authentication system - KV backend with localStorage fallback
+        // Authentication system - KV backend ONLY (NO DEMO MODE)
         const authSystem = {
             async login(formData) {
                 const submitBtn = document.querySelector('#signInForm .password-toggle');
@@ -1770,77 +1770,45 @@
 
                     console.log('🔄 Attempting login with backend APIs...');
                     
-                    try {
-                        // Call Cloudflare KV backend directly
-                        const { data } = await api.call('/api/users/login', {
-                            method: 'POST',
-                            body: formData  // Send FormData directly to match backend expectations
-                        });
-                        
-                        console.log('✅ Login successful with backend APIs');
-                        
-                        const { name, role, email: userEmail, sessionToken } = data;
-                        
-                        utils.cookies.set('user', JSON.stringify({ name, role, email: userEmail }));
-                        utils.cookies.set('session', sessionToken);
-                        
-                        appState.user = { name, role, email: userEmail };
-                        appState.sessionToken = sessionToken;
-                        appState.authenticated = true;
-                        
-                        if (role === 'admin') {
-                            const adminBtn = document.getElementById('adminButton');
-                            if (adminBtn) adminBtn.style.display = 'block';
-                        }
-                        
-                        showDashboard();
-                        await loadUserProgress();
-                        await loadLabHistory();
-                        closeModal('signInModal');
-                        
-                        // Show welcome notification only if not already shown
-                        if (!appState.isWelcomeShown) {
-                            notificationSystem.success(`Welcome back, ${name}! 🎉`);
-                        }
-                        
-                    } catch (apiError) {
-                        if (apiError.message === 'BACKEND_NOT_AVAILABLE') {
-                            console.log('📁 Backend not available, using demo mode');
-                            
-                            // Demo mode - allow any login with admin role for emails containing 'admin'
-                            const name = email.split('@')[0] || 'Demo User';
-                            const role = email.toLowerCase().includes('admin') ? 'admin' : 'user';
-                            const demoSessionToken = 'demo_' + Math.random().toString(36).substr(2, 9);
-                            
-                            utils.cookies.set('user', JSON.stringify({ name, role, email }));
-                            utils.cookies.set('session', demoSessionToken);
-                            
-                            appState.user = { name, role, email };
-                            appState.sessionToken = demoSessionToken;
-                            appState.authenticated = true;
-                            
-                            if (role === 'admin') {
-                                const adminBtn = document.getElementById('adminButton');
-                                if (adminBtn) adminBtn.style.display = 'block';
-                            }
-                            
-                            showDashboard();
-                            await loadUserProgress();
-                            await loadLabHistory();
-                            closeModal('signInModal');
-                            
-                            // Show welcome notification
-                            if (!appState.isWelcomeShown) {
-                                notificationSystem.success(`Welcome ${name}! (Demo Mode) 🎉`);
-                            }
-                        } else {
-                            throw apiError;
-                        }
+                    // Call Cloudflare KV backend directly - NO DEMO MODE
+                    const { data } = await api.call('/api/users/login', {
+                        method: 'POST',
+                        body: formData  // Send FormData directly to match backend expectations
+                    });
+                    
+                    console.log('✅ Login successful with backend APIs');
+                    
+                    const { name, role, email: userEmail, sessionToken } = data;
+                    
+                    utils.cookies.set('user', JSON.stringify({ name, role, email: userEmail }));
+                    utils.cookies.set('session', sessionToken);
+                    
+                    appState.user = { name, role, email: userEmail };
+                    appState.sessionToken = sessionToken;
+                    appState.authenticated = true;
+                    
+                    if (role === 'admin') {
+                        const adminBtn = document.getElementById('adminButton');
+                        if (adminBtn) adminBtn.style.display = 'block';
+                    }
+                    
+                    showDashboard();
+                    await loadUserProgress();
+                    await loadLabHistory();
+                    closeModal('signInModal');
+                    
+                    // Show welcome notification only if not already shown
+                    if (!appState.isWelcomeShown) {
+                        notificationSystem.success(`Welcome back, ${name}! 🎉`);
                     }
                     
                 } catch (err) {
                     console.error('❌ Login failed:', err);
-                    notificationSystem.error(err.message || 'Login failed. Please check your credentials.');
+                    if (err.message === 'BACKEND_NOT_AVAILABLE') {
+                        notificationSystem.error('Backend service not available. Please ensure the API functions are deployed.');
+                    } else {
+                        notificationSystem.error(err.message || 'Login failed. Please check your credentials.');
+                    }
                 } finally {
                     // Remove loading spinner
                     if (submitBtn) {
@@ -1872,78 +1840,47 @@
 
                     console.log('🔄 Attempting registration with backend APIs...');
                     
-                    try {
-                        // Call Cloudflare KV backend directly
-                        const { data } = await api.call('/api/users/register', {
-                            method: 'POST',
-                            body: formData  // Send FormData directly to match backend expectations
-                        });
-                        
-                        console.log('✅ Registration successful with backend APIs');
-                        
-                        const { name: userName, email: userEmail, role, sessionToken } = data;
-                        
-                        // Note: Backend ensures new users get role 'user', not 'admin'
-                        utils.cookies.set('user', JSON.stringify({ name: userName, email: userEmail, role }));
-                        utils.cookies.set('session', sessionToken);
-                        
-                        appState.user = { name: userName, email: userEmail, role };
-                        appState.sessionToken = sessionToken;
-                        appState.authenticated = true;
-                        
-                        // Only show admin button if user is admin (should not happen for new registrations)
-                        if (role === 'admin') {
-                            const adminBtn = document.getElementById('adminButton');
-                            if (adminBtn) adminBtn.style.display = 'block';
-                        }
-                        
-                        showDashboard();
-                        await loadUserProgress();
-                        await loadLabHistory();
-                        closeModal('registerModal');
-                        
-                        // Show welcome notification only if not already shown
-                        if (!appState.isWelcomeShown) {
-                            notificationSystem.success(`Welcome to Velocity Lab, ${userName}! 🚀`);
-                        }
-                        
-                    } catch (apiError) {
-                        if (apiError.message === 'BACKEND_NOT_AVAILABLE') {
-                            console.log('📁 Backend APIs not deployed, using demo mode');
-                            
-                            // Demo mode - allow any registration with admin role for emails containing 'admin'
-                            const role = email.toLowerCase().includes('admin') ? 'admin' : 'user';
-                            const demoSessionToken = 'demo_' + Math.random().toString(36).substr(2, 9);
-                            
-                            utils.cookies.set('user', JSON.stringify({ name, email, role }));
-                            utils.cookies.set('session', demoSessionToken);
-                            
-                            appState.user = { name, email, role };
-                            appState.sessionToken = demoSessionToken;
-                            appState.authenticated = true;
-                            
-                            if (role === 'admin') {
-                                const adminBtn = document.getElementById('adminButton');
-                                if (adminBtn) adminBtn.style.display = 'block';
-                            }
-                            
-                            showDashboard();
-                            await loadUserProgress();
-                            await loadLabHistory();
-                            closeModal('registerModal');
-                            
-                            // Show welcome notification
-                            if (!appState.isWelcomeShown) {
-                                notificationSystem.success(`Welcome to Velocity Lab, ${name}! (Demo Mode) 🚀`);
-                            }
-                        } else {
-                            throw apiError;
-                        }
+                    // Call Cloudflare KV backend directly - NO DEMO MODE
+                    const { data } = await api.call('/api/users/register', {
+                        method: 'POST',
+                        body: formData  // Send FormData directly to match backend expectations
+                    });
+                    
+                    console.log('✅ Registration successful with backend APIs');
+                    
+                    const { name: userName, email: userEmail, role, sessionToken } = data;
+                    
+                    // Note: Backend ensures new users get role 'user', not 'admin'
+                    utils.cookies.set('user', JSON.stringify({ name: userName, email: userEmail, role }));
+                    utils.cookies.set('session', sessionToken);
+                    
+                    appState.user = { name: userName, email: userEmail, role };
+                    appState.sessionToken = sessionToken;
+                    appState.authenticated = true;
+                    
+                    // Only show admin button if user is admin (should not happen for new registrations)
+                    if (role === 'admin') {
+                        const adminBtn = document.getElementById('adminButton');
+                        if (adminBtn) adminBtn.style.display = 'block';
+                    }
+                    
+                    showDashboard();
+                    await loadUserProgress();
+                    await loadLabHistory();
+                    closeModal('registerModal');
+                    
+                    // Show welcome notification only if not already shown
+                    if (!appState.isWelcomeShown) {
+                        notificationSystem.success(`Welcome to Velocity Lab, ${userName}! 🚀`);
                     }
                     
                 } catch (err) {
                     console.error('❌ Registration failed:', err);
-                    notificationSystem.error(err.message || 'Registration failed. Please try again.');
+                    if (err.message === 'BACKEND_NOT_AVAILABLE') {
+                        notificationSystem.error('Backend service not available. Please ensure the API functions are deployed.');
+                    } else {
+                        notificationSystem.error(err.message || 'Registration failed. Please try again.');
+                    }
                 } finally {
                     // Remove loading spinner
                     if (submitBtn) {
@@ -1954,7 +1891,7 @@
             
             async logout() {
                 try {
-                    if (appState.sessionToken && !appState.sessionToken.startsWith('demo_')) {
+                    if (appState.sessionToken) {
                         await api.call('/api/users/logout', { 
                             method: 'POST',
                             headers: {
@@ -1997,7 +1934,7 @@
                 
                 // Try to save to KV backend
                 try {
-                    if (appState.sessionToken && !appState.sessionToken.startsWith('demo_')) {
+                    if (appState.sessionToken) {
                         await api.call('/api/user/preferences', {
                             method: 'POST',
                             headers: {
@@ -2042,7 +1979,7 @@
             async loadTheme() {
                 try {
                     // Try to load from KV backend first
-                    if (appState.sessionToken && !appState.sessionToken.startsWith('demo_')) {
+                    if (appState.sessionToken) {
                         const response = await api.call('/api/user/preferences', {
                             headers: {
                                 'Authorization': `Bearer ${appState.sessionToken}`
@@ -2544,111 +2481,41 @@
 
         window.startLabEnvironment = async function() {
             try {
-                // Check if backend is available
-                let backendAvailable = false;
-                if (appState.sessionToken && !appState.sessionToken.startsWith('demo_')) {
-                    try {
-                        console.log('🔄 Starting new lab environment...');
-                        
-                        // Send empty object since backend expects JSON but doesn't need specific data
-                        const response = await api.call('/api/lab/start', {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `Bearer ${appState.sessionToken}`,
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({}) // Send empty JSON object
-                        });
-                        
-                        if (response.success) {
-                            console.log('✅ Lab started successfully with backend');
-                            backendAvailable = true;
-                            
-                            // Reset progress and reload
-                            appState.progress = {};
-                            updateProgressDisplay();
-                            await loadLabHistory();
-                            
-                            if (response.data.previousLabCompleted) {
-                                notificationSystem.success(`🎉 Previous lab completed! New ${response.data.labId} started!`);
-                            } else {
-                                notificationSystem.success(`🚀 New lab ${response.data.labId} started!`);
-                            }
-                            return;
-                        }
-                    } catch (error) {
-                        if (error.message !== 'BACKEND_NOT_AVAILABLE') {
-                            throw error;
-                        }
-                    }
-                }
+                console.log('🔄 Starting new lab environment...');
                 
-                // Fallback to localStorage logic
-                if (!backendAvailable) {
-                    console.log('📁 Using localStorage fallback for lab management');
+                // Call backend API - ONLY KV backend, no localStorage fallback for this function
+                const response = await api.call('/api/lab/start', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${appState.sessionToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({}) // Send empty JSON object
+                });
+                
+                if (response.success) {
+                    console.log('✅ Lab started successfully with backend');
                     
-                    // Get current progress to check completion
-                    const totalTasks = 42;
-                    const completedTasks = Object.values(appState.progress).filter(task => task?.completed).length;
-                    const isCurrentLabCompleted = completedTasks === totalTasks;
-                    
-                    const today = new Date().toISOString().split('T')[0];
-                    
-                    // Check for existing in-progress lab today
-                    const todayInProgressLab = appState.labHistory.find(lab => 
-                        lab.date === today && lab.status === 'started'
-                    );
-                    
-                    if (todayInProgressLab) {
-                        notificationSystem.info('Lab already started today');
-                        return;
-                    }
-                    
-                    // Mark current lab as completed if all tasks are done
-                    let previousLabCompleted = false;
-                    if (appState.labHistory.length > 0 && isCurrentLabCompleted) {
-                        const currentLab = appState.labHistory.find(lab => lab.status === 'started');
-                        if (currentLab) {
-                            currentLab.status = 'completed';
-                            currentLab.completedAt = new Date().toISOString();
-                            currentLab.tasksCompleted = completedTasks;
-                            currentLab.totalTasks = totalTasks;
-                            previousLabCompleted = true;
-                        }
-                    }
-                    
-                    // Create new lab session
-                    const newSession = {
-                        session: appState.labHistory.length + 1,
-                        date: today,
-                        status: 'started',
-                        labId: `LAB${String(appState.labHistory.length + 1).padStart(3, '0')}`,
-                        startedAt: new Date().toISOString(),
-                        completedAt: null,
-                        tasksCompleted: 0,
-                        totalTasks: totalTasks
-                    };
-                    
-                    // Add new session and reset progress
-                    appState.labHistory.push(newSession);
+                    // Reset progress and reload
                     appState.progress = {};
-                    
-                    // Save to localStorage
-                    localStorage.setItem('velocity_lab_history', JSON.stringify(appState.labHistory));
-                    localStorage.setItem('velocity_progress', JSON.stringify({}));
-                    
                     updateProgressDisplay();
+                    await loadLabHistory();
                     
-                    if (previousLabCompleted) {
-                        notificationSystem.success(`🎉 Previous lab completed! New ${newSession.labId} started!`);
+                    if (response.data.previousLabCompleted) {
+                        notificationSystem.success(`🎉 Previous lab completed! New ${response.data.labId} started!`);
                     } else {
-                        notificationSystem.success(`🚀 New lab ${newSession.labId} started!`);
+                        notificationSystem.success(`🚀 New lab ${response.data.labId} started!`);
                     }
                 }
                 
             } catch (error) {
                 console.error('Failed to start lab:', error);
-                notificationSystem.error('Failed to start lab environment. Please try again.');
+                
+                if (error.message === 'BACKEND_NOT_AVAILABLE') {
+                    notificationSystem.error('Backend API not available. Please deploy the functions first.');
+                } else {
+                    notificationSystem.error('Failed to start lab environment. Please try again.');
+                }
             }
         };
 
@@ -2715,8 +2582,8 @@
                 console.error('Failed to load admin data:', error);
                 
                 if (error.message === 'BACKEND_NOT_AVAILABLE') {
-                    console.log('📁 Backend APIs not deployed, showing local admin fallback');
-                    showAdminPanelFallback('Backend APIs not deployed yet. Please deploy the Functions to enable full admin features.');
+                    console.log('📁 Backend APIs not deployed, showing fallback');
+                    showAdminPanelFallback('Backend APIs not deployed yet. Please deploy the Functions to enable admin features.');
                 } else {
                     console.log('⚠️ Admin panel API unavailable, showing fallback');
                     showAdminPanelFallback('Admin panel temporarily unavailable. Please try again later.');
@@ -3279,7 +3146,7 @@
                         </div>
                     </div>
                     <div style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
-                        Current mode: <strong>Demo mode with localStorage fallback</strong>
+                        Current mode: <strong>KV Backend Required</strong>
                     </div>
                 </div>
             `;
