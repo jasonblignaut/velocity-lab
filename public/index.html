@@ -94,7 +94,6 @@
             justify-content: space-between;
             padding: 0 2rem;
             transition: all 0.3s ease;
-            overflow: hidden;
         }
 
         [data-theme="dark"] .header {
@@ -476,7 +475,6 @@
 
         .apple-modal .modal-body {
             color: white;
-            padding-top: 70px;
         }
 
         .modal-title {
@@ -1403,11 +1401,10 @@
             👋 Welcome to Velocity Lab! Sign in to access your Exchange Hybrid training journey.
         </div>
         
-        <h1 class="welcome-title">Master Exchange Hybrid</h1>
+        <h1 class="welcome-title">Exchange Hybrid</h1>
         <p class="welcome-subtitle">
-            Embark on a comprehensive 4-week journey with 42 hands-on tasks to build
-            a complete Exchange Hybrid lab environment, from Domain Controllers to
-            Microsoft 365 integration.
+            Comprehensive 4 week journey with 42 tasks to build
+            a complete Exchange Hybrid lab environment
         </p>
         
         <div class="welcome-buttons">
@@ -1801,7 +1798,7 @@
                     
                     // Show welcome notification only if not already shown
                     if (!appState.isWelcomeShown) {
-                        notificationSystem.success(`Welcome back, ${name}!`);
+                        notificationSystem.success(`Welcome back, ${name}! 🎉`);
                     }
                     
                 } catch (err) {
@@ -1873,7 +1870,7 @@
                     
                     // Show welcome notification only if not already shown
                     if (!appState.isWelcomeShown) {
-                        notificationSystem.success(`Welcome to Velocity Lab, ${userName}!`);
+                        notificationSystem.success(`Welcome to Velocity Lab, ${userName}! 🚀`);
                     }
                     
                 } catch (err) {
@@ -2835,7 +2832,7 @@
             } else {
                 mobileMenuItems.innerHTML = `
                     <button class="mobile-menu-item secondary" onclick="showSignInModal(); closeMobileMenu();">👤 Sign In</button>
-                    <button class="mobile-menu-item primary" onclick="showRegisterModal(); closeMobileMenu();">🚀 Get Started</button>
+                    <button class="mobile-menu-item primary" onclick="showRegisterModal(); closeMobileMenu();">Get Started</button>
                 `;
             }
         }
