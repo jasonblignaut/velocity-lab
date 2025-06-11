@@ -7,14 +7,17 @@ exports.handler = async (event, context, { VELOCITY_SESSIONS, VELOCITY_LABS }) =
     'Content-Type': 'application/json'
   };
 
+  console.log(`[Lab Start] Request received: ${event.httpMethod} ${event.path}`);
+
   // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
+    console.log('[Lab Start] Handling OPTIONS preflight');
     return { statusCode: 200, headers, body: '' };
   }
 
   // Only allow POST
   if (event.httpMethod !== 'POST') {
-    console.log('Method not allowed:', event.httpMethod);
+    console.log(`[Lab Start] Invalid method: ${event.httpMethod}`);
     return {
       statusCode: 405,
       headers,
@@ -29,6 +32,7 @@ exports.handler = async (event, context, { VELOCITY_SESSIONS, VELOCITY_LABS }) =
     // Extract and validate authorization token
     const authHeader = event.headers.authorization || event.headers.Authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('[Lab Start] Missing or invalid authorization header');
       return {
         statusCode: 401,
         headers,
@@ -39,9 +43,25 @@ exports.handler = async (event, context, { VELOCITY_SESSIONS, VELOCITY_LABS }) =
       };
     }
 
-    const sessionToken = authHeader.replace('Bearer ', '');
+    const sessionToken = authHeader.replace('Bearer /', '');
+    console.log(`[Lab Start] Session token: ${sessionToken}`);
+
+    // Check KV binding
+    if (!VELOCITY_SESSIONS) {
+      console.error('[Lab Start] VELOCITY_SESSIONS KV binding missing');
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'Server configuration error'
+        })
+      };
+    }
+
     const sessionData = await VELOCITY_SESSIONS.get(`session:${sessionToken}`, { type: 'json' });
     if (!sessionData) {
+      console.log(`[Lab Start] Invalid session token: ${sessionToken}`);
       return {
         statusCode: 401,
         headers,
@@ -51,11 +71,13 @@ exports.handler = async (event, context, { VELOCITY_SESSIONS, VELOCITY_LABS }) =
         })
       };
     }
+    console.log(`[Lab Start] Session data: ${JSON.stringify(sessionData)}`);
 
     // Parse request body
     const body = JSON.parse(event.body || '{}');
     const { labId, config } = body;
     if (!labId) {
+      console.log('[Lab Start] Missing labId in request body');
       return {
         statusCode: 400,
         headers,
@@ -67,6 +89,18 @@ exports.handler = async (event, context, { VELOCITY_SESSIONS, VELOCITY_LABS }) =
     }
 
     // Store lab session in KV
+    if (!VELOCITY_LABS) {
+      console.error('[Lab Start] VELOCITY_LABS KV binding missing');
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'Server configuration error'
+        })
+      };
+    }
+
     const labSession = {
       labId,
       userEmail: sessionData.email,
@@ -75,8 +109,10 @@ exports.handler = async (event, context, { VELOCITY_SESSIONS, VELOCITY_LABS }) =
       status: 'running'
     };
     const labKey = `lab:${sessionToken}:${labId}:${Date.now()}`;
+    console.log(`[Lab Start] Saving lab session: ${labKey}`);
     await VELOCITY_LABS.put(labKey, JSON.stringify(labSession));
 
+    console.log(`[Lab Start] Lab started successfully for labId: ${labId}`);
     return {
       statusCode: 200,
       headers,
@@ -87,7 +123,7 @@ exports.handler = async (event, context, { VELOCITY_SESSIONS, VELOCITY_LABS }) =
       })
     };
   } catch (error) {
-    console.error('Lab start error:', error);
+    console.error(`[Lab Start] Error: ${error.message}`, error.stack);
     return {
       statusCode: 500,
       headers,
