@@ -1,12 +1,12 @@
 // /functions/api/lab/start.js
 // Cloudflare Pages Function for starting new lab sessions
-// Handles POST (start new lab session)
+// Handles lab creation and completion detection
 
 export async function onRequestPost(context) {
     const { request, env } = context;
     
     try {
-        console.log('🚀 Starting new lab session...');
+        console.log('🚀 Lab start request received');
         
         // Get Authorization header
         const authHeader = request.headers.get('Authorization');
@@ -17,13 +17,18 @@ export async function onRequestPost(context) {
                 message: 'Authentication required.'
             }), {
                 status: 401,
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                }
             });
         }
         
         const sessionToken = authHeader.substring(7); // Remove 'Bearer ' prefix
         
-        // Validate session and get user ID
+        // Validate session with KV
         const sessionDataRaw = await env.VELOCITY_SESSIONS.get(`session:${sessionToken}`);
         if (!sessionDataRaw) {
             console.log('❌ Invalid session token');
@@ -32,7 +37,12 @@ export async function onRequestPost(context) {
                 message: 'Session expired or invalid.'
             }), {
                 status: 401,
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                }
             });
         }
         
@@ -46,111 +56,117 @@ export async function onRequestPost(context) {
                 message: 'Session expired. Please log in again.'
             }), {
                 status: 401,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-        
-        console.log('👤 Starting lab for user:', sessionData.email);
-        
-        // Get existing lab history
-        const existingHistoryRaw = await env.VELOCITY_LABS.get(`history:${sessionData.userId}`);
-        let labHistory = [];
-        
-        if (existingHistoryRaw) {
-            try {
-                labHistory = JSON.parse(existingHistoryRaw);
-                if (!Array.isArray(labHistory)) {
-                    labHistory = [];
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
                 }
-            } catch (parseError) {
-                console.warn('⚠️ Failed to parse existing lab history:', parseError);
-                labHistory = [];
-            }
-        }
-        
-        // Get current user progress to check if current lab is completed
-        const currentProgressRaw = await env.VELOCITY_PROGRESS.get(`progress:${sessionData.userId}`);
-        let currentProgress = {};
-        if (currentProgressRaw) {
-            try {
-                currentProgress = JSON.parse(currentProgressRaw);
-            } catch (parseError) {
-                console.warn('⚠️ Failed to parse current progress:', parseError);
-                currentProgress = {};
-            }
-        }
-        
-        // Count completed tasks
-        const completedTasks = Object.values(currentProgress).filter(task => task && task.completed).length;
-        const totalTasks = 42;
-        const isCurrentLabCompleted = completedTasks === totalTasks;
-        
-        console.log(`📊 Current progress: ${completedTasks}/${totalTasks} tasks completed`);
-        
-        // Find the current active lab (status = 'started')
-        const currentActiveLab = labHistory.find(lab => lab.status === 'started');
-        
-        // If there's an active lab and it's completed, mark it as completed
-        let previousLabCompleted = false;
-        if (currentActiveLab && isCurrentLabCompleted) {
-            console.log('✅ Marking current lab as completed');
-            currentActiveLab.status = 'completed';
-            currentActiveLab.completedAt = new Date().toISOString();
-            currentActiveLab.tasksCompleted = completedTasks;
-            currentActiveLab.totalTasks = totalTasks;
-            previousLabCompleted = true;
-        }
-        
-        // If there's still an active lab that's not completed, don't allow starting a new one
-        const stillActiveLab = labHistory.find(lab => lab.status === 'started');
-        if (stillActiveLab && !isCurrentLabCompleted) {
-            console.log('⚠️ Active lab found that is not completed');
-            return new Response(JSON.stringify({
-                success: false,
-                message: 'Please complete your current lab before starting a new one.'
-            }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
             });
+        }
+        
+        console.log('👤 Lab start request from user:', sessionData.email);
+        
+        // Get current lab history
+        const labHistoryRaw = await env.VELOCITY_LABS.get(`history:${sessionData.userId}`);
+        let labHistory = [];
+        let previousLabCompleted = false;
+        
+        if (labHistoryRaw) {
+            labHistory = JSON.parse(labHistoryRaw);
+            console.log('📊 Current lab history:', labHistory.length, 'sessions');
+        }
+        
+        // Check for active (in-progress) lab
+        const activeLab = labHistory.find(lab => lab.status === 'started');
+        
+        if (activeLab) {
+            // Check if the active lab should be completed first
+            // Get user's current progress
+            const progressRaw = await env.VELOCITY_PROGRESS.get(`progress:${sessionData.userId}`);
+            let completedTasks = 0;
+            
+            if (progressRaw) {
+                const progress = JSON.parse(progressRaw);
+                completedTasks = Object.values(progress).filter(task => task && task.completed).length;
+            }
+            
+            const totalTasks = 42;
+            const isLabCompleted = completedTasks === totalTasks;
+            
+            if (isLabCompleted) {
+                // Mark current lab as completed
+                console.log('🎉 Marking current lab as completed');
+                activeLab.status = 'completed';
+                activeLab.completedAt = new Date().toISOString();
+                activeLab.tasksCompleted = completedTasks;
+                activeLab.totalTasks = totalTasks;
+                previousLabCompleted = true;
+                
+                // Save updated history
+                await env.VELOCITY_LABS.put(`history:${sessionData.userId}`, JSON.stringify(labHistory));
+            } else {
+                // Active lab exists and not completed - don't allow new lab
+                console.log('⚠️ Active lab exists and not completed');
+                return new Response(JSON.stringify({
+                    success: false,
+                    message: 'Please complete your current lab before starting a new one.',
+                    data: {
+                        currentLab: activeLab,
+                        completedTasks: completedTasks,
+                        totalTasks: totalTasks,
+                        progressPercentage: Math.round((completedTasks / totalTasks) * 100)
+                    }
+                }), {
+                    status: 400,
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                    }
+                });
+            }
         }
         
         // Create new lab session
         const today = new Date().toISOString().split('T')[0];
-        const newLabSession = {
-            session: labHistory.length + 1,
+        const newSessionNumber = labHistory.length + 1;
+        const newLabId = `LAB${String(newSessionNumber).padStart(3, '0')}`;
+        
+        const newLab = {
+            session: newSessionNumber,
             date: today,
             status: 'started',
-            labId: `LAB${String(labHistory.length + 1).padStart(3, '0')}`,
+            labId: newLabId,
             startedAt: new Date().toISOString(),
             completedAt: null,
             tasksCompleted: 0,
-            totalTasks: totalTasks
+            totalTasks: 42
         };
         
-        // Add new session to history
-        labHistory.push(newLabSession);
-        console.log('✅ Adding new lab session:', newLabSession.labId);
+        // Add new lab to history
+        labHistory.push(newLab);
         
-        // Reset user progress when starting new lab
-        console.log('🔄 Resetting user progress for new lab...');
+        // Reset user progress for new lab
+        console.log('🔄 Resetting user progress for new lab');
         await env.VELOCITY_PROGRESS.put(`progress:${sessionData.userId}`, JSON.stringify({}));
         
         // Save updated lab history
-        await env.VELOCITY_LABS.put(
-            `history:${sessionData.userId}`, 
-            JSON.stringify(labHistory)
-        );
+        console.log('💾 Saving new lab session to VELOCITY_LABS KV...');
+        await env.VELOCITY_LABS.put(`history:${sessionData.userId}`, JSON.stringify(labHistory));
         
-        console.log('✅ Lab session started successfully in Cloudflare KV');
+        console.log('✅ New lab started successfully:', newLabId);
         
         return new Response(JSON.stringify({
             success: true,
-            message: previousLabCompleted ? 'Previous lab completed! New lab started successfully!' : 'Lab session started successfully!',
+            message: previousLabCompleted ? 'Previous lab completed! New lab started.' : 'New lab started successfully!',
             data: {
-                session: newLabSession,
-                totalSessions: labHistory.length,
+                labId: newLabId,
+                sessionNumber: newSessionNumber,
+                startedAt: newLab.startedAt,
                 previousLabCompleted: previousLabCompleted,
-                labId: newLabSession.labId
+                totalSessions: labHistory.length
             }
         }), {
             status: 200,
@@ -166,10 +182,15 @@ export async function onRequestPost(context) {
         console.error('❌ Lab start error:', error);
         return new Response(JSON.stringify({
             success: false,
-            message: 'Failed to start lab session on server.'
+            message: 'Failed to start lab. Please try again.'
         }), {
             status: 500,
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+            }
         });
     }
 }

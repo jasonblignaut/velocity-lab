@@ -24,7 +24,12 @@ export async function onRequestPost(context) {
                 message: 'Please fill in all required fields.'
             }), {
                 status: 400,
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                }
             });
         }
         
@@ -39,7 +44,12 @@ export async function onRequestPost(context) {
                 message: 'Invalid email or password.'
             }), {
                 status: 401,
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                }
             });
         }
         
@@ -54,7 +64,12 @@ export async function onRequestPost(context) {
                 message: 'Invalid email or password.'
             }), {
                 status: 401,
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                }
             });
         }
         
@@ -78,9 +93,12 @@ export async function onRequestPost(context) {
             sessionExpiry.setHours(sessionExpiry.getHours() + 24); // 24 hours
         }
         
+        // 🔥 FIX: Include role and name in session data
         const sessionData = {
             userId: userData.id,
             email: userData.email,
+            name: userData.name,        // 🆕 Added name
+            role: userData.role,        // 🆕 Added role - THIS WAS MISSING!
             token: sessionToken,
             createdAt: new Date().toISOString(),
             expiresAt: sessionExpiry.toISOString(),
@@ -129,7 +147,12 @@ export async function onRequestPost(context) {
             message: 'Login failed. Please try again.'
         }), {
             status: 500,
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+            }
         });
     }
 }
@@ -150,7 +173,12 @@ export async function onRequestGet(context) {
                 message: 'No valid session found.'
             }), {
                 status: 401,
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                }
             });
         }
         
@@ -167,7 +195,12 @@ export async function onRequestGet(context) {
                 message: 'Session expired or invalid.'
             }), {
                 status: 401,
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                }
             });
         }
         
@@ -185,7 +218,12 @@ export async function onRequestGet(context) {
                 message: 'Session expired. Please log in again.'
             }), {
                 status: 401,
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                }
             });
         }
         
@@ -200,7 +238,12 @@ export async function onRequestGet(context) {
                 message: 'User account not found.'
             }), {
                 status: 404,
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                }
             });
         }
         
@@ -239,7 +282,12 @@ export async function onRequestGet(context) {
             message: 'Session validation failed.'
         }), {
             status: 500,
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+            }
         });
     }
 }
