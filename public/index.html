@@ -106,6 +106,7 @@
             height: 80px;
             background: url('/assets/Velocity-Logo.png') center/contain no-repeat;
             cursor: pointer;
+            /* Default desktop positioning - stays in normal flow */
         }
 
         [data-theme="dark"] .logo {
@@ -921,6 +922,14 @@
 
         .task-content {
             flex: 1;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            padding: 0.25rem;
+            border-radius: 4px;
+        }
+
+        .task-content:hover {
+            background: var(--surface-hover);
         }
 
         .task-title {
@@ -1047,8 +1056,9 @@
                 height: 100px;
             }
 
+            /* FORCE HIDE header buttons on mobile - important override */
             .header-buttons {
-                display: none;
+                display: none !important;
             }
 
             .hamburger {
@@ -1057,8 +1067,9 @@
                 right: 1rem;
             }
 
+            /* FORCE HIDE user menu on mobile - important override */
             .user-menu {
-                display: none;
+                display: none !important;
             }
 
             .welcome-screen {
@@ -2740,10 +2751,23 @@
                 appState.progress[taskId].completedAt = !isCompleted ? new Date().toISOString() : null;
                 appState.progress[taskId].lastUpdated = new Date().toISOString();
                 
+                // Update UI immediately - find the checkbox and task item
+                const taskCheckbox = document.querySelector(`input[onchange="toggleTaskCompletion('${taskId}')"]`);
+                const taskItem = taskCheckbox?.closest('.task-item');
+                
+                if (taskCheckbox && taskItem) {
+                    taskCheckbox.checked = !isCompleted;
+                    if (!isCompleted) {
+                        taskItem.classList.add('completed');
+                    } else {
+                        taskItem.classList.remove('completed');
+                    }
+                }
+                
                 // Save to KV backend
                 await saveUserProgress(taskId, appState.progress[taskId]);
                 
-                // Update UI immediately
+                // Update progress display
                 updateProgressDisplay();
                 
                 // Check if lab is now completed
@@ -3010,8 +3034,29 @@
         function showWelcomeScreen() {
             document.getElementById('welcomeScreen').classList.remove('hidden');
             document.getElementById('mainContent').classList.add('hidden');
-            document.getElementById('headerButtons').classList.remove('hidden');
-            document.getElementById('userMenu').classList.add('hidden');
+            
+            const headerButtons = document.getElementById('headerButtons');
+            const userMenu = document.getElementById('userMenu');
+            
+            // Show header buttons and hide user menu for welcome screen
+            if (headerButtons) headerButtons.classList.remove('hidden');
+            if (userMenu) userMenu.classList.add('hidden');
+            
+            // FORCE HIDE header buttons on mobile regardless of state (mobile uses welcome screen buttons)
+            if (window.innerWidth <= 768) {
+                if (headerButtons) {
+                    headerButtons.style.display = 'none';
+                }
+                if (userMenu) {
+                    userMenu.style.display = 'none';
+                }
+            } else {
+                // Desktop - show header buttons normally
+                if (headerButtons) {
+                    headerButtons.style.display = '';
+                }
+            }
+            
             closeMobileMenu();
             updateMobileMenuItems(); // Update mobile menu for unauthenticated state
         }
@@ -3026,6 +3071,16 @@
             
             if (headerButtons) headerButtons.classList.add('hidden'); // Hide Sign In/Get Started buttons
             if (userMenu) userMenu.classList.remove('hidden'); // Show user menu (desktop only due to CSS)
+            
+            // FORCE HIDE header buttons on mobile regardless of state
+            if (window.innerWidth <= 768) {
+                if (headerButtons) {
+                    headerButtons.style.display = 'none';
+                }
+                if (userMenu) {
+                    userMenu.style.display = 'none';
+                }
+            }
             
             // Update user info
             const userNameEl = document.getElementById('userName');
@@ -3080,12 +3135,12 @@
                                         <input type="checkbox" class="task-checkbox" 
                                                ${isCompleted ? 'checked' : ''} 
                                                onchange="toggleTaskCompletion('${task.id}')">
-                                        <div class="task-content" onclick="showTaskDetail('${task.id}')">
+                                        <div class="task-content" onclick="toggleTaskCompletion('${task.id}')">
                                             <div class="task-title">${task.title}</div>
-                                            <div class="task-description">Click to view step-by-step instructions</div>
+                                            <div class="task-description">Click to toggle completion or view details →</div>
                                         </div>
-                                        <button class="task-detail-btn" onclick="showTaskDetail('${task.id}')">
-                                            View Details
+                                        <button class="task-detail-btn" onclick="event.stopPropagation(); showTaskDetail('${task.id}')">
+                                            Details
                                         </button>
                                     </div>
                                 `;
@@ -3311,6 +3366,39 @@
             checkExistingSession();
             setupMobileMenuHandlers();
             setupFormHandlers();
+        });
+
+        // Handle window resize to ensure proper mobile/desktop layout
+        window.addEventListener('resize', function() {
+            const headerButtons = document.getElementById('headerButtons');
+            const userMenu = document.getElementById('userMenu');
+            
+            if (window.innerWidth <= 768) {
+                // Mobile view - force hide desktop elements
+                if (headerButtons) headerButtons.style.display = 'none';
+                if (userMenu) userMenu.style.display = 'none';
+            } else {
+                // Desktop view - restore normal display based on auth state
+                if (appState.authenticated) {
+                    if (headerButtons) {
+                        headerButtons.style.display = 'none';
+                        headerButtons.classList.add('hidden');
+                    }
+                    if (userMenu) {
+                        userMenu.style.display = '';
+                        userMenu.classList.remove('hidden');
+                    }
+                } else {
+                    if (headerButtons) {
+                        headerButtons.style.display = '';
+                        headerButtons.classList.remove('hidden');
+                    }
+                    if (userMenu) {
+                        userMenu.style.display = 'none';
+                        userMenu.classList.add('hidden');
+                    }
+                }
+            }
         });
 
         // Close modals and menus when clicking outside
