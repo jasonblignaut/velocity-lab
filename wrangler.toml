@@ -5,20 +5,20 @@ compatibility_date = "2025-05-31"
 # KV Namespaces for data storage
 [[kv_namespaces]]
 binding = "VELOCITY_USERS"
-id = "92065323806e46ff89949262ba803008"
-preview_id = "92065323806e46ff89949262ba803008"
+id = "65e9dc79e0cd45a9adda5b0ab5663810"
+preview_id = "65e9dc79e0cd45a9adda5b0ab5663810"
 
 [[kv_namespaces]]
 binding = "VELOCITY_PROGRESS"
-id = "72beb3bc668347b584984bc61aed9492"
-preview_id = "72beb3bc668347b584984bc61aed9492"
+id = "5b6b79b8bc744e3faece779044176a53"
+preview_id = "5b6b79b8bc744e3faece779044176a53"
 
 [[kv_namespaces]]
 binding = "VELOCITY_SESSIONS"
-id = "b71b2efbc3d54f88bd0d0ef37d5ab995"
-preview_id = "b71b2efbc3d54f88bd0d0ef37d5ab995"
+id = "a7223c4bf5834639b5d3528e6835e35a"
+preview_id = "a7223c4bf5834639b5d3528e6835e35a"
 
 [[kv_namespaces]]
 binding = "VELOCITY_LABS"
-id = "6279d496fa8442d8804380268a5e643d"
-preview_id = "6279d496fa8442d8804380268a5e643d"
+id = "e303860142694b2da5488366535300bd"
+preview_id = "e303860142694b2da5488366535300bd"
