@@ -64,13 +64,14 @@ exports.handler = async (event, context, { VELOCITY_SESSIONS, VELOCITY_LABS }) =
 
     return {
       statusCode: 200,
-      headers: {
+      headers,
+      body: JSON.stringify({
         success: true,
         data: labHistoryList
-      }
-    });
+      })
+    };
   } catch (error) {
-    console.log('Lab history error:', error);
+    console.error('Lab history error:', error);
     return {
       statusCode: 500,
       headers,
