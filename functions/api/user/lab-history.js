@@ -1,242 +1,171 @@
-// /functions/api/user/lab-history.js
-// Cloudflare Pages Function for user lab history management
-// Handles GET (load lab history) and POST (save lab history)
+// Cloudflare Workers API - User Lab History
+// File: /api/user/lab-history.js
 
-// Load user lab history (GET)
-export async function onRequestGet(context) {
-    const { request, env } = context;
-    
+export default {
+  async fetch(request, env, ctx) {
+    // CORS headers
+    const corsHeaders = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    };
+
+    // Handle preflight requests
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { headers: corsHeaders });
+    }
+
     try {
-        console.log('🔬 Loading user lab history from Cloudflare KV...');
+      // Check authorization
+      const authHeader = request.headers.get('Authorization');
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: 'Authorization required'
+        }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const sessionToken = authHeader.replace('Bearer ', '');
+      
+      // Verify session
+      const sessionData = await env.VELOCITY_KV.get(`session:${sessionToken}`, 'json');
+      if (!sessionData) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: 'Invalid session'
+        }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const userEmail = sessionData.email;
+
+      if (request.method === 'GET') {
+        // Get lab history
+        const historyKey = `lab-history:${userEmail}`;
+        let labHistory = await env.VELOCITY_KV.get(historyKey, 'json') || [];
         
-        // Get Authorization header
-        const authHeader = request.headers.get('Authorization');
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            console.log('❌ Missing or invalid Authorization header');
-            return new Response(JSON.stringify({
-                success: false,
-                message: 'Authentication required.'
-            }), {
-                status: 401,
-                headers: { 'Content-Type': 'application/json' }
-            });
+        // If no history exists, create default first lab
+        if (labHistory.length === 0) {
+          const today = new Date().toISOString().split('T')[0];
+          const defaultLab = {
+            session: 1,
+            date: today,
+            status: 'started',
+            labId: 'LAB001',
+            startedAt: new Date().toISOString(),
+            tasksCompleted: 0,
+            totalTasks: 42
+          };
+          
+          labHistory = [defaultLab];
+          await env.VELOCITY_KV.put(historyKey, JSON.stringify(labHistory));
         }
         
-        const sessionToken = authHeader.substring(7); // Remove 'Bearer ' prefix
+        // Update current lab progress
+        const progressKey = `progress:${userEmail}`;
+        const userProgress = await env.VELOCITY_KV.get(progressKey, 'json') || {};
+        const completedTasks = Object.values(userProgress).filter(task => task?.completed).length;
         
-        // Validate session and get user ID
-        const sessionDataRaw = await env.VELOCITY_SESSIONS.get(`session:${sessionToken}`);
-        if (!sessionDataRaw) {
-            console.log('❌ Invalid session token');
-            return new Response(JSON.stringify({
-                success: false,
-                message: 'Session expired or invalid.'
-            }), {
-                status: 401,
-                headers: { 'Content-Type': 'application/json' }
-            });
+        // Update the current lab's task count
+        const currentLab = labHistory.find(lab => lab.status === 'started');
+        if (currentLab) {
+          currentLab.tasksCompleted = completedTasks;
+          
+          // Auto-complete if all tasks are done
+          if (completedTasks === 42) {
+            currentLab.status = 'completed';
+            currentLab.completedAt = new Date().toISOString();
+          }
+          
+          await env.VELOCITY_KV.put(historyKey, JSON.stringify(labHistory));
         }
+
+        return new Response(JSON.stringify({
+          success: true,
+          data: labHistory
+        }), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+
+      } else if (request.method === 'POST') {
+        // Add new lab session entry
+        const body = await request.json();
+        const { session, date, status, labId, startedAt, completedAt, tasksCompleted, totalTasks } = body;
         
-        const sessionData = JSON.parse(sessionDataRaw);
-        
-        // Check if session is expired
-        if (new Date() > new Date(sessionData.expiresAt)) {
-            console.log('❌ Session expired');
-            return new Response(JSON.stringify({
-                success: false,
-                message: 'Session expired. Please log in again.'
-            }), {
-                status: 401,
-                headers: { 'Content-Type': 'application/json' }
-            });
+        if (!session || !date || !status || !labId) {
+          return new Response(JSON.stringify({
+            success: false,
+            message: 'Missing required fields'
+          }), {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
         }
+
+        const historyKey = `lab-history:${userEmail}`;
+        let labHistory = await env.VELOCITY_KV.get(historyKey, 'json') || [];
         
-        console.log('👤 Loading lab history for user:', sessionData.email);
+        // Create new lab entry
+        const newEntry = {
+          session,
+          date,
+          status,
+          labId,
+          startedAt: startedAt || new Date().toISOString(),
+          ...(completedAt && { completedAt }),
+          ...(tasksCompleted !== undefined && { tasksCompleted }),
+          ...(totalTasks !== undefined && { totalTasks })
+        };
         
-        // Get user lab history from KV
-        const labHistoryRaw = await env.VELOCITY_LABS.get(`history:${sessionData.userId}`);
-        let labHistory = [];
-        
-        if (labHistoryRaw) {
-            try {
-                labHistory = JSON.parse(labHistoryRaw);
-                console.log('✅ Lab history loaded from Cloudflare KV - Sessions:', labHistory.length);
-                
-                // Ensure it's an array
-                if (!Array.isArray(labHistory)) {
-                    console.warn('⚠️ Lab history is not an array, resetting to empty array');
-                    labHistory = [];
-                }
-            } catch (parseError) {
-                console.warn('⚠️ Failed to parse lab history data, starting fresh:', parseError);
-                labHistory = [];
-            }
+        // Check if entry with same labId already exists
+        const existingIndex = labHistory.findIndex(entry => entry.labId === labId);
+        if (existingIndex >= 0) {
+          // Update existing entry
+          labHistory[existingIndex] = { ...labHistory[existingIndex], ...newEntry };
         } else {
-            console.log('🆕 No existing lab history found, starting fresh');
+          // Add new entry
+          labHistory.push(newEntry);
         }
         
-        return new Response(JSON.stringify({
-            success: true,
-            data: labHistory
-        }), {
-            status: 200,
-            headers: { 
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-            }
-        });
+        // Sort by session number
+        labHistory.sort((a, b) => a.session - b.session);
         
-    } catch (error) {
-        console.error('❌ Lab history load error:', error);
-        return new Response(JSON.stringify({
-            success: false,
-            message: 'Failed to load lab history from server.'
-        }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' }
-        });
-    }
-}
+        await env.VELOCITY_KV.put(historyKey, JSON.stringify(labHistory));
 
-// Save user lab history (POST)
-export async function onRequestPost(context) {
-    const { request, env } = context;
-    
-    try {
-        console.log('💾 Saving user lab history to Cloudflare KV...');
-        
-        // Get Authorization header
-        const authHeader = request.headers.get('Authorization');
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            console.log('❌ Missing or invalid Authorization header');
-            return new Response(JSON.stringify({
-                success: false,
-                message: 'Authentication required.'
-            }), {
-                status: 401,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-        
-        const sessionToken = authHeader.substring(7); // Remove 'Bearer ' prefix
-        
-        // Validate session and get user ID
-        const sessionDataRaw = await env.VELOCITY_SESSIONS.get(`session:${sessionToken}`);
-        if (!sessionDataRaw) {
-            console.log('❌ Invalid session token');
-            return new Response(JSON.stringify({
-                success: false,
-                message: 'Session expired or invalid.'
-            }), {
-                status: 401,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-        
-        const sessionData = JSON.parse(sessionDataRaw);
-        
-        // Check if session is expired
-        if (new Date() > new Date(sessionData.expiresAt)) {
-            console.log('❌ Session expired');
-            return new Response(JSON.stringify({
-                success: false,
-                message: 'Session expired. Please log in again.'
-            }), {
-                status: 401,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-        
-        // Parse lab history data from request body
-        let labHistoryData;
-        try {
-            labHistoryData = await request.json();
-            
-            // Ensure it's an array
-            if (!Array.isArray(labHistoryData)) {
-                console.log('❌ Lab history data is not an array');
-                return new Response(JSON.stringify({
-                    success: false,
-                    message: 'Lab history must be an array.'
-                }), {
-                    status: 400,
-                    headers: { 'Content-Type': 'application/json' }
-                });
-            }
-            
-        } catch (parseError) {
-            console.log('❌ Failed to parse request body:', parseError);
-            return new Response(JSON.stringify({
-                success: false,
-                message: 'Invalid lab history data format.'
-            }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-        
-        console.log('👤 Saving lab history for user:', sessionData.email);
-        console.log('🔬 Lab sessions:', labHistoryData.length);
-        
-        // Validate lab history entries
-        const validatedHistory = labHistoryData.map(session => {
-            // Ensure required fields exist
-            return {
-                session: session.session || 1,
-                date: session.date || new Date().toISOString().split('T')[0],
-                status: session.status || 'started',
-                labId: session.labId || `LAB001`,
-                startedAt: session.startedAt || new Date().toISOString(),
-                completedAt: session.completedAt || null,
-                tasksCompleted: session.tasksCompleted || 0,
-                totalTasks: session.totalTasks || 42
-            };
-        });
-        
-        // Save lab history to KV
-        await env.VELOCITY_LABS.put(
-            `history:${sessionData.userId}`, 
-            JSON.stringify(validatedHistory)
-        );
-        
-        console.log('✅ Lab history saved successfully to Cloudflare KV');
-        
         return new Response(JSON.stringify({
-            success: true,
-            message: 'Lab history saved successfully.',
-            data: validatedHistory
+          success: true,
+          message: 'Lab history updated successfully',
+          data: newEntry
         }), {
-            status: 200,
-            headers: { 
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-            }
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
-        
-    } catch (error) {
-        console.error('❌ Lab history save error:', error);
-        return new Response(JSON.stringify({
-            success: false,
-            message: 'Failed to save lab history to server.'
-        }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' }
-        });
-    }
-}
 
-// Handle CORS preflight requests
-export async function onRequestOptions(context) {
-    return new Response(null, {
-        status: 200,
-        headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-        }
-    });
-}
+      } else {
+        return new Response(JSON.stringify({
+          success: false,
+          message: 'Method not allowed'
+        }), {
+          status: 405,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+    } catch (error) {
+      console.error('Lab history error:', error);
+      return new Response(JSON.stringify({
+        success: false,
+        message: 'Internal server error'
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+};

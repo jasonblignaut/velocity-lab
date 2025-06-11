@@ -2100,7 +2100,7 @@
                 
                 if (response.success) {
                     appState.labHistory = response.data || [];
-                    console.log('✅ Lab history loaded from Cloudflare KV');
+                    console.log('✅ Lab history loaded from Cloudflare KV:', appState.labHistory.length, 'sessions');
                 } else {
                     console.warn('API returned error:', response.message);
                     appState.labHistory = [];
@@ -2130,6 +2130,8 @@
                 
                 if (response.success) {
                     console.log('✅ Lab history saved to Cloudflare KV');
+                    // Reload lab history to get updated data
+                    await loadLabHistory();
                 } else {
                     console.warn('Failed to save lab history:', response.message);
                 }
@@ -2143,26 +2145,26 @@
             const completedTasks = Object.values(appState.progress).filter(task => task.completed).length;
             
             // Check if lab is completed (all tasks done)
-            if (completedTasks === totalTasks && totalTasks > 0) {
-                const lastEntry = appState.labHistory[appState.labHistory.length - 1];
-                const today = new Date().toISOString().split('T')[0];
+            if (completedTasks === totalTasks && totalTasks > 0 && appState.labHistory.length > 0) {
+                const currentLab = appState.labHistory.find(lab => lab.status === 'started');
                 
-                // Only add completion if not already completed today
-                if (!lastEntry || lastEntry.date !== today || lastEntry.status !== 'completed') {
+                // Only mark as completed if not already completed
+                if (currentLab && currentLab.status === 'started') {
                     const completionEntry = {
-                        session: appState.labHistory.length + 1,
-                        date: today,
+                        ...currentLab,
                         status: 'completed',
-                        labId: `LAB${String(appState.labHistory.length + 1).padStart(3, '0')}`,
                         completedAt: new Date().toISOString(),
                         tasksCompleted: completedTasks,
                         totalTasks: totalTasks
                     };
                     
-                    appState.labHistory.push(completionEntry);
-                    saveLabHistory(completionEntry);
-                    
-                    notificationSystem.success('🎉 Lab completed successfully!');
+                    // Update local history
+                    const labIndex = appState.labHistory.findIndex(lab => lab.labId === currentLab.labId);
+                    if (labIndex >= 0) {
+                        appState.labHistory[labIndex] = completionEntry;
+                        saveLabHistory(completionEntry); // This will trigger a reload
+                        notificationSystem.success('🎉 Lab completed successfully!');
+                    }
                 }
             }
         }
@@ -2314,31 +2316,36 @@
 
         window.startLabEnvironment = async function() {
             try {
-                // Reset all progress when starting new lab
-                appState.progress = {};
-                updateProgressDisplay();
-                
-                // Add a new lab session entry
-                const today = new Date().toISOString().split('T')[0];
-                const newSession = {
-                    session: appState.labHistory.length + 1,
-                    date: today,
-                    status: 'started',
-                    labId: `LAB${String(appState.labHistory.length + 1).padStart(3, '0')}`,
-                    startedAt: new Date().toISOString()
-                };
-                
-                // Check if already started today
-                const todaySession = appState.labHistory.find(session => 
-                    session.date === today && session.status === 'started'
-                );
-                
-                if (!todaySession) {
-                    appState.labHistory.push(newSession);
-                    await saveLabHistory(newSession);
+                if (!appState.sessionToken) {
+                    notificationSystem.error('Please sign in to start a lab');
+                    return;
                 }
+
+                console.log('🔄 Starting new lab environment...');
+                const response = await api.call('/api/lab/start', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${appState.sessionToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
                 
-                notificationSystem.success('New lab started!');
+                if (response.success) {
+                    console.log('✅ Lab started successfully');
+                    
+                    // Reset progress and reload
+                    appState.progress = {};
+                    updateProgressDisplay();
+                    await loadLabHistory();
+                    
+                    if (response.data.previousLabCompleted) {
+                        notificationSystem.success(`🎉 Previous lab completed! New ${response.data.labId} started!`);
+                    } else {
+                        notificationSystem.success(`🚀 New lab ${response.data.labId} started!`);
+                    }
+                } else {
+                    notificationSystem.error(`Failed to start lab: ${response.message}`);
+                }
                 
             } catch (error) {
                 console.error('Failed to start lab:', error);
@@ -2678,17 +2685,8 @@
                 if (a.status === 'started' && b.status !== 'started') return -1;
                 if (b.status === 'started' && a.status !== 'started') return 1;
                 
-                // Otherwise sort by date (newest first)
-                return new Date(b.date) - new Date(a.date);
-            });
-            
-            // Number completed labs sequentially (Lab 1, Lab 2, etc.)
-            const completedLabs = history.filter(lab => lab.status === 'completed')
-                .sort((a, b) => new Date(a.date) - new Date(b.date)); // Oldest first for numbering
-            
-            let labNumberMap = {};
-            completedLabs.forEach((lab, index) => {
-                labNumberMap[lab.labId] = index + 1;
+                // Otherwise sort by session number (newest first)
+                return b.session - a.session;
             });
             
             return sortedHistory.map(session => {
@@ -2699,14 +2697,15 @@
                 
                 // Get current progress for in-progress labs
                 const currentProgress = getCurrentLabProgress();
-                const completedTasks = currentProgress.completedTasks || 0;
+                const completedTasks = isInProgress ? currentProgress.completedTasks : (session.tasksCompleted || 0);
                 
                 // Lab title
                 let labTitle;
                 if (isInProgress) {
                     labTitle = `${statusIcon} Current Lab`;
                 } else {
-                    const labNumber = labNumberMap[session.labId];
+                    // Extract lab number from labId (LAB001 -> Lab 1)
+                    const labNumber = session.labId ? session.labId.replace('LAB', '').replace(/^0+/, '') : session.session;
                     labTitle = `${statusIcon} Lab ${labNumber}`;
                 }
                 
@@ -2719,12 +2718,9 @@
                         <div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
                             Lab ID: ${session.labId} • ${new Date(session.date).toLocaleDateString()}
                         </div>
-                        ${isInProgress ? 
-                            `<div style="color: var(--primary); font-size: 0.8rem; font-weight: 600;">Tasks: ${completedTasks}/42</div>` : 
-                            session.tasksCompleted ? 
-                            `<div style="color: var(--success); font-size: 0.8rem;">Tasks: ${session.tasksCompleted}/${session.totalTasks}</div>` : 
-                            '<div style="color: var(--success); font-size: 0.8rem;">Tasks: 42/42</div>'
-                        }
+                        <div style="color: ${isInProgress ? 'var(--primary)' : 'var(--success)'}; font-size: 0.8rem; font-weight: 600;">
+                            Tasks: ${completedTasks}/${session.totalTasks || 42}
+                        </div>
                         ${session.completedAt ? 
                             `<div style="color: var(--text-secondary); font-size: 0.75rem;">Completed: ${new Date(session.completedAt).toLocaleString()}</div>` : 
                             session.startedAt ? 
@@ -2950,14 +2946,21 @@
             showModal('adminModal');
         }
 
-        function displayAdminPanel(users) {
+        function displayAdminPanel(usersData) {
             const content = document.getElementById('adminContent');
             
-            if (users.length === 0) {
+            // Ensure usersData is an array
+            if (!Array.isArray(usersData)) {
+                console.error('Expected array but got:', usersData);
+                content.innerHTML = '<p style="text-align: center; color: var(--danger); padding: 2rem;">Invalid data format received from server.</p>';
+                return;
+            }
+            
+            if (usersData.length === 0) {
                 content.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No users found.</p>';
             } else {
                 // Sort by completed tasks and progress percentage
-                users.sort((a, b) => {
+                usersData.sort((a, b) => {
                     if (a.completedTasks !== b.completedTasks) {
                         return b.completedTasks - a.completedTasks; // More completed tasks first
                     }
@@ -2966,10 +2969,10 @@
                 
                 content.innerHTML = `
                     <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
-                        <strong>Leaderboard - ${users.length} Users</strong>
+                        <strong>Leaderboard - ${usersData.length} Users</strong>
                         <small style="color: var(--text-secondary);">📊 Sorted by Progress</small>
                     </div>
-                    ${users.map((user, index) => {
+                    ${usersData.map((user, index) => {
                         const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
                         return `
                             <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem;">
