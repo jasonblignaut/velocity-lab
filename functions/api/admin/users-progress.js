@@ -17,13 +17,98 @@ export async function onRequestGet(context) {
                 message: 'Authentication required.'
             }), {
                 status: 401,
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                }
             });
         }
         
         const sessionToken = authHeader.substring(7); // Remove 'Bearer ' prefix
         
-        // Validate session and get user ID
+        // Handle demo mode (session tokens starting with 'demo_')
+        if (sessionToken.startsWith('demo_')) {
+            console.log('🎭 Demo mode detected, providing demo admin data');
+            
+            // In demo mode, we'll create realistic mock data
+            const demoUsers = [
+                {
+                    name: 'Demo Admin',
+                    email: 'admin@velocitylab.com',
+                    role: 'admin',
+                    completedTasks: 42,
+                    progressPercentage: 100,
+                    completedLabs: 3,
+                    hasNotes: true,
+                    lastActive: new Date().toISOString()
+                },
+                {
+                    name: 'John Doe',
+                    email: 'john.doe@example.com',
+                    role: 'user',
+                    completedTasks: 35,
+                    progressPercentage: 83,
+                    completedLabs: 2,
+                    hasNotes: true,
+                    lastActive: new Date(Date.now() - 3600000).toISOString() // 1 hour ago
+                },
+                {
+                    name: 'Jane Smith', 
+                    email: 'jane.smith@example.com',
+                    role: 'user',
+                    completedTasks: 28,
+                    progressPercentage: 67,
+                    completedLabs: 1,
+                    hasNotes: false,
+                    lastActive: new Date(Date.now() - 86400000).toISOString() // 1 day ago
+                },
+                {
+                    name: 'Mike Johnson',
+                    email: 'mike.johnson@example.com', 
+                    role: 'user',
+                    completedTasks: 15,
+                    progressPercentage: 36,
+                    completedLabs: 0,
+                    hasNotes: true,
+                    lastActive: new Date(Date.now() - 172800000).toISOString() // 2 days ago
+                },
+                {
+                    name: 'Sarah Wilson',
+                    email: 'sarah.wilson@example.com',
+                    role: 'user',
+                    completedTasks: 8,
+                    progressPercentage: 19,
+                    completedLabs: 0,
+                    hasNotes: false,
+                    lastActive: new Date(Date.now() - 604800000).toISOString() // 1 week ago
+                }
+            ];
+            
+            // Sort by progress (completed tasks first, then percentage)
+            demoUsers.sort((a, b) => {
+                if (a.completedTasks !== b.completedTasks) {
+                    return b.completedTasks - a.completedTasks;
+                }
+                return b.progressPercentage - a.progressPercentage;
+            });
+            
+            return new Response(JSON.stringify({
+                success: true,
+                data: demoUsers
+            }), {
+                status: 200,
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                }
+            });
+        }
+        
+        // For non-demo mode, validate session with KV
         const sessionDataRaw = await env.VELOCITY_SESSIONS.get(`session:${sessionToken}`);
         if (!sessionDataRaw) {
             console.log('❌ Invalid session token');
@@ -32,7 +117,12 @@ export async function onRequestGet(context) {
                 message: 'Session expired or invalid.'
             }), {
                 status: 401,
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                }
             });
         }
         
@@ -46,7 +136,12 @@ export async function onRequestGet(context) {
                 message: 'Session expired. Please log in again.'
             }), {
                 status: 401,
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                }
             });
         }
         
@@ -58,7 +153,12 @@ export async function onRequestGet(context) {
                 message: 'Admin access required.'
             }), {
                 status: 403,
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                }
             });
         }
         
@@ -185,7 +285,12 @@ export async function onRequestGet(context) {
                 message: 'Failed to compile user data.'
             }), {
                 status: 500,
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+                }
             });
         }
         
@@ -196,7 +301,12 @@ export async function onRequestGet(context) {
             message: 'Failed to load admin data from server.'
         }), {
             status: 500,
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+            }
         });
     }
 }
