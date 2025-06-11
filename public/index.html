@@ -94,6 +94,7 @@
             justify-content: space-between;
             padding: 0 2rem;
             transition: all 0.3s ease;
+            overflow: hidden;
         }
 
         [data-theme="dark"] .header {
@@ -475,6 +476,7 @@
 
         .apple-modal .modal-body {
             color: white;
+            padding-top: 70px;
         }
 
         .modal-title {
@@ -1799,7 +1801,7 @@
                     
                     // Show welcome notification only if not already shown
                     if (!appState.isWelcomeShown) {
-                        notificationSystem.success(`Welcome back, ${name}! 🎉`);
+                        notificationSystem.success(`Welcome back, ${name}!`);
                     }
                     
                 } catch (err) {
@@ -1871,7 +1873,7 @@
                     
                     // Show welcome notification only if not already shown
                     if (!appState.isWelcomeShown) {
-                        notificationSystem.success(`Welcome to Velocity Lab, ${userName}! 🚀`);
+                        notificationSystem.success(`Welcome to Velocity Lab, ${userName}!`);
                     }
                     
                 } catch (err) {
