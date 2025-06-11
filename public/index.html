@@ -1,4 +1,4 @@
-co<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1706,7 +1706,7 @@ co<!DOCTYPE html>
                         throw new Error('Please fill in all required fields.');
                     }
 
-                    console.log('🔄 Attempting login with Cloudflare KV backend...');
+                    console.log('🔄 Attempting login with backend APIs...');
                     
                     try {
                         // Call Cloudflare KV backend directly
@@ -1715,7 +1715,7 @@ co<!DOCTYPE html>
                             body: formData  // Send FormData directly to match backend expectations
                         });
                         
-                        console.log('✅ Login successful with Cloudflare KV backend');
+                        console.log('✅ Login successful with backend APIs');
                         
                         const { name, role, email: userEmail, sessionToken } = data;
                         
@@ -1808,7 +1808,7 @@ co<!DOCTYPE html>
                         throw new Error('Password must be at least 8 characters long.');
                     }
 
-                    console.log('🔄 Attempting registration with Cloudflare KV backend...');
+                    console.log('🔄 Attempting registration with backend APIs...');
                     
                     try {
                         // Call Cloudflare KV backend directly
@@ -1817,7 +1817,7 @@ co<!DOCTYPE html>
                             body: formData  // Send FormData directly to match backend expectations
                         });
                         
-                        console.log('✅ Registration successful with Cloudflare KV backend');
+                        console.log('✅ Registration successful with backend APIs');
                         
                         const { name: userName, email: userEmail, role, sessionToken } = data;
                         
@@ -1939,7 +1939,7 @@ co<!DOCTYPE html>
                             },
                             body: JSON.stringify({ theme: theme })
                         });
-                        console.log('✅ Theme preference saved to KV backend');
+                        console.log('✅ Theme preference saved to backend APIs');
                     } else {
                         throw new Error('BACKEND_NOT_AVAILABLE');
                     }
@@ -1984,7 +1984,7 @@ co<!DOCTYPE html>
                         
                         if (response.success && response.data.theme) {
                             document.body.setAttribute('data-theme', response.data.theme);
-                            console.log('✅ Theme loaded from KV backend:', response.data.theme);
+                            console.log('✅ Theme loaded from backend APIs:', response.data.theme);
                             return;
                         }
                     }
@@ -2253,7 +2253,7 @@ co<!DOCTYPE html>
                     return;
                 }
 
-                console.log('🔄 Saving lab history to Cloudflare KV...');
+                console.log('🔄 Saving lab history to backend APIs...');
                 const response = await api.call(`${API_BASE}/user/lab-history`, {
                     method: 'POST',
                     headers: {
@@ -2264,7 +2264,7 @@ co<!DOCTYPE html>
                 });
                 
                 if (response.success) {
-                    console.log('✅ Lab history saved to Cloudflare KV');
+                    console.log('✅ Lab history saved to backend APIs');
                     // Reload lab history to get updated data
                     await loadLabHistory();
                 } else {
@@ -2604,7 +2604,7 @@ co<!DOCTYPE html>
                     return;
                 }
 
-                console.log('🔄 Loading admin data from Cloudflare KV...');
+                console.log('🔄 Loading admin data from backend APIs...');
                 const response = await api.call(`${API_BASE}/admin/users-progress`, {
                     headers: {
                         'Authorization': `Bearer ${appState.sessionToken}`,
@@ -2613,7 +2613,7 @@ co<!DOCTYPE html>
                 });
                 
                 if (response.success) {
-                    console.log('✅ Admin data loaded from Cloudflare KV');
+                    console.log('✅ Admin data loaded from backend APIs');
                     displayAdminPanel(response.data);
                 } else {
                     notificationSystem.error(`Failed to load admin data: ${response.message}`);
