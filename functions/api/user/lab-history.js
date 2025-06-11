@@ -72,7 +72,7 @@ export async function onRequestGet(context) {
                 labHistory = [];
             }
         } else {
-            console.log('🆕 No existing lab history found, starting fresh');
+            console.log('🆕 No existing lab history found, will return empty array');
         }
         
         return new Response(JSON.stringify({
@@ -178,22 +178,25 @@ export async function onRequestPost(context) {
         }
         
         console.log('👤 Saving lab history for user:', sessionData.email);
-        console.log('🔬 Lab sessions:', labHistoryData.length);
+        console.log('🔬 Lab sessions to save:', labHistoryData.length);
         
-        // Validate lab history entries
-        const validatedHistory = labHistoryData.map(session => {
-            // Ensure required fields exist
+        // Validate and normalize lab history entries
+        const validatedHistory = labHistoryData.map((session, index) => {
+            // Ensure required fields exist with defaults
             return {
-                session: session.session || 1,
+                session: session.session || (index + 1),
                 date: session.date || new Date().toISOString().split('T')[0],
                 status: session.status || 'started',
-                labId: session.labId || `LAB001`,
+                labId: session.labId || `LAB${String(index + 1).padStart(3, '0')}`,
                 startedAt: session.startedAt || new Date().toISOString(),
                 completedAt: session.completedAt || null,
                 tasksCompleted: session.tasksCompleted || 0,
                 totalTasks: session.totalTasks || 42
             };
         });
+        
+        // Sort by session number to maintain order
+        validatedHistory.sort((a, b) => a.session - b.session);
         
         // Save lab history to KV
         await env.VELOCITY_LABS.put(

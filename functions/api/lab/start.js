@@ -50,23 +50,7 @@ export async function onRequestPost(context) {
             });
         }
         
-        // Parse new lab session data from request body
-        let newLabSession;
-        try {
-            newLabSession = await request.json();
-        } catch (parseError) {
-            console.log('❌ Failed to parse request body:', parseError);
-            return new Response(JSON.stringify({
-                success: false,
-                message: 'Invalid lab session data format.'
-            }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-        
         console.log('👤 Starting lab for user:', sessionData.email);
-        console.log('🔬 Lab session:', newLabSession.labId);
         
         // Get existing lab history
         const existingHistoryRaw = await env.VELOCITY_LABS.get(`history:${sessionData.userId}`);
@@ -84,38 +68,71 @@ export async function onRequestPost(context) {
             }
         }
         
-        // Validate and normalize the new lab session
         const today = new Date().toISOString().split('T')[0];
-        const normalizedSession = {
-            session: newLabSession.session || (labHistory.length + 1),
-            date: newLabSession.date || today,
-            status: 'started', // Always 'started' for new labs
-            labId: newLabSession.labId || `LAB${String(labHistory.length + 1).padStart(3, '0')}`,
-            startedAt: newLabSession.startedAt || new Date().toISOString(),
-            completedAt: null, // New labs are not completed yet
-            tasksCompleted: 0, // Start with 0 tasks completed
-            totalTasks: 42 // Standard total
-        };
         
-        // Check if there's already a session started today
-        const todaySession = labHistory.find(session => 
+        // Check if there's already a lab started today
+        const todayStartedLab = labHistory.find(session => 
             session.date === today && session.status === 'started'
         );
         
-        if (todaySession) {
-            console.log('⚠️ Lab session already started today, updating existing session');
-            // Update existing session instead of creating a new one
-            const sessionIndex = labHistory.findIndex(s => s.labId === todaySession.labId);
-            if (sessionIndex !== -1) {
-                labHistory[sessionIndex] = { ...todaySession, startedAt: new Date().toISOString() };
-            }
-        } else {
-            // Add new session to history
-            console.log('✅ Adding new lab session to history');
-            labHistory.push(normalizedSession);
+        if (todayStartedLab) {
+            console.log('⚠️ Lab session already started today');
+            return new Response(JSON.stringify({
+                success: false,
+                message: 'You already have a lab session started today.'
+            }), {
+                status: 400,
+                headers: { 'Content-Type': 'application/json' }
+            });
         }
         
-        // Reset user progress when starting new lab (as per frontend logic)
+        // Get current user progress to check if current lab is completed
+        const currentProgressRaw = await env.VELOCITY_PROGRESS.get(`progress:${sessionData.userId}`);
+        let currentProgress = {};
+        if (currentProgressRaw) {
+            try {
+                currentProgress = JSON.parse(currentProgressRaw);
+            } catch (parseError) {
+                console.warn('⚠️ Failed to parse current progress:', parseError);
+                currentProgress = {};
+            }
+        }
+        
+        // Count completed tasks
+        const completedTasks = Object.values(currentProgress).filter(task => task && task.completed).length;
+        const totalTasks = 42;
+        const isCurrentLabCompleted = completedTasks === totalTasks;
+        
+        // Mark current lab as completed if all tasks are done
+        let previousLabCompleted = false;
+        if (labHistory.length > 0 && isCurrentLabCompleted) {
+            const currentLab = labHistory.find(lab => lab.status === 'started');
+            if (currentLab) {
+                currentLab.status = 'completed';
+                currentLab.completedAt = new Date().toISOString();
+                currentLab.tasksCompleted = completedTasks;
+                currentLab.totalTasks = totalTasks;
+                previousLabCompleted = true;
+                console.log('✅ Previous lab marked as completed');
+            }
+        }
+        
+        // Create new lab session
+        const newLabSession = {
+            session: labHistory.length + 1,
+            date: today,
+            status: 'started',
+            labId: `LAB${String(labHistory.length + 1).padStart(3, '0')}`,
+            startedAt: new Date().toISOString(),
+            completedAt: null,
+            tasksCompleted: 0,
+            totalTasks: totalTasks
+        };
+        
+        // Add new session to history
+        labHistory.push(newLabSession);
+        
+        // Reset user progress when starting new lab
         console.log('🔄 Resetting user progress for new lab...');
         await env.VELOCITY_PROGRESS.put(`progress:${sessionData.userId}`, JSON.stringify({}));
         
@@ -129,10 +146,12 @@ export async function onRequestPost(context) {
         
         return new Response(JSON.stringify({
             success: true,
-            message: 'Lab session started successfully!',
+            message: previousLabCompleted ? 'Previous lab completed! New lab started successfully!' : 'Lab session started successfully!',
             data: {
-                session: normalizedSession,
-                totalSessions: labHistory.length
+                session: newLabSession,
+                totalSessions: labHistory.length,
+                previousLabCompleted: previousLabCompleted,
+                labId: newLabSession.labId
             }
         }), {
             status: 200,

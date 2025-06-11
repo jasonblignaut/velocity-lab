@@ -2195,6 +2195,7 @@
                             status: 'started',
                             labId: 'LAB001',
                             startedAt: new Date().toISOString(),
+                            completedAt: null,
                             tasksCompleted: 0,
                             totalTasks: 42
                         };
@@ -2214,6 +2215,24 @@
                 if (response.success) {
                     appState.labHistory = response.data || [];
                     console.log('✅ Lab history loaded from backend APIs:', appState.labHistory.length, 'sessions');
+                    
+                    // Create default lab if none exists (for new users)
+                    if (appState.labHistory.length === 0) {
+                        const today = new Date().toISOString().split('T')[0];
+                        const defaultLab = {
+                            session: 1,
+                            date: today,
+                            status: 'started',
+                            labId: 'LAB001',
+                            startedAt: new Date().toISOString(),
+                            completedAt: null,
+                            tasksCompleted: 0,
+                            totalTasks: 42
+                        };
+                        appState.labHistory = [defaultLab];
+                        // Save the default lab to backend
+                        await saveLabHistory(appState.labHistory);
+                    }
                 } else {
                     console.warn('API returned error:', response.message);
                     appState.labHistory = [];
@@ -2232,6 +2251,7 @@
                             status: 'started',
                             labId: 'LAB001',
                             startedAt: new Date().toISOString(),
+                            completedAt: null,
                             tasksCompleted: 0,
                             totalTasks: 42
                         };
@@ -2260,7 +2280,7 @@
                         'Authorization': `Bearer ${appState.sessionToken}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(newSession)
+                    body: JSON.stringify(Array.isArray(newSession) ? newSession : appState.labHistory)
                 });
                 
                 if (response.success) {
@@ -2459,15 +2479,18 @@
             try {
                 // Check if backend is available
                 let backendAvailable = false;
-                if (appState.sessionToken) {
+                if (appState.sessionToken && !appState.sessionToken.startsWith('demo_')) {
                     try {
                         console.log('🔄 Starting new lab environment...');
+                        
+                        // Send empty object since backend expects JSON but doesn't need specific data
                         const response = await api.call('/api/lab/start', {
                             method: 'POST',
                             headers: {
                                 'Authorization': `Bearer ${appState.sessionToken}`,
                                 'Content-Type': 'application/json'
-                            }
+                            },
+                            body: JSON.stringify({}) // Send empty JSON object
                         });
                         
                         if (response.success) {
@@ -2515,13 +2538,15 @@
                     }
                     
                     // Mark current lab as completed if all tasks are done
+                    let previousLabCompleted = false;
                     if (appState.labHistory.length > 0 && isCurrentLabCompleted) {
-                        const currentLab = appState.labHistory[appState.labHistory.length - 1];
-                        if (currentLab.status === 'started') {
+                        const currentLab = appState.labHistory.find(lab => lab.status === 'started');
+                        if (currentLab) {
                             currentLab.status = 'completed';
                             currentLab.completedAt = new Date().toISOString();
                             currentLab.tasksCompleted = completedTasks;
                             currentLab.totalTasks = totalTasks;
+                            previousLabCompleted = true;
                         }
                     }
                     
@@ -2532,6 +2557,7 @@
                         status: 'started',
                         labId: `LAB${String(appState.labHistory.length + 1).padStart(3, '0')}`,
                         startedAt: new Date().toISOString(),
+                        completedAt: null,
                         tasksCompleted: 0,
                         totalTasks: totalTasks
                     };
@@ -2546,7 +2572,7 @@
                     
                     updateProgressDisplay();
                     
-                    if (isCurrentLabCompleted) {
+                    if (previousLabCompleted) {
                         notificationSystem.success(`🎉 Previous lab completed! New ${newSession.labId} started!`);
                     } else {
                         notificationSystem.success(`🚀 New lab ${newSession.labId} started!`);
@@ -2890,7 +2916,7 @@
                 return '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">No sessions found for this period.</div>';
             }
             
-            // Sort history with newest first, but in-progress labs at the very top
+            // Sort history: in-progress labs first, then by session number (newest first)
             const sortedHistory = [...history].sort((a, b) => {
                 // In-progress labs go to top
                 if (a.status === 'started' && b.status !== 'started') return -1;
@@ -2910,33 +2936,51 @@
                 const currentProgress = getCurrentLabProgress();
                 const completedTasks = isInProgress ? currentProgress.completedTasks : (session.tasksCompleted || 0);
                 
-                // Lab title
+                // Lab title with better formatting
                 let labTitle;
                 if (isInProgress) {
-                    labTitle = `${statusIcon} Current Lab`;
+                    labTitle = `${statusIcon} Current Lab (${session.labId})`;
                 } else {
                     // Extract lab number from labId (LAB001 -> Lab 1)
                     const labNumber = session.labId ? session.labId.replace('LAB', '').replace(/^0+/, '') : session.session;
-                    labTitle = `${statusIcon} Lab ${labNumber}`;
+                    labTitle = `${statusIcon} Lab ${labNumber} (${session.labId})`;
                 }
                 
+                // Calculate progress percentage
+                const progressPercentage = Math.round((completedTasks / (session.totalTasks || 42)) * 100);
+                
                 return `
-                    <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem;">
+                    <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; ${isInProgress ? 'border-color: var(--primary); background: linear-gradient(135deg, rgba(0, 168, 255, 0.05), transparent);' : ''}">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                            <span style="font-weight: 600;">${labTitle}</span>
+                            <span style="font-weight: 600; ${isInProgress ? 'color: var(--primary);' : ''}">${labTitle}</span>
                             <span style="color: ${statusColor}; font-weight: 600;">${statusText}</span>
                         </div>
-                        <div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
-                            Lab ID: ${session.labId} • ${new Date(session.date).toLocaleDateString()}
+                        <div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.75rem;">
+                            Session #${session.session} • ${new Date(session.date).toLocaleDateString()}
                         </div>
-                        <div style="color: ${isInProgress ? 'var(--primary)' : 'var(--success)'}; font-size: 0.8rem; font-weight: 600;">
-                            Tasks: ${completedTasks}/${session.totalTasks || 42}
+                        
+                        <!-- Progress bar -->
+                        <div style="background: var(--surface); height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 0.5rem;">
+                            <div style="height: 100%; background: ${statusColor}; width: ${progressPercentage}%; transition: width 0.5s ease;"></div>
                         </div>
-                        ${session.completedAt ? 
-                            `<div style="color: var(--text-secondary); font-size: 0.75rem;">Completed: ${new Date(session.completedAt).toLocaleString()}</div>` : 
-                            session.startedAt ? 
-                            `<div style="color: var(--text-secondary); font-size: 0.75rem;">Started: ${new Date(session.startedAt).toLocaleString()}</div>` : ''
-                        }
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="color: ${isInProgress ? 'var(--primary)' : 'var(--success)'}; font-size: 0.9rem; font-weight: 600;">
+                                Tasks: ${completedTasks}/${session.totalTasks || 42} (${progressPercentage}%)
+                            </span>
+                            ${isInProgress ? 
+                                '<span style="color: var(--primary); font-size: 0.8rem; font-weight: 600;">⚡ ACTIVE</span>' : 
+                                `<span style="color: var(--success); font-size: 0.8rem; font-weight: 600;">🏆 DONE</span>`
+                            }
+                        </div>
+                        
+                        <div style="color: var(--text-secondary); font-size: 0.75rem;">
+                            ${session.completedAt ? 
+                                `✅ Completed: ${new Date(session.completedAt).toLocaleDateString()} at ${new Date(session.completedAt).toLocaleTimeString()}` : 
+                                session.startedAt ? 
+                                `🚀 Started: ${new Date(session.startedAt).toLocaleDateString()} at ${new Date(session.startedAt).toLocaleTimeString()}` : ''
+                            }
+                        </div>
                     </div>
                 `;
             }).join('');
