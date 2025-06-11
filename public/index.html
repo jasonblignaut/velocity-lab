@@ -573,6 +573,26 @@
             transform: translateY(-50%) scale(0.95);
         }
 
+        .password-toggle.loading {
+            background: #34c759;
+            color: transparent;
+            pointer-events: none;
+        }
+
+        .password-toggle.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            margin: -8px 0 0 -8px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
         .apple-checkbox-container {
             display: flex;
             align-items: center;
@@ -1640,7 +1660,14 @@
         // Authentication system - KV backend only
         const authSystem = {
             async login(formData) {
+                const submitBtn = document.querySelector('#signInForm .password-toggle');
+                
                 try {
+                    // Show loading spinner
+                    if (submitBtn) {
+                        submitBtn.classList.add('loading');
+                    }
+                    
                     const email = formData.get('email');
                     const password = formData.get('password');
                     
@@ -1684,11 +1711,23 @@
                 } catch (err) {
                     console.error('❌ Login failed:', err);
                     notificationSystem.error(err.message || 'Login failed. Please check your credentials.');
+                } finally {
+                    // Remove loading spinner
+                    if (submitBtn) {
+                        submitBtn.classList.remove('loading');
+                    }
                 }
             },
             
             async register(formData) {
+                const submitBtn = document.querySelector('#registerForm .password-toggle');
+                
                 try {
+                    // Show loading spinner
+                    if (submitBtn) {
+                        submitBtn.classList.add('loading');
+                    }
+                    
                     const name = formData.get('name');
                     const email = formData.get('email');
                     const password = formData.get('password');
@@ -1739,6 +1778,11 @@
                 } catch (err) {
                     console.error('❌ Registration failed:', err);
                     notificationSystem.error(err.message || 'Registration failed. Please try again.');
+                } finally {
+                    // Remove loading spinner
+                    if (submitBtn) {
+                        submitBtn.classList.remove('loading');
+                    }
                 }
             },
             
@@ -2969,6 +3013,7 @@
             const rememberGroup = document.getElementById('rememberGroup');
             const emailInput = document.getElementById('signInEmail');
             const passwordInput = document.getElementById('signInPassword');
+            const submitBtn = document.querySelector('#signInForm .password-toggle');
             
             if (passwordGroup) passwordGroup.classList.add('hidden');
             if (rememberGroup) rememberGroup.classList.add('hidden');
@@ -2977,11 +3022,19 @@
                 emailInput.classList.remove('loading');
             }
             if (passwordInput) passwordInput.value = '';
+            if (submitBtn) submitBtn.classList.remove('loading');
             
             showModal('signInModal');
         };
 
         window.showRegisterModal = function() {
+            // Reset register modal state
+            const registerForm = document.getElementById('registerForm');
+            const submitBtn = document.querySelector('#registerForm .password-toggle');
+            
+            if (registerForm) registerForm.reset();
+            if (submitBtn) submitBtn.classList.remove('loading');
+            
             showModal('registerModal');
         };
 
