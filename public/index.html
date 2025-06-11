@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+co<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1847,7 +1847,7 @@
                         
                     } catch (apiError) {
                         if (apiError.message === 'BACKEND_NOT_AVAILABLE') {
-                            console.log('📁 Backend not available, using demo mode');
+                            console.log('📁 Backend APIs not deployed, using demo mode');
                             
                             // Demo mode - allow any registration
                             const role = 'user';
@@ -2114,7 +2114,7 @@
                     return;
                 }
 
-                console.log('🔄 Loading progress from Cloudflare KV...');
+                console.log('🔄 Loading progress from backend APIs...');
                 const response = await api.call(`${API_BASE}/user/progress`, {
                     headers: {
                         'Authorization': `Bearer ${appState.sessionToken}`
@@ -2123,7 +2123,7 @@
                 
                 if (response.success) {
                     appState.progress = response.data || {};
-                    console.log('✅ Progress loaded from Cloudflare KV');
+                    console.log('✅ Progress loaded from backend APIs');
                 } else {
                     console.warn('API returned error:', response.message);
                     appState.progress = {};
@@ -2150,7 +2150,7 @@
                     return;
                 }
 
-                console.log(`🔄 Saving progress for task ${taskId} to Cloudflare KV...`);
+                console.log(`🔄 Saving progress for task ${taskId} to backend APIs...`);
                 const response = await api.call(`${API_BASE}/user/progress`, {
                     method: 'POST',
                     headers: {
@@ -2164,7 +2164,7 @@
                 });
                 
                 if (response.success) {
-                    console.log('✅ Progress saved to Cloudflare KV');
+                    console.log('✅ Progress saved to backend APIs');
                 } else {
                     console.warn('Failed to save progress:', response.message);
                 }
@@ -2204,7 +2204,7 @@
                     return;
                 }
 
-                console.log('🔄 Loading lab history from Cloudflare KV...');
+                console.log('🔄 Loading lab history from backend APIs...');
                 const response = await api.call(`${API_BASE}/user/lab-history`, {
                     headers: {
                         'Authorization': `Bearer ${appState.sessionToken}`
@@ -2213,7 +2213,7 @@
                 
                 if (response.success) {
                     appState.labHistory = response.data || [];
-                    console.log('✅ Lab history loaded from Cloudflare KV:', appState.labHistory.length, 'sessions');
+                    console.log('✅ Lab history loaded from backend APIs:', appState.labHistory.length, 'sessions');
                 } else {
                     console.warn('API returned error:', response.message);
                     appState.labHistory = [];
@@ -2622,8 +2622,8 @@
                 console.error('Failed to load admin data:', error);
                 
                 if (error.message === 'BACKEND_NOT_AVAILABLE') {
-                    console.log('📁 Backend not available, showing local admin fallback');
-                    showAdminPanelFallback('Backend APIs not deployed yet. Please deploy the Cloudflare Workers to enable full admin features.');
+                    console.log('📁 Backend APIs not deployed, showing local admin fallback');
+                    showAdminPanelFallback('Backend APIs not deployed yet. Please deploy the Functions to enable full admin features.');
                 } else {
                     console.log('⚠️ Admin panel API unavailable, showing fallback');
                     showAdminPanelFallback('Admin panel temporarily unavailable. Please try again later.');
@@ -3156,10 +3156,16 @@
                     <div style="margin-top: 2rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
                         <h4 style="margin-bottom: 1rem;">📚 To enable full admin features:</h4>
                         <ol style="text-align: left; max-width: 400px; margin: 0 auto;">
-                            <li>Deploy the 3 Cloudflare Workers provided</li>
-                            <li>Configure your domain routes</li>
+                            <li>Deploy the 3 Functions files to <code>/functions/api/</code></li>
+                            <li>Configure your serverless functions</li>
                             <li>Admin panel will automatically work</li>
                         </ol>
+                        <div style="margin-top: 1rem; font-size: 0.9rem; background: var(--surface); padding: 0.5rem; border-radius: 4px;">
+                            Files needed:<br>
+                            <code>/functions/api/admin/users-progress.js</code><br>
+                            <code>/functions/api/lab/start.js</code><br>
+                            <code>/functions/api/user/lab-history.js</code>
+                        </div>
                     </div>
                     <div style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
                         Current mode: <strong>localStorage fallback</strong>

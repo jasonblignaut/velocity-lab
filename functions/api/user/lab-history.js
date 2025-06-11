@@ -1,171 +1,128 @@
-// Cloudflare Workers API - User Lab History
-// File: /api/user/lab-history.js
+// Netlify/Vercel Functions API - User Lab History
+// File: /functions/api/user/lab-history.js
 
-export default {
-  async fetch(request, env, ctx) {
-    // CORS headers
-    const corsHeaders = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+exports.handler = async (event, context) => {
+  // CORS headers
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Content-Type': 'application/json'
+  };
+
+  // Handle preflight requests
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers,
+      body: ''
     };
+  }
 
-    // Handle preflight requests
-    if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: corsHeaders });
-    }
-
-    try {
-      // Check authorization
-      const authHeader = request.headers.get('Authorization');
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return new Response(JSON.stringify({
+  try {
+    // Check authorization
+    const authHeader = event.headers.authorization || event.headers.Authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return {
+        statusCode: 401,
+        headers,
+        body: JSON.stringify({
           success: false,
           message: 'Authorization required'
-        }), {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      }
+        })
+      };
+    }
 
-      const sessionToken = authHeader.replace('Bearer ', '');
+    const sessionToken = authHeader.replace('Bearer ', '');
+    
+    // For demo purposes - in production you'd:
+    // 1. Verify the session token
+    // 2. Get user ID from session
+    // 3. Load/save user's lab history from database
+
+    if (event.httpMethod === 'GET') {
+      // Mock lab history data
+      const mockLabHistory = [
+        {
+          session: 1,
+          date: new Date().toISOString().split('T')[0],
+          status: 'started',
+          labId: 'LAB001',
+          startedAt: new Date().toISOString(),
+          tasksCompleted: 0,
+          totalTasks: 42
+        }
+      ];
       
-      // Verify session
-      const sessionData = await env.VELOCITY_KV.get(`session:${sessionToken}`, 'json');
-      if (!sessionData) {
-        return new Response(JSON.stringify({
-          success: false,
-          message: 'Invalid session'
-        }), {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      }
-
-      const userEmail = sessionData.email;
-
-      if (request.method === 'GET') {
-        // Get lab history
-        const historyKey = `lab-history:${userEmail}`;
-        let labHistory = await env.VELOCITY_KV.get(historyKey, 'json') || [];
-        
-        // If no history exists, create default first lab
-        if (labHistory.length === 0) {
-          const today = new Date().toISOString().split('T')[0];
-          const defaultLab = {
-            session: 1,
-            date: today,
-            status: 'started',
-            labId: 'LAB001',
-            startedAt: new Date().toISOString(),
-            tasksCompleted: 0,
-            totalTasks: 42
-          };
-          
-          labHistory = [defaultLab];
-          await env.VELOCITY_KV.put(historyKey, JSON.stringify(labHistory));
-        }
-        
-        // Update current lab progress
-        const progressKey = `progress:${userEmail}`;
-        const userProgress = await env.VELOCITY_KV.get(progressKey, 'json') || {};
-        const completedTasks = Object.values(userProgress).filter(task => task?.completed).length;
-        
-        // Update the current lab's task count
-        const currentLab = labHistory.find(lab => lab.status === 'started');
-        if (currentLab) {
-          currentLab.tasksCompleted = completedTasks;
-          
-          // Auto-complete if all tasks are done
-          if (completedTasks === 42) {
-            currentLab.status = 'completed';
-            currentLab.completedAt = new Date().toISOString();
-          }
-          
-          await env.VELOCITY_KV.put(historyKey, JSON.stringify(labHistory));
-        }
-
-        return new Response(JSON.stringify({
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
           success: true,
-          data: labHistory
-        }), {
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
+          data: mockLabHistory
+        })
+      };
 
-      } else if (request.method === 'POST') {
-        // Add new lab session entry
-        const body = await request.json();
-        const { session, date, status, labId, startedAt, completedAt, tasksCompleted, totalTasks } = body;
-        
-        if (!session || !date || !status || !labId) {
-          return new Response(JSON.stringify({
+    } else if (event.httpMethod === 'POST') {
+      // Add/update lab session entry
+      const body = JSON.parse(event.body || '{}');
+      const { session, date, status, labId, startedAt, completedAt, tasksCompleted, totalTasks } = body;
+      
+      if (!session || !date || !status || !labId) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({
             success: false,
             message: 'Missing required fields'
-          }), {
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-          });
-        }
-
-        const historyKey = `lab-history:${userEmail}`;
-        let labHistory = await env.VELOCITY_KV.get(historyKey, 'json') || [];
-        
-        // Create new lab entry
-        const newEntry = {
-          session,
-          date,
-          status,
-          labId,
-          startedAt: startedAt || new Date().toISOString(),
-          ...(completedAt && { completedAt }),
-          ...(tasksCompleted !== undefined && { tasksCompleted }),
-          ...(totalTasks !== undefined && { totalTasks })
+          })
         };
-        
-        // Check if entry with same labId already exists
-        const existingIndex = labHistory.findIndex(entry => entry.labId === labId);
-        if (existingIndex >= 0) {
-          // Update existing entry
-          labHistory[existingIndex] = { ...labHistory[existingIndex], ...newEntry };
-        } else {
-          // Add new entry
-          labHistory.push(newEntry);
-        }
-        
-        // Sort by session number
-        labHistory.sort((a, b) => a.session - b.session);
-        
-        await env.VELOCITY_KV.put(historyKey, JSON.stringify(labHistory));
+      }
 
-        return new Response(JSON.stringify({
+      // Create new lab entry
+      const newEntry = {
+        session,
+        date,
+        status,
+        labId,
+        startedAt: startedAt || new Date().toISOString(),
+        ...(completedAt && { completedAt }),
+        ...(tasksCompleted !== undefined && { tasksCompleted }),
+        ...(totalTasks !== undefined && { totalTasks })
+      };
+      
+      // In production: Save to database here
+      
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
           success: true,
           message: 'Lab history updated successfully',
           data: newEntry
-        }), {
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
+        })
+      };
 
-      } else {
-        return new Response(JSON.stringify({
+    } else {
+      return {
+        statusCode: 405,
+        headers,
+        body: JSON.stringify({
           success: false,
           message: 'Method not allowed'
-        }), {
-          status: 405,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      }
+        })
+      };
+    }
 
-    } catch (error) {
-      console.error('Lab history error:', error);
-      return new Response(JSON.stringify({
+  } catch (error) {
+    console.error('Lab history error:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
         success: false,
         message: 'Internal server error'
-      }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
+      })
+    };
   }
 };
