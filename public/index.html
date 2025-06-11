@@ -7,7 +7,7 @@
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     
     <style>
-        /* Apple-inspired Color Scheme with Light/Dark Themes */
+        /* Apple White + Unifi Cloud Color Scheme with Dark Mode */
         :root {
             --primary: #00a8ff;
             --primary-hover: #0093e6;
@@ -61,7 +61,7 @@
             transition: all 0.3s ease;
         }
 
-        /* Background Image */
+        /* Background Image - Fixed to show in both themes */
         body::before {
             content: '';
             position: fixed;
@@ -104,7 +104,7 @@
         .logo {
             width: 80px;
             height: 80px;
-            background: url('/assets/Velocity.jpg') center/contain no-repeat;
+            background: url('/assets/Velocity-Logo.png') center/contain no-repeat;
             cursor: pointer;
         }
 
@@ -124,9 +124,7 @@
             flex-direction: column;
             cursor: pointer;
             padding: 8px;
-            width: 40px;
-            height: 40px;
-            border-radius: 5px;
+            border-radius: 6px;
             transition: background-color 0.2s ease;
         }
 
@@ -229,6 +227,9 @@
         }
 
         .theme-submenu {
+            position: absolute;
+            right: 100%;
+            top: 0;
             background: var(--background);
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -236,7 +237,6 @@
             min-width: 150px;
             z-index: 1001;
             display: none;
-            position: static; /* For mobile */
         }
 
         .theme-menu-item:hover .theme-submenu {
@@ -373,7 +373,7 @@
             border-radius: 12px;
         }
 
-        /* Apple-style Modal */
+        /* Modern Apple-style Modal */
         .modal {
             display: none;
             position: fixed;
@@ -393,8 +393,9 @@
             justify-content: center;
         }
 
+        /* Apple-style Modal Content */
         .modal-content {
-            background: #1a1c1a;
+            background: #1a1a1a;
             border-radius: 20px;
             padding: 0;
             width: 100%;
@@ -411,31 +412,41 @@
             background: var(--background);
             height: auto;
             min-height: unset;
-            max-height: 90vh;
-            overflow-y: auto;
+            max-height: unset;
         }
 
+        /* Apple-style signin has dark background */
         .apple-modal {
-            background: #1a1c1e;
+            background: #1a1a1a;
+            color: white;
         }
 
         @keyframes modalSlideIn {
-            from { transform: scale(0.8) translateY(60px); opacity: 0; }
-            to { transform: scale(1) translateY(0); opacity: 1; }
+            from { 
+                transform: scale(0.8) translateY(60px); 
+                opacity: 0; 
+            }
+            to { 
+                transform: scale(1) translateY(0); 
+                opacity: 1; 
+            }
         }
 
+        /* Clean header with logo */
         .modal-header-clean {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             height: 120px;
-            background: #1a1c1e;
+            background: #1a1a1a;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
+        /* Velocity logo in the center - properly sized and colored */
         .modal-logo {
             width: 120px;
             height: 35px;
@@ -443,12 +454,17 @@
             filter: invert(1) brightness(1.2);
         }
 
+        /* Modal content area with better centering */
         .modal-body {
             padding: 130px 35px 35px;
             text-align: center;
             height: calc(100% - 120px);
             display: flex;
             flex-direction: column;
+            justify-content: center;
+        }
+
+        .modal-body.initial-state {
             justify-content: center;
         }
 
@@ -493,6 +509,7 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
+        /* Form Styles for Apple Modal */
         .apple-form-group {
             margin-bottom: 16px;
             text-align: left;
@@ -529,10 +546,11 @@
         }
 
         .apple-form-input.loading {
-            background: #2c2c2e url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iOCIgc3Ryb2tlPSIjNmQ2ZDcwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWRhc2hhcnJheT0iNCAyIiBvcGFjaXR5PSIwLjUiPgo8YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIGF0dHJpYnV0ZVR5cGU9IlhNTCIgdHlwZT0icm90YXRlIiB2YWx1ZXM9IjAgMTAgMTA7MzYwIDEwIDEwIiBkdXI9IjFzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIvPgo8L2NpcmNsZT4KPC9zdmc+Cg==') no-repeat right 16px center;
+            background: #2c2c2e url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iOCIgc3Ryb2tlPSIjNmQ2ZDcwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWRhc2hhcnJheT0iNCAyIiBvcGFjaXR5PSIwLjUiPgogIDxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgYXR0cmlidXRlVHlwZT0iWE1MIiB0eXBlPSJyb3RhdGUiIHZhbHVlcz0iMCAxMCAxMDszNjAgMTAgMTAiIGR1cj0iMXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CjwvY2lyY2xlPgo8L3N2Zz4K') no-repeat right 16px center;
             pointer-events: none;
         }
 
+        /* Password field with styled arrow button */
         .password-field {
             position: relative;
         }
@@ -556,6 +574,7 @@
             height: 32px;
             border-radius: 50%;
             transition: all 0.2s ease;
+            line-height: 1;
         }
 
         .password-toggle:hover {
@@ -582,7 +601,7 @@
             left: 50%;
             width: 16px;
             height: 16px;
-            margin: -8px 0 0 -8px;
+            margin: -8px 0 0 -8.2px;
             border: 2px solid white;
             border-top-color: transparent;
             border-radius: 50%;
@@ -607,10 +626,10 @@
             font-size: 15px;
         }
 
+        /* Non-Apple modals keep original styling */
         .modal-header {
             text-align: center;
             margin-bottom: 1.5rem;
-            padding: 1rem;
         }
 
         .modal-header h2 {
@@ -618,10 +637,11 @@
             margin-bottom: 0.5rem;
         }
 
+        /* Task Detail Modal */
         .task-detail-content {
             max-height: 70vh;
             overflow-y: auto;
-            padding: 1rem;
+            padding: 1rem 0;
         }
 
         .subtask-container {
@@ -660,6 +680,7 @@
             text-decoration: line-through;
         }
 
+        /* Form Styles */
         .form-group {
             margin-bottom: 1rem;
         }
@@ -697,6 +718,7 @@
             margin-top: 1rem;
         }
 
+        /* Main Dashboard */
         .main-content {
             margin-top: 70px;
             padding: 2rem;
@@ -720,6 +742,7 @@
             font-size: 1.1rem;
         }
 
+        /* Progress Ring */
         .progress-section {
             display: flex;
             justify-content: center;
@@ -771,6 +794,7 @@
             color: var(--text-secondary);
         }
 
+        /* Week Cards */
         .weeks-container {
             display: flex;
             flex-direction: column;
@@ -845,6 +869,7 @@
             transform: rotate(180deg);
         }
 
+        /* Task List */
         .task-list {
             display: none;
             margin-top: 1.5rem;
@@ -919,6 +944,7 @@
             opacity: 1;
         }
 
+        /* User Menu */
         .user-menu {
             position: relative;
         }
@@ -980,6 +1006,16 @@
             background: var(--surface-hover);
         }
 
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        /* Mobile Responsive Design */
         @media (max-width: 768px) {
             .header {
                 padding: 0 1rem;
@@ -991,8 +1027,8 @@
                 position: absolute;
                 left: 50%;
                 transform: translateX(-50%);
-                width: 60px;
-                height: 60px;
+                width: 100px;
+                height: 100px;
             }
 
             .header-buttons {
@@ -1057,6 +1093,7 @@
             }
 
             .weeks-container {
+                flex-direction: column;
                 gap: 1rem;
             }
 
@@ -1073,6 +1110,8 @@
             }
 
             .modal-content {
+                padding: 0;
+                margin: auto;
                 max-width: 90vw;
                 height: 420px;
             }
@@ -1082,23 +1121,23 @@
                 height: calc(100% - 100px);
             }
 
+            .modal-body.initial-state {
+                justify-content: center;
+            }
+
             .modal-logo {
                 width: 100px;
                 height: 29px;
             }
 
-            .modal-header-clean {
-                height: 100px;
-            }
-
             .btn {
                 font-size: 0.9rem;
                 padding: 10px 16px;
+                justify-content: center;
             }
 
-            .theme-submenu {
-                position: static;
-                margin-left: 1rem;
+            .form-input {
+                font-size: 16px;
             }
         }
 
@@ -1118,8 +1157,8 @@
             }
 
             .logo {
-                width: 50px;
-                height: 50px;
+                width: 90px;
+                height: 90px;
             }
 
             .welcome-title {
@@ -1141,11 +1180,16 @@
                 height: calc(100% - 90px);
             }
 
+            .modal-body.initial-state {
+                justify-content: center;
+            }
+
             .modal-header-clean {
                 height: 90px;
             }
         }
 
+        /* Loading States */
         .loading {
             opacity: 0.7;
             pointer-events: none;
@@ -1174,6 +1218,7 @@
             to { transform: rotate(360deg); }
         }
 
+        /* Success/Error Messages */
         .message {
             padding: 12px 16px;
             border-radius: 8px;
@@ -1194,10 +1239,12 @@
             border: 1px solid rgba(255, 59, 48, 0.2);
         }
 
+        /* Hide elements by default */
         .hidden {
             display: none !important;
         }
 
+        /* Notification System */
         .notification {
             position: fixed;
             top: 90px;
@@ -1233,17 +1280,24 @@
 </head>
 <body data-theme="dark">
     <!-- Header -->
-    <header class="header" id="header">
+    <div class="header" id="header">
+        <!-- Logo only (no text) -->
         <div class="logo" onclick="goHome()"></div>
+        
+        <!-- Desktop Navigation - Always shows both Sign In and Get Started -->
         <div class="header-buttons" id="headerButtons">
             <button class="btn btn-secondary" onclick="showSignInModal()">Sign In</button>
             <button class="btn btn-primary" onclick="showRegisterModal()">Get Started</button>
         </div>
+        
+        <!-- Mobile Hamburger Menu -->
         <div class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
             <span></span>
             <span></span>
             <span></span>
         </div>
+        
+        <!-- Desktop User Menu -->
         <div class="user-menu hidden" id="userMenu">
             <button class="user-menu-toggle" onclick="toggleUserMenu()">
                 <span id="userName">User</span>
@@ -1251,7 +1305,7 @@
             </button>
             <div class="user-menu-dropdown" id="userMenuDropdown">
                 <button class="user-menu-item" onclick="startLabEnvironment()">🚀 Start New Lab</button>
-                <button class="user-menu-item" onclick="showLabHistoryModal()">📊 Lab History</button>
+                <button class="user-menu-item" onclick="showLabHistoryModal()" id="labHistoryButton">📊 Lab History</button>
                 <button class="user-menu-item" onclick="showAdminPanel()" id="adminButton" style="display: none;">👑 Admin Panel</button>
                 <div class="theme-menu-item">
                     <button class="theme-menu-toggle">
@@ -1259,147 +1313,194 @@
                         <span>▶</span>
                     </button>
                     <div class="theme-submenu">
-                        <button class="theme-option jedi" onclick="setTheme('light')">🌟 Light Jedi</button>
-                        <button class="theme-option sith active" onclick="setTheme('dark')">⚡ Dark Sith</button>
+                        <button class="theme-option jedi" onclick="setTheme('light')">
+                            🌟 Light Jedi
+                        </button>
+                        <button class="theme-option sith active" onclick="setTheme('dark')">
+                            ⚡ Dark Sith
+                        </button>
                     </div>
                 </div>
                 <button class="user-menu-item" onclick="logout()">🚪 Sign Out</button>
             </div>
         </div>
-    </header>
+    </div>
 
     <!-- Mobile Menu Overlay -->
     <div class="mobile-menu" id="mobileMenu">
-        <div class="mobile-menu-items" id="mobileMenuItems"></div>
+        <div class="mobile-menu-items" id="mobileMenuItems">
+            <!-- Items populated by JavaScript based on auth state -->
+        </div>
     </div>
 
-    <!-- Main Content -->
-    <main>
-        <!-- Welcome Screen -->
-        <div class="welcome-screen" id="welcomeScreen">
-            <div class="welcome-notification">
-                👋 Welcome to Velocity Lab! Sign in to access your Exchange Hybrid training journey.
-            </div>
-            <h1 class="welcome-title">Master Exchange Hybrid</h1>
-            <p class="welcome-subtitle">
-                Embark on a comprehensive 4-week journey with 42 hands-on tasks to build
-                a complete Exchange Hybrid lab environment, from Domain Controllers to
-                Microsoft 365 integration.
-            </p>
-            <div class="welcome-buttons">
-                <button class="btn btn-primary btn-large" onclick="showSignInModal()">👤 Sign In</button>
-            </div>
+    <!-- Welcome Screen - Only Sign In button -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-notification">
+            👋 Welcome to Velocity Lab! Sign in to access your Exchange Hybrid training journey.
+        </div>
+        
+        <h1 class="welcome-title">Master Exchange Hybrid</h1>
+        <p class="welcome-subtitle">
+            Embark on a comprehensive 4-week journey with 42 hands-on tasks to build
+            a complete Exchange Hybrid lab environment, from Domain Controllers to
+            Microsoft 365 integration.
+        </p>
+        
+        <div class="welcome-buttons">
+            <button class="btn btn-primary btn-large" onclick="showSignInModal()">
+                👤 Sign In
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div class="main-content hidden" id="mainContent">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Your Exchange Hybrid Journey</h1>
+            <p class="dashboard-subtitle">Track your progress through 42 hands-on tasks across 4 comprehensive weeks</p>
         </div>
 
-        <!-- Dashboard -->
-        <div class="main-content hidden" id="mainContent">
-            <div class="dashboard-header">
-                <h1 class="dashboard-title">Your Exchange Hybrid Journey</h1>
-                <p class="dashboard-subtitle">Track your progress through 42 hands-on tasks across 4 comprehensive weeks</p>
-            </div>
-            <div class="progress-section">
-                <div class="progress-ring">
-                    <svg viewBox="0 0 120 120">
-                        <circle class="progress-ring-bg" cx="60" cy="60" r="54"/>
-                        <circle class="progress-ring-fill" cx="60" cy="60" r="54" stroke-dasharray="0 339.292" id="progressRing"/>
-                    </svg>
-                    <div class="progress-text">
-                        <div class="progress-percentage" id="progressPercentage">0%</div>
-                        <div class="progress-label">Complete</div>
-                    </div>
+        <!-- Progress Ring -->
+        <div class="progress-section">
+            <div class="progress-ring">
+                <svg viewBox="0 0 120 120">
+                    <circle class="progress-ring-bg" cx="60" cy="60" r="54"/>
+                    <circle class="progress-ring-fill" cx="60" cy="60" r="54" 
+                            stroke-dasharray="0 339.292" id="progressRing"/>
+                </svg>
+                <div class="progress-text">
+                    <div class="progress-percentage" id="progressPercentage">0%</div>
+                    <div class="progress-label">Complete</div>
                 </div>
             </div>
-            <div class="weeks-container" id="weeksContainer"></div>
         </div>
-    </main>
 
-    <!-- Modals -->
+        <!-- Week Cards -->
+        <div class="weeks-container" id="weeksContainer">
+            <!-- Week cards will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Apple-style Sign In Modal -->
     <div class="modal" id="signInModal">
         <div class="modal-content apple-modal">
-            <button class="modal-close" onclick="closeModal('signInModal')">×</button>
+            <button class="modal-close" onclick="closeModal('signInModal')">&times;</button>
+            
+            <!-- Clean header with logo -->
             <div class="modal-header-clean">
                 <div class="modal-logo"></div>
             </div>
+            
             <div class="modal-body">
                 <h2 class="modal-title">Sign in with Velocity Lab</h2>
                 <p class="modal-subtitle">Welcome back to your training journey</p>
+                
                 <form id="signInForm">
                     <div class="apple-form-group">
-                        <input type="email" class="apple-form-input" id="signInEmail" name="email" placeholder="Email" required>
+                        <input type="email" class="apple-form-input" id="signInEmail" name="email" 
+                               placeholder="Email" required>
                     </div>
+                    
                     <div class="apple-form-group hidden" id="passwordGroup">
                         <div class="password-field">
-                            <input type="password" class="apple-form-input" id="signInPassword" name="password" placeholder="Password" required>
-                            <button type="submit" class="password-toggle" title="Sign In">→</button>
+                            <input type="password" class="apple-form-input" id="signInPassword" name="password" 
+                                   placeholder="Password" required>
+                            <button type="submit" class="password-toggle" title="Sign In">
+                                →
+                            </button>
                         </div>
                     </div>
+                    
                     <div class="apple-checkbox-container hidden" id="rememberGroup">
                         <input type="checkbox" class="apple-checkbox" name="remember" id="rememberMe">
                         <label class="apple-checkbox-label" for="rememberMe">Remember me for 30 days</label>
                     </div>
-                    <div id="signInMessage" class="message hidden"></div>
+                    
+                    <div id="signInMessage"></div>
                 </form>
             </div>
         </div>
     </div>
 
+    <!-- Apple-style Register Modal -->
     <div class="modal" id="registerModal">
         <div class="modal-content apple-modal">
-            <button class="modal-close" onclick="closeModal('registerModal')">×</button>
+            <button class="modal-close" onclick="closeModal('registerModal')">&times;</button>
+            
+            <!-- Clean header with logo -->
             <div class="modal-header-clean">
                 <div class="modal-logo"></div>
             </div>
+            
             <div class="modal-body">
                 <h2 class="modal-title">Create Velocity Lab Account</h2>
                 <p class="modal-subtitle">Start your Exchange Hybrid journey today</p>
+                
                 <form id="registerForm">
                     <div class="apple-form-group">
-                        <input type="text" class="apple-form-input" id="registerName" name="name" placeholder="Full Name" required>
+                        <input type="text" class="apple-form-input" id="registerName" name="name" 
+                               placeholder="Full Name" required>
                     </div>
+                    
                     <div class="apple-form-group">
-                        <input type="email" class="apple-form-input" id="registerEmail" name="email" placeholder="Email" required>
+                        <input type="email" class="apple-form-input" id="registerEmail" name="email" 
+                               placeholder="Email" required>
                     </div>
+                    
                     <div class="apple-form-group">
                         <div class="password-field">
-                            <input type="password" class="apple-form-input" id="registerPassword" name="password" placeholder="Password" required>
-                            <button type="submit" class="password-toggle" title="Create Account">→</button>
+                            <input type="password" class="apple-form-input" id="registerPassword" name="password" 
+                                   placeholder="Password" required>
+                            <button type="submit" class="password-toggle" title="Create Account">
+                                →
+                            </button>
                         </div>
                     </div>
-                    <div id="registerMessage" class="message hidden"></div>
+                    
+                    <div id="registerMessage"></div>
                 </form>
             </div>
         </div>
     </div>
 
+    <!-- Task Detail Modal -->
     <div class="modal" id="taskDetailModal">
         <div class="modal-content large">
-            <button class="modal-close" onclick="closeModal('taskDetailModal')">×</button>
+            <button class="modal-close" onclick="closeModal('taskDetailModal')">&times;</button>
             <div class="modal-header">
                 <h2 id="taskDetailTitle">Task Details</h2>
             </div>
-            <div class="task-detail-content" id="taskDetailContent"></div>
+            <div class="task-detail-content" id="taskDetailContent">
+                <!-- Task details will be populated by JavaScript -->
+            </div>
         </div>
     </div>
 
+    <!-- Lab History Modal -->
     <div class="modal" id="labHistoryModal">
-        <div class="modal-content large">
-            <button class="modal-close" onclick="closeModal('labHistoryModal')">×</button>
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('labHistoryModal')">&times;</button>
             <div class="modal-header">
                 <h2>📊 Lab History</h2>
                 <p style="color: var(--text-secondary);">Your training progress timeline</p>
             </div>
-            <div id="labHistoryModalContent"></div>
+            <div id="labHistoryModalContent">
+                <!-- Lab history content will be populated by JavaScript -->
+            </div>
         </div>
     </div>
 
+    <!-- Admin Panel Modal -->
     <div class="modal" id="adminModal">
-        <div class="modal-content large">
-            <button class="modal-close" onclick="closeModal('adminModal')">×</button>
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+            <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
             <div class="modal-header">
                 <h2>👑 Admin Panel</h2>
                 <p style="color: var(--text-secondary);">User progress leaderboard</p>
             </div>
-            <div id="adminContent"></div>
+            <div id="adminContent">
+                <!-- Admin content will be populated by JavaScript -->
+            </div>
         </div>
     </div>
 
@@ -1414,28 +1515,29 @@
             progress: {},
             authenticated: false,
             labHistory: [],
-            tasks: [],
-            isWelcomeShown: false,
-            shownNotifications: new Set()
+            tasks: [], // Will be populated from task-definitions.js
+            isWelcomeShown: false, // Flag to prevent duplicate welcome messages
+            shownNotifications: new Set() // Track shown notifications to prevent duplicates
         };
 
         // API configuration
         const API_BASE = '/api';
 
-        // Utility functions
+        // Utility functions for cookies and DOM manipulation - NO localStorage
         const utils = {
             cookies: {
-                set(name, value, days = 30) {
+                set(name, value) {
                     const expires = new Date();
-                    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires.setTime(expires.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days
                     document.cookie = `${name}=${value}; expires=${expires.toUTCString()}; path=/; SameSite=Strict`;
                 },
                 get(name) {
                     const nameEQ = name + "=";
                     const ca = document.cookie.split(';');
-                    for (let c of ca) {
-                        c = c.trim();
-                        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length);
+                    for(let i = 0; i < ca.length; i++) {
+                        let c = ca[i];
+                        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
                     }
                     return null;
                 },
@@ -1448,527 +1550,982 @@
             }
         };
 
-        // API call function
+        // API call function - with localStorage fallback when backend unavailable
         const api = {
             async call(url, options = {}) {
                 try {
                     console.log('🌐 API Call:', options.method || 'GET', url);
+                    
+                    // Debug FormData contents (for login/register)
                     if (options.body instanceof FormData) {
-                        console.log('📋 FormData Contents:');
+                        console.log('📋 FormData contents:');
                         for (let [key, value] of options.body.entries()) {
-                            console.log(`  ${key}: ${key === 'password' ? '[*hidden*]' : value}`);
+                            if (key === 'password') {
+                                console.log(`  ${key}: [${value.length} characters]`);
+                            } else {
+                                console.log(`  ${key}:`, value);
+                            }
                         }
                     }
+                    
                     const response = await fetch(url, {
                         method: options.method || 'GET',
                         body: options.body,
                         headers: {
-                            'Content-Type': options.body instanceof FormData ? undefined : 'application/json',
                             ...options.headers
                         }
                     });
-                    console.log(`📡 Response: ${response.status} ${response.statusText}`);
-                    const responseText = await response.text();
-                    console.log('📡 Raw response body:', responseText);
-                    if (!response.headers.get('Content-Type')?.includes('application/json')) {
-                        console.warn(`⚠️ Expected JSON but got '${response.headers.get('Content-Type')}' for ${url}`);
-                        throw new Error('BACKEND_NOT_AVAILABLE');
+
+                    console.log('📡 Response status:', response.status, response.statusText);
+
+                    // Check if response is JSON
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        // If we get HTML response, it means backend isn't deployed
+                        if (contentType && contentType.includes('text/html')) {
+                            console.warn('⚠️ Backend API not deployed, using localStorage fallback');
+                            throw new Error('BACKEND_NOT_AVAILABLE');
+                        }
+                        
+                        console.error('❌ Expected JSON response but got:', contentType);
+                        const responseText = await response.text();
+                        console.error('❌ Response body:', responseText);
+                        throw new Error(`API returned ${response.status}: Expected JSON response but got ${contentType}`);
                     }
-                    const result = JSON.parse(responseText);
-                    console.log('📡 Parsed JSON:', result);
+
+                    const result = await response.json();
+                    console.log('📡 Response data:', result);
+                    
                     if (!result.success) {
                         throw new Error(result.message || 'API call failed');
                     }
+                    
                     return result;
                 } catch (error) {
-                    console.error(`❌ API Error for ${url}:`, error.message);
+                    console.error('❌ API call failed:', error);
                     throw error;
                 }
             }
         };
 
-        // Notification system
+        // Enhanced notification system with deduplication
         const notificationSystem = {
             notifications: [],
+            
+            success(message) {
+                console.log('✅ Success:', message);
+                this.show(message, 'success');
+            },
+            
+            error(message) {
+                console.log('❌ Error:', message);
+                this.show(message, 'error');
+            },
+            
+            info(message) {
+                console.log('ℹ️ Info:', message);
+                this.show(message, 'info');
+            },
+            
             show(message, type) {
-                const id = `${type}:${message}`;
-                if (appState.shownNotifications.has(id) || (message.includes('Welcome') && appState.isWelcomeShown)) {
-                    console.log('🔔 Skipped duplicate:', message);
+                // Create unique notification ID based on message and type
+                const notificationId = `${type}:${message}`;
+                
+                // Check if this notification was already shown
+                if (appState.shownNotifications.has(notificationId)) {
+                    console.log('🚫 Duplicate notification prevented:', message);
                     return;
                 }
-                if (message.includes('Welcome')) appState.isWelcomeShown = true;
-                appState.shownNotifications.add(id);
+                
+                // For welcome messages, use the isWelcomeShown flag
+                if (message.includes('Welcome back') || message.includes('Welcome to Velocity Lab')) {
+                    if (appState.isWelcomeShown) {
+                        console.log('🚫 Duplicate welcome notification prevented:', message);
+                        return;
+                    }
+                    appState.isWelcomeShown = true;
+                }
+                
+                // Mark this notification as shown
+                appState.shownNotifications.add(notificationId);
+                
+                // Create notification element
                 const notification = document.createElement('div');
                 notification.className = `notification ${type}`;
                 notification.textContent = message;
-                notification.style.top = `${90 + (this.notifications.length * 80)}px`;
+                
+                // Calculate position based on existing notifications
+                const offset = this.notifications.length * 80;
+                notification.style.top = `${90 + offset}px`;
+                
                 document.body.appendChild(notification);
                 this.notifications.push(notification);
+                
+                // Remove after 5 seconds
                 setTimeout(() => {
                     notification.remove();
                     const index = this.notifications.indexOf(notification);
-                    if (index !== -1) {
+                    if (index > -1) {
                         this.notifications.splice(index, 1);
-                        this.notifications.forEach((n, i) => {
-                            n.style.top = `${90 + (i * 80)}px`;
+                        // Reposition remaining notifications
+                        this.notifications.forEach((notif, i) => {
+                            notif.style.top = `${90 + (i * 80)}px`;
                         });
                     }
-                    appState.shownNotifications.delete(id);
+                    
+                    // Remove from shown notifications after display
+                    // This allows the same notification to be shown again later if needed
+                    setTimeout(() => {
+                        appState.shownNotifications.delete(notificationId);
+                    }, 1000);
                 }, 5000);
             },
-            success(message) { this.show(message, 'success'); },
-            error(message) { this.show(message, 'error'); },
-            info(message) { this.show(message, 'info'); },
-            clearSession() {
+            
+            // Method to clear all shown notifications (useful for new sessions)
+            clearShownNotifications() {
                 appState.shownNotifications.clear();
                 appState.isWelcomeShown = false;
             }
         };
 
-        // Authentication system
+        // Authentication system - KV backend with localStorage fallback
         const authSystem = {
             async login(formData) {
-                const submitBtn = utils.getId('signInForm')?.querySelector('.password-toggle');
+                const submitBtn = document.querySelector('#signInForm .password-toggle');
+                
                 try {
-                    if (submitBtn) submitBtn.classList.add('loading');
+                    // Show loading spinner
+                    if (submitBtn) {
+                        submitBtn.classList.add('loading');
+                    }
+                    
                     const email = formData.get('email');
-                    if (!email || !formData.get('password')) throw new Error('Please fill in all fields');
-                    console.log('🔐 Logging in...');
-                    const { data } = await api.call(`${API_BASE}/users/login`, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    console.log('✅ Login Success');
-                    appState.user = { name: data.name, email: data.email, role: data.role };
-                    appState.sessionToken = data.sessionToken;
-                    appState.authenticated = true;
-                    utils.cookies.set('user', JSON.stringify(appState.user));
-                    utils.cookies.set('session', data.sessionToken);
-                    if (data.role === 'admin') utils.getId('adminButton').style.display = 'block';
-                    showDashboard();
-                    await loadUserData();
-                    closeModal('signInModal');
-                    notificationSystem.success(`Welcome back, ${data.name}! 🎉`);
-                } catch (error) {
-                    if (error.message === 'BACKEND_NOT_AVAILABLE') {
-                        console.warn('⚠️ Backend unavailable, using demo mode');
-                        const email = formData.get('email');
-                        const name = email.split('@')[0] || 'Demo User';
-                        const role = email.includes('admin') ? 'admin' : 'user';
-                        const sessionToken = `demo_${Math.random().toString(36).substr(2, 8)}`;
-                        appState.user = { name, email, role };
+                    const password = formData.get('password');
+                    
+                    if (!email || !password) {
+                        throw new Error('Please fill in all required fields.');
+                    }
+
+                    console.log('🔄 Attempting login with backend APIs...');
+                    
+                    try {
+                        // Call Cloudflare KV backend directly
+                        const { data } = await api.call('/api/users/login', {
+                            method: 'POST',
+                            body: formData  // Send FormData directly to match backend expectations
+                        });
+                        
+                        console.log('✅ Login successful with backend APIs');
+                        
+                        const { name, role, email: userEmail, sessionToken } = data;
+                        
+                        utils.cookies.set('user', JSON.stringify({ name, role, email: userEmail }));
+                        utils.cookies.set('session', sessionToken);
+                        
+                        appState.user = { name, role, email: userEmail };
                         appState.sessionToken = sessionToken;
                         appState.authenticated = true;
-                        utils.cookies.set('user', JSON.stringify(appState.user));
-                        utils.cookies.set('session', sessionToken);
-                        if (role === 'admin') utils.getId('adminButton').style.display = 'block';
+                        
+                        if (role === 'admin') {
+                            const adminBtn = document.getElementById('adminButton');
+                            if (adminBtn) adminBtn.style.display = 'block';
+                        }
+                        
                         showDashboard();
-                        await loadUserData();
+                        await loadUserProgress();
+                        await loadLabHistory();
                         closeModal('signInModal');
-                        notificationSystem.success(`Welcome, ${name}! (Demo Mode) 🎉`);
-                    } else {
-                        throw error;
+                        
+                        // Show welcome notification only if not already shown
+                        if (!appState.isWelcomeShown) {
+                            notificationSystem.success(`Welcome back, ${name}! 🎉`);
+                        }
+                        
+                    } catch (apiError) {
+                        if (apiError.message === 'BACKEND_NOT_AVAILABLE') {
+                            console.log('📁 Backend not available, using demo mode');
+                            
+                            // Demo mode - allow any login
+                            const name = email.split('@')[0] || 'Demo User';
+                            const role = email.includes('admin') ? 'admin' : 'user';
+                            const demoSessionToken = 'demo_' + Math.random().toString(36).substr(2, 9);
+                            
+                            utils.cookies.set('user', JSON.stringify({ name, role, email }));
+                            utils.cookies.set('session', demoSessionToken);
+                            
+                            appState.user = { name, role, email };
+                            appState.sessionToken = demoSessionToken;
+                            appState.authenticated = true;
+                            
+                            if (role === 'admin') {
+                                const adminBtn = document.getElementById('adminButton');
+                                if (adminBtn) adminBtn.style.display = 'block';
+                            }
+                            
+                            showDashboard();
+                            await loadUserProgress();
+                            await loadLabHistory();
+                            closeModal('signInModal');
+                            
+                            // Show welcome notification
+                            if (!appState.isWelcomeShown) {
+                                notificationSystem.success(`Welcome ${name}! (Demo Mode) 🎉`);
+                            }
+                        } else {
+                            throw apiError;
+                        }
                     }
+                    
+                } catch (err) {
+                    console.error('❌ Login failed:', err);
+                    notificationSystem.error(err.message || 'Login failed. Please check your credentials.');
                 } finally {
-                    if (submitBtn) submitBtn.classList.remove('loading');
+                    // Remove loading spinner
+                    if (submitBtn) {
+                        submitBtn.classList.remove('loading');
+                    }
                 }
             },
+            
             async register(formData) {
-                const submitBtn = utils.getId('registerForm')?.querySelector('.password-toggle');
+                const submitBtn = document.querySelector('#registerForm .password-toggle');
+                
                 try {
-                    if (submitBtn) submitBtn.classList.add('loading');
+                    // Show loading spinner
+                    if (submitBtn) {
+                        submitBtn.classList.add('loading');
+                    }
+                    
                     const name = formData.get('name');
                     const email = formData.get('email');
                     const password = formData.get('password');
-                    if (!name || !email || !password) throw new Error('Please fill all fields');
-                    if (password.length < 8) throw new Error('Password must be at least 8 characters');
-                    console.log('📝 Registering...');
-                    const { data } = await api.call(`${API_BASE}/users/register`, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    console.log('✅ Registration Success');
-                    appState.user = { name: data.name, email: data.email, role: data.role };
-                    appState.sessionToken = data.sessionToken;
-                    appState.authenticated = true;
-                    utils.cookies.set('user', JSON.stringify(appState.user));
-                    utils.cookies.set('session', data.sessionToken);
-                    showDashboard();
-                    await loadUserData();
-                    closeModal('registerModal');
-                    notificationSystem.success(`Welcome, ${data.name}! 🚀`);
-                } catch (error) {
-                    if (error.message === 'BACKEND_NOT_AVAILABLE') {
-                        console.warn('⚠️ Demo mode registration');
-                        const name = formData.get('name');
-                        const email = formData.get('email');
-                        const role = 'user';
-                        const sessionToken = `demo_${Math.random().toString(36).substr(2, 8)}`;
-                        appState.user = { name, email, role };
+                    
+                    if (!name || !email || !password) {
+                        throw new Error('Please fill in all required fields.');
+                    }
+                    
+                    if (password.length < 8) {
+                        throw new Error('Password must be at least 8 characters long.');
+                    }
+
+                    console.log('🔄 Attempting registration with backend APIs...');
+                    
+                    try {
+                        // Call Cloudflare KV backend directly
+                        const { data } = await api.call('/api/users/register', {
+                            method: 'POST',
+                            body: formData  // Send FormData directly to match backend expectations
+                        });
+                        
+                        console.log('✅ Registration successful with backend APIs');
+                        
+                        const { name: userName, email: userEmail, role, sessionToken } = data;
+                        
+                        // Note: Backend ensures new users get role 'user', not 'admin'
+                        utils.cookies.set('user', JSON.stringify({ name: userName, email: userEmail, role }));
+                        utils.cookies.set('session', sessionToken);
+                        
+                        appState.user = { name: userName, email: userEmail, role };
                         appState.sessionToken = sessionToken;
                         appState.authenticated = true;
-                        utils.cookies.set('user', JSON.stringify(appState.user));
-                        utils.cookies.set('session', sessionToken);
+                        
+                        // Only show admin button if user is admin (should not happen for new registrations)
+                        if (role === 'admin') {
+                            const adminBtn = document.getElementById('adminButton');
+                            if (adminBtn) adminBtn.style.display = 'block';
+                        }
+                        
                         showDashboard();
-                        await loadUserData();
+                        await loadUserProgress();
+                        await loadLabHistory();
                         closeModal('registerModal');
-                        notificationSystem.success(`Welcome, ${name}! (Demo Mode) 🚀`);
-                    } else {
-                        throw error;
+                        
+                        // Show welcome notification only if not already shown
+                        if (!appState.isWelcomeShown) {
+                            notificationSystem.success(`Welcome to Velocity Lab, ${userName}! 🚀`);
+                        }
+                        
+                    } catch (apiError) {
+                        if (apiError.message === 'BACKEND_NOT_AVAILABLE') {
+                            console.log('📁 Backend APIs not deployed, using demo mode');
+                            
+                            // Demo mode - allow any registration
+                            const role = 'user';
+                            const demoSessionToken = 'demo_' + Math.random().toString(36).substr(2, 9);
+                            
+                            utils.cookies.set('user', JSON.stringify({ name, email, role }));
+                            utils.cookies.set('session', demoSessionToken);
+                            
+                            appState.user = { name, email, role };
+                            appState.sessionToken = demoSessionToken;
+                            appState.authenticated = true;
+                            
+                            showDashboard();
+                            await loadUserProgress();
+                            await loadLabHistory();
+                            closeModal('registerModal');
+                            
+                            // Show welcome notification
+                            if (!appState.isWelcomeShown) {
+                                notificationSystem.success(`Welcome to Velocity Lab, ${name}! (Demo Mode) 🚀`);
+                            }
+                        } else {
+                            throw apiError;
+                        }
                     }
+                    
+                } catch (err) {
+                    console.error('❌ Registration failed:', err);
+                    notificationSystem.error(err.message || 'Registration failed. Please try again.');
                 } finally {
-                    if (submitBtn) submitBtn.classList.remove('loading');
+                    // Remove loading spinner
+                    if (submitBtn) {
+                        submitBtn.classList.remove('loading');
+                    }
                 }
             },
+            
             async logout() {
                 try {
                     if (appState.sessionToken && !appState.sessionToken.startsWith('demo_')) {
-                        await api.call(`${API_BASE}/users/logout`, {
+                        await api.call('/api/users/logout', { 
                             method: 'POST',
-                            headers: { 'Authorization': `Bearer ${appState.sessionToken}` }
+                            headers: {
+                                'Authorization': `Bearer ${appState.sessionToken}`
+                            }
                         });
                     }
-                } catch (e) {
-                    console.warn('Logout API failed:', e);
+                } catch (err) {
+                    console.log('ℹ️ Logout API call failed (expected if no backend logout endpoint):', err);
+                    // Don't show error for logout API failures - backend might not have logout endpoint
                 }
+                
                 utils.cookies.delete('user');
                 utils.cookies.delete('session');
-                localStorage.removeItem('progress');
-                localStorage.removeItem('labHistory');
+                
                 appState.user = null;
-                appState.sessionToken = null;
                 appState.progress = {};
                 appState.authenticated = false;
+                appState.sessionToken = null;
                 appState.labHistory = [];
-                notificationSystem.clearSession();
-                utils.getId('adminButton').style.display = 'none';
+                
+                // Clear localStorage data on logout
+                localStorage.removeItem('velocity_progress');
+                localStorage.removeItem('velocity_lab_history');
+                
+                // Clear notification history on logout
+                notificationSystem.clearShownNotifications();
+                
+                const adminBtn = document.getElementById('adminButton');
+                if (adminBtn) adminBtn.style.display = 'none';
                 showWelcomeScreen();
-                notificationSystem.info('Logged out successfully');
+                notificationSystem.info('Signed out successfully');
             }
         };
 
-        // Theme management
+        // Theme management with KV backend sync and localStorage fallback
         const themeSystem = {
             async setTheme(theme) {
                 document.body.setAttribute('data-theme', theme);
-                utils.cookies.set('theme', theme);
+                
+                // Try to save to KV backend
                 try {
-                    if (appState.sessionToken && !appState.sessionToken?.startsWith('demo_')) {
-                        await api.call(`${API_BASE}/user/preferences`, {
+                    if (appState.sessionToken && !appState.sessionToken.startsWith('demo_')) {
+                        await api.call('/api/user/preferences', {
                             method: 'POST',
                             headers: {
                                 'Authorization': `Bearer ${appState.sessionToken}`,
                                 'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify({ theme })
+                            body: JSON.stringify({ theme: theme })
                         });
+                        console.log('✅ Theme preference saved to backend APIs');
+                    } else {
+                        throw new Error('BACKEND_NOT_AVAILABLE');
                     }
                 } catch (error) {
-                    console.warn('⚠️ Theme sync failed:', error);
-                }
-                document.querySelectorAll('.theme-option').forEach(opt => {
-                    opt.classList.toggle('active', opt.classList.contains(theme === 'light' ? 'jedi' : 'sith'));
-                });
-                notificationSystem.success(theme === 'light' ? '🌟 Light Jedi Theme!' : '⚡ Dark Sith Theme!');
-            },
-            async loadTheme() {
-                let theme = utils.cookies.get('theme') || 'dark';
-                try {
-                    if (appState.sessionToken && !appState.sessionToken.startsWith('demo_')) {
-                        const { data } = await api.call(`${API_BASE}/user/preferences`, {
-                            headers: { 'Authorization': `Bearer ${appState.sessionToken}` }
-                        });
-                        theme = data.theme || theme;
+                    if (error.message === 'BACKEND_NOT_AVAILABLE') {
+                        console.warn('📁 Saving theme to localStorage fallback');
+                        utils.cookies.set('theme', theme);
+                    } else {
+                        console.warn('Failed to save theme to backend, using client-side only:', error);
+                        // Fallback to cookie for persistence
+                        utils.cookies.set('theme', theme);
                     }
-                } catch (e) {
-                    console.warn('Theme load failed:', e);
                 }
-                await this.setTheme(theme);
+                
+                // Update active states in desktop menu
+                const themeOptions = document.querySelectorAll('.theme-option');
+                themeOptions.forEach(option => {
+                    option.classList.remove('active');
+                    if ((theme === 'light' && option.classList.contains('jedi')) || 
+                        (theme === 'dark' && option.classList.contains('sith'))) {
+                        option.classList.add('active');
+                    }
+                });
+                
+                // Show notification
+                if (theme === 'light') {
+                    notificationSystem.success('🌟 Light Jedi theme activated!');
+                } else {
+                    notificationSystem.success('⚡ Dark Sith theme activated!');
+                }
+            },
+
+            async loadTheme() {
+                try {
+                    // Try to load from KV backend first
+                    if (appState.sessionToken && !appState.sessionToken.startsWith('demo_')) {
+                        const response = await api.call('/api/user/preferences', {
+                            headers: {
+                                'Authorization': `Bearer ${appState.sessionToken}`
+                            }
+                        });
+                        
+                        if (response.success && response.data.theme) {
+                            document.body.setAttribute('data-theme', response.data.theme);
+                            console.log('✅ Theme loaded from backend APIs:', response.data.theme);
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Failed to load theme from backend, using default:', error);
+                }
+                
+                // Fallback to cookie
+                const savedTheme = utils.cookies.get('theme') || 'dark';
+                document.body.setAttribute('data-theme', savedTheme);
+                console.log('✅ Theme loaded from cookie:', savedTheme);
             }
         };
 
-        // Task management
+        // Load task definitions from task-definitions.js
         function loadTaskDefinitions() {
-            if (window.TASKS_DEFINITIONS) {
-                appState.tasks = Object.entries(window.TASKS).map(([id, task]) => ({
-                    id,
-                    title: task.title || 'Unknown Task',
-                    description: task.description || 'No description available.',
-                    week: parseInt(id.split('-')[0].replace('week', '')) || 1,
-                    category: task.category || 'General'
-                }));
-                console.log(`✅ Loaded ${appState.tasks.length} tasks`);
+            if (typeof window !== 'undefined' && window.TASK_DEFINITIONS) {
+                // Convert object to array format
+                appState.tasks = [];
+                Object.keys(window.TASK_DEFINITIONS).forEach(taskId => {
+                    const task = window.TASK_DEFINITIONS[taskId];
+                    appState.tasks.push({
+                        id: taskId,
+                        title: task.title,
+                        description: task.description || 'No description available',
+                        week: parseInt(taskId.split('-')[0].replace('week', '')) || 1,
+                        category: task.category || 'General'
+                    });
+                });
+                console.log('Task definitions loaded:', appState.tasks.length, 'tasks');
             } else {
-                console.warn('⚠️ Task definitions missing, using fallback');
+                console.warn('Task definitions not loaded from task-definitions.js');
+                // Fallback task structure
                 appState.tasks = generateFallbackTasks();
             }
         }
 
         function generateFallbackTasks() {
-            return Array.from({ length: 4 }, (_, wIdx) => {
-                const week = wIdx + 1;
-                const titles = [
-                    ['Install Windows Server', 'Configure AD DS', 'Setup DNS'],
-                    ['Install Exchange Server', 'Configure Mailboxes', 'Setup DAG'],
-                    ['Create M365 Tenant', 'Configure Domain', 'Setup Security'],
-                    ['Install Azure AD Connect', 'Configure Hybrid Sync', 'Test Mail Flow']
-                ][wIdx];
-                return titles.map((title, tIdx) => ({
-                    id: `week${week}-task${tIdx + 1}`,
-                    week,
-                    title,
-                    description: `Complete ${title} for Week ${week}`,
-                    category: ['Foundation', 'Exchange', 'M365', 'Hybrid'][wIdx]
-                }));
-            }).flat();
+            const weeks = [
+                {
+                    title: 'Foundation Setup',
+                    tasks: [
+                        'Install Windows Server 2012 R2',
+                        'Configure Domain Controller',
+                        'Create Organizational Units',
+                        'Add Domain Users',
+                        'Configure DNS',
+                        'Setup DHCP',
+                        'Join Client Machine',
+                        'Test Domain Authentication',
+                        'Configure Group Policy',
+                        'Create Security Groups',
+                        'Configure File Shares',
+                        'Verify Network Services'
+                    ]
+                },
+                {
+                    title: 'Exchange On-Premises',
+                    tasks: [
+                        'Install Exchange Server 2016',
+                        'Configure Exchange Organization',
+                        'Create Mailboxes',
+                        'Setup Distribution Groups',
+                        'Configure Public Folders',
+                        'Setup OWA',
+                        'Configure SMTP Connectors',
+                        'Setup Message Routing',
+                        'Configure Anti-Spam',
+                        'Test Internal Mail Flow'
+                    ]
+                },
+                {
+                    title: 'Microsoft 365 Setup',
+                    tasks: [
+                        'Create M365 Tenant',
+                        'Configure Domain',
+                        'Setup Exchange Online',
+                        'Create Cloud Users',
+                        'Configure Licensing',
+                        'Setup Teams',
+                        'Configure SharePoint',
+                        'Setup OneDrive',
+                        'Configure Compliance',
+                        'Test Cloud Services'
+                    ]
+                },
+                {
+                    title: 'Hybrid Configuration',
+                    tasks: [
+                        'Install Azure AD Connect',
+                        'Configure Directory Sync',
+                        'Setup Hybrid Exchange',
+                        'Configure Mail Flow',
+                        'Test Hybrid Connectivity',
+                        'Migrate Test Mailbox',
+                        'Configure Hybrid Features',
+                        'Setup Single Sign-On',
+                        'Test User Experience',
+                        'Document Configuration'
+                    ]
+                }
+            ];
+
+            const tasks = [];
+            weeks.forEach((week, weekIndex) => {
+                week.tasks.forEach((task, taskIndex) => {
+                    tasks.push({
+                        id: `week${weekIndex + 1}-task${taskIndex + 1}`,
+                        week: weekIndex + 1,
+                        title: task,
+                        description: `Complete ${task} as part of Week ${weekIndex + 1}`,
+                        category: week.title
+                    });
+                });
+            });
+
+            return tasks;
         }
 
-        // Progress management
+        // Progress management with KV backend and localStorage fallback
         async function loadUserProgress() {
             try {
-                if (appState.sessionToken && !appState.sessionToken.startsWith('demo_')) {
-                    console.log('🔄 Loading user progress...');
-                    const { data } = await api.call(`${API_BASE}/user/progress`, {
-                        headers: {'Authorization': `Bearer ${appState.sessionToken}` }
-                    });
-                    appState.progress = data || {};
-                    console.log('✅ Progress loaded');
+                if (!appState.sessionToken) {
+                    console.warn('No session token available');
+                    appState.progress = JSON.parse(localStorage.getItem('velocity_progress') || '{}');
+                    updateProgressDisplay();
+                    return;
+                }
+
+                console.log('🔄 Loading progress from backend APIs...');
+                const response = await api.call(`${API_BASE}/user/progress`, {
+                    headers: {
+                        'Authorization': `Bearer ${appState.sessionToken}`
+                    }
+                });
+                
+                if (response.success) {
+                    appState.progress = response.data || {};
+                    console.log('✅ Progress loaded from backend APIs');
                 } else {
-                    throw new Error('No valid session');
+                    console.warn('API returned error:', response.message);
+                    appState.progress = {};
                 }
             } catch (error) {
-                console.warn('📁 Progress fallback:', error);
-                appState.progress = JSON.parse(localStorage.getItem('progress') || '{}');
+                if (error.message === 'BACKEND_NOT_AVAILABLE') {
+                    console.warn('📁 Using localStorage fallback for progress');
+                    appState.progress = JSON.parse(localStorage.getItem('velocity_progress') || '{}');
+                } else {
+                    console.warn('Progress API unavailable:', error);
+                    appState.progress = JSON.parse(localStorage.getItem('velocity_progress') || '{}');
+                }
             }
+            
             updateProgressDisplay();
             checkLabCompletion();
         }
 
-        async function saveUserProgress(taskId, progress) {
-            appState.progress[taskId] = progress;
+        async function saveUserProgress(taskId, taskProgress) {
             try {
-                if (appState.sessionToken && !appState.sessionToken.startsWith('demo_')) {
-                    console.log(`💾 Saving progress for ${taskId}...`);
-                    await api.call(`${API_BASE}/user/progress`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${appState.sessionToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ taskId, progress })
-                    });
-                    console.log('✅ Progress saved');
+                if (!appState.sessionToken) {
+                    console.warn('No session token, saving to localStorage');
+                    localStorage.setItem('velocity_progress', JSON.stringify(appState.progress));
+                    return;
+                }
+
+                console.log(`🔄 Saving progress for task ${taskId} to backend APIs...`);
+                const response = await api.call(`${API_BASE}/user/progress`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${appState.sessionToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        taskId: taskId,
+                        progress: taskProgress
+                    })
+                });
+                
+                if (response.success) {
+                    console.log('✅ Progress saved to backend APIs');
                 } else {
-                    throw new Error('No valid session');
+                    console.warn('Failed to save progress:', response.message);
                 }
             } catch (error) {
-                console.warn('📁 Saving progress locally:', error);
-                localStorage.setItem('progress', JSON.stringify(appState.progress));
+                if (error.message === 'BACKEND_NOT_AVAILABLE') {
+                    console.warn('📁 Saving progress to localStorage fallback');
+                    localStorage.setItem('velocity_progress', JSON.stringify(appState.progress));
+                } else {
+                    console.warn('Progress save failed, using localStorage:', error);
+                    localStorage.setItem('velocity_progress', JSON.stringify(appState.progress));
+                }
             }
-            updateProgressDisplay();
         }
 
-        // Lab history management
+        // Lab history management with KV backend and localStorage fallback
         async function loadLabHistory() {
             try {
-                if (appState.sessionToken && !appState.sessionToken.startsWith('demo_')) {
-                    console.log('🔄 Loading lab history...');
-                    const { data } = await api.call(`${API_BASE}/user/lab-history`, {
-                        headers: {'Authorization': `Bearer ${appState.sessionToken}` }
-                    });
-                    appState.labHistory = data || [];
-                    console.log(`✅ Loaded ${appState.labHistory.length} lab sessions`);
+                if (!appState.sessionToken) {
+                    console.warn('No session token available');
+                    appState.labHistory = JSON.parse(localStorage.getItem('velocity_lab_history') || '[]');
+                    
+                    // Create default lab if none exists
+                    if (appState.labHistory.length === 0) {
+                        const today = new Date().toISOString().split('T')[0];
+                        const defaultLab = {
+                            session: 1,
+                            date: today,
+                            status: 'started',
+                            labId: 'LAB001',
+                            startedAt: new Date().toISOString(),
+                            tasksCompleted: 0,
+                            totalTasks: 42
+                        };
+                        appState.labHistory = [defaultLab];
+                        localStorage.setItem('velocity_lab_history', JSON.stringify(appState.labHistory));
+                    }
+                    return;
+                }
+
+                console.log('🔄 Loading lab history from backend APIs...');
+                const response = await api.call(`${API_BASE}/user/lab-history`, {
+                    headers: {
+                        'Authorization': `Bearer ${appState.sessionToken}`
+                    }
+                });
+                
+                if (response.success) {
+                    appState.labHistory = response.data || [];
+                    console.log('✅ Lab history loaded from backend APIs:', appState.labHistory.length, 'sessions');
                 } else {
-                    throw new Error('No valid session');
+                    console.warn('API returned error:', response.message);
+                    appState.labHistory = [];
                 }
             } catch (error) {
-                console.warn('📁 Lab history fallback:', error);
-                appState.labHistory = JSON.parse(localStorage.getItem('labHistory') || '[]');
-                if (!appState.labHistory.length) {
-                    appState.labHistory = [{
-                        session: 1,
-                        date: new Date().toISOString().split('T')[0],
-                        status: 'started',
-                        labId: 'LAB001',
-                        startedAt: new Date().toISOString(),
-                        tasksCompleted: 0,
-                        totalTasks: appState.tasks.length || 42
-                    }];
-                    localStorage.setItem('labHistory', JSON.stringify(appState.labHistory));
+                if (error.message === 'BACKEND_NOT_AVAILABLE') {
+                    console.warn('📁 Using localStorage fallback for lab history');
+                    appState.labHistory = JSON.parse(localStorage.getItem('velocity_lab_history') || '[]');
+                    
+                    // Create default lab if none exists
+                    if (appState.labHistory.length === 0) {
+                        const today = new Date().toISOString().split('T')[0];
+                        const defaultLab = {
+                            session: 1,
+                            date: today,
+                            status: 'started',
+                            labId: 'LAB001',
+                            startedAt: new Date().toISOString(),
+                            tasksCompleted: 0,
+                            totalTasks: 42
+                        };
+                        appState.labHistory = [defaultLab];
+                        localStorage.setItem('velocity_lab_history', JSON.stringify(appState.labHistory));
+                    }
+                } else {
+                    console.warn('Lab history API unavailable:', error);
+                    appState.labHistory = JSON.parse(localStorage.getItem('velocity_lab_history') || '[]');
                 }
             }
         }
 
-        async function saveLabProgress(session) {
+        async function saveLabHistory(newSession) {
             try {
-                if (appState.sessionToken && !appState.sessionToken.startsWith('demo_')) {
-                    console.log('💾 Saving lab progress...');
-                    await api.call(`${API_BASE}/user/lab-progress`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${appState.sessionToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(session)
-                    });
-                    console.log('✅ Lab progress saved');
+                if (!appState.sessionToken) {
+                    console.warn('No session token, saving to localStorage');
+                    localStorage.setItem('velocity_lab_history', JSON.stringify(appState.labHistory));
+                    return;
+                }
+
+                console.log('🔄 Saving lab history to backend APIs...');
+                const response = await api.call(`${API_BASE}/user/lab-history`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${appState.sessionToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newSession)
+                });
+                
+                if (response.success) {
+                    console.log('✅ Lab history saved to backend APIs');
+                    // Reload lab history to get updated data
                     await loadLabHistory();
                 } else {
-                    throw new Error('No valid session');
+                    console.warn('Failed to save lab history:', response.message);
                 }
             } catch (error) {
-                console.warn('📁 Saving lab progress locally:', error);
-                appState.labHistory = appState.labHistory.filter(s => s.session !== session.session);
-                appState.labHistory.push(session);
-                localStorage.setItem('labHistory', JSON.stringify(appState.labHistory));
+                if (error.message === 'BACKEND_NOT_AVAILABLE') {
+                    console.warn('📁 Saving lab history to localStorage fallback');
+                    localStorage.setItem('velocity_lab_history', JSON.stringify(appState.labHistory));
+                } else {
+                    console.warn('Lab history save failed, using localStorage:', error);
+                    localStorage.setItem('velocity_lab_history', JSON.stringify(appState.labHistory));
+                }
             }
         }
 
         function checkLabCompletion() {
             const totalTasks = appState.tasks.length || 42;
-            const completedTasks = Object.values(appState.progress).filter(t => t.completed).length;
-            if (completedTasks === totalTasks && appState.labHistory.length) {
-                const currentLab = appState.labHistory.find(l => l.status === 'started');
-                if (currentLab) {
-                    currentLab.status = 'completed';
-                    currentLab.completedAt = new Date().toISOString();
-                    currentLab.tasksCompleted = completedTasks;
-                    currentLab.totalTasks = totalTasks;
-                    saveLabProgress(currentLab);
-                    notificationSystem.success('🎉 Lab completed!');
+            const completedTasks = Object.values(appState.progress).filter(task => task.completed).length;
+            
+            // Check if lab is completed (all tasks done)
+            if (completedTasks === totalTasks && totalTasks > 0 && appState.labHistory.length > 0) {
+                const currentLab = appState.labHistory.find(lab => lab.status === 'started');
+                
+                // Only mark as completed if not already completed
+                if (currentLab && currentLab.status === 'started') {
+                    const completionEntry = {
+                        ...currentLab,
+                        status: 'completed',
+                        completedAt: new Date().toISOString(),
+                        tasksCompleted: completedTasks,
+                        totalTasks: totalTasks
+                    };
+                    
+                    // Update local history
+                    const labIndex = appState.labHistory.findIndex(lab => lab.labId === currentLab.labId);
+                    if (labIndex >= 0) {
+                        appState.labHistory[labIndex] = completionEntry;
+                        saveLabHistory(completionEntry); // This will trigger a reload
+                        notificationSystem.success('🎉 Lab completed successfully!');
+                    }
                 }
             }
         }
 
-        async function loadUserData() {
-            await Promise.all([loadUserProgress(), loadLabHistory()]);
-            renderWeekCards();
-        }
-
-        function checkSession() {
-            const user = utils.cookies.get('user');
-            const session = utils.cookies.get('session');
-            if (user && session) {
+        // Check for existing session using cookies
+        function checkExistingSession() {
+            const userCookie = utils.cookies.get('user');
+            const sessionCookie = utils.cookies.get('session');
+            
+            if (userCookie && sessionCookie) {
                 try {
-                    appState.user = JSON.parse(user);
-                    appState.sessionToken = session;
+                    appState.user = JSON.parse(userCookie);
+                    appState.sessionToken = sessionCookie;
                     appState.authenticated = true;
+                    
+                    // Mark welcome as shown for existing sessions to prevent duplicates
                     appState.isWelcomeShown = true;
-                    if (appState.user.role === 'admin') utils.getId('adminButton').style.display = 'block';
+                    
+                    console.log('Found existing session for:', appState.user.name);
                     showDashboard();
-                    loadUserData();
+                    loadUserProgress();
+                    loadLabHistory();
                     themeSystem.loadTheme();
-                } catch (e) {
-                    console.error('Invalid session:', e);
-                    authSystem.logout();
+                } catch (error) {
+                    console.error('Session validation failed:', error);
+                    utils.cookies.delete('user');
+                    utils.cookies.delete('session');
+                    notificationSystem.clearShownNotifications();
+                    showWelcomeScreen();
+                    themeSystem.loadTheme();
                 }
             } else {
+                console.log('No existing session found');
+                notificationSystem.clearShownNotifications();
                 showWelcomeScreen();
                 themeSystem.loadTheme();
             }
         }
 
+        // Form handlers with progressive disclosure
         function setupFormHandlers() {
-            const signInForm = utils.getId('signInForm');
-            if (signInForm) {
-                const emailInput = utils.getId('signInEmail');
-                const passwordGroup = utils.getId('passwordGroup');
-                const rememberGroup = utils.getId('rememberGroup');
-                emailInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' && emailInput.value) {
-                        e.preventDefault();
-                        showPasswordField();
-                    }
-                });
-                emailInput.addEventListener('blur', () => {
-                    if (emailInput.value && emailInput.value.includes('@')) {
-                        setTimeout(showPasswordField, 100);
-                    }
-                });
+            const loginForm = utils.getId('signInForm');
+            if (loginForm) {
+                const emailInput = document.getElementById('signInEmail');
+                const passwordGroup = document.getElementById('passwordGroup');
+                const rememberGroup = document.getElementById('rememberGroup');
+                
+                // Progressive disclosure for login - only on Enter key or blur with valid email
+                if (emailInput) {
+                    emailInput.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter' && this.value.length > 0) {
+                            e.preventDefault();
+                            showPasswordField();
+                        }
+                    });
+                    
+                    emailInput.addEventListener('blur', function() {
+                        // Check if it looks like a valid email and is not empty
+                        if (this.value.length > 0 && (this.value.includes('@') || this.value.length > 3)) {
+                            setTimeout(() => showPasswordField(), 100);
+                        }
+                    });
+                }
+                
                 function showPasswordField() {
                     if (passwordGroup.classList.contains('hidden')) {
+                        const modalBody = document.querySelector('#signInModal .modal-body');
+                        
+                        // Add loading state
                         emailInput.classList.add('loading');
+                        
                         setTimeout(() => {
                             emailInput.classList.remove('loading');
                             passwordGroup.classList.remove('hidden');
                             rememberGroup.classList.remove('hidden');
-                            utils.getId('signInPassword').focus();
-                        }, 500);
+                            if (modalBody) modalBody.classList.remove('initial-state');
+                            document.getElementById('signInPassword').focus();
+                        }, 600);
                     }
                 }
-                signInForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    try {
-                        await authSystem.login(new FormData(signInForm));
-                    } catch (err) {
-                        utils.getId('signInMessage').classList.remove('hidden');
-                        utils.getId('signInMessage').classList.add('error');
-                        utils.getId('signInMessage').textContent = err.message || 'Login failed';
+
+                loginForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const formData = new FormData(loginForm);
+                    const email = formData.get('email');
+                    const password = formData.get('password');
+                    
+                    if (!email || !password) {
+                        notificationSystem.error('Please fill in all required fields.');
+                        return;
                     }
+                    
+                    console.log('📧 Login attempt for:', email);
+                    await authSystem.login(formData);
                 });
             }
+
             const registerForm = utils.getId('registerForm');
             if (registerForm) {
-                registerForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    try {
-                        await authSystem.register(new FormData(registerForm));
-                    } catch (err) {
-                        utils.getId('registerMessage').classList.remove('hidden');
-                        utils.getId('registerMessage').classList.add('error');
-                        utils.getId('registerMessage').textContent = err.message || 'Registration failed';
+                registerForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const formData = new FormData(registerForm);
+                    const name = formData.get('name');
+                    const email = formData.get('email');
+                    const password = formData.get('password');
+                    
+                    if (!name || !email || !password) {
+                        notificationSystem.error('Please fill in all required fields.');
+                        return;
                     }
+                    
+                    if (password.length < 8) {
+                        notificationSystem.error('Password must be at least 8 characters long.');
+                        return;
+                    }
+                    
+                    console.log('📧 Registration attempt for:', email);
+                    await authSystem.register(formData);
                 });
             }
         }
 
-        window.setTheme = themeSystem.setTheme;
-        window.logout = authSystem.logout;
-        window.goHome = () => appState.authenticated ? showDashboard() : showWelcomeScreen();
-        window.toggleMobileMenu = () => {
-            const hamburger = utils.getId('hamburger');
-            const mobileMenu = utils.getId('mobileMenu');
+        // Global functions for HTML event handlers
+        window.setTheme = function(theme) {
+            themeSystem.setTheme(theme);
+        };
+
+        window.logout = async function() {
+            await authSystem.logout();
+        };
+
+        window.goHome = function() {
+            if (appState.authenticated) {
+                return;
+            } else {
+                showWelcomeScreen();
+            }
+        };
+
+        window.toggleMobileMenu = function() {
+            const hamburger = document.getElementById('hamburger');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
             hamburger.classList.toggle('active');
             mobileMenu.classList.toggle('active');
-            updateMobileMenu();
+            
+            updateMobileMenuItems();
         };
-        window.startLabEnvironment = async () => {
+
+        window.startLabEnvironment = async function() {
             try {
-                let labId, previousLabCompleted = false;
-                if (appState.sessionToken && !appState.sessionToken.startsWith('demo_')) {
-                    console.log('🔄 Starting lab...');
-                    const { data } = await api.call(`${API_BASE}/lab/start`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${appState.sessionToken}`,
-                            'Content-Type': 'application/json'
+                // Check if backend is available
+                let backendAvailable = false;
+                if (appState.sessionToken) {
+                    try {
+                        console.log('🔄 Starting new lab environment...');
+                        const response = await api.call('/api/lab/start', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${appState.sessionToken}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (response.success) {
+                            console.log('✅ Lab started successfully with backend');
+                            backendAvailable = true;
+                            
+                            // Reset progress and reload
+                            appState.progress = {};
+                            updateProgressDisplay();
+                            await loadLabHistory();
+                            
+                            if (response.data.previousLabCompleted) {
+                                notificationSystem.success(`🎉 Previous lab completed! New ${response.data.labId} started!`);
+                            } else {
+                                notificationSystem.success(`🚀 New lab ${response.data.labId} started!`);
+                            }
+                            return;
                         }
-                    });
-                    labId = data.labId;
-                    previousLabCompleted = data.previousLabCompleted;
-                    appState.progress = {};
-                    await loadLabHistory();
-                } else {
-                    console.log('📁 Starting demo lab...');
-                    const totalTasks = appState.tasks.length || 42;
-                    const completedTasks = Object.values(appState.progress).filter(t => t.completed).length;
-                    const isCompleted = completedTasks === totalTasks;
+                    } catch (error) {
+                        if (error.message !== 'BACKEND_NOT_AVAILABLE') {
+                            throw error;
+                        }
+                    }
+                }
+                
+                // Fallback to localStorage logic
+                if (!backendAvailable) {
+                    console.log('📁 Using localStorage fallback for lab management');
+                    
+                    // Get current progress to check completion
+                    const totalTasks = 42;
+                    const completedTasks = Object.values(appState.progress).filter(task => task?.completed).length;
+                    const isCurrentLabCompleted = completedTasks === totalTasks;
+                    
                     const today = new Date().toISOString().split('T')[0];
-                    if (appState.labHistory.find(l => l.date === today && l.status === 'started')) {
+                    
+                    // Check for existing in-progress lab today
+                    const todayInProgressLab = appState.labHistory.find(lab => 
+                        lab.date === today && lab.status === 'started'
+                    );
+                    
+                    if (todayInProgressLab) {
                         notificationSystem.info('Lab already started today');
                         return;
                     }
-                    if (appState.labHistory.length && isCompleted) {
+                    
+                    // Mark current lab as completed if all tasks are done
+                    if (appState.labHistory.length > 0 && isCurrentLabCompleted) {
                         const currentLab = appState.labHistory[appState.labHistory.length - 1];
                         if (currentLab.status === 'started') {
                             currentLab.status = 'completed';
                             currentLab.completedAt = new Date().toISOString();
                             currentLab.tasksCompleted = completedTasks;
                             currentLab.totalTasks = totalTasks;
-                            previousLabCompleted = true;
-                            await saveLabProgress(currentLab);
                         }
                     }
+                    
+                    // Create new lab session
                     const newSession = {
                         session: appState.labHistory.length + 1,
                         date: today,
@@ -1976,427 +2533,807 @@
                         labId: `LAB${String(appState.labHistory.length + 1).padStart(3, '0')}`,
                         startedAt: new Date().toISOString(),
                         tasksCompleted: 0,
-                        totalTasks
+                        totalTasks: totalTasks
                     };
+                    
+                    // Add new session and reset progress
+                    appState.labHistory.push(newSession);
                     appState.progress = {};
-                    await saveLabProgress(newSession);
-                    labId = newSession.labId;
+                    
+                    // Save to localStorage
+                    localStorage.setItem('velocity_lab_history', JSON.stringify(appState.labHistory));
+                    localStorage.setItem('velocity_progress', JSON.stringify({}));
+                    
+                    updateProgressDisplay();
+                    
+                    if (isCurrentLabCompleted) {
+                        notificationSystem.success(`🎉 Previous lab completed! New ${newSession.labId} started!`);
+                    } else {
+                        notificationSystem.success(`🚀 New lab ${newSession.labId} started!`);
+                    }
                 }
-                updateProgressDisplay();
-                notificationSystem.success(previousLabCompleted ? `🎉 Previous lab completed! New ${labId} started!` : `🚀 New lab ${labId} started!`);
+                
             } catch (error) {
-                console.error('❌ Lab start error:', error);
-                notificationSystem.error('Failed to start lab');
+                console.error('Failed to start lab:', error);
+                notificationSystem.error('Failed to start lab environment. Please try again.');
             }
         };
-        window.showLabHistoryModal = async () => {
-            try {
-                await loadLabHistory();
-                const content = utils.getId('labHistoryModalContent');
-                if (!appState.labHistory.length) {
-                    content.innerHTML = `
-                        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                            <div style="font-size: 3rem; margin-bottom: 1rem;">🚀</div>
-                            <p>No lab sessions yet!</p>
-                            <p style="margin-top: 0.5rem;">Click "Start New Lab" to begin.</p>
-                        </div>
-                    `;
-                } else {
-                    content.innerHTML = `
-                        <div style="margin-bottom: 1rem;">
-                            <button class="btn btn-secondary lab-filter-btn active" data-filter="all" onclick="filterLabHistory('all')">All</button>
-                            <button class="btn btn-secondary lab-filter-btn" data-filter="week" onclick="filterLabHistory('week')">Week</button>
-                            <button class="btn btn-secondary lab-filter-btn" data-filter="month" onclick="filterLabHistory('month')">Month</button>
-                        </div>
-                        <div id="labHistoryContent">
-                            ${generateLabHistoryHTML(appState.labHistory)}
-                        </div>
-                    `;
-                }
-                showModal('labHistoryModal');
-            } catch (error) {
-                console.error('❌ Lab history load error:', error);
-                utils.getId('labHistoryModalContent').innerHTML = `
+
+        window.showLabHistoryModal = function() {
+            const content = document.getElementById('labHistoryModalContent');
+            
+            if (appState.labHistory.length === 0) {
+                content.innerHTML = `
                     <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                        <p>Lab history unavailable.</p>
-                        <p style="margin-top: 1rem;">
-                            ${error.message === 'BACKEND_NOT_AVAILABLE' ? 
-                                'Backend unavailable. Deploy: /api/user/lab-history.js' : 
-                                'Try again later.'}
-                        </p>
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🚀</div>
+                        <p>No lab sessions yet!</p>
+                        <p style="margin-top: 0.5rem;">Click "Start New Lab" to begin your first training session.</p>
                     </div>
                 `;
-                showModal('labHistoryModal');
+            } else {
+                // Filter buttons
+                const filterButtons = `
+                    <div style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        <button onclick="filterLabHistory('week')" class="lab-filter-btn" data-filter="week" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last Week</button>
+                        <button onclick="filterLabHistory('month')" class="lab-filter-btn" data-filter="month" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last 30 Days</button>
+                        <button onclick="filterLabHistory('quarter')" class="lab-filter-btn" data-filter="quarter" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last 3 Months</button>
+                        <button onclick="filterLabHistory('halfyear')" class="lab-filter-btn" data-filter="halfyear" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last 6 Months</button>
+                        <button onclick="filterLabHistory('year')" class="lab-filter-btn" data-filter="year" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last Year</button>
+                        <button onclick="filterLabHistory('lifetime')" class="lab-filter-btn active" data-filter="lifetime" style="padding: 0.5rem 1rem; border: 1px solid var(--primary); border-radius: 6px; background: var(--primary); color: white; cursor: pointer; font-size: 0.8rem;">Lifetime</button>
+                    </div>
+                `;
+                
+                content.innerHTML = filterButtons + `
+                    <div style="margin-bottom: 1rem; color: var(--text-secondary);">
+                        <strong>Total Sessions: <span id="filteredCount">${appState.labHistory.length}</span></strong>
+                    </div>
+                    <div id="labHistoryContent">
+                        ${generateLabHistoryHTML(appState.labHistory)}
+                    </div>
+                `;
             }
+            
+            showModal('labHistoryModal');
         };
-        window.showTaskDetail = (taskId) => {
-            const task = window.TASKS_DEFINITIONS?.[taskId];
-            if (!task) {
-                notificationSystem.error('Task details not found');
-                return;
-            }
-            utils.getId('taskDetailTitle').value = task.title;
-            if (!appState.progress[taskId]) {
-                appState.progress[taskId] = { completed: false, subtasks: {}, notes: '' };
-            }
-            const progress = appState.progress[taskId];
-            utils.getId('contentDetailContent').innerHTML = `
-                <p>${task.description}</p>
-                <div class="subtask-container">
-                    ${task.subtasks?.map((step, i) => `
-                        <div class="subtask-item ${progress.subtasks[i]?.completed ? 'completed' : ''}" data-step="${i}">
-                            <input type="checkbox" class="subtask-checkbox" data-step="${i}" ${progress.subtasks[i]?.completed ? 'checked' : ''}>
-                            <label>${step}</label>
-                        </div>
-                    `).join('') || '<p>No subtasks available.</p>'}
-                </div>
-                <div style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1rem;">
-                    <h4>Notes</h4>
-                    <textarea id="taskNotes_${taskId}" style="width: 100%; height: 100px; padding: 8px; border-radius: 8px;" onchange="saveTaskNotes('${taskId}')">${progress.notes || ''}</textarea>
-                </div>
-            `;
-            setTimeout(() => {
-                document.querySelectorAll('.subtask-checkbox').forEach(cb => {
-                    const step = cb.dataset.step;
-                    cb.addEventListener('change', () => handleSubtaskChange(taskId, step, cb.checked));
-                });
-            }, 100);
-            showModal('taskDetailModal');
-        };
-        window.saveTaskNotes = (taskId) => {
-            const notes = document.getElementById(`taskNotes_${taskId}`).value;
-            appState.progress[taskId].notes = notes;
-            appState.progress[taskId].lastUpdated = new Date().toISOString();
-            saveUserProgress(taskId, appState.progress[taskId]);
-            console.log(`📝 Saved notes for ${taskId}`);
-        };
-        window.toggleTaskCompletion = async (taskId) => {
+
+        window.showAdminPanel = async function() {
             try {
-                if (!appState.progress[taskId]) {
-                    appState.progress[taskId] = { completed: false, subtasks: {}, notes: '' };
+                // Check if user is admin
+                if (!appState.user || appState.user.role !== 'admin') {
+                    notificationSystem.error('Admin access required');
+                    return;
                 }
-                const progress = appState.progress[taskId];
-                progress.completed = !progress.completed;
-                progress.completedAt = progress.completed ? new Date().toISOString() : null;
-                progress.lastUpdated = new Date().toISOString();
-                await saveUserProgress(taskId, progress);
-                updateProgressDisplay();
-                checkLabCompletion();
-                const taskItem = document.querySelector(`[data-task-id="${taskId}"]`);
-                if (taskItem) {
-                    taskItem.classList.toggle('completed', progress.completed);
-                    const checkbox = taskItem.querySelector('.checkbox-task');
-                    if (checkbox) checkbox.checked = progress.completed;
-                }
-                notificationSystem.success(progress.completed ? `✅ Task ${taskId} completed!` : `↩️ Task ${taskId} marked incomplete`);
-            } catch (error) {
-                console.error(`❌ Task completion error for ${taskId}:`, error);
-                alertSystem.error('Failed to update task status');
-            }
-        };
-        window.filterLabHistory = (period) => {
-            let filtered = appState.labHistory;
-            const now = new Date();
-            if (period !== 'all') {
-                const cutoff = new Date();
-                if (period === 'week') cutoff.setDate(now.getDate() - 7);
-                else if (period === 'month') cutoff.setDate(now.getDate() - 30);
-                filtered = filtered.filter(l => new Date(l.date) >= cutoff);
-            }
-            document.querySelectorAll('lab-filter-btn').forEach(btn => {
-                button.classList.toggle('active', btn.dataset.filter === period);
-            });
-            utils.getId('labHistoryContent').innerHTML = generateLabHistoryContentHTML(filtered);
-        };
-        window.showAdminPanel = async () => {
-            try {
-                if (!appState.user || appState.user.role !== 'admin') throw new Error('Admin access required');
-                console.log('🔄 Loading admin panel...');
-                const { data } = await api.call(`${API_BASE}/admin/users-progress`, {
+
+                console.log('🔄 Loading admin data from backend APIs...');
+                const response = await api.call(`${API_BASE}/admin/users-progress`, {
                     headers: {
                         'Authorization': `Bearer ${appState.sessionToken}`,
                         'Content-Type': 'application/json'
                     }
                 });
-                console.log('✅ Admin data loaded');
-                displayAdminPanel(data);
+                
+                if (response.success) {
+                    console.log('✅ Admin data loaded from backend APIs');
+                    displayAdminPanel(response.data);
+                } else {
+                    notificationSystem.error(`Failed to load admin data: ${response.message}`);
+                }
             } catch (error) {
-                console.error('❌ Admin panel error:', error);
-                const message = error.message === 'BACKEND_NOT_AVAILABLE' ?
-                    'Backend unavailable. Deploy: /api/admin/users-progress.js' :
-                    'Admin panel unavailable';
-                showAdminPanelFallback(message);
-            }
-        };
-        window.toggleUserMenu = () => {
-            const dropdown = utils.getId('userMenuDropdown');
-            if (dropdown) {
-                dropdown.classList.toggle('active');
+                console.error('Failed to load admin data:', error);
+                
+                if (error.message === 'BACKEND_NOT_AVAILABLE') {
+                    console.log('📁 Backend APIs not deployed, showing local admin fallback');
+                    showAdminPanelFallback('Backend APIs not deployed yet. Please deploy the Functions to enable full admin features.');
+                } else {
+                    console.log('⚠️ Admin panel API unavailable, showing fallback');
+                    showAdminPanelFallback('Admin panel temporarily unavailable. Please try again later.');
+                }
             }
         };
 
-        function handleSubtaskChange(taskId, stepIndex, isChecked) {
-            if (!appState.progress[taskId]) {
-                appState.progress[taskId] = { completed: false, subtasks: {}, notes: '' };
+        window.filterLabHistory = function(period) {
+            const now = new Date();
+            let filteredHistory = appState.labHistory;
+            
+            if (period !== 'lifetime') {
+                const cutoffDate = new Date();
+                switch(period) {
+                    case 'week':
+                        cutoffDate.setDate(now.getDate() - 7);
+                        break;
+                    case 'month':
+                        cutoffDate.setDate(now.getDate() - 30);
+                        break;
+                    case 'quarter':
+                        cutoffDate.setMonth(now.getMonth() - 3);
+                        break;
+                    case 'halfyear':
+                        cutoffDate.setMonth(now.getMonth() - 6);
+                        break;
+                    case 'year':
+                        cutoffDate.setFullYear(now.getFullYear() - 1);
+                        break;
+                }
+                
+                filteredHistory = appState.labHistory.filter(session => 
+                    new Date(session.date) >= cutoffDate
+                );
             }
-            appState.progress[taskId].subtasks[stepIndex] = {
-                completed: isChecked,
-                updatedAt: new Date().toISOString()
-            };
-            const allSubtasks = window.TASKS_DEFINITIONS?.[taskId]?.subtasks || [];
-            const completedSubtasks = Object.values(appState.progress[taskId].subtasks).filter(s => s.completed).length;
-            appState.progress[taskId].completed = completedSubtasks === allSubtasks.length;
-            appState.progress[taskId].lastUpdated = new Date().toISOString();
-            saveUserProgress(taskId, appState.progress[taskId]);
-            console.log(`✅ Subtask ${stepIndex} for ${taskId} updated`);
-            const subtaskItem = document.querySelector(`.subtask-item[data-step="${stepIndex}"]`);
-            if (subtaskItem) {
-                subtaskItem.classList.toggle('completed', isChecked);
+            
+            // Update active button
+            document.querySelectorAll('.lab-filter-btn').forEach(btn => {
+                btn.style.background = 'var(--surface)';
+                btn.style.color = 'var(--text)';
+                btn.style.border = '1px solid var(--border)';
+            });
+            
+            const activeBtn = document.querySelector(`[data-filter="${period}"]`);
+            if (activeBtn) {
+                activeBtn.style.background = 'var(--primary)';
+                activeBtn.style.color = 'white';
+                activeBtn.style.border = '1px solid var(--primary)';
             }
-            checkLabCompletion();
+            
+            // Update content
+            document.getElementById('filteredCount').textContent = filteredHistory.length;
+            document.getElementById('labHistoryContent').innerHTML = generateLabHistoryHTML(filteredHistory);
+        };
+
+        window.showTaskDetail = function(taskId) {
+            const taskDefinition = window.TASK_DEFINITIONS && window.TASK_DEFINITIONS[taskId];
+            
+            if (taskDefinition) {
+                document.getElementById('taskDetailTitle').textContent = taskDefinition.title;
+                
+                // Get or create task progress
+                if (!appState.progress[taskId]) {
+                    appState.progress[taskId] = {
+                        completed: false,
+                        subtasks: {},
+                        notes: ''
+                    };
+                }
+                
+                const taskProgress = appState.progress[taskId];
+                
+                // Create task detail content with notes section
+                const notesSection = `
+                    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                        <h4 style="margin-bottom: 1rem; color: var(--text);">📝 Your Notes</h4>
+                        <textarea 
+                            id="taskNotes_${taskId}" 
+                            placeholder="Add your notes, observations, or troubleshooting steps here..."
+                            style="width: 100%; min-height: 100px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--background); color: var(--text); font-family: inherit; resize: vertical;"
+                            onchange="saveTaskNotes('${taskId}')"
+                        >${taskProgress.notes || ''}</textarea>
+                        <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);">
+                            💡 Tip: Document any issues, solutions, or key learnings for future reference
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('taskDetailContent').innerHTML = taskDefinition.description + notesSection;
+                
+                // Add event listeners for subtask checkboxes
+                setTimeout(() => {
+                    const subtaskCheckboxes = document.querySelectorAll('.subtask-checkbox');
+                    subtaskCheckboxes.forEach(checkbox => {
+                        const step = checkbox.getAttribute('data-step');
+                        
+                        // Set checkbox state from saved progress
+                        if (taskProgress.subtasks && taskProgress.subtasks[step]) {
+                            checkbox.checked = taskProgress.subtasks[step].completed;
+                            const subtaskItem = checkbox.closest('.subtask-item');
+                            if (checkbox.checked) {
+                                subtaskItem.classList.add('completed');
+                            }
+                        }
+                        
+                        checkbox.addEventListener('change', function() {
+                            handleSubtaskChange(taskId, step, this.checked);
+                        });
+                    });
+                }, 100);
+                
+                showModal('taskDetailModal');
+            } else {
+                notificationSystem.error('Task details not available');
+            }
+        };
+
+        window.saveTaskNotes = function(taskId) {
+            const notesTextarea = document.getElementById(`taskNotes_${taskId}`);
+            if (notesTextarea && appState.progress[taskId]) {
+                appState.progress[taskId].notes = notesTextarea.value;
+                appState.progress[taskId].lastUpdated = new Date().toISOString();
+                saveUserProgress(taskId, appState.progress[taskId]);
+                console.log('📝 Notes saved for task:', taskId);
+            }
+        };
+
+        window.toggleTaskCompletion = async function(taskId) {
+            try {
+                // Initialize task progress if not exists
+                if (!appState.progress[taskId]) {
+                    appState.progress[taskId] = {
+                        completed: false,
+                        subtasks: {},
+                        notes: ''
+                    };
+                }
+                
+                const isCompleted = appState.progress[taskId].completed;
+                
+                // Update local state
+                appState.progress[taskId].completed = !isCompleted;
+                appState.progress[taskId].completedAt = !isCompleted ? new Date().toISOString() : null;
+                appState.progress[taskId].lastUpdated = new Date().toISOString();
+                
+                // Save to KV backend
+                await saveUserProgress(taskId, appState.progress[taskId]);
+                
+                // Update UI immediately
+                updateProgressDisplay();
+                
+                // Check if lab is now completed
+                checkLabCompletion();
+                
+            } catch (error) {
+                console.error('Failed to toggle task completion:', error);
+                notificationSystem.error('Failed to save progress. Please try again.');
+            }
+        };
+
+        window.toggleWeekExpansion = function(weekNum) {
+            const weekCards = document.querySelectorAll('.week-card');
+            const targetCard = weekCards[weekNum - 1];
+            
+            if (targetCard) {
+                targetCard.classList.toggle('expanded');
+            }
+        };
+
+        window.toggleMobileThemeMenu = function(event) {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            
+            const themeOptions = document.getElementById('mobileThemeOptions');
+            const themeToggle = document.getElementById('mobileThemeToggle');
+            
+            if (themeOptions && themeToggle) {
+                if (themeOptions.style.display === 'none') {
+                    themeOptions.style.display = 'block';
+                    themeToggle.innerHTML = '🎨 Theme ▼';
+                } else {
+                    themeOptions.style.display = 'none';
+                    themeToggle.innerHTML = '🎨 Theme ▶';
+                }
+            }
+        };
+
+        window.showUserLabHistory = function(userName, userEmail) {
+            // This would need KV backend implementation for cross-user access
+            notificationSystem.info('User lab history requires backend implementation');
+        };
+
+        // Mobile menu functionality
+        function setupMobileMenuHandlers() {
+            document.addEventListener('click', function(event) {
+                const mobileMenu = document.getElementById('mobileMenu');
+                const hamburger = document.getElementById('hamburger');
+                
+                if (mobileMenu && hamburger && !mobileMenu.contains(event.target) && !hamburger.contains(event.target)) {
+                    closeMobileMenu();
+                }
+            });
+        }
+
+        function closeMobileMenu() {
+            const hamburger = document.getElementById('hamburger');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            hamburger.classList.remove('active');
+            mobileMenu.classList.remove('active');
+            
+            // Close theme submenu if open
+            closeMobileThemeMenu();
+        }
+
+        function updateMobileMenuItems() {
+            const mobileMenuItems = document.getElementById('mobileMenuItems');
+            
+            if (appState.authenticated && appState.user) {
+                let adminItem = '';
+                if (appState.user.role === 'admin') {
+                    adminItem = '<button class="mobile-menu-item" onclick="showAdminPanel(); closeMobileMenu();">👑 Admin Panel</button>';
+                }
+                
+                mobileMenuItems.innerHTML = `
+                    <div style="padding: 0.5rem 1rem; text-align: center; color: var(--text-secondary); font-size: 0.9rem; border-bottom: 1px solid var(--border); margin-bottom: 0.5rem;">
+                        Welcome, ${appState.user.name}
+                    </div>
+                    <button class="mobile-menu-item" onclick="startLabEnvironment(); closeMobileMenu();">🚀 Start New Lab</button>
+                    <button class="mobile-menu-item" onclick="showLabHistoryModal(); closeMobileMenu();">📊 Lab History</button>
+                    ${adminItem}
+                    <button class="mobile-menu-item" onclick="toggleMobileThemeMenu(event)" id="mobileThemeToggle">
+                        🎨 Theme ▶
+                    </button>
+                    <div id="mobileThemeOptions" style="display: none; padding-left: 1rem; background: var(--bg-secondary);">
+                        <button class="mobile-menu-item" onclick="setTheme('light'); closeMobileMenu();" style="background: var(--bg-secondary); font-size: 0.9rem;">
+                            🌟 Light Jedi
+                        </button>
+                        <button class="mobile-menu-item" onclick="setTheme('dark'); closeMobileMenu();" style="background: var(--bg-secondary); font-size: 0.9rem;">
+                            ⚡ Dark Sith
+                        </button>
+                    </div>
+                    <button class="mobile-menu-item" onclick="logout(); closeMobileMenu();">🚪 Sign Out</button>
+                `;
+            } else {
+                mobileMenuItems.innerHTML = `
+                    <button class="mobile-menu-item secondary" onclick="showSignInModal(); closeMobileMenu();">👤 Sign In</button>
+                    <button class="mobile-menu-item primary" onclick="showRegisterModal(); closeMobileMenu();">🚀 Get Started</button>
+                `;
+            }
+        }
+
+        function closeMobileThemeMenu() {
+            const existingSubmenu = document.getElementById('mobileThemeSubmenu');
+            if (existingSubmenu) {
+                existingSubmenu.remove();
+            }
         }
 
         function generateLabHistoryHTML(history) {
-            return history.map(l => `
-                <div style="padding: 1rem; border-bottom: 1px solid var(--border);">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <strong>${l.labId}</strong> - ${new Date(l.date).toLocaleDateString()}
-                        </div>
-                        <span style="color: ${l.status === 'completed' ? 'var(--success)' : 'var(--warning)'}; font-weight: 500;">
-                            ${l.status.charAt(0).toUpperCase() + l.status.slice(1)}
-                        </span>
-                    </div>
-                    <p style="color: var(--text-secondary); margin-top: 0.5rem;">
-                        Tasks: ${l.tasksCompleted}/${l.totalTasks} • Started: ${new Date(l.startedAt).toLocaleString()}
-                        ${l.completedAt ? ` • Completed: ${new Date(l.completedAt).toLocaleString()}` : ''}
-                    </p>
-                </div>
-            `).join('');
-        }
-
-        function displayAdminPanel(data) {
-            const content = utils.getId('adminContent');
-            if (!data || !data.length) {
-                content.innerHTML = `
-                    <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
-                        <p>No user progress data available.</p>
-                    </div>
-                `;
-            } else {
-                content.innerHTML = `
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 2px solid var(--border);">
-                                <th style="padding: 1rem; text-align: left;">User</th>
-                                <th style="padding: 1rem; text-align: left;">Email</th>
-                                <th style="padding: 1rem; text-align: left;">Progress</th>
-                                <th style="padding: 1rem; text-align: left;">Last Lab</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${data.map(user => `
-                                <tr style="border-bottom: 1px solid var(--border);">
-                                    <td style="padding: 1rem;">${user.name}</td>
-                                    <td style="padding: 1rem;">${user.email}</td>
-                                    <td style="padding: 1rem;">
-                                        ${Math.round((user.completedTasks / user.totalTasks) * 100)}%
-                                    </td>
-                                    <td style="padding: 1rem;">
-                                        ${user.lastLab ? new Date(user.lastLab).toLocaleDateString() : 'N/A'}
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
+            if (history.length === 0) {
+                return '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">No sessions found for this period.</div>';
             }
-            showModal('adminModal');
-        }
-
-        function showAdminPanelFallback(message) {
-            const content = utils.getId('adminContent');
-            content.innerHTML = `
-                <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                    <p>${message}</p>
-                    <p style="margin-top: 1rem;">
-                        ${appState.sessionToken?.startsWith('demo_') ? 'Demo mode: Admin data unavailable.' : 'Ensure admin role and try again.'}
-                    </p>
-                </div>
-            `;
-            showModal('adminModal');
-        }
-
-        function updateProgressDisplay() {
-            const totalTasks = appState.tasks.length || 42;
-            const completedTasks = Object.values(appState.progress).filter(t => t.completed).length;
-            const percentage = Math.round((completedTasks / totalTasks) * 100);
-            const circumference = 339.292; // 2 * π * 54
-            const dashArray = (percentage / 100) * circumference;
-            const ring = utils.getId('progressRing');
-            if (ring) {
-                ring.setAttribute('stroke-dasharray', `${dashArray} ${circumference}`);
-            }
-            const percentageText = utils.getId('progressPercentage');
-            if (percentageText) {
-                percentageText.textContent = `${percentage}%`;
-            }
-            renderWeekCards();
-        }
-
-        function renderWeekCards() {
-            const container = utils.getId('weeksContainer');
-            if (!container) return;
-            const weeks = Array.from({ length: 4 }, (_, i) => i + 1);
-            container.innerHTML = weeks.map(week => {
-                const weekTasks = appState.tasks.filter(t => t.week === week);
-                const completed = weekTasks.filter(t => appState.progress[t.id]?.completed).length;
-                const progress = weekTasks.length ? (completed / weekTasks.length) * 100 : 0;
+            
+            // Sort history with newest first, but in-progress labs at the very top
+            const sortedHistory = [...history].sort((a, b) => {
+                // In-progress labs go to top
+                if (a.status === 'started' && b.status !== 'started') return -1;
+                if (b.status === 'started' && a.status !== 'started') return 1;
+                
+                // Otherwise sort by session number (newest first)
+                return b.session - a.session;
+            });
+            
+            return sortedHistory.map(session => {
+                const isInProgress = session.status === 'started';
+                const statusIcon = session.status === 'completed' ? '✅' : '🚀';
+                const statusText = session.status === 'completed' ? 'Completed' : 'In Progress';
+                const statusColor = session.status === 'completed' ? 'var(--success)' : 'var(--primary)';
+                
+                // Get current progress for in-progress labs
+                const currentProgress = getCurrentLabProgress();
+                const completedTasks = isInProgress ? currentProgress.completedTasks : (session.tasksCompleted || 0);
+                
+                // Lab title
+                let labTitle;
+                if (isInProgress) {
+                    labTitle = `${statusIcon} Current Lab`;
+                } else {
+                    // Extract lab number from labId (LAB001 -> Lab 1)
+                    const labNumber = session.labId ? session.labId.replace('LAB', '').replace(/^0+/, '') : session.session;
+                    labTitle = `${statusIcon} Lab ${labNumber}`;
+                }
+                
                 return `
-                    <div class="week-card" onclick="toggleWeekCard(${week})" data-week="${week}">
+                    <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 600;">${labTitle}</span>
+                            <span style="color: ${statusColor}; font-weight: 600;">${statusText}</span>
+                        </div>
+                        <div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                            Lab ID: ${session.labId} • ${new Date(session.date).toLocaleDateString()}
+                        </div>
+                        <div style="color: ${isInProgress ? 'var(--primary)' : 'var(--success)'}; font-size: 0.8rem; font-weight: 600;">
+                            Tasks: ${completedTasks}/${session.totalTasks || 42}
+                        </div>
+                        ${session.completedAt ? 
+                            `<div style="color: var(--text-secondary); font-size: 0.75rem;">Completed: ${new Date(session.completedAt).toLocaleString()}</div>` : 
+                            session.startedAt ? 
+                            `<div style="color: var(--text-secondary); font-size: 0.75rem;">Started: ${new Date(session.startedAt).toLocaleString()}</div>` : ''
+                        }
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getCurrentLabProgress() {
+            const totalTasks = 42;
+            const completedTasks = Object.values(appState.progress).filter(task => task.completed).length;
+            return { completedTasks, totalTasks };
+        }
+
+        function handleSubtaskChange(taskId, step, isCompleted) {
+            // Initialize subtasks if not exists
+            if (!appState.progress[taskId].subtasks) {
+                appState.progress[taskId].subtasks = {};
+            }
+            
+            // Update subtask status
+            appState.progress[taskId].subtasks[step] = {
+                completed: isCompleted,
+                completedAt: isCompleted ? new Date().toISOString() : null
+            };
+            
+            // Update UI
+            const checkbox = document.querySelector(`[data-step="${step}"]`);
+            const subtaskItem = checkbox.closest('.subtask-item');
+            
+            if (isCompleted) {
+                subtaskItem.classList.add('completed');
+            } else {
+                subtaskItem.classList.remove('completed');
+            }
+            
+            // Check if all subtasks are completed
+            const allSubtaskCheckboxes = document.querySelectorAll('.subtask-checkbox');
+            const completedSubtasks = Array.from(allSubtaskCheckboxes).filter(cb => cb.checked);
+            
+            if (completedSubtasks.length === allSubtaskCheckboxes.length && allSubtaskCheckboxes.length > 0) {
+                // Auto-complete the main task
+                appState.progress[taskId].completed = true;
+                appState.progress[taskId].completedAt = new Date().toISOString();
+                
+                notificationSystem.success(`🎉 Task completed: ${window.TASK_DEFINITIONS[taskId].title}`);
+                
+                // Update main task checkbox in the week view
+                const mainTaskCheckbox = document.querySelector(`input[onchange="toggleTaskCompletion('${taskId}')"]`);
+                if (mainTaskCheckbox) {
+                    mainTaskCheckbox.checked = true;
+                    const taskItem = mainTaskCheckbox.closest('.task-item');
+                    if (taskItem) {
+                        taskItem.classList.add('completed');
+                    }
+                }
+                
+                updateProgressDisplay();
+            } else if (appState.progress[taskId].completed && completedSubtasks.length < allSubtaskCheckboxes.length) {
+                // Uncheck main task if not all subtasks are complete
+                appState.progress[taskId].completed = false;
+                
+                const mainTaskCheckbox = document.querySelector(`input[onchange="toggleTaskCompletion('${taskId}')"]`);
+                if (mainTaskCheckbox) {
+                    mainTaskCheckbox.checked = false;
+                    const taskItem = mainTaskCheckbox.closest('.task-item');
+                    if (taskItem) {
+                        taskItem.classList.remove('completed');
+                    }
+                }
+                
+                updateProgressDisplay();
+            }
+            
+            // Save progress to KV backend
+            saveUserProgress(taskId, appState.progress[taskId]);
+        }
+
+        // UI state management
+        function showWelcomeScreen() {
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+            document.getElementById('mainContent').classList.add('hidden');
+            document.getElementById('headerButtons').classList.remove('hidden');
+            document.getElementById('userMenu').classList.add('hidden');
+            closeMobileMenu();
+        }
+
+        function showDashboard() {
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            document.getElementById('headerButtons').classList.add('hidden'); // Hide Sign In/Get Started buttons
+            document.getElementById('userMenu').classList.remove('hidden'); // Show user menu
+            
+            // Update user info
+            const userNameEl = document.getElementById('userName');
+            if (userNameEl && appState.user) {
+                userNameEl.textContent = appState.user.name;
+            }
+            
+            // Show admin button if user is admin
+            if (appState.user && appState.user.role === 'admin') {
+                const adminBtn = document.getElementById('adminButton');
+                if (adminBtn) adminBtn.style.display = 'block';
+            }
+            
+            generateWeekCards();
+            updateProgressDisplay();
+            closeMobileMenu();
+        }
+
+        function generateWeekCards() {
+            const container = document.getElementById('weeksContainer');
+            if (!container) return;
+
+            const weekGroups = groupTasksByWeek();
+            
+            container.innerHTML = Object.keys(weekGroups).map(weekNum => {
+                const week = weekGroups[weekNum];
+                const completedTasks = week.tasks.filter(task => 
+                    appState.progress[task.id] && appState.progress[task.id].completed
+                ).length;
+                const progressPercentage = Math.round((completedTasks / week.tasks.length) * 100);
+                
+                return `
+                    <div class="week-card" onclick="toggleWeekExpansion(${weekNum})">
                         <div class="week-header">
                             <div>
-                                <h3 class="week-title">Week ${week}: ${['Foundation', 'Exchange Setup', 'M365 Integration', 'Hybrid Deployment'][week - 1]}</h3>
-                                <p class="week-tasks">${completed}/${weekTasks.length} tasks completed</p>
+                                <div class="week-title">${week.title}</div>
+                                <div class="week-tasks">${completedTasks}/${week.tasks.length} tasks</div>
                             </div>
-                            <span class="expand-icon">▼</span>
+                            <div class="expand-icon">▼</div>
                         </div>
                         <div class="week-progress">
-                            <div class="week-progress-fill" style="width: ${progress}%"></div>
+                            <div class="week-progress-fill" style="width: ${progressPercentage}%"></div>
                         </div>
-                        <p class="week-description">
-                            ${['Set up core infrastructure including AD and DNS.',
-                               'Deploy and configure Exchange Server.',
-                               'Integrate with Microsoft 365 services.',
-                               'Establish and test hybrid connectivity.'][week - 1]}
-                        </p>
+                        <div class="week-description">${week.description}</div>
+                        
                         <div class="task-list">
-                            ${weekTasks.map(task => `
-                                <div class="task-item ${appState.progress[task.id]?.completed ? 'completed' : ''}" data-task-id="${task.id}">
-                                    <input type="checkbox" class="task-checkbox" ${appState.progress[task.id]?.completed ? 'checked' : ''} onclick="event.stopPropagation(); toggleTaskCompletion('${task.id}')">
-                                    <div class="task-content">
-                                        <div class="task-title">${task.title}</div>
-                                        <div class="task-description">${task.description}</div>
+                            ${week.tasks.map(task => {
+                                const isCompleted = appState.progress[task.id] && appState.progress[task.id].completed;
+                                return `
+                                    <div class="task-item ${isCompleted ? 'completed' : ''}" onclick="event.stopPropagation()">
+                                        <input type="checkbox" class="task-checkbox" 
+                                               ${isCompleted ? 'checked' : ''} 
+                                               onchange="toggleTaskCompletion('${task.id}')">
+                                        <div class="task-content" onclick="showTaskDetail('${task.id}')">
+                                            <div class="task-title">${task.title}</div>
+                                            <div class="task-description">Click to view step-by-step instructions</div>
+                                        </div>
+                                        <button class="task-detail-btn" onclick="showTaskDetail('${task.id}')">
+                                            View Details
+                                        </button>
                                     </div>
-                                    <button class="task-detail-btn" onclick="event.stopPropagation(); showTaskDetail('${task.id}')">Details</button>
-                                </div>
-                            `).join('')}
+                                `;
+                            }).join('')}
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        window.toggleWeekCard = (week) => {
-            const card = document.querySelector(`.week-card[data-week="${week}"]`);
-            if (card) {
-                const isExpanded = card.classList.contains('expanded');
-                document.querySelectorAll('.week-card').forEach(c => c.classList.remove('expanded'));
-                if (!isExpanded) {
-                    card.classList.add('expanded');
+        function groupTasksByWeek() {
+            const weeks = {};
+            
+            appState.tasks.forEach(task => {
+                const weekNum = task.week || 1;
+                if (!weeks[weekNum]) {
+                    weeks[weekNum] = {
+                        title: `Week ${weekNum}: ${task.category || 'Training'}`,
+                        description: `Complete ${appState.tasks.filter(t => t.week === weekNum).length} tasks in this week`,
+                        tasks: []
+                    };
                 }
+                weeks[weekNum].tasks.push(task);
+            });
+            
+            return weeks;
+        }
+
+        function updateProgressDisplay() {
+            const totalTasks = appState.tasks.length || 42;
+            const completedTasks = Object.values(appState.progress).filter(task => task.completed).length;
+            const percentage = Math.round((completedTasks / totalTasks) * 100);
+            
+            // Update progress ring
+            const circumference = 2 * Math.PI * 54; // r = 54
+            const offset = circumference - (percentage / 100) * circumference;
+            const progressRing = document.getElementById('progressRing');
+            if (progressRing) {
+                progressRing.style.strokeDasharray = `${circumference - offset} ${circumference}`;
+            }
+            
+            const progressPercentage = document.getElementById('progressPercentage');
+            if (progressPercentage) {
+                progressPercentage.textContent = `${percentage}%`;
+            }
+            
+            // Update week cards if they exist
+            const mainContent = document.getElementById('mainContent');
+            if (mainContent && !mainContent.classList.contains('hidden')) {
+                generateWeekCards();
+            }
+            
+            // Check for lab completion after updating display
+            if (appState.authenticated) {
+                checkLabCompletion();
+            }
+        }
+
+        // Admin functions
+        function showAdminPanelFallback(customMessage) {
+            const content = document.getElementById('adminContent');
+            const message = customMessage || 'Admin features will be available once the backend is deployed.';
+            
+            content.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">👑</div>
+                    <h3>Admin Panel</h3>
+                    <p>${message}</p>
+                    <div style="margin-top: 2rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                        <h4 style="margin-bottom: 1rem;">📚 To enable full admin features:</h4>
+                        <ol style="text-align: left; max-width: 400px; margin: 0 auto;">
+                            <li>Deploy the 3 Functions files to <code>/functions/api/</code></li>
+                            <li>Configure your serverless functions</li>
+                            <li>Admin panel will automatically work</li>
+                        </ol>
+                        <div style="margin-top: 1rem; font-size: 0.9rem; background: var(--surface); padding: 0.5rem; border-radius: 4px;">
+                            Files needed:<br>
+                            <code>/functions/api/admin/users-progress.js</code><br>
+                            <code>/functions/api/lab/start.js</code><br>
+                            <code>/functions/api/user/lab-history.js</code>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
+                        Current mode: <strong>localStorage fallback</strong>
+                    </div>
+                </div>
+            `;
+            showModal('adminModal');
+        }
+
+        function displayAdminPanel(usersData) {
+            const content = document.getElementById('adminContent');
+            
+            // Ensure usersData is an array
+            if (!Array.isArray(usersData)) {
+                console.error('Expected array but got:', usersData);
+                content.innerHTML = '<p style="text-align: center; color: var(--danger); padding: 2rem;">Invalid data format received from server.</p>';
+                return;
+            }
+            
+            if (usersData.length === 0) {
+                content.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No users found.</p>';
+            } else {
+                // Sort by completed tasks and progress percentage
+                usersData.sort((a, b) => {
+                    if (a.completedTasks !== b.completedTasks) {
+                        return b.completedTasks - a.completedTasks; // More completed tasks first
+                    }
+                    return b.progressPercentage - a.progressPercentage; // Higher percentage first
+                });
+                
+                content.innerHTML = `
+                    <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                        <strong>Leaderboard - ${usersData.length} Users</strong>
+                        <small style="color: var(--text-secondary);">📊 Sorted by Progress</small>
+                    </div>
+                    ${usersData.map((user, index) => {
+                        const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+                        return `
+                            <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <span style="font-weight: 600;">${medal} ${user.name}</span>
+                                    <span style="color: var(--success); font-weight: 600;">${user.progressPercentage}%</span>
+                                </div>
+                                <div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                                    ${user.email} • ${user.role}
+                                </div>
+                                <div style="background: var(--surface); height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 0.5rem;">
+                                    <div style="height: 100%; background: var(--success); width: ${user.progressPercentage}%; transition: width 0.5s ease;"></div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 0.5rem;">
+                                    <div style="text-align: center; background: var(--bg-secondary); padding: 0.5rem; border-radius: 6px;">
+                                        <div style="font-weight: 600; color: var(--primary);">${user.completedTasks}/42</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-secondary);">Tasks Done</div>
+                                    </div>
+                                    <div style="text-align: center; background: var(--bg-secondary); padding: 0.5rem; border-radius: 6px;">
+                                        <div style="font-weight: 600; color: var(--success);">${user.completedLabs || 0}</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-secondary);">Labs Completed</div>
+                                    </div>
+                                </div>
+                                <div style="color: var(--text-secondary); font-size: 0.8rem; display: flex; justify-content: space-between;">
+                                    <span>${user.hasNotes ? '📝 Has notes' : 'No notes'}</span>
+                                    <span>Last: ${user.lastActive ? new Date(user.lastActive).toLocaleDateString() : 'Never'}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                `;
+            }
+            
+            showModal('adminModal');
+        }
+
+        // Modal management functions - Ensure global scope
+        window.showModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+            }
+            closeMobileMenu();
+        };
+
+        window.closeModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
             }
         };
 
-        function showModal(modalId) {
-            const modal = utils.getId(modalId);
-            if (modal) {
-                modal.classList.add('active');
-                document.body.style.overflow = 'hidden';
+        window.showSignInModal = function() {
+            // Reset modal state for progressive disclosure
+            const passwordGroup = document.getElementById('passwordGroup');
+            const rememberGroup = document.getElementById('rememberGroup');
+            const emailInput = document.getElementById('signInEmail');
+            const passwordInput = document.getElementById('signInPassword');
+            const submitBtn = document.querySelector('#signInForm .password-toggle');
+            const modalBody = document.querySelector('#signInModal .modal-body');
+            
+            if (passwordGroup) passwordGroup.classList.add('hidden');
+            if (rememberGroup) rememberGroup.classList.add('hidden');
+            if (emailInput) {
+                emailInput.value = '';
+                emailInput.classList.remove('loading');
             }
-        }
-
-        function closeModal(modalId) {
-            const modal = utils.getId(modalId);
-            if (modal) {
-                modal.classList.remove('active');
-                document.body.style.overflow = '';
-                const message = modal.querySelector('.message');
-                if (message) {
-                    message.classList.add('hidden');
-                    message.textContent = '';
-                }
+            if (passwordInput) {
+                passwordInput.value = '';
+                passwordInput.type = 'password';
             }
-        }
+            if (submitBtn) submitBtn.classList.remove('loading');
+            if (modalBody) modalBody.classList.add('initial-state');
+            
+            showModal('signInModal');
+        };
 
-        function showWelcomeScreen() {
-            utils.getId('welcomeScreen').classList.remove('hidden');
-            utils.getId('mainContent').classList.add('hidden');
-            utils.getId('headerButtons').classList.remove('hidden');
-            utils.getId('userMenu').classList.add('hidden');
-            updateMobileMenu();
-        }
+        window.showRegisterModal = function() {
+            // Reset register modal state
+            const registerForm = document.getElementById('registerForm');
+            const submitBtn = document.querySelector('#registerForm .password-toggle');
+            const passwordInput = document.getElementById('registerPassword');
+            
+            if (registerForm) registerForm.reset();
+            if (submitBtn) submitBtn.classList.remove('loading');
+            if (passwordInput) passwordInput.type = 'password';
+            
+            showModal('registerModal');
+        };
 
-        function showDashboard() {
-            utils.getId('welcomeScreen').classList.add('hidden');
-            utils.getId('mainContent').classList.remove('hidden');
-            utils.getId('headerButtons').classList.add('hidden');
-            utils.getId('userMenu').classList.remove('hidden');
-            utils.getId('userName').textContent = appState.user?.name || 'User';
-            updateMobileMenu();
-        }
-
-        function updateMobileMenu() {
-            const items = utils.getId('mobileMenuItems');
-            if (!items) return;
-            const isAuthenticated = appState.authenticated;
-            items.innerHTML = `
-                ${isAuthenticated ? `
-                    <button class="mobile-menu-item" onclick="startLabEnvironment()">🚀 Start New Lab</button>
-                    <button class="mobile-menu-item" onclick="showLabHistoryModal()">📊 Lab History</button>
-                    ${appState.user?.role === 'admin' ? `<button class="mobile-menu-item" onclick="showAdminPanel()">👑 Admin Panel</button>` : ''}
-                    <div class="mobile-menu-item theme-menu-item">
-                        <button class="theme-menu-toggle" onclick="this.nextElementSibling.classList.toggle('active')">
-                            <span>🎨 Theme</span>
-                            <span>▶</span>
-                        </button>
-                        <div class="theme-submenu">
-                            <button class="theme-option jedi ${document.body.getAttribute('data-theme') === 'light' ? 'active' : ''}" onclick="setTheme('light')">🌟 Light Jedi</button>
-                            <button class="theme-option sith ${document.body.getAttribute('data-theme') === 'dark' ? 'active' : ''}" onclick="setTheme('dark')">⚡ Dark Sith</button>
-                        </div>
-                    </div>
-                    <button class="mobile-menu-item" onclick="logout()">🚪 Sign Out</button>
-                ` : `
-                    <button class="mobile-menu-item primary" onclick="showSignInModal()">Sign In</button>
-                    <button class="mobile-menu-item secondary" onclick="showRegisterModal()">Get Started</button>
-                    <div class="mobile-menu-item theme-menu-item">
-                        <button class="theme-menu-toggle" onclick="this.nextElementSibling.classList.toggle('active')">
-                            <span>🎨 Theme</span>
-                            <span>▶</span>
-                        </button>
-                        <div class="theme-submenu">
-                            <button class="theme-option jedi ${document.body.getAttribute('data-theme') === 'light' ? 'active' : ''}" onclick="setTheme('light')">🌟 Light Jedi</button>
-                            <button class="theme-option sith ${document.body.getAttribute('data-theme') === 'dark' ? 'active' : ''}" onclick="setTheme('dark')">⚡ Dark Sith</button>
-                        </div>
-                    </div>
-                `}
-            `;
-            const hamburger = utils.getId('hamburger');
-            const mobileMenu = utils.getId('mobileMenu');
-            if (hamburger?.classList.contains('active')) {
-                hamburger.classList.remove('active');
-                mobileMenu.classList.remove('active');
+        window.toggleUserMenu = function() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('active');
             }
-        }
+        };
 
-        function initializeApp() {
-            console.log('🚀 Initializing Velocity Lab...');
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, checking session...');
             loadTaskDefinitions();
-            checkSession();
+            checkExistingSession();
+            setupMobileMenuHandlers();
             setupFormHandlers();
-            updateMobileMenu();
-            document.addEventListener('click', (e) => {
-                const userMenu = utils.getId('userMenuDropdown');
-                const userToggle = document.querySelector('.user-menu-toggle');
-                if (userMenu && userToggle && !userToggle.contains(e.target) && !userMenu.contains(e.target)) {
-                    userMenu.classList.remove('active');
+        });
+
+        // Close modals and menus when clicking outside
+        document.addEventListener('click', function(event) {
+            // Close modals when clicking outside
+            const modals = document.querySelectorAll('.modal.active');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.remove('active');
                 }
             });
-        }
+            
+            // Close user menu when clicking outside
+            const userMenu = document.getElementById('userMenu');
+            const dropdown = document.getElementById('userMenuDropdown');
+            if (userMenu && dropdown && !userMenu.contains(event.target) && dropdown.classList.contains('active')) {
+                dropdown.classList.remove('active');
+            }
+        });
 
-        // Start the application
-        initializeApp();
+        // Error logging for debugging
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error, e.filename, e.lineno);
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e.reason);
+        });
     </script>
 </body>
 </html>
