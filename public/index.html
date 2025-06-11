@@ -23,8 +23,8 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/assets/icon-512.png">
     
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json">
+    <!-- PWA Manifest - Only load if file exists -->
+    <link rel="manifest" href="/manifest.json" onerror="this.remove()">
     
     <!-- Open Graph for sharing -->
     <meta property="og:title" content="Velocity Lab - Exchange Hybrid Training">
@@ -3440,13 +3440,22 @@
                 setTimeout(() => showLabHistoryModal(), 1000);
             }
             
-            // Register PWA Service Worker
+            // Register PWA Service Worker (only if file exists)
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/sw.js').then(function(registration) {
-                    console.log('✅ PWA Service Worker registered successfully:', registration.scope);
-                }).catch(function(error) {
-                    console.log('ℹ️ PWA Service Worker registration failed (optional):', error);
-                });
+                fetch('/sw.js', { method: 'HEAD' })
+                    .then(response => {
+                        if (response.ok && response.headers.get('content-type')?.includes('javascript')) {
+                            return navigator.serviceWorker.register('/sw.js');
+                        } else {
+                            throw new Error('Service worker file not found or wrong MIME type');
+                        }
+                    })
+                    .then(function(registration) {
+                        console.log('✅ PWA Service Worker registered successfully:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('ℹ️ PWA Service Worker not available (optional):', error.message);
+                    });
             }
         });
 
