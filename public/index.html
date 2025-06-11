@@ -1796,6 +1796,9 @@
                     await loadLabHistory();
                     closeModal('signInModal');
                     
+                    // Ensure mobile menu is closed and updated
+                    closeMobileMenu();
+                    
                     // Show welcome notification only if not already shown
                     if (!appState.isWelcomeShown) {
                         notificationSystem.success(`Welcome back, ${name}! 🎉`);
@@ -1868,6 +1871,9 @@
                     await loadLabHistory();
                     closeModal('registerModal');
                     
+                    // Ensure mobile menu is closed and updated
+                    closeMobileMenu();
+                    
                     // Show welcome notification only if not already shown
                     if (!appState.isWelcomeShown) {
                         notificationSystem.success(`Welcome to Velocity Lab, ${userName}! 🚀`);
@@ -1921,6 +1927,9 @@
                 
                 const adminBtn = document.getElementById('adminButton');
                 if (adminBtn) adminBtn.style.display = 'none';
+                
+                // Close any open menus before showing welcome screen
+                closeMobileMenu();
                 showWelcomeScreen();
                 notificationSystem.info('Signed out successfully');
             }
@@ -2352,6 +2361,9 @@
                     loadUserProgress();
                     loadLabHistory();
                     themeSystem.loadTheme();
+                    
+                    // Ensure mobile menu is properly set for authenticated state
+                    updateMobileMenuItems();
                 } catch (error) {
                     console.error('Session validation failed:', error);
                     utils.cookies.delete('user');
@@ -2798,6 +2810,11 @@
             
             // Close theme submenu if open
             closeMobileThemeMenu();
+            
+            // Force update mobile menu items to ensure proper state
+            setTimeout(() => {
+                updateMobileMenuItems();
+            }, 100);
         }
 
         function updateMobileMenuItems() {
@@ -2996,13 +3013,19 @@
             document.getElementById('headerButtons').classList.remove('hidden');
             document.getElementById('userMenu').classList.add('hidden');
             closeMobileMenu();
+            updateMobileMenuItems(); // Update mobile menu for unauthenticated state
         }
 
         function showDashboard() {
             document.getElementById('welcomeScreen').classList.add('hidden');
             document.getElementById('mainContent').classList.remove('hidden');
-            document.getElementById('headerButtons').classList.add('hidden'); // Hide Sign In/Get Started buttons
-            document.getElementById('userMenu').classList.remove('hidden'); // Show user menu
+            
+            // Only manipulate desktop header buttons (mobile uses hamburger menu)
+            const headerButtons = document.getElementById('headerButtons');
+            const userMenu = document.getElementById('userMenu');
+            
+            if (headerButtons) headerButtons.classList.add('hidden'); // Hide Sign In/Get Started buttons
+            if (userMenu) userMenu.classList.remove('hidden'); // Show user menu (desktop only due to CSS)
             
             // Update user info
             const userNameEl = document.getElementById('userName');
@@ -3019,6 +3042,7 @@
             generateWeekCards();
             updateProgressDisplay();
             closeMobileMenu();
+            updateMobileMenuItems(); // Ensure mobile menu shows authenticated state
         }
 
         function generateWeekCards() {
