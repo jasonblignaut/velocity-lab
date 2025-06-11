@@ -106,26 +106,18 @@ export async function onRequestPost(context) {
                 // Save updated history
                 await env.VELOCITY_LABS.put(`history:${sessionData.userId}`, JSON.stringify(labHistory));
             } else {
-                // Active lab exists and not completed - don't allow new lab
-                console.log('⚠️ Active lab exists and not completed');
-                return new Response(JSON.stringify({
-                    success: false,
-                    message: 'Please complete your current lab before starting a new one.',
-                    data: {
-                        currentLab: activeLab,
-                        completedTasks: completedTasks,
-                        totalTasks: totalTasks,
-                        progressPercentage: Math.round((completedTasks / totalTasks) * 100)
-                    }
-                }), {
-                    status: 400,
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*',
-                        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-                    }
-                });
+                // 🔥 NEW: Force start new lab by marking current as abandoned
+                console.log('🔄 Force starting new lab - marking current lab as abandoned');
+                activeLab.status = 'abandoned';
+                activeLab.abandonedAt = new Date().toISOString();
+                activeLab.tasksCompleted = completedTasks;
+                activeLab.totalTasks = totalTasks;
+                activeLab.reason = 'User started new lab before completion';
+                
+                // Save updated history
+                await env.VELOCITY_LABS.put(`history:${sessionData.userId}`, JSON.stringify(labHistory));
+                
+                console.log('✅ Previous lab marked as abandoned, proceeding with new lab');
             }
         }
         
