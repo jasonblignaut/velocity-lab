@@ -4,7 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Velocity Lab - Exchange Hybrid Training</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="Velocity Lab">
+    <meta name="apple-mobile-web-app-title" content="Velocity Lab">
+    <meta name="description" content="Comprehensive Exchange Hybrid training with 42 hands-on tasks across 4 weeks">
+    <meta name="theme-color" content="#00a8ff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    
+    <!-- PWA Icons -->
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/Appleios.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/icon-512.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Open Graph for sharing -->
+    <meta property="og:title" content="Velocity Lab - Exchange Hybrid Training">
+    <meta property="og:description" content="Comprehensive 4 week journey with 42 tasks to build a complete Exchange Hybrid lab environment">
+    <meta property="og:image" content="/assets/Android_512.png">
+    <meta property="og:url" content="https://velocitylab.pages.dev">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Velocity Lab - Exchange Hybrid Training">
+    <meta name="twitter:description" content="Comprehensive 4 week journey with 42 tasks to build a complete Exchange Hybrid lab environment">
+    <meta name="twitter:image" content="/assets/Android_512.png">
     
     <style>
         /* Apple White + Unifi Cloud Color Scheme with Dark Mode */
@@ -1056,9 +1089,15 @@
                 height: 100px;
             }
 
-            /* FORCE HIDE header buttons on mobile - important override */
-            .header-buttons {
+            /* AGGRESSIVE HIDE header buttons on mobile - multiple selectors to ensure hiding */
+            .header-buttons,
+            #headerButtons,
+            .header .header-buttons {
                 display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                position: absolute !important;
+                left: -9999px !important;
             }
 
             .hamburger {
@@ -1067,9 +1106,15 @@
                 right: 1rem;
             }
 
-            /* FORCE HIDE user menu on mobile - important override */
-            .user-menu {
+            /* AGGRESSIVE HIDE user menu on mobile - multiple selectors to ensure hiding */
+            .user-menu,
+            #userMenu,
+            .header .user-menu {
                 display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                position: absolute !important;
+                left: -9999px !important;
             }
 
             .welcome-screen {
@@ -1228,6 +1273,24 @@
             .logo {
                 width: 90px;
                 height: 90px;
+            }
+
+            /* SUPER AGGRESSIVE HIDE on smallest screens */
+            .header-buttons,
+            #headerButtons,
+            .header .header-buttons,
+            .user-menu,
+            #userMenu,
+            .header .user-menu {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                position: fixed !important;
+                left: -9999px !important;
+                top: -9999px !important;
+                width: 0 !important;
+                height: 0 !important;
+                overflow: hidden !important;
             }
 
             .welcome-title {
@@ -3366,38 +3429,24 @@
             checkExistingSession();
             setupMobileMenuHandlers();
             setupFormHandlers();
-        });
-
-        // Handle window resize to ensure proper mobile/desktop layout
-        window.addEventListener('resize', function() {
-            const headerButtons = document.getElementById('headerButtons');
-            const userMenu = document.getElementById('userMenu');
             
-            if (window.innerWidth <= 768) {
-                // Mobile view - force hide desktop elements
-                if (headerButtons) headerButtons.style.display = 'none';
-                if (userMenu) userMenu.style.display = 'none';
-            } else {
-                // Desktop view - restore normal display based on auth state
-                if (appState.authenticated) {
-                    if (headerButtons) {
-                        headerButtons.style.display = 'none';
-                        headerButtons.classList.add('hidden');
-                    }
-                    if (userMenu) {
-                        userMenu.style.display = '';
-                        userMenu.classList.remove('hidden');
-                    }
-                } else {
-                    if (headerButtons) {
-                        headerButtons.style.display = '';
-                        headerButtons.classList.remove('hidden');
-                    }
-                    if (userMenu) {
-                        userMenu.style.display = 'none';
-                        userMenu.classList.add('hidden');
-                    }
-                }
+            // Handle PWA shortcut actions
+            const urlParams = new URLSearchParams(window.location.search);
+            const action = urlParams.get('action');
+            
+            if (action === 'start-lab' && appState.authenticated) {
+                setTimeout(() => startLabEnvironment(), 1000);
+            } else if (action === 'lab-history' && appState.authenticated) {
+                setTimeout(() => showLabHistoryModal(), 1000);
+            }
+            
+            // Register PWA Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    console.log('✅ PWA Service Worker registered successfully:', registration.scope);
+                }).catch(function(error) {
+                    console.log('ℹ️ PWA Service Worker registration failed (optional):', error);
+                });
             }
         });
 
