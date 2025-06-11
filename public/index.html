@@ -399,9 +399,8 @@
             border-radius: 20px;
             padding: 0;
             width: 100%;
-            max-width: 420px;
-            min-height: 460px;
-            max-height: 520px;
+            max-width: 400px;
+            height: 460px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             position: relative;
             animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -411,6 +410,7 @@
         .modal-content.large {
             max-width: 800px;
             background: var(--background);
+            height: auto;
             min-height: unset;
             max-height: unset;
         }
@@ -455,9 +455,9 @@
 
         /* Modal content area with better centering */
         .modal-body {
-            padding: 140px 40px 40px;
+            padding: 130px 35px 35px;
             text-align: center;
-            min-height: 320px;
+            height: calc(100% - 120px);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -465,7 +465,6 @@
 
         .modal-body.initial-state {
             justify-content: center;
-            padding-top: 80px;
         }
 
         .apple-modal .modal-body {
@@ -1107,17 +1106,16 @@
                 padding: 0;
                 margin: auto;
                 max-width: 90vw;
-                min-height: 420px;
-                max-height: 90vh;
+                height: 420px;
             }
 
             .modal-body {
-                padding: 120px 24px 32px;
-                min-height: 280px;
+                padding: 110px 20px 30px;
+                height: calc(100% - 100px);
             }
 
             .modal-body.initial-state {
-                padding-top: 60px;
+                justify-content: center;
             }
 
             .modal-logo {
@@ -1167,21 +1165,20 @@
             .modal-content {
                 border-radius: 16px;
                 max-width: 95vw;
-                min-height: 400px;
-                max-height: 85vh;
+                height: 400px;
             }
 
             .modal-body {
-                padding: 100px 20px 28px;
-                min-height: 260px;
+                padding: 90px 18px 25px;
+                height: calc(100% - 90px);
             }
 
             .modal-body.initial-state {
-                padding-top: 50px;
+                justify-content: center;
             }
 
             .modal-header-clean {
-                height: 100px;
+                height: 90px;
             }
         }
 
