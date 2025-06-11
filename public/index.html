@@ -1,4 +1,9 @@
-<!DOCTYPE html>
+window.startLabEnvironment = async function() {
+            try {
+                // Check if backend is available
+                let backendAvailable = false;
+                if (appState.sessionToken) {
+              <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1550,7 +1555,7 @@
             }
         };
 
-        // API call function - Cloudflare KV backend only, no localStorage fallback
+        // API call function - with localStorage fallback when backend unavailable
         const api = {
             async call(url, options = {}) {
                 try {
@@ -1581,6 +1586,12 @@
                     // Check if response is JSON
                     const contentType = response.headers.get('content-type');
                     if (!contentType || !contentType.includes('application/json')) {
+                        // If we get HTML response, it means backend isn't deployed
+                        if (contentType && contentType.includes('text/html')) {
+                            console.warn('⚠️ Backend API not deployed, using localStorage fallback');
+                            throw new Error('BACKEND_NOT_AVAILABLE');
+                        }
+                        
                         console.error('❌ Expected JSON response but got:', contentType);
                         const responseText = await response.text();
                         console.error('❌ Response body:', responseText);
@@ -2019,12 +2030,12 @@
             return tasks;
         }
 
-        // Progress management with KV backend only
+        // Progress management with KV backend and localStorage fallback
         async function loadUserProgress() {
             try {
                 if (!appState.sessionToken) {
                     console.warn('No session token available');
-                    appState.progress = {};
+                    appState.progress = JSON.parse(localStorage.getItem('velocity_progress') || '{}');
                     updateProgressDisplay();
                     return;
                 }
@@ -2044,8 +2055,13 @@
                     appState.progress = {};
                 }
             } catch (error) {
-                console.warn('Progress API unavailable:', error);
-                appState.progress = {};
+                if (error.message === 'BACKEND_NOT_AVAILABLE') {
+                    console.warn('📁 Using localStorage fallback for progress');
+                    appState.progress = JSON.parse(localStorage.getItem('velocity_progress') || '{}');
+                } else {
+                    console.warn('Progress API unavailable:', error);
+                    appState.progress = JSON.parse(localStorage.getItem('velocity_progress') || '{}');
+                }
             }
             
             updateProgressDisplay();
@@ -2055,7 +2071,8 @@
         async function saveUserProgress(taskId, taskProgress) {
             try {
                 if (!appState.sessionToken) {
-                    console.warn('No session token, cannot save progress');
+                    console.warn('No session token, saving to localStorage');
+                    localStorage.setItem('velocity_progress', JSON.stringify(appState.progress));
                     return;
                 }
 
@@ -2078,16 +2095,38 @@
                     console.warn('Failed to save progress:', response.message);
                 }
             } catch (error) {
-                console.warn('Progress save failed:', error);
+                if (error.message === 'BACKEND_NOT_AVAILABLE') {
+                    console.warn('📁 Saving progress to localStorage fallback');
+                    localStorage.setItem('velocity_progress', JSON.stringify(appState.progress));
+                } else {
+                    console.warn('Progress save failed, using localStorage:', error);
+                    localStorage.setItem('velocity_progress', JSON.stringify(appState.progress));
+                }
             }
         }
 
-        // Lab history management with KV backend only
+        // Lab history management with KV backend and localStorage fallback
         async function loadLabHistory() {
             try {
                 if (!appState.sessionToken) {
                     console.warn('No session token available');
-                    appState.labHistory = [];
+                    appState.labHistory = JSON.parse(localStorage.getItem('velocity_lab_history') || '[]');
+                    
+                    // Create default lab if none exists
+                    if (appState.labHistory.length === 0) {
+                        const today = new Date().toISOString().split('T')[0];
+                        const defaultLab = {
+                            session: 1,
+                            date: today,
+                            status: 'started',
+                            labId: 'LAB001',
+                            startedAt: new Date().toISOString(),
+                            tasksCompleted: 0,
+                            totalTasks: 42
+                        };
+                        appState.labHistory = [defaultLab];
+                        localStorage.setItem('velocity_lab_history', JSON.stringify(appState.labHistory));
+                    }
                     return;
                 }
 
@@ -2106,15 +2145,37 @@
                     appState.labHistory = [];
                 }
             } catch (error) {
-                console.warn('Lab history API unavailable:', error);
-                appState.labHistory = [];
+                if (error.message === 'BACKEND_NOT_AVAILABLE') {
+                    console.warn('📁 Using localStorage fallback for lab history');
+                    appState.labHistory = JSON.parse(localStorage.getItem('velocity_lab_history') || '[]');
+                    
+                    // Create default lab if none exists
+                    if (appState.labHistory.length === 0) {
+                        const today = new Date().toISOString().split('T')[0];
+                        const defaultLab = {
+                            session: 1,
+                            date: today,
+                            status: 'started',
+                            labId: 'LAB001',
+                            startedAt: new Date().toISOString(),
+                            tasksCompleted: 0,
+                            totalTasks: 42
+                        };
+                        appState.labHistory = [defaultLab];
+                        localStorage.setItem('velocity_lab_history', JSON.stringify(appState.labHistory));
+                    }
+                } else {
+                    console.warn('Lab history API unavailable:', error);
+                    appState.labHistory = JSON.parse(localStorage.getItem('velocity_lab_history') || '[]');
+                }
             }
         }
 
         async function saveLabHistory(newSession) {
             try {
                 if (!appState.sessionToken) {
-                    console.warn('No session token, cannot save lab history');
+                    console.warn('No session token, saving to localStorage');
+                    localStorage.setItem('velocity_lab_history', JSON.stringify(appState.labHistory));
                     return;
                 }
 
@@ -2136,7 +2197,13 @@
                     console.warn('Failed to save lab history:', response.message);
                 }
             } catch (error) {
-                console.warn('Lab history save failed:', error);
+                if (error.message === 'BACKEND_NOT_AVAILABLE') {
+                    console.warn('📁 Saving lab history to localStorage fallback');
+                    localStorage.setItem('velocity_lab_history', JSON.stringify(appState.labHistory));
+                } else {
+                    console.warn('Lab history save failed, using localStorage:', error);
+                    localStorage.setItem('velocity_lab_history', JSON.stringify(appState.labHistory));
+                }
             }
         }
 
