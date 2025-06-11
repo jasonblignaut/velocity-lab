@@ -1,38 +1,32 @@
-// Netlify/Vercel Functions API - Admin Users Progress
-// File: /functions/api/admin/users-progress.js
-
-exports.handler = async (event, context) => {
-  // CORS headers
+// /functions/api/admin/users-progress.js
+exports.handler = async (event, context, { VELOCITY_SESSIONS, VELOCITY_PROGRESS }) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Content-Type': 'application/json'
   };
 
-  // Handle preflight requests
+  // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+
+  // Only allow GET
+  if (event.httpMethod !== 'GET') {
+    console.log('Method not allowed:', event.httpMethod);
     return {
-      statusCode: 200,
+      statusCode: 405,
       headers,
-      body: ''
+      body: JSON.stringify({
+        success: false,
+        message: 'Method Not Allowed'
+      })
     };
   }
 
   try {
-    // Only allow GET requests
-    if (event.httpMethod !== 'GET') {
-      return {
-        statusCode: 405,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          message: 'Method not allowed'
-        })
-      };
-    }
-
-    // Check authorization
+    // Extract and validate authorization token
     const authHeader = event.headers.authorization || event.headers.Authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return {
@@ -40,69 +34,44 @@ exports.handler = async (event, context) => {
         headers,
         body: JSON.stringify({
           success: false,
-          message: 'Authorization required'
+          message: 'Authorization header missing or invalid'
         })
       };
     }
 
     const sessionToken = authHeader.replace('Bearer ', '');
-    
-    // For demo purposes, create mock admin data
-    // In production, you'd verify the session and check if user is admin
-    // and fetch real user data from your database
-    
-    const mockUsers = [
-      {
-        name: 'John Doe',
-        email: 'john@example.com',
-        role: 'user',
-        completedTasks: 35,
-        progressPercentage: 83,
-        completedLabs: 2,
-        hasNotes: true,
-        lastActive: new Date().toISOString()
-      },
-      {
-        name: 'Jane Smith', 
-        email: 'jane@example.com',
-        role: 'user',
-        completedTasks: 28,
-        progressPercentage: 67,
-        completedLabs: 1,
-        hasNotes: false,
-        lastActive: new Date(Date.now() - 86400000).toISOString() // 1 day ago
-      },
-      {
-        name: 'Admin User',
-        email: 'admin@example.com', 
-        role: 'admin',
-        completedTasks: 42,
-        progressPercentage: 100,
-        completedLabs: 3,
-        hasNotes: true,
-        lastActive: new Date().toISOString()
-      }
-    ];
+    const sessionData = await VELOCITY_SESSIONS.get(`session:${sessionToken}`, { type: 'json' });
+    if (!sessionData || sessionData.role !== 'admin') {
+      return {
+        statusCode: 403,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'Admin access required'
+        })
+      };
+    }
 
-    // Sort by progress (completed tasks first, then percentage)
-    mockUsers.sort((a, b) => {
-      if (a.completedTasks !== b.completedTasks) {
-        return b.completedTasks - a.completedTasks;
+    // Fetch all user progress from KV
+    const progressList = await VELOCITY_PROGRESS.list();
+    const progressData = [];
+    for (const key of progressList.keys) {
+      if (key.name.startsWith('progress:')) {
+        const data = await VELOCITY_PROGRESS.get(key.name, { type: 'json' });
+        progressData.push(data);
       }
-      return b.progressPercentage - a.progressPercentage;
-    });
+    }
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        data: mockUsers
+        data: progressData
       })
     };
-
   } catch (error) {
-    console.error('Admin users progress error:', error);
+    console.error('Users progress error:', error);
     return {
       statusCode: 500,
       headers,

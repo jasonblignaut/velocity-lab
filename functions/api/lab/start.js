@@ -1,38 +1,32 @@
-// Netlify/Vercel Functions API - Start New Lab
-// File: /functions/api/lab/start.js
-
-exports.handler = async (event, context) => {
-  // CORS headers
+// /functions/api/lab/start.js
+exports.handler = async (event, context, { VELOCITY_SESSIONS, VELOCITY_LABS }) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Content-Type': 'application/json'
   };
 
-  // Handle preflight requests
+  // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+
+  // Only allow POST
+  if (event.httpMethod !== 'POST') {
+    console.log('Method not allowed:', event.httpMethod);
     return {
-      statusCode: 200,
+      statusCode: 405,
       headers,
-      body: ''
+      body: JSON.stringify({
+        success: false,
+        message: 'Method Not Allowed'
+      })
     };
   }
 
   try {
-    // Only allow POST requests
-    if (event.httpMethod !== 'POST') {
-      return {
-        statusCode: 405,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          message: 'Method not allowed'
-        })
-      };
-    }
-
-    // Check authorization
+    // Extract and validate authorization token
     const authHeader = event.headers.authorization || event.headers.Authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return {
@@ -40,91 +34,60 @@ exports.handler = async (event, context) => {
         headers,
         body: JSON.stringify({
           success: false,
-          message: 'Authorization required'
+          message: 'Authorization header missing or invalid'
         })
       };
     }
 
     const sessionToken = authHeader.replace('Bearer ', '');
-    
-    // For demo purposes - in production you'd:
-    // 1. Verify the session token
-    // 2. Get user from database
-    // 3. Load their actual lab history and progress
-    // 4. Save to database
-    
-    // Mock lab creation logic
-    const today = new Date().toISOString().split('T')[0];
-    
-    // Simulate getting existing lab history (in production, load from database)
-    const mockLabHistory = JSON.parse(context.clientContext?.custom?.labHistory || '[]');
-    
-    // Check for existing in-progress lab today
-    const todayInProgressLab = mockLabHistory.find(lab => 
-      lab.date === today && lab.status === 'started'
-    );
-    
-    if (todayInProgressLab) {
+    const sessionData = await VELOCITY_SESSIONS.get(`session:${sessionToken}`, { type: 'json' });
+    if (!sessionData) {
       return {
-        statusCode: 200,
+        statusCode: 401,
         headers,
         body: JSON.stringify({
-          success: true,
-          message: 'Lab already started today',
-          data: {
-            labId: todayInProgressLab.labId,
-            session: todayInProgressLab.session,
-            startedAt: todayInProgressLab.startedAt
-          }
+          success: false,
+          message: 'Invalid session token'
         })
       };
     }
-    
-    // Check if current lab should be marked as completed
-    // (In production, check actual user progress)
-    const isCurrentLabCompleted = false; // Mock value
-    
-    // Mark current lab as completed if needed
-    if (mockLabHistory.length > 0 && isCurrentLabCompleted) {
-      const currentLab = mockLabHistory[mockLabHistory.length - 1];
-      if (currentLab.status === 'started') {
-        currentLab.status = 'completed';
-        currentLab.completedAt = new Date().toISOString();
-        currentLab.tasksCompleted = 42;
-        currentLab.totalTasks = 42;
-      }
+
+    // Parse request body
+    const body = JSON.parse(event.body || '{}');
+    const { labId, config } = body;
+    if (!labId) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          message: 'Lab ID is required'
+        })
+      };
     }
-    
-    // Create new lab session
-    const newSession = {
-      session: mockLabHistory.length + 1,
-      date: today,
-      status: 'started',
-      labId: `LAB${String(mockLabHistory.length + 1).padStart(3, '0')}`,
+
+    // Store lab session in KV
+    const labSession = {
+      labId,
+      userEmail: sessionData.email,
+      config: config || {},
       startedAt: new Date().toISOString(),
-      tasksCompleted: 0,
-      totalTasks: 42
+      status: 'running'
     };
-    
-    // In production: Save to database here
-    
+    const labKey = `lab:${sessionToken}:${labId}:${Date.now()}`;
+    await VELOCITY_LABS.put(labKey, JSON.stringify(labSession));
+
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        message: 'New lab started successfully',
-        data: {
-          labId: newSession.labId,
-          session: newSession.session,
-          startedAt: newSession.startedAt,
-          previousLabCompleted: isCurrentLabCompleted
-        }
+        message: 'Lab started successfully',
+        data: labSession
       })
     };
-
   } catch (error) {
-    console.error('Start lab error:', error);
+    console.error('Lab start error:', error);
     return {
       statusCode: 500,
       headers,

@@ -1,26 +1,32 @@
-// Netlify/Vercel Functions API - User Lab History
-// File: /functions/api/user/lab-history.js
-
-exports.handler = async (event, context) => {
-  // CORS headers
+// /functions/api/user/lab-history.js
+exports.handler = async (event, context, { VELOCITY_SESSIONS, VELOCITY_LABS }) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Content-Type': 'application/json'
   };
 
-  // Handle preflight requests
+  // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+
+  // Only allow GET
+  if (event.httpMethod !== 'GET') {
+    console.log('Method not allowed:', event.httpMethod);
     return {
-      statusCode: 200,
+      statusCode: 405,
       headers,
-      body: ''
+      body: JSON.stringify({
+        success: false,
+        message: 'Method Not Allowed'
+      })
     };
   }
 
   try {
-    // Check authorization
+    // Extract and validate authorization token
     const authHeader = event.headers.authorization || event.headers.Authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return {
@@ -28,94 +34,43 @@ exports.handler = async (event, context) => {
         headers,
         body: JSON.stringify({
           success: false,
-          message: 'Authorization required'
+          message: 'Authorization header missing or invalid'
         })
       };
     }
 
     const sessionToken = authHeader.replace('Bearer ', '');
-    
-    // For demo purposes - in production you'd:
-    // 1. Verify the session token
-    // 2. Get user ID from session
-    // 3. Load/save user's lab history from database
-
-    if (event.httpMethod === 'GET') {
-      // Mock lab history data
-      const mockLabHistory = [
-        {
-          session: 1,
-          date: new Date().toISOString().split('T')[0],
-          status: 'started',
-          labId: 'LAB001',
-          startedAt: new Date().toISOString(),
-          tasksCompleted: 0,
-          totalTasks: 42
-        }
-      ];
-      
+    const sessionData = await VELOCITY_SESSIONS.get(`session:${sessionToken}`, { type: 'json' });
+    if (!sessionData) {
       return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({
-          success: true,
-          data: mockLabHistory
-        })
-      };
-
-    } else if (event.httpMethod === 'POST') {
-      // Add/update lab session entry
-      const body = JSON.parse(event.body || '{}');
-      const { session, date, status, labId, startedAt, completedAt, tasksCompleted, totalTasks } = body;
-      
-      if (!session || !date || !status || !labId) {
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({
-            success: false,
-            message: 'Missing required fields'
-          })
-        };
-      }
-
-      // Create new lab entry
-      const newEntry = {
-        session,
-        date,
-        status,
-        labId,
-        startedAt: startedAt || new Date().toISOString(),
-        ...(completedAt && { completedAt }),
-        ...(tasksCompleted !== undefined && { tasksCompleted }),
-        ...(totalTasks !== undefined && { totalTasks })
-      };
-      
-      // In production: Save to database here
-      
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({
-          success: true,
-          message: 'Lab history updated successfully',
-          data: newEntry
-        })
-      };
-
-    } else {
-      return {
-        statusCode: 405,
+        statusCode: 401,
         headers,
         body: JSON.stringify({
           success: false,
-          message: 'Method not allowed'
+          message: 'Invalid session token'
         })
       };
     }
 
+    // Fetch lab history from KV
+    const labHistoryList = [];
+    const labKeys = await VELOCITY_LABS.list();
+    for (const key of labKeys.keys) {
+      if (key.name.startsWith(`lab:${sessionToken}:`)) {
+        const labData = await VELOCITY_LABS.get(key.name, { type: 'json' });
+        labHistoryList.push(labData);
+      }
+    }
+
+    return {
+      statusCode: 200,
+      headers: {
+        success: true,
+        data: labHistoryList
+      }
+    });
   } catch (error) {
-    console.error('Lab history error:', error);
+    console.log('Lab history error:', error);
     return {
       statusCode: 500,
       headers,
