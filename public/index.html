@@ -532,7 +532,7 @@
         }
 
         .password-field .apple-form-input {
-            padding-right: 96px;
+            padding-right: 56px;
         }
 
         .apple-form-input:focus {
@@ -550,7 +550,7 @@
             pointer-events: none;
         }
 
-        /* Password field with styled arrow button and eye toggle */
+        /* Password field with styled arrow button */
         .password-field {
             position: relative;
         }
@@ -575,31 +575,6 @@
             border-radius: 50%;
             transition: all 0.2s ease;
             line-height: 1;
-        }
-
-        .password-eye {
-            position: absolute;
-            right: 56px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #8e8e93;
-            cursor: pointer;
-            font-size: 16px;
-            padding: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-        }
-
-        .password-eye:hover {
-            background: rgba(142, 142, 147, 0.1);
-            color: #a1a1a6;
         }
 
         .password-toggle:hover {
@@ -1430,9 +1405,6 @@
                         <div class="password-field">
                             <input type="password" class="apple-form-input" id="signInPassword" name="password" 
                                    placeholder="Password" required>
-                            <button type="button" class="password-eye" onclick="togglePasswordVisibility('signInPassword')" title="Show password">
-                                👁
-                            </button>
                             <button type="submit" class="password-toggle" title="Sign In">
                                 →
                             </button>
@@ -1479,9 +1451,6 @@
                         <div class="password-field">
                             <input type="password" class="apple-form-input" id="registerPassword" name="password" 
                                    placeholder="Password" required>
-                            <button type="button" class="password-eye" onclick="togglePasswordVisibility('registerPassword')" title="Show password">
-                                👁
-                            </button>
                             <button type="submit" class="password-toggle" title="Create Account">
                                 →
                             </button>
@@ -2317,19 +2286,6 @@
         }
 
         // Global functions for HTML event handlers
-        window.togglePasswordVisibility = function(inputId) {
-            const input = document.getElementById(inputId);
-            const eyeButton = input.parentNode.querySelector('.password-eye');
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                eyeButton.innerHTML = '🙈'; // closed eye when showing
-            } else {
-                input.type = 'password';
-                eyeButton.innerHTML = '👁'; // open eye when hidden
-            }
-        };
-
         window.setTheme = function(theme) {
             themeSystem.setTheme(theme);
         };
@@ -3073,7 +3029,6 @@
             const emailInput = document.getElementById('signInEmail');
             const passwordInput = document.getElementById('signInPassword');
             const submitBtn = document.querySelector('#signInForm .password-toggle');
-            const eyeBtn = document.querySelector('#signInForm .password-eye');
             const modalBody = document.querySelector('#signInModal .modal-body');
             
             if (passwordGroup) passwordGroup.classList.add('hidden');
@@ -3087,7 +3042,6 @@
                 passwordInput.type = 'password';
             }
             if (submitBtn) submitBtn.classList.remove('loading');
-            if (eyeBtn) eyeBtn.innerHTML = '👁';
             if (modalBody) modalBody.classList.add('initial-state');
             
             showModal('signInModal');
@@ -3097,12 +3051,10 @@
             // Reset register modal state
             const registerForm = document.getElementById('registerForm');
             const submitBtn = document.querySelector('#registerForm .password-toggle');
-            const eyeBtn = document.querySelector('#registerForm .password-eye');
             const passwordInput = document.getElementById('registerPassword');
             
             if (registerForm) registerForm.reset();
             if (submitBtn) submitBtn.classList.remove('loading');
-            if (eyeBtn) eyeBtn.innerHTML = '👁';
             if (passwordInput) passwordInput.type = 'password';
             
             showModal('registerModal');
