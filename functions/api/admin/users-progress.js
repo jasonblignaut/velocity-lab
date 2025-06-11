@@ -84,74 +84,87 @@ export async function onRequestGet(context) {
         
         console.log('👤 Admin access granted for:', sessionData.email);
         
-        // Get all user data from KV stores
+        // 🔥 NEW: Get ALL users from KV store
         try {
-            // Start with the current admin user
-            const adminUser = {
-                name: sessionData.name,
-                email: sessionData.email,
-                role: sessionData.role,
-                completedTasks: 0,
-                progressPercentage: 0,
-                completedLabs: 0,
-                hasNotes: false,
-                lastActive: new Date().toISOString()
-            };
+            console.log('🔍 Enumerating all users from VELOCITY_USERS KV...');
             
-            // Try to get actual admin user progress
-            try {
-                const adminProgressRaw = await env.VELOCITY_PROGRESS.get(`progress:${sessionData.userId}`);
-                const adminLabHistoryRaw = await env.VELOCITY_LABS.get(`history:${sessionData.userId}`);
-                
-                if (adminProgressRaw) {
-                    const adminProgress = JSON.parse(adminProgressRaw);
-                    const completedTasks = Object.values(adminProgress).filter(task => task && task.completed).length;
-                    const progressPercentage = Math.round((completedTasks / 42) * 100);
+            // Use KV list to get all user keys
+            const usersList = await env.VELOCITY_USERS.list({ prefix: 'user:' });
+            console.log('📊 Found', usersList.keys.length, 'users in KV store');
+            
+            const allUsers = [];
+            
+            // Process each user
+            for (const userKey of usersList.keys) {
+                try {
+                    // Get user data
+                    const userDataRaw = await env.VELOCITY_USERS.get(userKey.name);
+                    if (!userDataRaw) continue;
                     
-                    let completedLabs = 0;
+                    const userData = JSON.parse(userDataRaw);
+                    console.log('👤 Processing user:', userData.name, '(' + userData.email + ')');
+                    
+                    // Get user progress
+                    let completedTasks = 0;
                     let hasNotes = false;
+                    let progressPercentage = 0;
                     
-                    if (adminLabHistoryRaw) {
-                        const labHistory = JSON.parse(adminLabHistoryRaw);
-                        completedLabs = labHistory.filter(lab => lab.status === 'completed').length;
+                    try {
+                        const progressRaw = await env.VELOCITY_PROGRESS.get(`progress:${userData.id}`);
+                        if (progressRaw) {
+                            const progress = JSON.parse(progressRaw);
+                            completedTasks = Object.values(progress).filter(task => task && task.completed).length;
+                            progressPercentage = Math.round((completedTasks / 42) * 100);
+                            
+                            // Check if user has notes
+                            hasNotes = Object.values(progress).some(task => 
+                                task && task.notes && task.notes.trim().length > 0
+                            );
+                        }
+                    } catch (progressError) {
+                        console.warn('Failed to load progress for user:', userData.email, progressError);
                     }
                     
-                    // Check if admin has notes
-                    hasNotes = Object.values(adminProgress).some(task => task && task.notes && task.notes.trim().length > 0);
+                    // Get lab history
+                    let completedLabs = 0;
+                    try {
+                        const labHistoryRaw = await env.VELOCITY_LABS.get(`history:${userData.id}`);
+                        if (labHistoryRaw) {
+                            const labHistory = JSON.parse(labHistoryRaw);
+                            completedLabs = labHistory.filter(lab => lab.status === 'completed').length;
+                        }
+                    } catch (labError) {
+                        console.warn('Failed to load lab history for user:', userData.email, labError);
+                    }
                     
-                    // Update admin user data
-                    adminUser.completedTasks = completedTasks;
-                    adminUser.progressPercentage = progressPercentage;
-                    adminUser.completedLabs = completedLabs;
-                    adminUser.hasNotes = hasNotes;
+                    // Add user to results
+                    allUsers.push({
+                        name: userData.name,
+                        email: userData.email,
+                        role: userData.role,
+                        completedTasks: completedTasks,
+                        progressPercentage: progressPercentage,
+                        completedLabs: completedLabs,
+                        hasNotes: hasNotes,
+                        lastActive: userData.lastActive || userData.createdAt || new Date().toISOString()
+                    });
+                    
+                } catch (userError) {
+                    console.warn('Failed to process user:', userKey.name, userError);
+                    continue;
                 }
-            } catch (progressError) {
-                console.warn('Failed to load admin progress:', progressError);
             }
             
-            // In a real implementation, you would:
-            // 1. Maintain a user registry in KV
-            // 2. Or iterate through all user sessions
-            // 3. Or use a separate database for user management
-            
-            // For now, we'll return just the admin user with sample data
-            // You should implement proper user enumeration based on your needs
-            const allUsers = [
-                adminUser,
-                // Add other real users here when you implement user enumeration
-                // Example of how you'd add real users:
-                // ...await getAllRealUsersFromKV(env)
-            ];
-            
-            // Sort by progress
+            // Sort by progress (highest first)
             allUsers.sort((a, b) => {
                 if (a.completedTasks !== b.completedTasks) {
-                    return b.completedTasks - a.completedTasks;
+                    return b.completedTasks - a.completedTasks; // More completed tasks first
                 }
-                return b.progressPercentage - a.progressPercentage;
+                return b.progressPercentage - a.progressPercentage; // Higher percentage first
             });
             
             console.log('✅ Admin data compiled successfully for', allUsers.length, 'users');
+            console.log('📊 User breakdown:', allUsers.map(u => `${u.name} (${u.completedTasks}/42 tasks)`));
             
             return new Response(JSON.stringify({
                 success: true,
