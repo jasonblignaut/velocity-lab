@@ -61,6 +61,55 @@
             --bg-secondary: #f0f0f5;
         }
 
+        /* ADDITIONAL MOBILE OVERRIDE - Force hide on ALL mobile devices */
+        @media (max-width: 768px), (max-device-width: 768px), (orientation: portrait) {
+            .header-buttons,
+            #headerButtons,
+            .header .header-buttons,
+            .header-buttons .btn,
+            #headerButtons .btn,
+            .header .header-buttons .btn,
+            .btn-secondary,
+            .btn-primary,
+            .user-menu,
+            #userMenu,
+            .header .user-menu {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                position: fixed !important;
+                left: -99999px !important;
+                top: -99999px !important;
+                width: 0 !important;
+                height: 0 !important;
+                overflow: hidden !important;
+                pointer-events: none !important;
+                z-index: -9999 !important;
+            }
+            
+            /* Ensure only hamburger and logo are visible on mobile */
+            .header > * {
+                display: none !important;
+            }
+            
+            .header .logo,
+            .header .hamburger,
+            .header #hamburger {
+                display: flex !important;
+                position: absolute !important;
+            }
+            
+            .header .logo {
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+            }
+            
+            .header .hamburger,
+            .header #hamburger {
+                right: 1rem !important;
+            }
+        }
+
         [data-theme="dark"] {
             --primary: #00a8ff;
             --primary-hover: #0093e6;
@@ -1089,32 +1138,51 @@
                 height: 100px;
             }
 
-            /* AGGRESSIVE HIDE header buttons on mobile - multiple selectors to ensure hiding */
+            /* NUCLEAR OPTION - Hide ALL header buttons on mobile regardless of state */
             .header-buttons,
             #headerButtons,
-            .header .header-buttons {
+            .header .header-buttons,
+            .header-buttons *,
+            #headerButtons *,
+            .header .header-buttons * {
                 display: none !important;
                 visibility: hidden !important;
                 opacity: 0 !important;
-                position: absolute !important;
-                left: -9999px !important;
+                position: fixed !important;
+                left: -99999px !important;
+                top: -99999px !important;
+                width: 0 !important;
+                height: 0 !important;
+                overflow: hidden !important;
+                pointer-events: none !important;
+                z-index: -9999 !important;
             }
 
             .hamburger {
                 display: flex;
                 position: absolute;
                 right: 1rem;
+                z-index: 1001;
             }
 
-            /* AGGRESSIVE HIDE user menu on mobile - multiple selectors to ensure hiding */
+            /* NUCLEAR OPTION - Hide ALL user menu on mobile regardless of state */
             .user-menu,
             #userMenu,
-            .header .user-menu {
+            .header .user-menu,
+            .user-menu *,
+            #userMenu *,
+            .header .user-menu * {
                 display: none !important;
                 visibility: hidden !important;
                 opacity: 0 !important;
-                position: absolute !important;
-                left: -9999px !important;
+                position: fixed !important;
+                left: -99999px !important;
+                top: -99999px !important;
+                width: 0 !important;
+                height: 0 !important;
+                overflow: hidden !important;
+                pointer-events: none !important;
+                z-index: -9999 !important;
             }
 
             .welcome-screen {
@@ -1279,18 +1347,25 @@
             .header-buttons,
             #headerButtons,
             .header .header-buttons,
+            .header-buttons *,
+            #headerButtons *,
             .user-menu,
             #userMenu,
-            .header .user-menu {
+            .header .user-menu,
+            .user-menu *,
+            #userMenu *,
+            .header .user-menu * {
                 display: none !important;
                 visibility: hidden !important;
                 opacity: 0 !important;
                 position: fixed !important;
-                left: -9999px !important;
-                top: -9999px !important;
+                left: -99999px !important;
+                top: -99999px !important;
                 width: 0 !important;
                 height: 0 !important;
                 overflow: hidden !important;
+                pointer-events: none !important;
+                z-index: -9999 !important;
             }
 
             .welcome-title {
