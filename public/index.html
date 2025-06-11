@@ -399,8 +399,9 @@
             border-radius: 20px;
             padding: 0;
             width: 100%;
-            max-width: 400px;
-            aspect-ratio: 1/1.2;
+            max-width: 420px;
+            min-height: 460px;
+            max-height: 520px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             position: relative;
             animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -410,7 +411,8 @@
         .modal-content.large {
             max-width: 800px;
             background: var(--background);
-            aspect-ratio: unset;
+            min-height: unset;
+            max-height: unset;
         }
 
         /* Apple-style signin has dark background */
@@ -456,6 +458,7 @@
         .modal-body {
             padding: 140px 40px 40px;
             text-align: center;
+            min-height: 320px;
         }
 
         .apple-modal .modal-body {
@@ -544,7 +547,7 @@
             right: 16px;
             top: 50%;
             transform: translateY(-50%);
-            background: #0a84ff;
+            background: #6d6d70;
             border: none;
             color: white;
             cursor: pointer;
@@ -561,16 +564,13 @@
         }
 
         .password-toggle:hover {
-            background: #0056b3;
-            transform: translateY(-50%) scale(1.1);
+            background: #8e8e93;
+            transform: translateY(-50%) scale(1.05);
         }
 
-        .password-toggle.sign-in-mode {
+        .password-toggle:active {
             background: #34c759;
-        }
-
-        .password-toggle.sign-in-mode:hover {
-            background: #28a745;
+            transform: translateY(-50%) scale(0.95);
         }
 
         .apple-checkbox-container {
@@ -1077,11 +1077,14 @@
             .modal-content {
                 padding: 0;
                 margin: auto;
-                aspect-ratio: 1/1.1;
+                max-width: 90vw;
+                min-height: 420px;
+                max-height: 480px;
             }
 
             .modal-body {
                 padding: 120px 24px 32px;
+                min-height: 280px;
             }
 
             .modal-logo {
@@ -1130,10 +1133,14 @@
 
             .modal-content {
                 border-radius: 16px;
+                max-width: 95vw;
+                min-height: 400px;
+                max-height: 460px;
             }
 
             .modal-body {
                 padding: 100px 20px 28px;
+                min-height: 260px;
             }
         }
 
@@ -1353,7 +1360,7 @@
                         <div class="password-field">
                             <input type="password" class="apple-form-input" id="signInPassword" name="password" 
                                    placeholder="Password" required>
-                            <button type="submit" class="password-toggle sign-in-mode" title="Sign In">
+                            <button type="submit" class="password-toggle" title="Sign In">
                                 →
                             </button>
                         </div>
@@ -1399,7 +1406,7 @@
                         <div class="password-field">
                             <input type="password" class="apple-form-input" id="registerPassword" name="password" 
                                    placeholder="Password" required>
-                            <button type="submit" class="password-toggle sign-in-mode" title="Create Account">
+                            <button type="submit" class="password-toggle" title="Create Account">
                                 →
                             </button>
                         </div>
@@ -2134,18 +2141,19 @@
                 const passwordGroup = document.getElementById('passwordGroup');
                 const rememberGroup = document.getElementById('rememberGroup');
                 
-                // Progressive disclosure for login
+                // Progressive disclosure for login - only on Enter key or blur with valid email
                 if (emailInput) {
-                    emailInput.addEventListener('input', function() {
-                        if (this.value.length > 0) {
-                            showPasswordField();
-                        }
-                    });
-                    
                     emailInput.addEventListener('keypress', function(e) {
                         if (e.key === 'Enter' && this.value.length > 0) {
                             e.preventDefault();
                             showPasswordField();
+                        }
+                    });
+                    
+                    emailInput.addEventListener('blur', function() {
+                        // Check if it looks like a valid email and is not empty
+                        if (this.value.length > 0 && (this.value.includes('@') || this.value.length > 3)) {
+                            setTimeout(() => showPasswordField(), 100);
                         }
                     });
                 }
@@ -2160,7 +2168,7 @@
                             passwordGroup.classList.remove('hidden');
                             rememberGroup.classList.remove('hidden');
                             document.getElementById('signInPassword').focus();
-                        }, 800);
+                        }, 600);
                     }
                 }
 
