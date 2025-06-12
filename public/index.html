@@ -3279,6 +3279,16 @@
             // Scroll to top when showing dashboard (especially important on mobile)
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
+            // ENSURE MOBILE MENU IS COMPLETELY CLOSED
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburger = document.querySelector('.hamburger');
+            if (mobileMenu) {
+                mobileMenu.classList.remove('show');
+            }
+            if (hamburger) {
+                hamburger.classList.remove('active');
+            }
+            
             // Only manipulate desktop header buttons (mobile uses hamburger menu)
             const headerButtons = document.getElementById('headerButtons');
             const userMenu = document.getElementById('userMenu');
@@ -3325,7 +3335,7 @@
             
             generateWeekCards();
             updateProgressDisplay();
-            closeMobileMenu();
+            closeMobileMenu(); // Double-ensure mobile menu is closed
             updateMobileMenuItems(); // Ensure mobile menu shows authenticated state
         }
 
@@ -3597,8 +3607,21 @@
             setupMobileMenuHandlers();
             setupFormHandlers();
             
+            // ENSURE MOBILE MENU IS CLOSED ON PAGE LOAD
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburger = document.querySelector('.hamburger');
+            if (mobileMenu) {
+                mobileMenu.classList.remove('show');
+            }
+            if (hamburger) {
+                hamburger.classList.remove('active');
+            }
+            
             // Handle window resize to ensure proper mobile hiding
             window.addEventListener('resize', function() {
+                // Close mobile menu on resize
+                closeMobileMenu();
+                
                 if (window.innerWidth <= 768 && appState.authenticated) {
                     const headerButtons = document.getElementById('headerButtons');
                     const userMenu = document.getElementById('userMenu');
