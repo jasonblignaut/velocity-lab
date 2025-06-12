@@ -647,7 +647,7 @@
             left: 50%;
             width: 16px;
             height: 16px;
-            margin: -8px 0 0 -8.2px;
+            margin: -8px 0 0 -8px; /* Perfect centering for 16px element */
             border: 2px solid white;
             border-top-color: transparent;
             border-radius: 50%;
@@ -1117,12 +1117,15 @@
             /* AGGRESSIVE HIDE user menu on mobile - multiple selectors to ensure hiding */
             .user-menu,
             #userMenu,
-            .header .user-menu {
+            .header .user-menu,
+            .user-menu-dropdown,
+            #userMenuDropdown {
                 display: none !important;
                 visibility: hidden !important;
                 opacity: 0 !important;
                 position: absolute !important;
                 left: -9999px !important;
+                pointer-events: none !important;
             }
 
             .welcome-screen {
@@ -1307,6 +1310,7 @@
                 width: 0 !important;
                 height: 0 !important;
                 overflow: hidden !important;
+                pointer-events: none !important;
             }
 
             .welcome-title {
@@ -3196,14 +3200,18 @@
             if (window.innerWidth <= 768) {
                 if (headerButtons) {
                     headerButtons.style.display = 'none';
+                    headerButtons.style.visibility = 'hidden';
                 }
                 if (userMenu) {
                     userMenu.style.display = 'none';
+                    userMenu.style.visibility = 'hidden';
+                    userMenu.style.pointerEvents = 'none';
                 }
             } else {
                 // Desktop - show header buttons normally
                 if (headerButtons) {
                     headerButtons.style.display = '';
+                    headerButtons.style.visibility = '';
                 }
             }
             
@@ -3232,9 +3240,12 @@
             if (window.innerWidth <= 768) {
                 if (headerButtons) {
                     headerButtons.style.display = 'none';
+                    headerButtons.style.visibility = 'hidden';
                 }
                 if (userMenu) {
                     userMenu.style.display = 'none';
+                    userMenu.style.visibility = 'hidden';
+                    userMenu.style.pointerEvents = 'none';
                 }
             }
             
@@ -3523,6 +3534,24 @@
             checkExistingSession();
             setupMobileMenuHandlers();
             setupFormHandlers();
+            
+            // Handle window resize to ensure proper mobile hiding
+            window.addEventListener('resize', function() {
+                if (window.innerWidth <= 768 && appState.authenticated) {
+                    const headerButtons = document.getElementById('headerButtons');
+                    const userMenu = document.getElementById('userMenu');
+                    
+                    if (headerButtons) {
+                        headerButtons.style.display = 'none';
+                        headerButtons.style.visibility = 'hidden';
+                    }
+                    if (userMenu) {
+                        userMenu.style.display = 'none';
+                        userMenu.style.visibility = 'hidden';
+                        userMenu.style.pointerEvents = 'none';
+                    }
+                }
+            });
             
             // Register PWA Service Worker
             if ('serviceWorker' in navigator) {
