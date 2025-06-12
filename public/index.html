@@ -372,7 +372,7 @@
 
         .welcome-notification {
             position: absolute;
-            top: 100px;
+            top: 120px; /* Moved higher up on mobile */
             left: 2rem;
             background: var(--primary);
             color: white;
@@ -525,7 +525,7 @@
         .modal-title {
             font-size: clamp(22px, 5vw, 28px);
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 20px; /* Increased space below Create Account text */
             color: white;
             line-height: 1.2;
         }
@@ -1093,10 +1093,14 @@
         @media (max-width: 768px) {
             .header {
                 padding: 0 1rem;
-                position: relative;
+                position: fixed; /* Ensure header stays sticky on mobile */
+                top: 0;
+                left: 0;
+                right: 0;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
+                z-index: 9999; /* Highest z-index to stay on top during scroll */
             }
             
             /* TARGETED HIDE: Only user menu and header buttons, NOT logo or hamburger */
@@ -1150,14 +1154,15 @@
                 opacity: 1 !important;
             }
 
-            .welcome-screen {
-                padding: 1rem;
-            }
-
             .welcome-notification {
                 position: static;
                 margin-bottom: 2rem;
                 max-width: none;
+                margin-top: 1rem; /* Higher up on mobile */
+            }
+
+            .welcome-screen {
+                padding: 1rem;
             }
 
             .welcome-title {
@@ -1366,6 +1371,7 @@
 
             .modal-title {
                 font-size: 20px;
+                margin-bottom: 16px; /* Increased space on mobile too */
             }
 
             .modal-subtitle {
@@ -1544,7 +1550,7 @@
         <h1 class="welcome-title">Exchange Hybrid LAB</h1>
         <p class="welcome-subtitle">
             4 week journey with 42 tasks to build
-            a complete Exchange Hybrid lab environment
+            a Exchange Hybrid lab environment
         </p>
         
         <div class="welcome-buttons">
