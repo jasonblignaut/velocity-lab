@@ -1018,7 +1018,7 @@
             opacity: 1;
         }
 
-        /* User Menu */
+        /* User Menu - CRITICAL MOBILE FIX */
         .user-menu {
             position: relative;
         }
@@ -1089,23 +1089,28 @@
             flex-wrap: wrap;
         }
 
-        /* Mobile Responsive Design */
+        /* Mobile Responsive Design - CRITICAL FIXES */
         @media (max-width: 768px) {
             .header {
                 padding: 0 1rem;
                 justify-content: center;
                 position: relative;
-                /* Ensure only logo and hamburger are visible */
             }
             
-            /* Mobile header should only contain logo and hamburger */
-            .header > * {
-                display: none;
-            }
-            
-            .header .logo,
-            .header .hamburger {
-                display: flex !important;
+            /* CRITICAL: Mobile header should only contain logo and hamburger - NOTHING ELSE */
+            .header > .header-buttons,
+            .header > .user-menu {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                position: absolute !important;
+                left: -9999px !important;
+                top: -9999px !important;
+                width: 0 !important;
+                height: 0 !important;
+                overflow: hidden !important;
+                pointer-events: none !important;
+                z-index: -1 !important;
             }
 
             .logo {
@@ -1116,27 +1121,17 @@
                 height: 100px;
             }
 
-            /* AGGRESSIVE HIDE header buttons on mobile - multiple selectors to ensure hiding */
-            .header-buttons,
-            #headerButtons,
-            .header .header-buttons {
-                display: none !important;
-                visibility: hidden !important;
-                opacity: 0 !important;
-                position: absolute !important;
-                left: -9999px !important;
-            }
-
             .hamburger {
                 display: flex;
                 position: absolute;
                 right: 1rem;
             }
 
-            /* COMPLETE HIDE of user menu on mobile - multiple approaches */
+            /* AGGRESSIVE HIDE of user menu and header buttons on mobile */
+            .header-buttons,
+            #headerButtons,
             .user-menu,
             #userMenu,
-            .header .user-menu,
             .user-menu-toggle,
             .user-menu-dropdown,
             #userMenuDropdown {
@@ -1311,17 +1306,7 @@
             .mobile-menu {
                 top: 60px;
                 max-height: calc(100vh - 60px);
-                z-index: 9998; /* Ensure it stays behind header on smaller screens too */
-            }
-
-            /* Mobile header should only contain logo and hamburger */
-            .header > * {
-                display: none;
-            }
-            
-            .header .logo,
-            .header .hamburger {
-                display: flex !important;
+                z-index: 9998;
             }
 
             .logo {
@@ -1329,13 +1314,11 @@
                 height: 90px;
             }
 
-            /* COMPLETE HIDE on smallest screens - user menu and all related elements */
+            /* COMPLETE HIDE on smallest screens - NOTHING FROM USER MENU VISIBLE */
             .header-buttons,
             #headerButtons,
-            .header .header-buttons,
             .user-menu,
             #userMenu,
-            .header .user-menu,
             .user-menu-toggle,
             .user-menu-dropdown,
             #userMenuDropdown {
@@ -1509,7 +1492,7 @@
             <span></span>
         </div>
         
-        <!-- Desktop User Menu -->
+        <!-- Desktop User Menu - WILL BE HIDDEN ON MOBILE VIA CSS -->
         <div class="user-menu hidden" id="userMenu">
             <button class="user-menu-toggle" onclick="toggleUserMenu()">
                 <span id="userName">User</span>
@@ -3289,36 +3272,36 @@
                 hamburger.classList.remove('active');
             }
             
-            // Only manipulate desktop header buttons (mobile uses hamburger menu)
+            // CRITICAL: Ensure user menu is COMPLETELY hidden on mobile
             const headerButtons = document.getElementById('headerButtons');
             const userMenu = document.getElementById('userMenu');
             
             if (headerButtons) headerButtons.classList.add('hidden'); // Hide Sign In/Get Started buttons
             if (userMenu) userMenu.classList.remove('hidden'); // Show user menu (desktop only due to CSS)
             
-            // FORCE HIDE ALL user menu elements on mobile
+            // FORCE HIDE ALL user menu elements on mobile - MULTIPLE APPROACHES FOR CERTAINTY
             if (window.innerWidth <= 768) {
-                if (headerButtons) {
-                    headerButtons.style.display = 'none';
-                    headerButtons.style.visibility = 'hidden';
-                }
-                if (userMenu) {
-                    userMenu.style.display = 'none';
-                    userMenu.style.visibility = 'hidden';
-                    userMenu.style.pointerEvents = 'none';
-                    userMenu.style.position = 'fixed';
-                    userMenu.style.left = '-9999px';
-                    userMenu.style.top = '-9999px';
-                    userMenu.style.zIndex = '-1';
-                }
+                const elementsToHide = [
+                    headerButtons,
+                    userMenu,
+                    document.getElementById('userMenuDropdown')
+                ];
                 
-                // Also hide dropdown specifically
-                const userMenuDropdown = document.getElementById('userMenuDropdown');
-                if (userMenuDropdown) {
-                    userMenuDropdown.style.display = 'none';
-                    userMenuDropdown.style.visibility = 'hidden';
-                    userMenuDropdown.style.pointerEvents = 'none';
-                }
+                elementsToHide.forEach(element => {
+                    if (element) {
+                        element.style.display = 'none !important';
+                        element.style.visibility = 'hidden !important';
+                        element.style.opacity = '0 !important';
+                        element.style.pointerEvents = 'none !important';
+                        element.style.position = 'fixed !important';
+                        element.style.left = '-9999px !important';
+                        element.style.top = '-9999px !important';
+                        element.style.zIndex = '-1 !important';
+                        element.style.width = '0 !important';
+                        element.style.height = '0 !important';
+                        element.style.overflow = 'hidden !important';
+                    }
+                });
             }
             
             // Update user info
@@ -3622,29 +3605,29 @@
                 // Close mobile menu on resize
                 closeMobileMenu();
                 
+                // CRITICAL: Re-apply mobile hiding whenever window resizes to mobile size
                 if (window.innerWidth <= 768 && appState.authenticated) {
-                    const headerButtons = document.getElementById('headerButtons');
-                    const userMenu = document.getElementById('userMenu');
-                    const userMenuDropdown = document.getElementById('userMenuDropdown');
+                    const elementsToHide = [
+                        document.getElementById('headerButtons'),
+                        document.getElementById('userMenu'),
+                        document.getElementById('userMenuDropdown')
+                    ];
                     
-                    if (headerButtons) {
-                        headerButtons.style.display = 'none';
-                        headerButtons.style.visibility = 'hidden';
-                    }
-                    if (userMenu) {
-                        userMenu.style.display = 'none';
-                        userMenu.style.visibility = 'hidden';
-                        userMenu.style.pointerEvents = 'none';
-                        userMenu.style.position = 'fixed';
-                        userMenu.style.left = '-9999px';
-                        userMenu.style.top = '-9999px';
-                        userMenu.style.zIndex = '-1';
-                    }
-                    if (userMenuDropdown) {
-                        userMenuDropdown.style.display = 'none';
-                        userMenuDropdown.style.visibility = 'hidden';
-                        userMenuDropdown.style.pointerEvents = 'none';
-                    }
+                    elementsToHide.forEach(element => {
+                        if (element) {
+                            element.style.display = 'none !important';
+                            element.style.visibility = 'hidden !important';
+                            element.style.opacity = '0 !important';
+                            element.style.pointerEvents = 'none !important';
+                            element.style.position = 'fixed !important';
+                            element.style.left = '-9999px !important';
+                            element.style.top = '-9999px !important';
+                            element.style.zIndex = '-1 !important';
+                            element.style.width = '0 !important';
+                            element.style.height = '0 !important';
+                            element.style.overflow = 'hidden !important';
+                        }
+                    });
                 }
             });
             
