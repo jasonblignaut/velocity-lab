@@ -94,6 +94,12 @@
             transition: all 0.3s ease;
         }
 
+        /* Landing page scroll prevention */
+        body.no-scroll {
+            overflow: hidden;
+            height: 100vh;
+        }
+
         /* Background Image - Fixed to show in both themes */
         body::before {
             content: '';
@@ -696,6 +702,7 @@
             padding: 0.5rem;
             border-radius: 6px;
             transition: background-color 0.2s ease;
+            cursor: pointer;
         }
 
         .subtask-item:hover {
@@ -711,6 +718,7 @@
         .subtask-item label {
             cursor: pointer;
             line-height: 1.4;
+            flex: 1;
         }
 
         .subtask-item.completed {
@@ -939,7 +947,6 @@
             border-radius: 8px;
             margin-bottom: 0.5rem;
             transition: all 0.2s ease;
-            cursor: pointer;
         }
 
         .task-item:hover {
@@ -1252,6 +1259,13 @@
             .mobile-menu.active {
                 overflow-y: auto;
             }
+
+            /* Hide hamburger on landing page when not authenticated */
+            .landing-page .hamburger {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1322,6 +1336,13 @@
 
             .modal-subtitle {
                 display: none; /* Hide subtitle on mobile to save space */
+            }
+
+            /* Hide hamburger on landing page when not authenticated */
+            .landing-page .hamburger {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
             }
         }
 
@@ -1412,9 +1433,19 @@
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+
+        /* Landing page specific class for mobile */
+        .landing-page {
+            /* Additional styling if needed */
+        }
+
+        /* Prevent week collapse when tasks are clicked */
+        .task-item-wrapper {
+            /* Wrapper to prevent event bubbling */
+        }
     </style>
 </head>
-<body data-theme="dark">
+<body data-theme="dark" class="no-scroll landing-page">
     <!-- Header -->
     <div class="header" id="header">
         <!-- Logo only (no text) -->
@@ -1484,6 +1515,9 @@
         <div class="welcome-buttons">
             <button class="btn btn-primary btn-large" onclick="showSignInModal()">
                 👤 Sign In
+            </button>
+            <button class="btn btn-secondary btn-large" onclick="showRegisterModal()">
+                Get Started
             </button>
         </div>
     </div>
@@ -2759,24 +2793,46 @@
                 
                 document.getElementById('taskDetailContent').innerHTML = taskDefinition.description + notesSection;
                 
-                // Add event listeners for subtask checkboxes
+                // Add event listeners for subtask checkboxes and make text clickable
                 setTimeout(() => {
-                    const subtaskCheckboxes = document.querySelectorAll('.subtask-checkbox');
-                    subtaskCheckboxes.forEach(checkbox => {
-                        const step = checkbox.getAttribute('data-step');
+                    const subtaskItems = document.querySelectorAll('.subtask-item');
+                    subtaskItems.forEach(item => {
+                        const checkbox = item.querySelector('.subtask-checkbox');
+                        const label = item.querySelector('label');
+                        const step = checkbox ? checkbox.getAttribute('data-step') : null;
                         
-                        // Set checkbox state from saved progress
-                        if (taskProgress.subtasks && taskProgress.subtasks[step]) {
-                            checkbox.checked = taskProgress.subtasks[step].completed;
-                            const subtaskItem = checkbox.closest('.subtask-item');
-                            if (checkbox.checked) {
-                                subtaskItem.classList.add('completed');
+                        if (step && checkbox && label) {
+                            // Set checkbox state from saved progress
+                            if (taskProgress.subtasks && taskProgress.subtasks[step]) {
+                                checkbox.checked = taskProgress.subtasks[step].completed;
+                                if (checkbox.checked) {
+                                    item.classList.add('completed');
+                                }
                             }
+                            
+                            // Make the entire subtask item clickable to toggle checkbox
+                            const clickHandler = function(e) {
+                                // Don't trigger if clicking directly on checkbox
+                                if (e.target === checkbox) return;
+                                
+                                e.preventDefault();
+                                e.stopPropagation();
+                                
+                                // Toggle checkbox
+                                checkbox.checked = !checkbox.checked;
+                                handleSubtaskChange(taskId, step, checkbox.checked);
+                            };
+                            
+                            // Add click handler to the entire item
+                            item.addEventListener('click', clickHandler);
+                            label.addEventListener('click', clickHandler);
+                            
+                            // Handle direct checkbox clicks
+                            checkbox.addEventListener('change', function(e) {
+                                e.stopPropagation();
+                                handleSubtaskChange(taskId, step, this.checked);
+                            });
                         }
-                        
-                        checkbox.addEventListener('change', function() {
-                            handleSubtaskChange(taskId, step, this.checked);
-                        });
                     });
                 }, 100);
                 
@@ -2842,7 +2898,18 @@
             }
         };
 
-        window.toggleWeekExpansion = function(weekNum) {
+        window.toggleWeekExpansion = function(weekNum, event) {
+            // Prevent collapsing if event came from within task list
+            if (event && event.target) {
+                // Check if click came from task item or its children
+                const taskItem = event.target.closest('.task-item');
+                const taskList = event.target.closest('.task-list');
+                
+                if (taskItem || taskList) {
+                    return; // Don't collapse when clicking on tasks
+                }
+            }
+            
             const weekCards = document.querySelectorAll('.week-card');
             const targetCard = weekCards[weekNum - 1];
             
@@ -2934,10 +3001,8 @@
                     <button class="mobile-menu-item" onclick="logout(); closeMobileMenu();">🚪 Sign Out</button>
                 `;
             } else {
-                mobileMenuItems.innerHTML = `
-                    <button class="mobile-menu-item secondary" onclick="showSignInModal(); closeMobileMenu();">👤 Sign In</button>
-                    <button class="mobile-menu-item primary" onclick="showRegisterModal(); closeMobileMenu();">Get Started</button>
-                `;
+                // For unauthenticated users on mobile - NO menu items on landing page
+                mobileMenuItems.innerHTML = '';
             }
         }
 
@@ -3043,12 +3108,14 @@
             
             // Update UI
             const checkbox = document.querySelector(`[data-step="${step}"]`);
-            const subtaskItem = checkbox.closest('.subtask-item');
+            const subtaskItem = checkbox?.closest('.subtask-item');
             
-            if (isCompleted) {
-                subtaskItem.classList.add('completed');
-            } else {
-                subtaskItem.classList.remove('completed');
+            if (subtaskItem) {
+                if (isCompleted) {
+                    subtaskItem.classList.add('completed');
+                } else {
+                    subtaskItem.classList.remove('completed');
+                }
             }
             
             // Check if all subtasks are completed
@@ -3098,6 +3165,9 @@
             document.getElementById('welcomeScreen').classList.remove('hidden');
             document.getElementById('mainContent').classList.add('hidden');
             
+            // Add landing page class and disable scrolling
+            document.body.classList.add('no-scroll', 'landing-page');
+            
             const headerButtons = document.getElementById('headerButtons');
             const userMenu = document.getElementById('userMenu');
             
@@ -3127,6 +3197,9 @@
         function showDashboard() {
             document.getElementById('welcomeScreen').classList.add('hidden');
             document.getElementById('mainContent').classList.remove('hidden');
+            
+            // Remove landing page class and enable scrolling
+            document.body.classList.remove('no-scroll', 'landing-page');
             
             // Only manipulate desktop header buttons (mobile uses hamburger menu)
             const headerButtons = document.getElementById('headerButtons');
@@ -3177,7 +3250,7 @@
                 const progressPercentage = Math.round((completedTasks / week.tasks.length) * 100);
                 
                 return `
-                    <div class="week-card" onclick="toggleWeekExpansion(${weekNum})">
+                    <div class="week-card" onclick="toggleWeekExpansion(${weekNum}, event)">
                         <div class="week-header">
                             <div>
                                 <div class="week-title">${week.title}</div>
@@ -3197,10 +3270,11 @@
                                     <div class="task-item ${isCompleted ? 'completed' : ''}" onclick="event.stopPropagation()">
                                         <input type="checkbox" class="task-checkbox" 
                                                ${isCompleted ? 'checked' : ''} 
-                                               onchange="toggleTaskCompletion('${task.id}')">
-                                        <div class="task-content" onclick="toggleTaskCompletion('${task.id}')">
+                                               onchange="toggleTaskCompletion('${task.id}')"
+                                               onclick="event.stopPropagation()">
+                                        <div class="task-content" onclick="event.stopPropagation(); showTaskDetail('${task.id}')">
                                             <div class="task-title">${task.title}</div>
-                                            <div class="task-description">Click to toggle completion or view details →</div>
+                                            <div class="task-description">Click for details →</div>
                                         </div>
                                         <button class="task-detail-btn" onclick="event.stopPropagation(); showTaskDetail('${task.id}')">
                                             Details
