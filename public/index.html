@@ -1089,63 +1089,104 @@
             flex-wrap: wrap;
         }
 
-        /* Mobile Responsive Design - CRITICAL FIXES */
+        /* Mobile Responsive Design - NUCLEAR OPTION TO PREVENT SIGN OUT */
         @media (max-width: 768px) {
             .header {
                 padding: 0 1rem;
-                justify-content: center;
                 position: relative;
             }
             
-            /* CRITICAL: Mobile header should only contain logo and hamburger - NOTHING ELSE */
-            .header > .header-buttons,
-            .header > .user-menu {
+            /* NUCLEAR APPROACH: ONLY logo and hamburger exist on mobile */
+            .header * {
                 display: none !important;
                 visibility: hidden !important;
                 opacity: 0 !important;
-                position: absolute !important;
-                left: -9999px !important;
-                top: -9999px !important;
+                position: fixed !important;
+                left: -99999px !important;
+                top: -99999px !important;
                 width: 0 !important;
                 height: 0 !important;
                 overflow: hidden !important;
                 pointer-events: none !important;
-                z-index: -1 !important;
+                z-index: -9999 !important;
+            }
+            
+            /* ONLY ALLOW logo and hamburger to be visible */
+            .header .logo,
+            .header .hamburger,
+            .header .hamburger span {
+                display: flex !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                position: absolute !important;
+                width: auto !important;
+                height: auto !important;
+                overflow: visible !important;
+                pointer-events: auto !important;
+                z-index: 10001 !important;
+                left: auto !important;
+                top: auto !important;
             }
 
             .logo {
-                position: absolute;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 100px;
-                height: 100px;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                width: 100px !important;
+                height: 100px !important;
+                top: 50% !important;
+                transform: translateX(-50%) translateY(-50%) !important;
             }
 
             .hamburger {
-                display: flex;
-                position: absolute;
-                right: 1rem;
+                right: 1rem !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                flex-direction: column !important;
+            }
+            
+            .hamburger span {
+                position: relative !important;
+                left: 0 !important;
+                top: 0 !important;
+                transform: none !important;
+                width: 24px !important;
+                height: 2px !important;
+                margin: 3px 0 !important;
             }
 
-            /* AGGRESSIVE HIDE of user menu and header buttons on mobile */
+            /* AGGRESSIVE HIDE ALL USER MENU RELATED ELEMENTS */
             .header-buttons,
             #headerButtons,
             .user-menu,
             #userMenu,
             .user-menu-toggle,
             .user-menu-dropdown,
-            #userMenuDropdown {
+            #userMenuDropdown,
+            [id*="user"],
+            [class*="user"],
+            [onclick*="logout"],
+            [onclick*="signOut"] {
                 display: none !important;
                 visibility: hidden !important;
                 opacity: 0 !important;
                 position: fixed !important;
-                left: -9999px !important;
-                top: -9999px !important;
+                left: -99999px !important;
+                top: -99999px !important;
                 width: 0 !important;
                 height: 0 !important;
                 overflow: hidden !important;
                 pointer-events: none !important;
-                z-index: -1 !important;
+                z-index: -9999 !important;
+                content: "" !important;
+            }
+            
+            /* PREVENT ANY TEXT CONTENT CHANGES */
+            .header::before,
+            .header::after,
+            .header *::before,
+            .header *::after {
+                content: "" !important;
+                display: none !important;
             }
 
             .welcome-screen {
@@ -2513,8 +2554,14 @@
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     }, 100);
                     
-                    // Ensure mobile menu is properly set for authenticated state
-                    updateMobileMenuItems();
+                    // Ensure mobile menu is properly set for authenticated state (but don't access destroyed user menu)
+                    if (window.innerWidth <= 768) {
+                        // On mobile, just update mobile menu - don't touch user menu elements
+                        updateMobileMenuItems();
+                    } else {
+                        // On desktop, normal behavior
+                        updateMobileMenuItems();
+                    }
                 } catch (error) {
                     console.error('Session validation failed:', error);
                     utils.cookies.delete('user');
@@ -2996,6 +3043,66 @@
                     closeMobileMenu();
                 }
             });
+            
+            // NUCLEAR OPTION: Remove user menu from DOM entirely on mobile
+            function nukeUserMenuOnMobile() {
+                if (window.innerWidth <= 768) {
+                    const elementsToDestroy = [
+                        'headerButtons',
+                        'userMenu', 
+                        'userMenuDropdown',
+                        'userName'
+                    ];
+                    
+                    elementsToDestroy.forEach(id => {
+                        const element = document.getElementById(id);
+                        if (element && element.parentNode) {
+                            element.parentNode.removeChild(element);
+                        }
+                    });
+                    
+                    // Remove any elements with user-related classes or text
+                    const allElements = document.querySelectorAll('.header *');
+                    allElements.forEach(el => {
+                        if (el.textContent && el.textContent.toLowerCase().includes('sign out')) {
+                            if (el.parentNode) {
+                                el.parentNode.removeChild(el);
+                            }
+                        }
+                        if (el.className && (el.className.includes('user') || el.className.includes('header-buttons'))) {
+                            if (el.parentNode) {
+                                el.parentNode.removeChild(el);
+                            }
+                        }
+                    });
+                    
+                    // Ensure header only contains logo and hamburger
+                    const header = document.getElementById('header');
+                    if (header) {
+                        const children = Array.from(header.children);
+                        children.forEach(child => {
+                            if (!child.classList.contains('logo') && !child.classList.contains('hamburger')) {
+                                if (child.parentNode) {
+                                    child.parentNode.removeChild(child);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            
+            // Run immediately and on resize
+            nukeUserMenuOnMobile();
+            window.addEventListener('resize', nukeUserMenuOnMobile);
+            
+            // Prevent any header content changes on scroll
+            let lastScrollTop = 0;
+            window.addEventListener('scroll', function(e) {
+                e.preventDefault();
+                if (window.innerWidth <= 768) {
+                    nukeUserMenuOnMobile(); // Re-nuke on every scroll
+                }
+            });
         }
 
         function closeMobileMenu() {
@@ -3279,39 +3386,94 @@
             if (headerButtons) headerButtons.classList.add('hidden'); // Hide Sign In/Get Started buttons
             if (userMenu) userMenu.classList.remove('hidden'); // Show user menu (desktop only due to CSS)
             
-            // FORCE HIDE ALL user menu elements on mobile - MULTIPLE APPROACHES FOR CERTAINTY
+            // NUCLEAR OPTION: Physically remove user menu elements from DOM on mobile
             if (window.innerWidth <= 768) {
-                const elementsToHide = [
-                    headerButtons,
-                    userMenu,
-                    document.getElementById('userMenuDropdown')
+                console.log('🚫 MOBILE DETECTED: Nuking user menu from DOM');
+                
+                // List of IDs to completely remove from DOM
+                const idsToDestroy = [
+                    'headerButtons',
+                    'userMenu', 
+                    'userMenuDropdown',
+                    'userName'
                 ];
                 
-                elementsToHide.forEach(element => {
-                    if (element) {
-                        element.style.display = 'none !important';
-                        element.style.visibility = 'hidden !important';
-                        element.style.opacity = '0 !important';
-                        element.style.pointerEvents = 'none !important';
-                        element.style.position = 'fixed !important';
-                        element.style.left = '-9999px !important';
-                        element.style.top = '-9999px !important';
-                        element.style.zIndex = '-1 !important';
-                        element.style.width = '0 !important';
-                        element.style.height = '0 !important';
-                        element.style.overflow = 'hidden !important';
+                idsToDestroy.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element && element.parentNode) {
+                        console.log(`🗑️ Removing ${id} from DOM`);
+                        element.parentNode.removeChild(element);
                     }
                 });
+                
+                // Remove any remaining elements that might contain "Sign Out" text
+                const allHeaderElements = document.querySelectorAll('.header *');
+                allHeaderElements.forEach(el => {
+                    const text = el.textContent || el.innerText || '';
+                    if (text.toLowerCase().includes('sign out') || 
+                        text.toLowerCase().includes('logout') ||
+                        el.className.includes('user-menu') ||
+                        el.className.includes('header-buttons')) {
+                        if (el.parentNode && !el.classList.contains('logo') && !el.classList.contains('hamburger')) {
+                            console.log(`🗑️ Removing element with text: "${text}"`);
+                            el.parentNode.removeChild(el);
+                        }
+                    }
+                });
+                
+                // Ensure header only contains logo and hamburger
+                const header = document.getElementById('header');
+                if (header) {
+                    const children = Array.from(header.children);
+                    children.forEach(child => {
+                        if (!child.classList.contains('logo') && 
+                            !child.classList.contains('hamburger') &&
+                            !child.classList.contains('mobile-menu')) {
+                            console.log(`🗑️ Removing unexpected header child:`, child);
+                            if (child.parentNode) {
+                                child.parentNode.removeChild(child);
+                            }
+                        }
+                    });
+                }
+                
+                // Block any future attempts to add user menu content
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === 'childList' && window.innerWidth <= 768) {
+                            mutation.addedNodes.forEach(function(node) {
+                                if (node.nodeType === 1) { // Element node
+                                    const text = node.textContent || node.innerText || '';
+                                    if (text.includes('Sign Out') || 
+                                        text.includes('logout') ||
+                                        node.className.includes('user-menu')) {
+                                        console.log('🚫 BLOCKED: Attempt to add user menu content on mobile');
+                                        if (node.parentNode) {
+                                            node.parentNode.removeChild(node);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+                
+                // Observe the header for changes
+                if (header) {
+                    observer.observe(header, { childList: true, subtree: true });
+                }
             }
             
-            // Update user info
-            const userNameEl = document.getElementById('userName');
-            if (userNameEl && appState.user) {
-                userNameEl.textContent = appState.user.name;
+            // Update user info (desktop only)
+            if (window.innerWidth > 768) {
+                const userNameEl = document.getElementById('userName');
+                if (userNameEl && appState.user) {
+                    userNameEl.textContent = appState.user.name;
+                }
             }
             
-            // Show admin button if user is admin
-            if (appState.user && appState.user.role === 'admin') {
+            // Show admin button if user is admin (desktop only)
+            if (appState.user && appState.user.role === 'admin' && window.innerWidth > 768) {
                 const adminBtn = document.getElementById('adminButton');
                 if (adminBtn) adminBtn.style.display = 'block';
             }
@@ -3576,6 +3738,12 @@
         };
 
         window.toggleUserMenu = function() {
+            // Safety check - don't try to toggle if on mobile or element doesn't exist
+            if (window.innerWidth <= 768) {
+                console.log('🚫 toggleUserMenu blocked on mobile');
+                return;
+            }
+            
             const dropdown = document.getElementById('userMenuDropdown');
             if (dropdown) {
                 dropdown.classList.toggle('active');
@@ -3585,6 +3753,45 @@
         // Initialize application
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, checking session...');
+            
+            // IMMEDIATE MOBILE NUKE - Before anything else happens
+            if (window.innerWidth <= 768) {
+                console.log('🚫 MOBILE DETECTED: Immediate user menu destruction');
+                
+                // Destroy user menu elements immediately
+                const elementsToDestroy = ['headerButtons', 'userMenu', 'userMenuDropdown', 'userName'];
+                elementsToDestroy.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element && element.parentNode) {
+                        element.parentNode.removeChild(element);
+                    }
+                });
+                
+                // Set up continuous monitoring to prevent any user menu content
+                setInterval(() => {
+                    if (window.innerWidth <= 768) {
+                        const header = document.getElementById('header');
+                        if (header) {
+                            const children = Array.from(header.children);
+                            children.forEach(child => {
+                                const text = child.textContent || child.innerText || '';
+                                if ((text.includes('Sign Out') || 
+                                     text.includes('logout') ||
+                                     child.className.includes('user-menu') ||
+                                     child.className.includes('header-buttons')) &&
+                                    !child.classList.contains('logo') && 
+                                    !child.classList.contains('hamburger')) {
+                                    console.log('🚫 CONTINUOUS MONITOR: Removing user menu element');
+                                    if (child.parentNode) {
+                                        child.parentNode.removeChild(child);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }, 100); // Check every 100ms
+            }
+            
             loadTaskDefinitions();
             checkExistingSession();
             setupMobileMenuHandlers();
@@ -3605,27 +3812,15 @@
                 // Close mobile menu on resize
                 closeMobileMenu();
                 
-                // CRITICAL: Re-apply mobile hiding whenever window resizes to mobile size
+                // CRITICAL: Re-apply mobile nuking whenever window resizes to mobile size
                 if (window.innerWidth <= 768 && appState.authenticated) {
-                    const elementsToHide = [
-                        document.getElementById('headerButtons'),
-                        document.getElementById('userMenu'),
-                        document.getElementById('userMenuDropdown')
-                    ];
+                    console.log('🚫 RESIZE TO MOBILE: Re-nuking user menu');
                     
-                    elementsToHide.forEach(element => {
-                        if (element) {
-                            element.style.display = 'none !important';
-                            element.style.visibility = 'hidden !important';
-                            element.style.opacity = '0 !important';
-                            element.style.pointerEvents = 'none !important';
-                            element.style.position = 'fixed !important';
-                            element.style.left = '-9999px !important';
-                            element.style.top = '-9999px !important';
-                            element.style.zIndex = '-1 !important';
-                            element.style.width = '0 !important';
-                            element.style.height = '0 !important';
-                            element.style.overflow = 'hidden !important';
+                    const elementsToDestroy = ['headerButtons', 'userMenu', 'userMenuDropdown', 'userName'];
+                    elementsToDestroy.forEach(id => {
+                        const element = document.getElementById(id);
+                        if (element && element.parentNode) {
+                            element.parentNode.removeChild(element);
                         }
                     });
                 }
@@ -3652,11 +3847,13 @@
                 }
             });
             
-            // Close user menu when clicking outside
-            const userMenu = document.getElementById('userMenu');
-            const dropdown = document.getElementById('userMenuDropdown');
-            if (userMenu && dropdown && !userMenu.contains(event.target) && dropdown.classList.contains('active')) {
-                dropdown.classList.remove('active');
+            // Close user menu when clicking outside (desktop only)
+            if (window.innerWidth > 768) {
+                const userMenu = document.getElementById('userMenu');
+                const dropdown = document.getElementById('userMenuDropdown');
+                if (userMenu && dropdown && !userMenu.contains(event.target) && dropdown.classList.contains('active')) {
+                    dropdown.classList.remove('active');
+                }
             }
         });
 
