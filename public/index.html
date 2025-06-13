@@ -92,7 +92,7 @@
             line-height: 1.6;
             overflow-x: hidden;
             transition: all 0.3s ease;
-            scroll-behavior: smooth; /* Smooth scrolling for better UX */
+            scroll-behavior: smooth;
         }
 
         /* Landing page scroll prevention */
@@ -127,7 +127,7 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
-            z-index: 9999; /* Highest z-index to stay on top of everything */
+            z-index: 9999;
             height: 70px;
             display: flex;
             align-items: center;
@@ -147,8 +147,7 @@
             background: url('/assets/Velocity-Logo.png') center/contain no-repeat;
             cursor: pointer;
             position: relative;
-            z-index: 10001; /* Highest z-index to ensure logo always shows on top */
-            /* Default desktop positioning - stays in normal flow */
+            z-index: 10001;
         }
 
         [data-theme="dark"] .logo {
@@ -170,7 +169,7 @@
             border-radius: 6px;
             transition: background-color 0.2s ease;
             position: relative;
-            z-index: 10001; /* High z-index to ensure hamburger always shows on top */
+            z-index: 10001;
         }
 
         .hamburger:hover {
@@ -209,7 +208,7 @@
             border-bottom: 1px solid var(--border);
             transform: translateY(-100%);
             transition: transform 0.3s ease;
-            z-index: 9998; /* Below header (z-index: 9999) so menu sticks behind header when scrolling */
+            z-index: 9998;
             padding: 1rem;
             max-height: calc(100vh - 70px);
             overflow-y: auto;
@@ -282,7 +281,7 @@
             border-radius: 8px;
             box-shadow: 0 8px 25px var(--shadow-heavy);
             min-width: 150px;
-            z-index: 9996; /* Below user menu dropdown */
+            z-index: 9996;
             display: none;
         }
 
@@ -372,7 +371,7 @@
 
         .welcome-notification {
             position: absolute;
-            top: 120px; /* Moved higher up on mobile */
+            top: 120px;
             left: 2rem;
             background: var(--primary);
             color: white;
@@ -429,7 +428,7 @@
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.8);
-            z-index: 10000; /* Highest z-index for modals */
+            z-index: 10000;
             padding: 2rem;
             overflow-y: auto;
         }
@@ -525,7 +524,7 @@
         .modal-title {
             font-size: clamp(22px, 5vw, 28px);
             font-weight: 600;
-            margin-bottom: 32px; /* Even more professional spacing */
+            margin-bottom: 32px;
             color: white;
             line-height: 1.2;
         }
@@ -595,9 +594,40 @@
             color: #6d6d70;
         }
 
+        /* Updated loading spinner for email field - moves left to right */
         .apple-form-input.loading {
-            background: #2c2c2e url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iOCIgc3Ryb2tlPSIjNmQ2ZDcwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWRhc2hhcnJheT0iNCAyIiBvcGFjaXR5PSIwLjUiPgogIDxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgYXR0cmlidXRlVHlwZT0iWE1MIiB0eXBlPSJyb3RhdGUiIHZhbHVlcz0iMCAxMCAxMDszNjAgMTAgMTAiIGR1cj0iMXMiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+CjwvY2lyY2xlPgo8L3N2Zz4K') no-repeat right 16px center;
+            background: #2c2c2e;
+            position: relative;
             pointer-events: none;
+        }
+
+        .apple-form-input.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 16px;
+            width: 16px;
+            height: 16px;
+            margin-top: -8px;
+            border: 2px solid #0a84ff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: emailSpinnerMove 2s linear infinite;
+        }
+
+        @keyframes emailSpinnerMove {
+            0% {
+                left: 16px;
+                transform: rotate(0deg);
+            }
+            50% {
+                left: calc(100% - 32px);
+                transform: rotate(180deg);
+            }
+            100% {
+                left: 16px;
+                transform: rotate(360deg);
+            }
         }
 
         /* Password field with styled arrow button */
@@ -643,7 +673,6 @@
             pointer-events: none;
             font-size: 0;
             border: none;
-            /* Hide button completely when loading */
             background-color: transparent !important;
         }
 
@@ -654,7 +683,7 @@
             left: 50%;
             width: 20px;
             height: 20px;
-            margin: -10px 0 0 -10px; /* Perfect centering for 20px element */
+            margin: -10px 0 0 -10px;
             border: 2px solid #0a84ff;
             border-top-color: transparent;
             border-radius: 50%;
@@ -1117,7 +1146,7 @@
             opacity: 1;
         }
 
-        /* User Menu - CRITICAL MOBILE FIX */
+        /* User Menu */
         .user-menu {
             position: relative;
         }
@@ -1148,7 +1177,7 @@
             border-radius: 8px;
             box-shadow: 0 8px 25px var(--shadow-heavy);
             min-width: 200px;
-            z-index: 9997; /* Below header but above other content */
+            z-index: 9997;
             display: none;
         }
 
@@ -1188,21 +1217,20 @@
             flex-wrap: wrap;
         }
 
-        /* Mobile Responsive Design - TARGETED APPROACH */
+        /* Mobile Responsive Design */
         @media (max-width: 768px) {
             .header {
                 padding: 0 1rem;
-                position: fixed; /* Ensure header stays sticky on mobile */
+                position: fixed;
                 top: 0;
                 left: 0;
                 right: 0;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                z-index: 9999; /* Highest z-index to stay on top during scroll */
+                z-index: 9999;
             }
             
-            /* TARGETED HIDE: Only user menu and header buttons, NOT logo or hamburger */
             .header-buttons,
             #headerButtons,
             .user-menu,
@@ -1226,7 +1254,6 @@
                 z-index: -9999 !important;
             }
 
-            /* ENSURE logo and hamburger are visible and positioned correctly */
             .logo {
                 position: absolute;
                 left: 50%;
@@ -1257,7 +1284,7 @@
                 position: static;
                 margin-bottom: 2rem;
                 max-width: none;
-                margin-top: 1rem; /* Higher up on mobile */
+                margin-top: 1rem;
             }
 
             .welcome-screen {
@@ -1353,7 +1380,6 @@
                 font-size: 16px;
             }
 
-            /* Mobile Theme Options - Vertical Layout */
             #mobileThemeOptions {
                 display: none;
                 flex-direction: column;
@@ -1378,7 +1404,6 @@
                 border-bottom-right-radius: 8px;
             }
 
-            /* Fix mobile menu scrolling issue */
             .mobile-menu {
                 position: fixed;
                 max-height: calc(100vh - 70px);
@@ -1390,7 +1415,6 @@
                 overflow-y: auto;
             }
 
-            /* Hide hamburger on landing page when not authenticated */
             .landing-page .hamburger {
                 display: none !important;
                 visibility: hidden !important;
@@ -1420,7 +1444,6 @@
                 height: 90px;
             }
 
-            /* COMPLETE HIDE on smallest screens - NOTHING FROM USER MENU VISIBLE */
             .header-buttons,
             #headerButtons,
             .user-menu,
@@ -1478,15 +1501,14 @@
 
             .modal-title {
                 font-size: 20px;
-                margin-bottom: 24px; /* Even more professional spacing on mobile */
+                margin-bottom: 24px;
             }
 
             .modal-subtitle {
                 font-size: 14px;
-                display: block; /* Show subtitle on mobile */
+                display: block;
             }
 
-            /* Hide hamburger on landing page when not authenticated */
             .landing-page .hamburger {
                 display: none !important;
                 visibility: hidden !important;
@@ -1557,7 +1579,7 @@
             padding: 1rem 1.5rem;
             border-radius: 8px;
             box-shadow: 0 4px 12px var(--shadow);
-            z-index: 9995; /* Below header but above content */
+            z-index: 9995;
             animation: slideInRight 0.3s ease;
             max-width: 350px;
         }
@@ -1582,12 +1604,10 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Landing page specific class for mobile */
         .landing-page {
             /* Additional styling if needed */
         }
 
-        /* Prevent week collapse when tasks are clicked */
         .task-item-wrapper {
             /* Wrapper to prevent event bubbling */
         }
@@ -1612,31 +1632,31 @@
             <span></span>
         </div>
         
-        <!-- Desktop User Menu - WILL BE HIDDEN ON MOBILE VIA CSS -->
+        <!-- Desktop User Menu -->
         <div class="user-menu hidden" id="userMenu">
             <button class="user-menu-toggle" onclick="toggleUserMenu()">
                 <span id="userName">User</span>
                 <span>▼</span>
             </button>
             <div class="user-menu-dropdown" id="userMenuDropdown">
-                <button class="user-menu-item" onclick="startLabEnvironment()">🚀 Start New Lab</button>
-                <button class="user-menu-item" onclick="showLabHistoryModal()" id="labHistoryButton">📊 Lab History</button>
-                <button class="user-menu-item" onclick="showAdminPanel()" id="adminButton" style="display: none;">👑 Admin Panel</button>
+                <button class="user-menu-item" onclick="startLabEnvironment()">Start New Lab</button>
+                <button class="user-menu-item" onclick="showLabHistoryModal()" id="labHistoryButton">Lab History</button>
+                <button class="user-menu-item" onclick="showAdminPanel()" id="adminButton" style="display: none;">Admin Panel</button>
                 <div class="theme-menu-item">
                     <button class="theme-menu-toggle">
-                        <span>🎨 Theme</span>
+                        <span>Theme</span>
                         <span>▶</span>
                     </button>
                     <div class="theme-submenu">
                         <button class="theme-option jedi" onclick="setTheme('light')">
-                            🌟 Light Jedi
+                            Light Theme
                         </button>
                         <button class="theme-option sith active" onclick="setTheme('dark')">
-                            ⚡ Dark Sith
+                            Dark Theme
                         </button>
                     </div>
                 </div>
-                <button class="user-menu-item" onclick="logout()">🚪 Sign Out</button>
+                <button class="user-menu-item" onclick="logout()">Sign Out</button>
             </div>
         </div>
     </div>
@@ -1648,10 +1668,10 @@
         </div>
     </div>
 
-    <!-- Welcome Screen - Only Sign In button -->
+    <!-- Welcome Screen -->
     <div class="welcome-screen" id="welcomeScreen">
         <div class="welcome-notification">
-            👋 Welcome to Velocity Lab! Sign in to access your Exchange Hybrid training journey.
+            Welcome to Velocity Lab! Sign in to access your Exchange Hybrid training journey.
         </div>
         
         <h1 class="welcome-title">Exchange Hybrid LAB</h1>
@@ -1662,7 +1682,7 @@
         
         <div class="welcome-buttons">
             <button class="btn btn-primary btn-large" onclick="showSignInModal()">
-                👤 Sign In
+                Sign In
             </button>
             <button class="btn btn-secondary btn-large" onclick="showRegisterModal()">
                 Get Started
@@ -1751,7 +1771,6 @@
             
             <div class="modal-body">
                 <h2 class="modal-title">Create Account</h2>
-                <!-- Removed subtitle to save space and prevent cut-off -->
                 
                 <form id="registerForm">
                     <div class="apple-form-group">
@@ -1798,7 +1817,7 @@
         <div class="modal-content large">
             <button class="modal-close" onclick="closeModal('labHistoryModal')">&times;</button>
             <div class="modal-header">
-                <h2>📊 Lab History</h2>
+                <h2>Lab History</h2>
                 <p style="color: var(--text-secondary);">Your training progress timeline</p>
             </div>
             <div class="lab-history-modal-content" id="labHistoryModalContent">
@@ -1812,7 +1831,7 @@
         <div class="modal-content large">
             <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
             <div class="modal-header">
-                <h2>👑 Admin Panel</h2>
+                <h2>Admin Panel</h2>
                 <p style="color: var(--text-secondary);">User progress leaderboard</p>
             </div>
             <div class="lab-history-modal-content" id="adminContent">
@@ -1832,15 +1851,15 @@
             progress: {},
             authenticated: false,
             labHistory: [],
-            tasks: [], // Will be populated from task-definitions.js
-            isWelcomeShown: false, // Flag to prevent duplicate welcome messages
-            shownNotifications: new Set() // Track shown notifications to prevent duplicates
+            tasks: [],
+            isWelcomeShown: false,
+            shownNotifications: new Set()
         };
 
         // API configuration
         const API_BASE = '/api';
 
-        // Utility functions for cookies and DOM manipulation - NO localStorage for auth
+        // Utility functions for cookies and DOM manipulation
         const utils = {
             cookies: {
                 set(name, value) {
@@ -1867,15 +1886,14 @@
             }
         };
 
-        // API call function - ONLY KV backend for auth, localStorage fallback only for progress data
+        // API call function
         const api = {
             async call(url, options = {}) {
                 try {
-                    console.log('🌐 API Call:', options.method || 'GET', url);
+                    console.log('API Call:', options.method || 'GET', url);
                     
-                    // Debug FormData contents (for login/register)
                     if (options.body instanceof FormData) {
-                        console.log('📋 FormData contents:');
+                        console.log('FormData contents:');
                         for (let [key, value] of options.body.entries()) {
                             if (key === 'password') {
                                 console.log(`  ${key}: [${value.length} characters]`);
@@ -1893,25 +1911,23 @@
                         }
                     });
 
-                    console.log('📡 Response status:', response.status, response.statusText);
+                    console.log('Response status:', response.status, response.statusText);
 
-                    // Check if response is JSON
                     const contentType = response.headers.get('content-type');
                     if (!contentType || !contentType.includes('application/json')) {
-                        // If we get HTML response, it means backend isn't deployed
                         if (contentType && contentType.includes('text/html')) {
-                            console.warn('⚠️ Backend API not deployed');
+                            console.warn('Backend API not deployed');
                             throw new Error('BACKEND_NOT_AVAILABLE');
                         }
                         
-                        console.error('❌ Expected JSON response but got:', contentType);
+                        console.error('Expected JSON response but got:', contentType);
                         const responseText = await response.text();
-                        console.error('❌ Response body:', responseText);
+                        console.error('Response body:', responseText);
                         throw new Error(`API returned ${response.status}: Expected JSON response but got ${contentType}`);
                     }
 
                     const result = await response.json();
-                    console.log('📡 Response data:', result);
+                    console.log('Response data:', result);
                     
                     if (!result.success) {
                         throw new Error(result.message || 'API call failed');
@@ -1919,7 +1935,7 @@
                     
                     return result;
                 } catch (error) {
-                    console.error('❌ API call failed:', error);
+                    console.error('API call failed:', error);
                     throw error;
                 }
             }
@@ -1930,88 +1946,76 @@
             notifications: [],
             
             success(message) {
-                console.log('✅ Success:', message);
+                console.log('Success:', message);
                 this.show(message, 'success');
             },
             
             error(message) {
-                console.log('❌ Error:', message);
+                console.log('Error:', message);
                 this.show(message, 'error');
             },
             
             info(message) {
-                console.log('ℹ️ Info:', message);
+                console.log('Info:', message);
                 this.show(message, 'info');
             },
             
             show(message, type) {
-                // Create unique notification ID based on message and type
                 const notificationId = `${type}:${message}`;
                 
-                // Check if this notification was already shown
                 if (appState.shownNotifications.has(notificationId)) {
-                    console.log('🚫 Duplicate notification prevented:', message);
+                    console.log('Duplicate notification prevented:', message);
                     return;
                 }
                 
-                // For welcome messages, use the isWelcomeShown flag
                 if (message.includes('Welcome back') || message.includes('Welcome to Velocity Lab')) {
                     if (appState.isWelcomeShown) {
-                        console.log('🚫 Duplicate welcome notification prevented:', message);
+                        console.log('Duplicate welcome notification prevented:', message);
                         return;
                     }
                     appState.isWelcomeShown = true;
                 }
                 
-                // Mark this notification as shown
                 appState.shownNotifications.add(notificationId);
                 
-                // Create notification element
                 const notification = document.createElement('div');
                 notification.className = `notification ${type}`;
                 notification.textContent = message;
                 
-                // Calculate position based on existing notifications
                 const offset = this.notifications.length * 80;
                 notification.style.top = `${90 + offset}px`;
                 
                 document.body.appendChild(notification);
                 this.notifications.push(notification);
                 
-                // Remove after 5 seconds
                 setTimeout(() => {
                     notification.remove();
                     const index = this.notifications.indexOf(notification);
                     if (index > -1) {
                         this.notifications.splice(index, 1);
-                        // Reposition remaining notifications
                         this.notifications.forEach((notif, i) => {
                             notif.style.top = `${90 + (i * 80)}px`;
                         });
                     }
                     
-                    // Remove from shown notifications after display
-                    // This allows the same notification to be shown again later if needed
                     setTimeout(() => {
                         appState.shownNotifications.delete(notificationId);
                     }, 1000);
                 }, 5000);
             },
             
-            // Method to clear all shown notifications (useful for new sessions)
             clearShownNotifications() {
                 appState.shownNotifications.clear();
                 appState.isWelcomeShown = false;
             }
         };
 
-        // Authentication system - KV backend ONLY (NO DEMO MODE)
+        // Authentication system
         const authSystem = {
             async login(formData) {
                 const submitBtn = document.querySelector('#signInForm .password-toggle');
                 
                 try {
-                    // Show loading spinner
                     if (submitBtn) {
                         submitBtn.classList.add('loading');
                     }
@@ -2023,15 +2027,14 @@
                         throw new Error('Please fill in all required fields.');
                     }
 
-                    console.log('🔄 Attempting login with backend APIs...');
+                    console.log('Attempting login with backend APIs...');
                     
-                    // Call Cloudflare KV backend directly - NO DEMO MODE
                     const { data } = await api.call('/api/users/login', {
                         method: 'POST',
-                        body: formData  // Send FormData directly to match backend expectations
+                        body: formData
                     });
                     
-                    console.log('✅ Login successful with backend APIs');
+                    console.log('Login successful with backend APIs');
                     
                     const { name, role, email: userEmail, sessionToken } = data;
                     
@@ -2052,28 +2055,24 @@
                     await loadLabHistory();
                     closeModal('signInModal');
                     
-                    // Ensure mobile menu is closed and updated
                     closeMobileMenu();
                     
-                    // Additional scroll to top for mobile after modal closes
                     setTimeout(() => {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     }, 100);
                     
-                    // Show welcome notification only if not already shown
                     if (!appState.isWelcomeShown) {
-                        notificationSystem.success(`Welcome back, ${name}! 🎉`);
+                        notificationSystem.success(`Welcome back, ${name}!`);
                     }
                     
                 } catch (err) {
-                    console.error('❌ Login failed:', err);
+                    console.error('Login failed:', err);
                     if (err.message === 'BACKEND_NOT_AVAILABLE') {
                         notificationSystem.error('Backend service not available. Please ensure the API functions are deployed.');
                     } else {
                         notificationSystem.error(err.message || 'Login failed. Please check your credentials.');
                     }
                 } finally {
-                    // Remove loading spinner
                     if (submitBtn) {
                         submitBtn.classList.remove('loading');
                     }
@@ -2084,7 +2083,6 @@
                 const submitBtn = document.querySelector('#registerForm .password-toggle');
                 
                 try {
-                    // Show loading spinner
                     if (submitBtn) {
                         submitBtn.classList.add('loading');
                     }
@@ -2101,19 +2099,17 @@
                         throw new Error('Password must be at least 8 characters long.');
                     }
 
-                    console.log('🔄 Attempting registration with backend APIs...');
+                    console.log('Attempting registration with backend APIs...');
                     
-                    // Call Cloudflare KV backend directly - NO DEMO MODE
                     const { data } = await api.call('/api/users/register', {
                         method: 'POST',
-                        body: formData  // Send FormData directly to match backend expectations
+                        body: formData
                     });
                     
-                    console.log('✅ Registration successful with backend APIs');
+                    console.log('Registration successful with backend APIs');
                     
                     const { name: userName, email: userEmail, role, sessionToken } = data;
                     
-                    // Note: Backend ensures new users get role 'user', not 'admin'
                     utils.cookies.set('user', JSON.stringify({ name: userName, email: userEmail, role }));
                     utils.cookies.set('session', sessionToken);
                     
@@ -2121,7 +2117,6 @@
                     appState.sessionToken = sessionToken;
                     appState.authenticated = true;
                     
-                    // Only show admin button if user is admin (should not happen for new registrations)
                     if (role === 'admin') {
                         const adminBtn = document.getElementById('adminButton');
                         if (adminBtn) adminBtn.style.display = 'block';
@@ -2132,28 +2127,24 @@
                     await loadLabHistory();
                     closeModal('registerModal');
                     
-                    // Ensure mobile menu is closed and updated
                     closeMobileMenu();
                     
-                    // Additional scroll to top for mobile after modal closes
                     setTimeout(() => {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     }, 100);
                     
-                    // Show welcome notification only if not already shown
                     if (!appState.isWelcomeShown) {
-                        notificationSystem.success(`Welcome to Velocity Lab, ${userName}! 🚀`);
+                        notificationSystem.success(`Welcome to Velocity Lab, ${userName}!`);
                     }
                     
                 } catch (err) {
-                    console.error('❌ Registration failed:', err);
+                    console.error('Registration failed:', err);
                     if (err.message === 'BACKEND_NOT_AVAILABLE') {
                         notificationSystem.error('Backend service not available. Please ensure the API functions are deployed.');
                     } else {
                         notificationSystem.error(err.message || 'Registration failed. Please try again.');
                     }
                 } finally {
-                    // Remove loading spinner
                     if (submitBtn) {
                         submitBtn.classList.remove('loading');
                     }
@@ -2171,8 +2162,7 @@
                         });
                     }
                 } catch (err) {
-                    console.log('ℹ️ Logout API call failed (expected if no backend logout endpoint):', err);
-                    // Don't show error for logout API failures - backend might not have logout endpoint
+                    console.log('Logout API call failed (expected if no backend logout endpoint):', err);
                 }
                 
                 utils.cookies.delete('user');
@@ -2184,29 +2174,25 @@
                 appState.sessionToken = null;
                 appState.labHistory = [];
                 
-                // Clear localStorage data on logout
                 localStorage.removeItem('velocity_progress');
                 localStorage.removeItem('velocity_lab_history');
                 
-                // Clear notification history on logout
                 notificationSystem.clearShownNotifications();
                 
                 const adminBtn = document.getElementById('adminButton');
                 if (adminBtn) adminBtn.style.display = 'none';
                 
-                // Close any open menus before showing welcome screen
                 closeMobileMenu();
                 showWelcomeScreen();
                 notificationSystem.info('Signed out successfully');
             }
         };
 
-        // Theme management with KV backend sync and localStorage fallback
+        // Theme management
         const themeSystem = {
             async setTheme(theme) {
                 document.body.setAttribute('data-theme', theme);
                 
-                // Try to save to KV backend
                 try {
                     if (appState.sessionToken) {
                         await api.call('/api/user/preferences', {
@@ -2217,22 +2203,20 @@
                             },
                             body: JSON.stringify({ theme: theme })
                         });
-                        console.log('✅ Theme preference saved to backend APIs');
+                        console.log('Theme preference saved to backend APIs');
                     } else {
                         throw new Error('BACKEND_NOT_AVAILABLE');
                     }
                 } catch (error) {
                     if (error.message === 'BACKEND_NOT_AVAILABLE') {
-                        console.warn('📁 Saving theme to localStorage fallback');
+                        console.warn('Saving theme to localStorage fallback');
                         utils.cookies.set('theme', theme);
                     } else {
                         console.warn('Failed to save theme to backend, using client-side only:', error);
-                        // Fallback to cookie for persistence
                         utils.cookies.set('theme', theme);
                     }
                 }
                 
-                // Update active states in desktop menu
                 const themeOptions = document.querySelectorAll('.theme-option');
                 themeOptions.forEach(option => {
                     option.classList.remove('active');
@@ -2242,17 +2226,15 @@
                     }
                 });
                 
-                // Show notification
                 if (theme === 'light') {
-                    notificationSystem.success('🌟 Light Jedi theme activated!');
+                    notificationSystem.success('Light theme activated!');
                 } else {
-                    notificationSystem.success('⚡ Dark Sith theme activated!');
+                    notificationSystem.success('Dark theme activated!');
                 }
             },
 
             async loadTheme() {
                 try {
-                    // Try to load from KV backend first
                     if (appState.sessionToken) {
                         const response = await api.call('/api/user/preferences', {
                             headers: {
@@ -2262,7 +2244,7 @@
                         
                         if (response.success && response.data.theme) {
                             document.body.setAttribute('data-theme', response.data.theme);
-                            console.log('✅ Theme loaded from backend APIs:', response.data.theme);
+                            console.log('Theme loaded from backend APIs:', response.data.theme);
                             return;
                         }
                     }
@@ -2270,17 +2252,15 @@
                     console.warn('Failed to load theme from backend, using default:', error);
                 }
                 
-                // Fallback to cookie
                 const savedTheme = utils.cookies.get('theme') || 'dark';
                 document.body.setAttribute('data-theme', savedTheme);
-                console.log('✅ Theme loaded from cookie:', savedTheme);
+                console.log('Theme loaded from cookie:', savedTheme);
             }
         };
 
-        // Load task definitions from task-definitions.js
+        // Load task definitions
         function loadTaskDefinitions() {
             if (typeof window !== 'undefined' && window.TASK_DEFINITIONS) {
-                // Convert object to array format
                 appState.tasks = [];
                 Object.keys(window.TASK_DEFINITIONS).forEach(taskId => {
                     const task = window.TASK_DEFINITIONS[taskId];
@@ -2295,7 +2275,6 @@
                 console.log('Task definitions loaded:', appState.tasks.length, 'tasks');
             } else {
                 console.warn('Task definitions not loaded from task-definitions.js');
-                // Fallback task structure
                 appState.tasks = generateFallbackTasks();
             }
         }
@@ -2382,7 +2361,7 @@
             return tasks;
         }
 
-        // Progress management with KV backend and localStorage fallback
+        // Progress management
         async function loadUserProgress() {
             try {
                 if (!appState.sessionToken) {
@@ -2392,7 +2371,7 @@
                     return;
                 }
 
-                console.log('🔄 Loading progress from backend APIs...');
+                console.log('Loading progress from backend APIs...');
                 const response = await api.call(`${API_BASE}/user/progress`, {
                     headers: {
                         'Authorization': `Bearer ${appState.sessionToken}`
@@ -2401,14 +2380,14 @@
                 
                 if (response.success) {
                     appState.progress = response.data || {};
-                    console.log('✅ Progress loaded from backend APIs');
+                    console.log('Progress loaded from backend APIs');
                 } else {
                     console.warn('API returned error:', response.message);
                     appState.progress = {};
                 }
             } catch (error) {
                 if (error.message === 'BACKEND_NOT_AVAILABLE') {
-                    console.warn('📁 Using localStorage fallback for progress');
+                    console.warn('Using localStorage fallback for progress');
                     appState.progress = JSON.parse(localStorage.getItem('velocity_progress') || '{}');
                 } else {
                     console.warn('Progress API unavailable:', error);
@@ -2428,7 +2407,7 @@
                     return;
                 }
 
-                console.log(`🔄 Saving progress for task ${taskId} to backend APIs...`);
+                console.log(`Saving progress for task ${taskId} to backend APIs...`);
                 const response = await api.call(`${API_BASE}/user/progress`, {
                     method: 'POST',
                     headers: {
@@ -2442,13 +2421,13 @@
                 });
                 
                 if (response.success) {
-                    console.log('✅ Progress saved to backend APIs');
+                    console.log('Progress saved to backend APIs');
                 } else {
                     console.warn('Failed to save progress:', response.message);
                 }
             } catch (error) {
                 if (error.message === 'BACKEND_NOT_AVAILABLE') {
-                    console.warn('📁 Saving progress to localStorage fallback');
+                    console.warn('Saving progress to localStorage fallback');
                     localStorage.setItem('velocity_progress', JSON.stringify(appState.progress));
                 } else {
                     console.warn('Progress save failed, using localStorage:', error);
@@ -2457,14 +2436,13 @@
             }
         }
 
-        // Lab history management with KV backend and localStorage fallback
+        // Lab history management
         async function loadLabHistory() {
             try {
                 if (!appState.sessionToken) {
                     console.warn('No session token available');
                     appState.labHistory = JSON.parse(localStorage.getItem('velocity_lab_history') || '[]');
                     
-                    // Create default lab if none exists
                     if (appState.labHistory.length === 0) {
                         const today = new Date().toISOString().split('T')[0];
                         const defaultLab = {
@@ -2483,7 +2461,7 @@
                     return;
                 }
 
-                console.log('🔄 Loading lab history from backend APIs...');
+                console.log('Loading lab history from backend APIs...');
                 const response = await api.call(`${API_BASE}/user/lab-history`, {
                     headers: {
                         'Authorization': `Bearer ${appState.sessionToken}`
@@ -2492,9 +2470,8 @@
                 
                 if (response.success) {
                     appState.labHistory = response.data || [];
-                    console.log('✅ Lab history loaded from backend APIs:', appState.labHistory.length, 'sessions');
+                    console.log('Lab history loaded from backend APIs:', appState.labHistory.length, 'sessions');
                     
-                    // Create default lab if none exists (for new users)
                     if (appState.labHistory.length === 0) {
                         const today = new Date().toISOString().split('T')[0];
                         const defaultLab = {
@@ -2508,7 +2485,6 @@
                             totalTasks: 42
                         };
                         appState.labHistory = [defaultLab];
-                        // Save the default lab to backend
                         await saveLabHistory(appState.labHistory);
                     }
                 } else {
@@ -2517,10 +2493,9 @@
                 }
             } catch (error) {
                 if (error.message === 'BACKEND_NOT_AVAILABLE') {
-                    console.warn('📁 Using localStorage fallback for lab history');
+                    console.warn('Using localStorage fallback for lab history');
                     appState.labHistory = JSON.parse(localStorage.getItem('velocity_lab_history') || '[]');
                     
-                    // Create default lab if none exists
                     if (appState.labHistory.length === 0) {
                         const today = new Date().toISOString().split('T')[0];
                         const defaultLab = {
@@ -2551,7 +2526,7 @@
                     return;
                 }
 
-                console.log('🔄 Saving lab history to backend APIs...');
+                console.log('Saving lab history to backend APIs...');
                 const response = await api.call(`${API_BASE}/user/lab-history`, {
                     method: 'POST',
                     headers: {
@@ -2562,15 +2537,14 @@
                 });
                 
                 if (response.success) {
-                    console.log('✅ Lab history saved to backend APIs');
-                    // Reload lab history to get updated data
+                    console.log('Lab history saved to backend APIs');
                     await loadLabHistory();
                 } else {
                     console.warn('Failed to save lab history:', response.message);
                 }
             } catch (error) {
                 if (error.message === 'BACKEND_NOT_AVAILABLE') {
-                    console.warn('📁 Saving lab history to localStorage fallback');
+                    console.warn('Saving lab history to localStorage fallback');
                     localStorage.setItem('velocity_lab_history', JSON.stringify(appState.labHistory));
                 } else {
                     console.warn('Lab history save failed, using localStorage:', error);
@@ -2583,11 +2557,9 @@
             const totalTasks = appState.tasks.length || 42;
             const completedTasks = Object.values(appState.progress).filter(task => task.completed).length;
             
-            // Check if lab is completed (all tasks done)
             if (completedTasks === totalTasks && totalTasks > 0 && appState.labHistory.length > 0) {
                 const currentLab = appState.labHistory.find(lab => lab.status === 'started');
                 
-                // Only mark as completed if not already completed
                 if (currentLab && currentLab.status === 'started') {
                     const completionEntry = {
                         ...currentLab,
@@ -2597,18 +2569,17 @@
                         totalTasks: totalTasks
                     };
                     
-                    // Update local history
                     const labIndex = appState.labHistory.findIndex(lab => lab.labId === currentLab.labId);
                     if (labIndex >= 0) {
                         appState.labHistory[labIndex] = completionEntry;
-                        saveLabHistory(completionEntry); // This will trigger a reload
-                        notificationSystem.success('🎉 Lab completed successfully!');
+                        saveLabHistory(completionEntry);
+                        notificationSystem.success('Lab completed successfully!');
                     }
                 }
             }
         }
 
-        // Check for existing session using cookies
+        // Check for existing session
         function checkExistingSession() {
             const userCookie = utils.cookies.get('user');
             const sessionCookie = utils.cookies.get('session');
@@ -2619,7 +2590,6 @@
                     appState.sessionToken = sessionCookie;
                     appState.authenticated = true;
                     
-                    // Mark welcome as shown for existing sessions to prevent duplicates
                     appState.isWelcomeShown = true;
                     
                     console.log('Found existing session for:', appState.user.name);
@@ -2628,12 +2598,10 @@
                     loadLabHistory();
                     themeSystem.loadTheme();
                     
-                    // Ensure proper scroll position for existing sessions
                     setTimeout(() => {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     }, 100);
                     
-                    // Ensure mobile menu is properly set for authenticated state
                     updateMobileMenuItems();
                 } catch (error) {
                     console.error('Session validation failed:', error);
@@ -2651,7 +2619,7 @@
             }
         }
 
-        // Form handlers with progressive disclosure
+        // Form handlers
         function setupFormHandlers() {
             const loginForm = utils.getId('signInForm');
             if (loginForm) {
@@ -2659,7 +2627,6 @@
                 const passwordGroup = document.getElementById('passwordGroup');
                 const rememberGroup = document.getElementById('rememberGroup');
                 
-                // Progressive disclosure for login - only on Enter key or blur with valid email
                 if (emailInput) {
                     emailInput.addEventListener('keypress', function(e) {
                         if (e.key === 'Enter' && this.value.length > 0) {
@@ -2669,7 +2636,6 @@
                     });
                     
                     emailInput.addEventListener('blur', function() {
-                        // Check if it looks like a valid email and is not empty
                         if (this.value.length > 0 && (this.value.includes('@') || this.value.length > 3)) {
                             setTimeout(() => showPasswordField(), 100);
                         }
@@ -2680,7 +2646,6 @@
                     if (passwordGroup.classList.contains('hidden')) {
                         const modalBody = document.querySelector('#signInModal .modal-body');
                         
-                        // Add loading state
                         emailInput.classList.add('loading');
                         
                         setTimeout(() => {
@@ -2704,7 +2669,7 @@
                         return;
                     }
                     
-                    console.log('📧 Login attempt for:', email);
+                    console.log('Login attempt for:', email);
                     await authSystem.login(formData);
                 });
             }
@@ -2728,7 +2693,7 @@
                         return;
                     }
                     
-                    console.log('📧 Registration attempt for:', email);
+                    console.log('Registration attempt for:', email);
                     await authSystem.register(formData);
                 });
             }
@@ -2763,30 +2728,28 @@
 
         window.startLabEnvironment = async function() {
             try {
-                console.log('🔄 Starting new lab environment...');
+                console.log('Starting new lab environment...');
                 
-                // Call backend API - ONLY KV backend, no localStorage fallback for this function
                 const response = await api.call('/api/lab/start', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${appState.sessionToken}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({}) // Send empty JSON object
+                    body: JSON.stringify({})
                 });
                 
                 if (response.success) {
-                    console.log('✅ Lab started successfully with backend');
+                    console.log('Lab started successfully with backend');
                     
-                    // Reset progress and reload
                     appState.progress = {};
                     updateProgressDisplay();
                     await loadLabHistory();
                     
                     if (response.data.previousLabCompleted) {
-                        notificationSystem.success(`🎉 Previous lab completed! New ${response.data.labId} started!`);
+                        notificationSystem.success(`Previous lab completed! New ${response.data.labId} started!`);
                     } else {
-                        notificationSystem.success(`🚀 New lab ${response.data.labId} started!`);
+                        notificationSystem.success(`New lab ${response.data.labId} started!`);
                     }
                 }
                 
@@ -2807,13 +2770,12 @@
             if (appState.labHistory.length === 0) {
                 content.innerHTML = `
                     <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">🚀</div>
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">LAB</div>
                         <p>No lab sessions yet!</p>
                         <p style="margin-top: 0.5rem;">Click "Start New Lab" to begin your first training session.</p>
                     </div>
                 `;
             } else {
-                // Filter buttons
                 const filterButtons = `
                     <div style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
                         <button onclick="filterLabHistory('week')" class="lab-filter-btn" data-filter="week" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last Week</button>
@@ -2840,13 +2802,12 @@
 
         window.showAdminPanel = async function() {
             try {
-                // Check if user is admin
                 if (!appState.user || appState.user.role !== 'admin') {
                     notificationSystem.error('Admin access required');
                     return;
                 }
 
-                console.log('🔄 Loading admin data from backend APIs...');
+                console.log('Loading admin data from backend APIs...');
                 const response = await api.call(`${API_BASE}/admin/users-progress`, {
                     headers: {
                         'Authorization': `Bearer ${appState.sessionToken}`,
@@ -2855,7 +2816,7 @@
                 });
                 
                 if (response.success) {
-                    console.log('✅ Admin data loaded from backend APIs');
+                    console.log('Admin data loaded from backend APIs');
                     displayAdminPanel(response.data);
                 } else {
                     notificationSystem.error(`Failed to load admin data: ${response.message}`);
@@ -2864,10 +2825,10 @@
                 console.error('Failed to load admin data:', error);
                 
                 if (error.message === 'BACKEND_NOT_AVAILABLE') {
-                    console.log('📁 Backend APIs not deployed, showing fallback');
+                    console.log('Backend APIs not deployed, showing fallback');
                     showAdminPanelFallback('Backend APIs not deployed yet. Please deploy the Functions to enable admin features.');
                 } else {
-                    console.log('⚠️ Admin panel API unavailable, showing fallback');
+                    console.log('Admin panel API unavailable, showing fallback');
                     showAdminPanelFallback('Admin panel temporarily unavailable. Please try again later.');
                 }
             }
@@ -2902,7 +2863,6 @@
                 );
             }
             
-            // Update active button
             document.querySelectorAll('.lab-filter-btn').forEach(btn => {
                 btn.style.background = 'var(--surface)';
                 btn.style.color = 'var(--text)';
@@ -2916,7 +2876,6 @@
                 activeBtn.style.border = '1px solid var(--primary)';
             }
             
-            // Update content
             document.getElementById('filteredCount').textContent = filteredHistory.length;
             document.getElementById('labHistoryContent').innerHTML = generateLabHistoryHTML(filteredHistory);
         };
@@ -2927,7 +2886,6 @@
             if (taskDefinition) {
                 document.getElementById('taskDetailTitle').textContent = taskDefinition.title;
                 
-                // Get or create task progress
                 if (!appState.progress[taskId]) {
                     appState.progress[taskId] = {
                         completed: false,
@@ -2939,13 +2897,12 @@
                 const taskProgress = appState.progress[taskId];
                 const hasNotes = taskProgress.notes && taskProgress.notes.trim().length > 0;
                 
-                // Create task detail content with improved notes section
                 const notesSection = `
                     <div class="notes-container">
                         <div class="notes-header">
-                            <h4 class="notes-title">📝 Your Notes</h4>
+                            <h4 class="notes-title">Your Notes</h4>
                             <button class="save-note-btn" id="saveNoteBtn_${taskId}" onclick="saveTaskNotes('${taskId}')">
-                                💾 Save Note
+                                Save Note
                             </button>
                         </div>
                         <textarea 
@@ -2955,7 +2912,7 @@
                             ${hasNotes ? 'title="Click to edit your notes"' : ''}
                         >${taskProgress.notes || ''}</textarea>
                         <div class="notes-tip">
-                            💡 Tip: Document any issues, solutions, or key learnings for future reference
+                            Tip: Document any issues, solutions, or key learnings for future reference
                             ${hasNotes ? ' • Click the textarea to edit your saved notes' : ''}
                         </div>
                     </div>
@@ -2963,7 +2920,6 @@
                 
                 document.getElementById('taskDetailContent').innerHTML = taskDefinition.description + notesSection;
                 
-                // Add event listeners for subtask checkboxes and make text clickable
                 setTimeout(() => {
                     const subtaskItems = document.querySelectorAll('.subtask-item');
                     subtaskItems.forEach(item => {
@@ -2972,7 +2928,6 @@
                         const step = checkbox ? checkbox.getAttribute('data-step') : null;
                         
                         if (step && checkbox && label) {
-                            // Set checkbox state from saved progress
                             if (taskProgress.subtasks && taskProgress.subtasks[step]) {
                                 checkbox.checked = taskProgress.subtasks[step].completed;
                                 if (checkbox.checked) {
@@ -2980,24 +2935,19 @@
                                 }
                             }
                             
-                            // Make the entire subtask item clickable to toggle checkbox
                             const clickHandler = function(e) {
-                                // Don't trigger if clicking directly on checkbox
                                 if (e.target === checkbox) return;
                                 
                                 e.preventDefault();
                                 e.stopPropagation();
                                 
-                                // Toggle checkbox
                                 checkbox.checked = !checkbox.checked;
                                 handleSubtaskChange(taskId, step, checkbox.checked);
                             };
                             
-                            // Add click handler to the entire item
                             item.addEventListener('click', clickHandler);
                             label.addEventListener('click', clickHandler);
                             
-                            // Handle direct checkbox clicks
                             checkbox.addEventListener('change', function(e) {
                                 e.stopPropagation();
                                 handleSubtaskChange(taskId, step, this.checked);
@@ -3005,25 +2955,21 @@
                         }
                     });
 
-                    // Add notes interaction handlers
                     const notesTextarea = document.getElementById(`taskNotes_${taskId}`);
                     const saveBtn = document.getElementById(`saveNoteBtn_${taskId}`);
                     
                     if (notesTextarea && saveBtn) {
-                        // Auto-save on input change
                         let saveTimeout;
                         notesTextarea.addEventListener('input', function() {
                             clearTimeout(saveTimeout);
-                            saveBtn.textContent = '💾 Save Note';
+                            saveBtn.textContent = 'Save Note';
                             saveBtn.classList.remove('saved');
                             
-                            // Auto-save after 2 seconds of no typing
                             saveTimeout = setTimeout(() => {
                                 saveTaskNotes(taskId);
                             }, 2000);
                         });
 
-                        // Make clickable if has content
                         if (hasNotes) {
                             notesTextarea.addEventListener('click', function() {
                                 this.focus();
@@ -3048,19 +2994,16 @@
                 appState.progress[taskId].lastUpdated = new Date().toISOString();
                 saveUserProgress(taskId, appState.progress[taskId]);
                 
-                // Update save button to show success
                 if (saveBtn) {
-                    saveBtn.textContent = '✅ Saved!';
+                    saveBtn.textContent = 'Saved!';
                     saveBtn.classList.add('saved');
                     
-                    // Reset button after 2 seconds
                     setTimeout(() => {
-                        saveBtn.textContent = '💾 Save Note';
+                        saveBtn.textContent = 'Save Note';
                         saveBtn.classList.remove('saved');
                     }, 2000);
                 }
                 
-                // Update textarea styling if it has content
                 const hasContent = notesTextarea.value.trim().length > 0;
                 if (hasContent) {
                     notesTextarea.classList.add('has-content');
@@ -3070,20 +3013,18 @@
                     notesTextarea.title = '';
                 }
                 
-                console.log('📝 Notes saved for task:', taskId);
+                console.log('Notes saved for task:', taskId);
                 
-                // Show success notification
                 if (hasContent) {
-                    notificationSystem.success('📝 Notes saved successfully!');
+                    notificationSystem.success('Notes saved successfully!');
                 } else {
-                    notificationSystem.info('📝 Notes cleared');
+                    notificationSystem.info('Notes cleared');
                 }
             }
         };
 
         window.toggleTaskCompletion = async function(taskId) {
             try {
-                // Initialize task progress if not exists
                 if (!appState.progress[taskId]) {
                     appState.progress[taskId] = {
                         completed: false,
@@ -3094,12 +3035,10 @@
                 
                 const isCompleted = appState.progress[taskId].completed;
                 
-                // Update local state
                 appState.progress[taskId].completed = !isCompleted;
                 appState.progress[taskId].completedAt = !isCompleted ? new Date().toISOString() : null;
                 appState.progress[taskId].lastUpdated = new Date().toISOString();
                 
-                // Update UI immediately - find the checkbox and task item
                 const taskCheckbox = document.querySelector(`input[onchange="toggleTaskCompletion('${taskId}')"]`);
                 const taskItem = taskCheckbox?.closest('.task-item');
                 
@@ -3112,13 +3051,10 @@
                     }
                 }
                 
-                // Save to KV backend
                 await saveUserProgress(taskId, appState.progress[taskId]);
                 
-                // Update progress display
                 updateProgressDisplay();
                 
-                // Check if lab is now completed
                 checkLabCompletion();
                 
             } catch (error) {
@@ -3128,14 +3064,12 @@
         };
 
         window.toggleWeekExpansion = function(weekNum, event) {
-            // Prevent collapsing if event came from within task list
             if (event && event.target) {
-                // Check if click came from task item or its children
                 const taskItem = event.target.closest('.task-item');
                 const taskList = event.target.closest('.task-list');
                 
                 if (taskItem || taskList) {
-                    return; // Don't collapse when clicking on tasks
+                    return;
                 }
             }
             
@@ -3159,16 +3093,15 @@
             if (themeOptions && themeToggle) {
                 if (themeOptions.style.display === 'none' || !themeOptions.style.display) {
                     themeOptions.style.display = 'flex';
-                    themeToggle.innerHTML = '🎨 Theme ▼';
+                    themeToggle.innerHTML = 'Theme ▼';
                 } else {
                     themeOptions.style.display = 'none';
-                    themeToggle.innerHTML = '🎨 Theme ▶';
+                    themeToggle.innerHTML = 'Theme ▶';
                 }
             }
         };
 
         window.showUserLabHistory = function(userName, userEmail) {
-            // This would need KV backend implementation for cross-user access
             notificationSystem.info('User lab history requires backend implementation');
         };
 
@@ -3191,10 +3124,8 @@
             if (hamburger) hamburger.classList.remove('active');
             if (mobileMenu) mobileMenu.classList.remove('active');
             
-            // Close theme submenu if open
             closeMobileThemeMenu();
             
-            // Force update mobile menu items to ensure proper state
             setTimeout(() => {
                 updateMobileMenuItems();
             }, 100);
@@ -3206,31 +3137,30 @@
             if (appState.authenticated && appState.user) {
                 let adminItem = '';
                 if (appState.user.role === 'admin') {
-                    adminItem = '<button class="mobile-menu-item" onclick="showAdminPanel(); closeMobileMenu();">👑 Admin Panel</button>';
+                    adminItem = '<button class="mobile-menu-item" onclick="showAdminPanel(); closeMobileMenu();">Admin Panel</button>';
                 }
                 
                 mobileMenuItems.innerHTML = `
                     <div style="padding: 0.5rem 1rem; text-align: center; color: var(--text-secondary); font-size: 0.9rem; border-bottom: 1px solid var(--border); margin-bottom: 0.5rem;">
                         Welcome, ${appState.user.name}
                     </div>
-                    <button class="mobile-menu-item" onclick="startLabEnvironment(); closeMobileMenu();">🚀 Start New Lab</button>
-                    <button class="mobile-menu-item" onclick="showLabHistoryModal(); closeMobileMenu();">📊 Lab History</button>
+                    <button class="mobile-menu-item" onclick="startLabEnvironment(); closeMobileMenu();">Start New Lab</button>
+                    <button class="mobile-menu-item" onclick="showLabHistoryModal(); closeMobileMenu();">Lab History</button>
                     ${adminItem}
                     <button class="mobile-menu-item" onclick="toggleMobileThemeMenu(event)" id="mobileThemeToggle">
-                        🎨 Theme ▶
+                        Theme ▶
                     </button>
                     <div id="mobileThemeOptions" style="display: none;">
                         <button class="mobile-menu-item" onclick="setTheme('light'); closeMobileMenu();">
-                            🌟 Light Jedi
+                            Light Theme
                         </button>
                         <button class="mobile-menu-item" onclick="setTheme('dark'); closeMobileMenu();">
-                            ⚡ Dark Sith
+                            Dark Theme
                         </button>
                     </div>
-                    <button class="mobile-menu-item" onclick="logout(); closeMobileMenu();">🚪 Sign Out</button>
+                    <button class="mobile-menu-item" onclick="logout(); closeMobileMenu();">Sign Out</button>
                 `;
             } else {
-                // For unauthenticated users on mobile - NO menu items on landing page
                 mobileMenuItems.innerHTML = '';
             }
         }
@@ -3247,37 +3177,30 @@
                 return '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">No sessions found for this period.</div>';
             }
             
-            // Sort history: in-progress labs first, then by session number (newest first)
             const sortedHistory = [...history].sort((a, b) => {
-                // In-progress labs go to top
                 if (a.status === 'started' && b.status !== 'started') return -1;
                 if (b.status === 'started' && a.status !== 'started') return 1;
                 
-                // Otherwise sort by session number (newest first)
                 return b.session - a.session;
             });
             
             return sortedHistory.map(session => {
                 const isInProgress = session.status === 'started';
-                const statusIcon = session.status === 'completed' ? '✅' : '🚀';
+                const statusIcon = session.status === 'completed' ? 'COMPLETED' : 'IN PROGRESS';
                 const statusText = session.status === 'completed' ? 'Completed' : 'In Progress';
                 const statusColor = session.status === 'completed' ? 'var(--success)' : 'var(--primary)';
                 
-                // Get current progress for in-progress labs
                 const currentProgress = getCurrentLabProgress();
                 const completedTasks = isInProgress ? currentProgress.completedTasks : (session.tasksCompleted || 0);
                 
-                // Lab title with better formatting
                 let labTitle;
                 if (isInProgress) {
-                    labTitle = `${statusIcon} Current Lab (${session.labId})`;
+                    labTitle = `Current Lab (${session.labId})`;
                 } else {
-                    // Extract lab number from labId (LAB001 -> Lab 1)
                     const labNumber = session.labId ? session.labId.replace('LAB', '').replace(/^0+/, '') : session.session;
-                    labTitle = `${statusIcon} Lab ${labNumber} (${session.labId})`;
+                    labTitle = `Lab ${labNumber} (${session.labId})`;
                 }
                 
-                // Calculate progress percentage
                 const progressPercentage = Math.round((completedTasks / (session.totalTasks || 42)) * 100);
                 
                 return `
@@ -3290,7 +3213,6 @@
                             Session #${session.session} • ${new Date(session.date).toLocaleDateString()}
                         </div>
                         
-                        <!-- Progress bar -->
                         <div style="background: var(--surface); height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 0.5rem;">
                             <div style="height: 100%; background: ${statusColor}; width: ${progressPercentage}%; transition: width 0.5s ease;"></div>
                         </div>
@@ -3300,16 +3222,16 @@
                                 Tasks: ${completedTasks}/${session.totalTasks || 42} (${progressPercentage}%)
                             </span>
                             ${isInProgress ? 
-                                '<span style="color: var(--primary); font-size: 0.8rem; font-weight: 600;">⚡ ACTIVE</span>' : 
-                                `<span style="color: var(--success); font-size: 0.8rem; font-weight: 600;">🏆 DONE</span>`
+                                '<span style="color: var(--primary); font-size: 0.8rem; font-weight: 600;">ACTIVE</span>' : 
+                                `<span style="color: var(--success); font-size: 0.8rem; font-weight: 600;">DONE</span>`
                             }
                         </div>
                         
                         <div style="color: var(--text-secondary); font-size: 0.75rem;">
                             ${session.completedAt ? 
-                                `✅ Completed: ${new Date(session.completedAt).toLocaleDateString()} at ${new Date(session.completedAt).toLocaleTimeString()}` : 
+                                `Completed: ${new Date(session.completedAt).toLocaleDateString()} at ${new Date(session.completedAt).toLocaleTimeString()}` : 
                                 session.startedAt ? 
-                                `🚀 Started: ${new Date(session.startedAt).toLocaleDateString()} at ${new Date(session.startedAt).toLocaleTimeString()}` : ''
+                                `Started: ${new Date(session.startedAt).toLocaleDateString()} at ${new Date(session.startedAt).toLocaleTimeString()}` : ''
                             }
                         </div>
                     </div>
@@ -3324,18 +3246,15 @@
         }
 
         function handleSubtaskChange(taskId, step, isCompleted) {
-            // Initialize subtasks if not exists
             if (!appState.progress[taskId].subtasks) {
                 appState.progress[taskId].subtasks = {};
             }
             
-            // Update subtask status
             appState.progress[taskId].subtasks[step] = {
                 completed: isCompleted,
                 completedAt: isCompleted ? new Date().toISOString() : null
             };
             
-            // Update UI
             const checkbox = document.querySelector(`[data-step="${step}"]`);
             const subtaskItem = checkbox?.closest('.subtask-item');
             
@@ -3347,18 +3266,15 @@
                 }
             }
             
-            // Check if all subtasks are completed
             const allSubtaskCheckboxes = document.querySelectorAll('.subtask-checkbox');
             const completedSubtasks = Array.from(allSubtaskCheckboxes).filter(cb => cb.checked);
             
             if (completedSubtasks.length === allSubtaskCheckboxes.length && allSubtaskCheckboxes.length > 0) {
-                // Auto-complete the main task
                 appState.progress[taskId].completed = true;
                 appState.progress[taskId].completedAt = new Date().toISOString();
                 
-                notificationSystem.success(`🎉 Task completed: ${window.TASK_DEFINITIONS[taskId].title}`);
+                notificationSystem.success(`Task completed: ${window.TASK_DEFINITIONS[taskId].title}`);
                 
-                // Update main task checkbox in the week view
                 const mainTaskCheckbox = document.querySelector(`input[onchange="toggleTaskCompletion('${taskId}')"]`);
                 if (mainTaskCheckbox) {
                     mainTaskCheckbox.checked = true;
@@ -3370,7 +3286,6 @@
                 
                 updateProgressDisplay();
             } else if (appState.progress[taskId].completed && completedSubtasks.length < allSubtaskCheckboxes.length) {
-                // Uncheck main task if not all subtasks are complete
                 appState.progress[taskId].completed = false;
                 
                 const mainTaskCheckbox = document.querySelector(`input[onchange="toggleTaskCompletion('${taskId}')"]`);
@@ -3385,7 +3300,6 @@
                 updateProgressDisplay();
             }
             
-            // Save progress to KV backend
             saveUserProgress(taskId, appState.progress[taskId]);
         }
 
@@ -3394,17 +3308,14 @@
             document.getElementById('welcomeScreen').classList.remove('hidden');
             document.getElementById('mainContent').classList.add('hidden');
             
-            // Add landing page class and disable scrolling
             document.body.classList.add('no-scroll', 'landing-page');
             
             const headerButtons = document.getElementById('headerButtons');
             const userMenu = document.getElementById('userMenu');
             
-            // Show header buttons and hide user menu for welcome screen
             if (headerButtons) headerButtons.classList.remove('hidden');
             if (userMenu) userMenu.classList.add('hidden');
             
-            // FORCE HIDE ALL user menu elements on mobile (mobile uses welcome screen buttons)
             if (window.innerWidth <= 768) {
                 if (headerButtons) {
                     headerButtons.style.display = 'none';
@@ -3427,7 +3338,6 @@
                     userMenuDropdown.style.pointerEvents = 'none';
                 }
             } else {
-                // Desktop - show header buttons normally
                 if (headerButtons) {
                     headerButtons.style.display = '';
                     headerButtons.style.visibility = '';
@@ -3435,20 +3345,17 @@
             }
             
             closeMobileMenu();
-            updateMobileMenuItems(); // Update mobile menu for unauthenticated state
+            updateMobileMenuItems();
         }
 
         function showDashboard() {
             document.getElementById('welcomeScreen').classList.add('hidden');
             document.getElementById('mainContent').classList.remove('hidden');
             
-            // Remove landing page class and enable scrolling
             document.body.classList.remove('no-scroll', 'landing-page');
             
-            // Scroll to top when showing dashboard (especially important on mobile)
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
-            // ENSURE MOBILE MENU IS COMPLETELY CLOSED
             const mobileMenu = document.getElementById('mobileMenu');
             const hamburger = document.querySelector('.hamburger');
             if (mobileMenu) {
@@ -3458,21 +3365,18 @@
                 hamburger.classList.remove('active');
             }
             
-            // Show/hide appropriate elements based on screen size
             const headerButtons = document.getElementById('headerButtons');
             const userMenu = document.getElementById('userMenu');
             
-            if (headerButtons) headerButtons.classList.add('hidden'); // Hide Sign In/Get Started buttons
-            if (userMenu) userMenu.classList.remove('hidden'); // Show user menu (will be hidden by CSS on mobile)
+            if (headerButtons) headerButtons.classList.add('hidden');
+            if (userMenu) userMenu.classList.remove('hidden');
             
-            // Update user info (desktop only)
             if (window.innerWidth > 768) {
                 const userNameEl = document.getElementById('userName');
                 if (userNameEl && appState.user) {
                     userNameEl.textContent = appState.user.name;
                 }
                 
-                // Show admin button if user is admin (desktop only)
                 if (appState.user && appState.user.role === 'admin') {
                     const adminBtn = document.getElementById('adminButton');
                     if (adminBtn) adminBtn.style.display = 'block';
@@ -3481,8 +3385,8 @@
             
             generateWeekCards();
             updateProgressDisplay();
-            closeMobileMenu(); // Double-ensure mobile menu is closed
-            updateMobileMenuItems(); // Ensure mobile menu shows authenticated state
+            closeMobileMenu();
+            updateMobileMenuItems();
         }
 
         function generateWeekCards() {
@@ -3560,8 +3464,7 @@
             const completedTasks = Object.values(appState.progress).filter(task => task.completed).length;
             const percentage = Math.round((completedTasks / totalTasks) * 100);
             
-            // Update progress ring
-            const circumference = 2 * Math.PI * 54; // r = 54
+            const circumference = 2 * Math.PI * 54;
             const offset = circumference - (percentage / 100) * circumference;
             const progressRing = document.getElementById('progressRing');
             if (progressRing) {
@@ -3573,13 +3476,11 @@
                 progressPercentage.textContent = `${percentage}%`;
             }
             
-            // Update week cards if they exist
             const mainContent = document.getElementById('mainContent');
             if (mainContent && !mainContent.classList.contains('hidden')) {
                 generateWeekCards();
             }
             
-            // Check for lab completion after updating display
             if (appState.authenticated) {
                 checkLabCompletion();
             }
@@ -3592,11 +3493,11 @@
             
             content.innerHTML = `
                 <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">👑</div>
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">ADMIN</div>
                     <h3>Admin Panel</h3>
                     <p>${message}</p>
                     <div style="margin-top: 2rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
-                        <h4 style="margin-bottom: 1rem;">📚 To enable full admin features:</h4>
+                        <h4 style="margin-bottom: 1rem;">To enable full admin features:</h4>
                         <ol style="text-align: left; max-width: 400px; margin: 0 auto;">
                             <li>Deploy the 3 Functions files to <code>/functions/api/</code></li>
                             <li>Configure your serverless functions</li>
@@ -3620,7 +3521,6 @@
         function displayAdminPanel(usersData) {
             const content = document.getElementById('adminContent');
             
-            // Ensure usersData is an array
             if (!Array.isArray(usersData)) {
                 console.error('Expected array but got:', usersData);
                 content.innerHTML = '<p style="text-align: center; color: var(--danger); padding: 2rem;">Invalid data format received from server.</p>';
@@ -3630,21 +3530,20 @@
             if (usersData.length === 0) {
                 content.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No users found.</p>';
             } else {
-                // Sort by completed tasks and progress percentage
                 usersData.sort((a, b) => {
                     if (a.completedTasks !== b.completedTasks) {
-                        return b.completedTasks - a.completedTasks; // More completed tasks first
+                        return b.completedTasks - a.completedTasks;
                     }
-                    return b.progressPercentage - a.progressPercentage; // Higher percentage first
+                    return b.progressPercentage - a.progressPercentage;
                 });
                 
                 content.innerHTML = `
                     <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
                         <strong>Leaderboard - ${usersData.length} Users</strong>
-                        <small style="color: var(--text-secondary);">📊 Sorted by Progress</small>
+                        <small style="color: var(--text-secondary);">Sorted by Progress</small>
                     </div>
                     ${usersData.map((user, index) => {
-                        const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+                        const medal = index === 0 ? '#1' : index === 1 ? '#2' : index === 2 ? '#3' : `#${index + 1}`;
                         return `
                             <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
@@ -3668,7 +3567,7 @@
                                     </div>
                                 </div>
                                 <div style="color: var(--text-secondary); font-size: 0.8rem; display: flex; justify-content: space-between;">
-                                    <span>${user.hasNotes ? '📝 Has notes' : 'No notes'}</span>
+                                    <span>${user.hasNotes ? 'Has notes' : 'No notes'}</span>
                                     <span>Last: ${user.lastActive ? new Date(user.lastActive).toLocaleDateString() : 'Never'}</span>
                                 </div>
                             </div>
@@ -3680,12 +3579,11 @@
             showModal('adminModal');
         }
 
-        // Modal management functions - Ensure global scope
+        // Modal management functions
         window.showModal = function(modalId) {
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.add('active');
-                // Prevent body scroll when modal is open
                 document.body.style.overflow = 'hidden';
             }
             closeMobileMenu();
@@ -3695,13 +3593,11 @@
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.remove('active');
-                // Restore body scroll when modal is closed
                 document.body.style.overflow = 'auto';
             }
         };
 
         window.showSignInModal = function() {
-            // Reset modal state for progressive disclosure
             const passwordGroup = document.getElementById('passwordGroup');
             const rememberGroup = document.getElementById('rememberGroup');
             const emailInput = document.getElementById('signInEmail');
@@ -3726,7 +3622,6 @@
         };
 
         window.showRegisterModal = function() {
-            // Reset register modal state
             const registerForm = document.getElementById('registerForm');
             const submitBtn = document.querySelector('#registerForm .password-toggle');
             const passwordInput = document.getElementById('registerPassword');
@@ -3754,7 +3649,6 @@
             setupMobileMenuHandlers();
             setupFormHandlers();
             
-            // ENSURE MOBILE MENU IS CLOSED ON PAGE LOAD
             const mobileMenu = document.getElementById('mobileMenu');
             const hamburger = document.querySelector('.hamburger');
             if (mobileMenu) {
@@ -3764,25 +3658,21 @@
                 hamburger.classList.remove('active');
             }
             
-            // Handle window resize to ensure proper mobile/desktop behavior
             window.addEventListener('resize', function() {
-                // Close mobile menu on resize
                 closeMobileMenu();
             });
             
-            // Register PWA Service Worker
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/sw.js').then(function(registration) {
-                    console.log('✅ PWA Service Worker registered successfully:', registration.scope);
+                    console.log('PWA Service Worker registered successfully:', registration.scope);
                 }).catch(function(error) {
-                    console.log('ℹ️ PWA Service Worker registration failed (optional):', error);
+                    console.log('PWA Service Worker registration failed (optional):', error);
                 });
             }
         });
 
         // Close modals and menus when clicking outside
         document.addEventListener('click', function(event) {
-            // Close modals when clicking outside
             const modals = document.querySelectorAll('.modal.active');
             modals.forEach(modal => {
                 if (event.target === modal) {
@@ -3791,7 +3681,6 @@
                 }
             });
             
-            // Close user menu when clicking outside
             const userMenu = document.getElementById('userMenu');
             const dropdown = document.getElementById('userMenuDropdown');
             if (userMenu && dropdown && !userMenu.contains(event.target) && dropdown.classList.contains('active')) {
@@ -3799,7 +3688,6 @@
             }
         });
 
-        // Error logging for debugging
         window.addEventListener('error', function(e) {
             console.error('Global error:', e.error, e.filename, e.lineno);
         });
