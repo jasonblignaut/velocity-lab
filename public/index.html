@@ -1817,7 +1817,7 @@
         <div class="modal-content large">
             <button class="modal-close" onclick="closeModal('labHistoryModal')">&times;</button>
             <div class="modal-header">
-                <h2>Lab History</h2>
+                <h2>📊 Lab History</h2>
                 <p style="color: var(--text-secondary);">Your training progress timeline</p>
             </div>
             <div class="lab-history-modal-content" id="labHistoryModalContent">
@@ -1831,7 +1831,7 @@
         <div class="modal-content large">
             <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
             <div class="modal-header">
-                <h2>Admin Panel</h2>
+                <h2>👑 Admin Panel</h2>
                 <p style="color: var(--text-secondary);">User progress leaderboard</p>
             </div>
             <div class="lab-history-modal-content" id="adminContent">
@@ -2062,7 +2062,7 @@
                     }, 100);
                     
                     if (!appState.isWelcomeShown) {
-                        notificationSystem.success(`Welcome back, ${name}!`);
+                        notificationSystem.success(`Welcome back, ${name}! 🎉`);
                     }
                     
                 } catch (err) {
@@ -2134,7 +2134,7 @@
                     }, 100);
                     
                     if (!appState.isWelcomeShown) {
-                        notificationSystem.success(`Welcome to Velocity Lab, ${userName}!`);
+                        notificationSystem.success(`Welcome to Velocity Lab, ${userName}! 🚀`);
                     }
                     
                 } catch (err) {
@@ -2227,9 +2227,9 @@
                 });
                 
                 if (theme === 'light') {
-                    notificationSystem.success('Light theme activated!');
+                    notificationSystem.success('🌟 Light theme activated!');
                 } else {
-                    notificationSystem.success('Dark theme activated!');
+                    notificationSystem.success('⚡ Dark theme activated!');
                 }
             },
 
@@ -2573,7 +2573,7 @@
                     if (labIndex >= 0) {
                         appState.labHistory[labIndex] = completionEntry;
                         saveLabHistory(completionEntry);
-                        notificationSystem.success('Lab completed successfully!');
+                        notificationSystem.success('🎉 Lab completed successfully!');
                     }
                 }
             }
@@ -2747,9 +2747,9 @@
                     await loadLabHistory();
                     
                     if (response.data.previousLabCompleted) {
-                        notificationSystem.success(`Previous lab completed! New ${response.data.labId} started!`);
+                        notificationSystem.success(`🎉 Previous lab completed! New ${response.data.labId} started!`);
                     } else {
-                        notificationSystem.success(`New lab ${response.data.labId} started!`);
+                        notificationSystem.success(`🚀 New lab ${response.data.labId} started!`);
                     }
                 }
                 
@@ -2770,7 +2770,7 @@
             if (appState.labHistory.length === 0) {
                 content.innerHTML = `
                     <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">LAB</div>
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🚀</div>
                         <p>No lab sessions yet!</p>
                         <p style="margin-top: 0.5rem;">Click "Start New Lab" to begin your first training session.</p>
                     </div>
@@ -2900,9 +2900,9 @@
                 const notesSection = `
                     <div class="notes-container">
                         <div class="notes-header">
-                            <h4 class="notes-title">Your Notes</h4>
+                            <h4 class="notes-title">📝 Your Notes</h4>
                             <button class="save-note-btn" id="saveNoteBtn_${taskId}" onclick="saveTaskNotes('${taskId}')">
-                                Save Note
+                                💾 Save Note
                             </button>
                         </div>
                         <textarea 
@@ -2912,7 +2912,7 @@
                             ${hasNotes ? 'title="Click to edit your notes"' : ''}
                         >${taskProgress.notes || ''}</textarea>
                         <div class="notes-tip">
-                            Tip: Document any issues, solutions, or key learnings for future reference
+                            💡 Tip: Document any issues, solutions, or key learnings for future reference
                             ${hasNotes ? ' • Click the textarea to edit your saved notes' : ''}
                         </div>
                     </div>
@@ -2995,11 +2995,11 @@
                 saveUserProgress(taskId, appState.progress[taskId]);
                 
                 if (saveBtn) {
-                    saveBtn.textContent = 'Saved!';
+                    saveBtn.textContent = '✅ Saved!';
                     saveBtn.classList.add('saved');
                     
                     setTimeout(() => {
-                        saveBtn.textContent = 'Save Note';
+                        saveBtn.textContent = '💾 Save Note';
                         saveBtn.classList.remove('saved');
                     }, 2000);
                 }
@@ -3016,9 +3016,9 @@
                 console.log('Notes saved for task:', taskId);
                 
                 if (hasContent) {
-                    notificationSystem.success('Notes saved successfully!');
+                    notificationSystem.success('📝 Notes saved successfully!');
                 } else {
-                    notificationSystem.info('Notes cleared');
+                    notificationSystem.info('📝 Notes cleared');
                 }
             }
         };
@@ -3186,7 +3186,7 @@
             
             return sortedHistory.map(session => {
                 const isInProgress = session.status === 'started';
-                const statusIcon = session.status === 'completed' ? 'COMPLETED' : 'IN PROGRESS';
+                const statusIcon = session.status === 'completed' ? '✅' : '🚀';
                 const statusText = session.status === 'completed' ? 'Completed' : 'In Progress';
                 const statusColor = session.status === 'completed' ? 'var(--success)' : 'var(--primary)';
                 
@@ -3195,10 +3195,10 @@
                 
                 let labTitle;
                 if (isInProgress) {
-                    labTitle = `Current Lab (${session.labId})`;
+                    labTitle = `${statusIcon} Current Lab (${session.labId})`;
                 } else {
                     const labNumber = session.labId ? session.labId.replace('LAB', '').replace(/^0+/, '') : session.session;
-                    labTitle = `Lab ${labNumber} (${session.labId})`;
+                    labTitle = `${statusIcon} Lab ${labNumber} (${session.labId})`;
                 }
                 
                 const progressPercentage = Math.round((completedTasks / (session.totalTasks || 42)) * 100);
@@ -3222,16 +3222,16 @@
                                 Tasks: ${completedTasks}/${session.totalTasks || 42} (${progressPercentage}%)
                             </span>
                             ${isInProgress ? 
-                                '<span style="color: var(--primary); font-size: 0.8rem; font-weight: 600;">ACTIVE</span>' : 
-                                `<span style="color: var(--success); font-size: 0.8rem; font-weight: 600;">DONE</span>`
+                                '<span style="color: var(--primary); font-size: 0.8rem; font-weight: 600;">⚡ ACTIVE</span>' : 
+                                `<span style="color: var(--success); font-size: 0.8rem; font-weight: 600;">🏆 DONE</span>`
                             }
                         </div>
                         
                         <div style="color: var(--text-secondary); font-size: 0.75rem;">
                             ${session.completedAt ? 
-                                `Completed: ${new Date(session.completedAt).toLocaleDateString()} at ${new Date(session.completedAt).toLocaleTimeString()}` : 
+                                `✅ Completed: ${new Date(session.completedAt).toLocaleDateString()} at ${new Date(session.completedAt).toLocaleTimeString()}` : 
                                 session.startedAt ? 
-                                `Started: ${new Date(session.startedAt).toLocaleDateString()} at ${new Date(session.startedAt).toLocaleTimeString()}` : ''
+                                `🚀 Started: ${new Date(session.startedAt).toLocaleDateString()} at ${new Date(session.startedAt).toLocaleTimeString()}` : ''
                             }
                         </div>
                     </div>
@@ -3273,7 +3273,7 @@
                 appState.progress[taskId].completed = true;
                 appState.progress[taskId].completedAt = new Date().toISOString();
                 
-                notificationSystem.success(`Task completed: ${window.TASK_DEFINITIONS[taskId].title}`);
+                notificationSystem.success(`🎉 Task completed: ${window.TASK_DEFINITIONS[taskId].title}`);
                 
                 const mainTaskCheckbox = document.querySelector(`input[onchange="toggleTaskCompletion('${taskId}')"]`);
                 if (mainTaskCheckbox) {
@@ -3493,11 +3493,11 @@
             
             content.innerHTML = `
                 <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">ADMIN</div>
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">👑</div>
                     <h3>Admin Panel</h3>
                     <p>${message}</p>
                     <div style="margin-top: 2rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
-                        <h4 style="margin-bottom: 1rem;">To enable full admin features:</h4>
+                        <h4 style="margin-bottom: 1rem;">📚 To enable full admin features:</h4>
                         <ol style="text-align: left; max-width: 400px; margin: 0 auto;">
                             <li>Deploy the 3 Functions files to <code>/functions/api/</code></li>
                             <li>Configure your serverless functions</li>
@@ -3540,10 +3540,10 @@
                 content.innerHTML = `
                     <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
                         <strong>Leaderboard - ${usersData.length} Users</strong>
-                        <small style="color: var(--text-secondary);">Sorted by Progress</small>
+                        <small style="color: var(--text-secondary);">📊 Sorted by Progress</small>
                     </div>
                     ${usersData.map((user, index) => {
-                        const medal = index === 0 ? '#1' : index === 1 ? '#2' : index === 2 ? '#3' : `#${index + 1}`;
+                        const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
                         return `
                             <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
@@ -3567,7 +3567,7 @@
                                     </div>
                                 </div>
                                 <div style="color: var(--text-secondary); font-size: 0.8rem; display: flex; justify-content: space-between;">
-                                    <span>${user.hasNotes ? 'Has notes' : 'No notes'}</span>
+                                    <span>${user.hasNotes ? '📝 Has notes' : 'No notes'}</span>
                                     <span>Last: ${user.lastActive ? new Date(user.lastActive).toLocaleDateString() : 'Never'}</span>
                                 </div>
                             </div>
