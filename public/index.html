@@ -1693,7 +1693,7 @@
     <!-- Main Dashboard -->
     <div class="main-content hidden" id="mainContent">
         <div class="dashboard-header">
-            <h1 class="dashboard-title">Your Hybrid Journey</h1>
+            <h1 class="dashboard-title">Your Exchange Hybrid Journey</h1>
             <p class="dashboard-subtitle">Track your progress through 42 hands-on tasks across 4 comprehensive weeks</p>
         </div>
 
@@ -2282,7 +2282,8 @@
         function generateFallbackTasks() {
             const weeks = [
                 {
-                    title: 'Foundation Setup',
+                    title: 'Foundation & Domain Setup',
+                    description: 'Domain Controller, network shares, and security groups',
                     tasks: [
                         'Install Windows Server 2012 R2',
                         'Configure Domain Controller',
@@ -2299,7 +2300,8 @@
                     ]
                 },
                 {
-                    title: 'Exchange On-Premises',
+                    title: 'Infrastructure & Updates',
+                    description: 'WSUS setup, time servers, and server upgrades',
                     tasks: [
                         'Install Exchange Server 2016',
                         'Configure Exchange Organization',
@@ -2314,7 +2316,8 @@
                     ]
                 },
                 {
-                    title: 'Microsoft 365 Setup',
+                    title: 'Exchange & Mail Flow',
+                    description: 'Exchange installation and internal mail communication',
                     tasks: [
                         'Create M365 Tenant',
                         'Configure Domain',
@@ -2329,7 +2332,8 @@
                     ]
                 },
                 {
-                    title: 'Hybrid Configuration',
+                    title: 'Hybrid & External Access',
+                    description: 'External mail publishing and 365 hybrid environment',
                     tasks: [
                         'Install Azure AD Connect',
                         'Configure Directory Sync',
@@ -3444,12 +3448,37 @@
         function groupTasksByWeek() {
             const weeks = {};
             
+            // Define proper week descriptions based on CTO instructions
+            const weekDescriptions = {
+                1: {
+                    title: 'Foundation & Domain Setup',
+                    description: '2012 Server promoted to DC, VM joined to domain, network shares with security groups'
+                },
+                2: {
+                    title: 'Infrastructure & Updates', 
+                    description: 'Install 2nd server, setup WSUS, configure time servers'
+                },
+                3: {
+                    title: 'Exchange & Mail Flow',
+                    description: 'Upgrade to Server 2016, install Exchange, create mailboxes, internal mail flow'
+                },
+                4: {
+                    title: 'Hybrid & External Access',
+                    description: 'Publish mail externally, setup Office 365 hybrid environment'
+                }
+            };
+            
             appState.tasks.forEach(task => {
                 const weekNum = task.week || 1;
                 if (!weeks[weekNum]) {
+                    const weekInfo = weekDescriptions[weekNum] || {
+                        title: `Week ${weekNum}: Training`,
+                        description: `Complete ${appState.tasks.filter(t => t.week === weekNum).length} tasks in this week`
+                    };
+                    
                     weeks[weekNum] = {
-                        title: `Week ${weekNum}: ${task.category || 'Training'}`,
-                        description: `Complete ${appState.tasks.filter(t => t.week === weekNum).length} tasks in this week`,
+                        title: `Week ${weekNum}: ${weekInfo.title}`,
+                        description: weekInfo.description,
                         tasks: []
                     };
                 }
