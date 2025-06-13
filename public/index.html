@@ -118,15 +118,12 @@
             opacity: 0.05;
         }
 
-        /* Header */
+        /* Header - Modern layered approach */
         .header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
             z-index: 9999;
             height: 70px;
             display: flex;
@@ -136,8 +133,34 @@
             transition: all 0.3s ease;
         }
 
-        [data-theme="dark"] .header {
-            background: rgba(0, 0, 0, 0.95);
+        /* Solid background layer */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--background);
+            z-index: -2;
+        }
+
+        /* Blur overlay layer */
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+            z-index: -1;
+        }
+
+        [data-theme="dark"] .header::after {
+            background: rgba(0, 0, 0, 0.8);
         }
 
         /* Logo */
@@ -1649,10 +1672,10 @@
                     </button>
                     <div class="theme-submenu">
                         <button class="theme-option jedi" onclick="setTheme('light')">
-                            Light Theme
+                            Light Jedi
                         </button>
                         <button class="theme-option sith active" onclick="setTheme('dark')">
-                            Dark Theme
+                            Dark Sith
                         </button>
                     </div>
                 </div>
@@ -2227,9 +2250,9 @@
                 });
                 
                 if (theme === 'light') {
-                    notificationSystem.success('🌟 Light theme activated!');
+                    notificationSystem.success('🌟 Light Jedi theme activated!');
                 } else {
-                    notificationSystem.success('⚡ Dark theme activated!');
+                    notificationSystem.success('⚡ Dark Sith theme activated!');
                 }
             },
 
@@ -3156,10 +3179,10 @@
                     </button>
                     <div id="mobileThemeOptions" style="display: none;">
                         <button class="mobile-menu-item" onclick="setTheme('light'); closeMobileMenu();">
-                            Light Theme
+                            Light Jedi
                         </button>
                         <button class="mobile-menu-item" onclick="setTheme('dark'); closeMobileMenu();">
-                            Dark Theme
+                            Dark Sith
                         </button>
                     </div>
                     <button class="mobile-menu-item" onclick="logout(); closeMobileMenu();">Sign Out</button>
