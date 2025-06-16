@@ -43,9 +43,81 @@ const TASK_DEFINITIONS = {
             📖 MS Learn: Server Installation Guide
           </a>
         </li>
-        <li>
-          <a href="https://www.youtube.com/watch?v=_3sGvvUYAzI" target="_blank" style="color: var(--primary); text-decoration: none;">
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.youtube.com/watch?v=hBuCOf4ht9o&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=2" target="_blank" style="color: var(--primary); text-decoration: none;">
             🎥 Install Active Directory Domain Controller on Windows Server 2019
+          </a>
+        </li>
+        <li>
+          <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-active-directory-domain-services" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 MS Learn: Install Active Directory Domain Services
+          </a>
+        </li>
+      </ul>
+    `
+  },
+
+  'week1-register-public-domain': {
+    title: 'Register Public Domain for Hybrid Deployment',
+    description: `
+      <p><strong>⚠️ CRITICAL: Exchange hybrid deployments require a real public domain, NOT .local domains!</strong></p>
+      <h3>📋 Steps to Complete</h3>
+      <div class="subtask-container">
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="1">
+          <label>1. Choose a domain registrar (Namecheap, GoDaddy, or free options like Freenom)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="2">
+          <label>2. Register a public domain (e.g., velocitylab.com, velocitylab.tk, etc.)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="3">
+          <label>3. Note your public domain name for use throughout the lab</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="4">
+          <label>4. Access your domain's DNS management panel</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="5">
+          <label>5. Note your current public IP address (whatismyipaddress.com)</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="6">
+          <label>6. Keep DNS management tab open for later configuration</label>
+        </div>
+      </div>
+      <h3>⚠️ Why .local Domains Don't Work</h3>
+      <p style="background: var(--warning); color: white; padding: 12px; border-radius: 8px; margin-top: 16px;">
+        • .local domains are not routable on the internet<br>
+        • Cannot be verified in Microsoft 365<br>
+        • Autodiscover fails for external clients<br>
+        • Hybrid configuration wizard will fail<br>
+        • Federation and free/busy won't work
+      </p>
+      <h3>💡 Domain Options</h3>
+      <p style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin-top: 16px;">
+        • Free: Freenom (.tk, .ml, .ga, .cf domains)<br>
+        • Cheap: Namecheap, GoDaddy (.com from $8-12/year)<br>
+        • Consider: .com, .net, .org for professional look<br>
+        • Avoid: .local, .internal, or any non-public TLD
+      </p>
+      <h3>📚 Reference Links</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.freenom.com/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🌐 Freenom - Free Domain Registration
+          </a>
+        </li>
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.alitajran.com/add-domain-office-365-tenant/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 Add domain to Office 365 tenant - ALI TAJRAN
+          </a>
+        </li>
+        <li>
+          <a href="https://learn.microsoft.com/en-us/microsoft-365/admin/setup/add-domain" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 MS Learn: Add a domain to Microsoft 365
           </a>
         </li>
       </ul>
@@ -97,6 +169,14 @@ const TASK_DEFINITIONS = {
         • Document your IP scheme for future reference<br>
         • Consider using 10.x.x.x or 172.16.x.x for larger labs
       </p>
+      <h3>📚 Reference Links</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li>
+          <a href="https://learn.microsoft.com/en-us/windows-server/networking/technologies/ipam/ipam-top" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 MS Learn: IP Address Management (IPAM)
+          </a>
+        </li>
+      </ul>
     `
   },
 
@@ -144,11 +224,16 @@ const TASK_DEFINITIONS = {
         • Configuration data storage<br>
         • Site and routing topology
       </p>
-      <h3>🔗 Reference</h3>
+      <h3>📚 Reference Links</h3>
       <ul style="list-style: none; padding: 0;">
-        <li>
-          <a href="https://www.youtube.com/watch?v=JgqMSgGPwOg" target="_blank" style="color: var(--primary); text-decoration: none;">
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.youtube.com/watch?v=Ye4kGuKnXqQ&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq" target="_blank" style="color: var(--primary); text-decoration: none;">
             🎥 Why Active Directory is required for Exchange Server
+          </a>
+        </li>
+        <li>
+          <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/virtual-dc/active-directory-domain-services-overview" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 MS Learn: Active Directory Domain Services Overview
           </a>
         </li>
       </ul>
@@ -158,7 +243,7 @@ const TASK_DEFINITIONS = {
   'week1-promote-to-dc': {
     title: 'Promote Server to Domain Controller',
     description: `
-      <p><strong>Create a new Active Directory forest and promote the server to domain controller.</strong></p>
+      <p><strong>Create a new Active Directory forest using your PUBLIC domain.</strong></p>
       <h3>📋 Steps to Complete</h3>
       <div class="subtask-container">
         <div class="subtask-item">
@@ -167,7 +252,7 @@ const TASK_DEFINITIONS = {
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="2">
-          <label>2. Select "Add a new forest" and enter root domain name (e.g., velocitylab.local)</label>
+          <label>2. Select "Add a new forest" and enter your PUBLIC domain (e.g., velocitylab.com)</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="3">
@@ -194,13 +279,26 @@ const TASK_DEFINITIONS = {
           <label>8. Review options and click Install (server will restart automatically)</label>
         </div>
       </div>
-      <h3>⚠️ Important Notes</h3>
+      <h3>⚠️ Domain Naming Critical Notes</h3>
       <p style="background: var(--warning); color: white; padding: 12px; border-radius: 8px; margin-top: 16px;">
-        • Use a .local domain for lab environments only<br>
-        • For production, use a subdomain of your public domain<br>
-        • Document your DSRM password securely<br>
-        • The server will restart after promotion
+        • MUST use your registered public domain (e.g., velocitylab.com)<br>
+        • DO NOT use .local - this breaks Exchange hybrid<br>
+        • This domain will be added to Microsoft 365 later<br>
+        • Document your DSRM password securely
       </p>
+      <h3>📚 Reference Links</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.youtube.com/watch?v=hBuCOf4ht9o&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=2" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 Install Active Directory Domain Controller on Windows Server 2019
+          </a>
+        </li>
+        <li>
+          <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-a-new-windows-server-2012-active-directory-forest" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 MS Learn: Install a New Active Directory Forest
+          </a>
+        </li>
+      </ul>
     `
   },
 
@@ -250,11 +348,16 @@ const TASK_DEFINITIONS = {
         • Create PTR records for all Exchange servers<br>
         • Prepare for split-brain DNS (internal vs external)
       </p>
-      <h3>🔗 Reference</h3>
+      <h3>📚 Reference Links</h3>
       <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.youtube.com/watch?v=Q_1RLwyLwaE&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=3" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 Domain Name System (DNS) management | Exchange Server 2019
+          </a>
+        </li>
         <li>
-          <a href="https://www.youtube.com/watch?v=nM_aMpYlkNw" target="_blank" style="color: var(--primary); text-decoration: none;">
-            🎥 Domain Name System (DNS) management
+          <a href="https://learn.microsoft.com/en-us/windows-server/networking/dns/dns-top" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 MS Learn: Domain Name System (DNS)
           </a>
         </li>
       </ul>
@@ -281,32 +384,49 @@ const TASK_DEFINITIONS = {
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="4">
-          <label>4. Set passwords to never expire for lab purposes</label>
+          <label>4. Set UPN suffix to your public domain (@yourpublicdomain.com)</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="5">
-          <label>5. Create security groups: IT-Staff, Sales-Team, Finance-Dept</label>
+          <label>5. Set passwords to never expire for lab purposes</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="6">
-          <label>6. Add users to appropriate groups</label>
+          <label>6. Create security groups: IT-Staff, Sales-Team, Finance-Dept</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="7">
-          <label>7. Create an Exchange Admin account for future use</label>
+          <label>7. Add users to appropriate groups</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="8">
-          <label>8. Document all usernames and passwords created</label>
+          <label>8. Create an Exchange Admin account for future use</label>
+        </div>
+        <div class="subtask-item">
+          <input type="checkbox" class="subtask-checkbox" data-step="9">
+          <label>9. Document all usernames and passwords created</label>
         </div>
       </div>
       <h3>💡 User Creation Best Practices</h3>
       <p style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin-top: 16px;">
         • Use a consistent naming convention (firstname.lastname)<br>
+        • Set UPN to match your public domain for hybrid<br>
         • Create service accounts for Exchange later<br>
-        • Enable "User must change password at next logon" in production<br>
         • Use groups for permissions, not individual users
       </p>
+      <h3>📚 Reference Links</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.alitajran.com/change-users-upn-with-powershell/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 Change Users UPN with PowerShell - ALI TAJRAN
+          </a>
+        </li>
+        <li>
+          <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-default-user-accounts" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 MS Learn: Active Directory User Account Management
+          </a>
+        </li>
+      </ul>
     `
   },
 
@@ -338,7 +458,7 @@ const TASK_DEFINITIONS = {
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="6">
-          <label>6. Verify DNS resolution: nslookup velocitylab.local</label>
+          <label>6. Verify DNS resolution: nslookup yourpublicdomain.com</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="7">
@@ -375,7 +495,7 @@ const TASK_DEFINITIONS = {
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="4">
-          <label>4. Select "Domain" and enter your domain name (velocitylab.local)</label>
+          <label>4. Select "Domain" and enter your domain name (yourpublicdomain.com)</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="5">
@@ -387,7 +507,7 @@ const TASK_DEFINITIONS = {
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="7">
-          <label>7. After restart, login with domain account (VELOCITYLAB\\username)</label>
+          <label>7. After restart, login with domain account (DOMAIN\\username)</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="8">
@@ -412,7 +532,7 @@ const TASK_DEFINITIONS = {
       <div class="subtask-container">
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="1">
-          <label>1. On DC, create folder C:\SharedData\HiddenShare</label>
+          <label>1. On DC, create folder C:\\SharedData\\HiddenShare</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="2">
@@ -518,7 +638,7 @@ const TASK_DEFINITIONS = {
       <div class="subtask-container">
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="1">
-          <label>1. Create batch script in SYSVOL: \\\\velocitylab.local\\SYSVOL\\velocitylab.local\\scripts\\mapdrive.bat</label>
+          <label>1. Create batch script in SYSVOL: \\\\yourdomain.com\\SYSVOL\\yourdomain.com\\scripts\\mapdrive.bat</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="2">
@@ -716,6 +836,14 @@ New-PSDrive -Name "J" -PSProvider FileSystem -Root "\\DC01\HiddenShare$" -Creden
         • Test user authentication against DC02<br>
         • Run dcdiag on both DCs
       </p>
+      <h3>📚 Reference Links</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li>
+          <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-a-replica-windows-server-2012-domain-controller-in-an-existing-domain" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 MS Learn: Install a Replica Domain Controller
+          </a>
+        </li>
+      </ul>
     `
   },
 
@@ -766,6 +894,14 @@ New-PSDrive -Name "J" -PSProvider FileSystem -Root "\\DC01\HiddenShare$" -Creden
         • Reporting on update compliance<br>
         • Critical for Exchange updates
       </p>
+      <h3>📚 Reference Links</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li>
+          <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-server-update-services/get-started/windows-server-update-services-wsus" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 MS Learn: Windows Server Update Services (WSUS)
+          </a>
+        </li>
+      </ul>
     `
   },
 
@@ -956,7 +1092,7 @@ New-PSDrive -Name "J" -PSProvider FileSystem -Root "\\DC01\HiddenShare$" -Creden
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="6">
-          <label>6. Check all DCs time: w32tm /monitor /domain:velocitylab.local</label>
+          <label>6. Check all DCs time: w32tm /monitor /domain:yourdomain.com</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="7">
@@ -1072,6 +1208,14 @@ New-PSDrive -Name "J" -PSProvider FileSystem -Root "\\DC01\HiddenShare$" -Creden
         • Document backup passwords<br>
         • Verify backup integrity
       </p>
+      <h3>📚 Reference Links</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li>
+          <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-server-backup/windows-server-backup-cmdlets-in-windows-powershell" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 MS Learn: Windows Server Backup
+          </a>
+        </li>
+      </ul>
     `
   },
 
@@ -1282,11 +1426,16 @@ New-PSDrive -Name "J" -PSProvider FileSystem -Root "\\DC01\HiddenShare$" -Creden
         • Visual C++ Redistributables<br>
         • 30GB free disk space minimum
       </p>
-      <h3>🔗 Reference</h3>
+      <h3>📚 Reference Links</h3>
       <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.youtube.com/watch?v=dKbelH9IFPc&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=4" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 Exchange Server Architecture | What is new in Exchange 2019
+          </a>
+        </li>
         <li>
-          <a href="https://www.youtube.com/watch?v=q0JmhDBJ5cA" target="_blank" style="color: var(--primary); text-decoration: none;">
-            🎥 System requirements for Exchange 2019
+          <a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/system-requirements" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 MS Learn: Exchange Server System Requirements
           </a>
         </li>
       </ul>
@@ -1337,6 +1486,19 @@ New-PSDrive -Name "J" -PSProvider FileSystem -Root "\\DC01\HiddenShare$" -Creden
 <code># One-liner for all Windows features
 Install-WindowsFeature -Name Server-Media-Foundation, NET-Framework-45-Features, RPC-over-HTTP-proxy, RSAT-Clustering, RSAT-Clustering-CmdInterface, RSAT-Clustering-Mgmt, RSAT-Clustering-PowerShell, WAS-Process-Model, Web-Asp-Net45, Web-Basic-Auth, Web-Client-Auth, Web-Digest-Auth, Web-Dir-Browsing, Web-Dyn-Compression, Web-Http-Errors, Web-Http-Logging, Web-Http-Redirect, Web-Http-Tracing, Web-ISAPI-Ext, Web-ISAPI-Filter, Web-Lgcy-Mgmt-Console, Web-Metabase, Web-Mgmt-Console, Web-Mgmt-Service, Web-Net-Ext45, Web-Request-Monitor, Web-Server, Web-Stat-Compression, Web-Static-Content, Web-Windows-Auth, Web-WMI, Windows-Identity-Foundation, RSAT-ADDS -Restart</code>
       </pre>
+      <h3>📚 Reference Links</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.youtube.com/watch?v=efzVDdBYHIs&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=5" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 System requirements and prerequisites for Exchange 2019 installation
+          </a>
+        </li>
+        <li>
+          <a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/prerequisites" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 MS Learn: Exchange Server Prerequisites
+          </a>
+        </li>
+      </ul>
     `
   },
 
@@ -1449,11 +1611,11 @@ Install-WindowsFeature -Name Server-Media-Foundation, NET-Framework-45-Features,
         • Installs Exchange Management Shell<br>
         • Sets up IIS for client access
       </p>
-      <h3>🔗 Reference</h3>
+      <h3>📚 Reference Links</h3>
       <ul style="list-style: none; padding: 0;">
         <li>
-          <a href="https://www.youtube.com/watch?v=4KY6nPBR5SY" target="_blank" style="color: var(--primary); text-decoration: none;">
-            🎥 Install Microsoft Exchange 2019 on Windows Server
+          <a href="https://www.youtube.com/watch?v=7TmzXHY8LXw&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=6" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 Install Microsoft Exchange 2019 on Windows Server 2019
           </a>
         </li>
       </ul>
@@ -1484,7 +1646,7 @@ Install-WindowsFeature -Name Server-Media-Foundation, NET-Framework-45-Features,
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="5">
-          <label>5. Configure Virtual Directories with internal URLs (https://ex01.velocitylab.local)</label>
+          <label>5. Configure Virtual Directories with internal URLs (https://ex01.yourdomain.com)</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="6">
@@ -1492,7 +1654,7 @@ Install-WindowsFeature -Name Server-Media-Foundation, NET-Framework-45-Features,
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="7">
-          <label>7. Create Accepted Domain for velocitylab.local</label>
+          <label>7. Create Accepted Domain for yourdomain.com</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="8">
@@ -1506,13 +1668,21 @@ Install-WindowsFeature -Name Server-Media-Foundation, NET-Framework-45-Features,
       <h3>💡 Configuration Commands</h3>
       <pre style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin-top: 16px; overflow-x: auto;">
 <code># Set Virtual Directory URLs (run in Exchange Management Shell)
-$hostname = "ex01.velocitylab.local"
+$hostname = "ex01.yourdomain.com"
 Set-OWAVirtualDirectory -Identity "EX01\owa (Default Web Site)" -InternalUrl "https://$hostname/owa"
 Set-ECPVirtualDirectory -Identity "EX01\ecp (Default Web Site)" -InternalUrl "https://$hostname/ecp"
 Set-OABVirtualDirectory -Identity "EX01\OAB (Default Web Site)" -InternalUrl "https://$hostname/oab"
 Set-WebServicesVirtualDirectory -Identity "EX01\EWS (Default Web Site)" -InternalUrl "https://$hostname/ews/exchange.asmx"
 Set-ActiveSyncVirtualDirectory -Identity "EX01\Microsoft-Server-ActiveSync (Default Web Site)" -InternalUrl "https://$hostname/Microsoft-Server-ActiveSync"</code>
       </pre>
+      <h3>📚 Reference Links</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li>
+          <a href="https://www.youtube.com/watch?v=J_ZD-fZW-_k&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=7" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 Configure Exchange 2019 post installation | Configure Internal and External URLs
+          </a>
+        </li>
+      </ul>
     `
   },
 
@@ -1548,7 +1718,7 @@ Set-ActiveSyncVirtualDirectory -Identity "EX01\Microsoft-Server-ActiveSync (Defa
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="7">
-          <label>7. Create a shared mailbox: Info@velocitylab.local</label>
+          <label>7. Create a shared mailbox: Info@yourdomain.com</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="8">
@@ -1567,16 +1737,21 @@ Enable-Mailbox -Identity "Jane Doe" -Database "Mailbox Database 1"
 Enable-Mailbox -Identity "Bob Johnson" -Database "Mailbox Database 1"
 
 # Create shared mailbox
-New-Mailbox -Name "Info" -Shared -PrimarySmtpAddress info@velocitylab.local
+New-Mailbox -Name "Info" -Shared -PrimarySmtpAddress info@yourdomain.com
 
 # Create room mailbox
 New-Mailbox -Name "Conference Room A" -Room</code>
       </pre>
-      <h3>🔗 Reference</h3>
+      <h3>📚 Reference Links</h3>
       <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.youtube.com/watch?v=ca0qoxRSlg0&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=9" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 Recipient types in Exchange 2019 | Create and manage recipients
+          </a>
+        </li>
         <li>
-          <a href="https://www.youtube.com/watch?v=yR-UgTvn7ks" target="_blank" style="color: var(--primary); text-decoration: none;">
-            🎥 Recipient types in Exchange 2019
+          <a href="https://www.youtube.com/watch?v=q2dwO7nXhos&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=8" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 How to create and manage Mailbox Database in Exchange Server 2019
           </a>
         </li>
       </ul>
@@ -1599,7 +1774,7 @@ New-Mailbox -Name "Conference Room A" -Room</code>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="3">
-          <label>3. Login as velocitylab\\john.smith</label>
+          <label>3. Login as domain\\john.smith</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="4">
@@ -1688,11 +1863,16 @@ New-Mailbox -Name "Conference Room A" -Room</code>
         • All roles on single Exchange 2019 server<br>
         • Ready for external configuration next week
       </p>
-      <h3>🔗 Reference</h3>
+      <h3>📚 Reference Links</h3>
       <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.youtube.com/watch?v=L_Uki4UUo3M&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=10" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 Mail Flow and Transport Pipeline in Exchange Server 2019
+          </a>
+        </li>
         <li>
-          <a href="https://www.youtube.com/watch?v=nZj46as01WI" target="_blank" style="color: var(--primary); text-decoration: none;">
-            🎥 Mail Flow and Transport Pipeline in Exchange
+          <a href="https://www.youtube.com/watch?v=UWIUi9gI4HQ&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=17" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 Message tracking in Exchange Server | How to trace emails
           </a>
         </li>
       </ul>
@@ -1708,52 +1888,65 @@ New-Mailbox -Name "Conference Room A" -Room</code>
       <div class="subtask-container">
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="1">
-          <label>1. Register a public domain (or use existing) - e.g., velocitylab.ga</label>
+          <label>1. Access your domain registrar's DNS management for your public domain</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="2">
-          <label>2. Access your domain registrar's DNS management</label>
+          <label>2. Create MX record: Priority 10, points to mail.yourdomain.com</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="3">
-          <label>3. Create MX record: Priority 10, points to mail.velocitylab.ga</label>
+          <label>3. Create A record: mail.yourdomain.com → Your public IP</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="4">
-          <label>4. Create A record: mail.velocitylab.ga → Your public IP</label>
+          <label>4. Create CNAME: autodiscover.yourdomain.com → mail.yourdomain.com</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="5">
-          <label>5. Create CNAME: autodiscover.velocitylab.ga → mail.velocitylab.ga</label>
+          <label>5. Create SPF record: "v=spf1 ip4:YOUR_PUBLIC_IP -all"</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="6">
-          <label>6. Create SPF record: "v=spf1 ip4:YOUR_PUBLIC_IP -all"</label>
+          <label>6. Wait for DNS propagation (5-30 minutes)</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="7">
-          <label>7. Wait for DNS propagation (5-30 minutes)</label>
+          <label>7. Verify with nslookup from external network</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="8">
-          <label>8. Verify with nslookup from external network</label>
+          <label>8. Test DNS resolution: nslookup mail.yourdomain.com 8.8.8.8</label>
         </div>
       </div>
       <h3>🌐 DNS Record Summary</h3>
       <pre style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin-top: 16px; overflow-x: auto;">
 <code>Type    Name                    Value
-MX      @                      10 mail.velocitylab.ga
+MX      @                      10 mail.yourdomain.com
 A       mail                   YOUR_PUBLIC_IP
-CNAME   autodiscover           mail.velocitylab.ga
+CNAME   autodiscover           mail.yourdomain.com
 TXT     @                      "v=spf1 ip4:YOUR_PUBLIC_IP -all"</code>
       </pre>
       <h3>💡 Tips</h3>
       <p style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin-top: 16px;">
-        • Free domains available from Freenom<br>
+        • Use your registered public domain, not .local<br>
         • Consider Cloudflare for free DNS hosting<br>
         • SPF helps prevent spoofing<br>
         • Add DKIM/DMARC later for better security
       </p>
+      <h3>📚 Reference Links</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.alitajran.com/configure-spf-record-for-office-365/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 Configure SPF record for Office 365 - ALI TAJRAN
+          </a>
+        </li>
+        <li>
+          <a href="https://www.alitajran.com/configure-dkim-record-for-office-365/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 Configure DKIM record for Office 365 - ALI TAJRAN
+          </a>
+        </li>
+      </ul>
     `
   },
 
@@ -1789,11 +1982,11 @@ TXT     @                      "v=spf1 ip4:YOUR_PUBLIC_IP -all"</code>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="7">
-          <label>7. Test port 25: telnet mail.velocitylab.ga 25 from external</label>
+          <label>7. Test port 25: telnet mail.yourdomain.com 25 from external</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="8">
-          <label>8. Test port 443: https://mail.velocitylab.ga/owa</label>
+          <label>8. Test port 443: https://mail.yourdomain.com/owa</label>
         </div>
       </div>
       <h3>🔥 Required Ports</h3>
@@ -1812,6 +2005,14 @@ TXT     @                      "v=spf1 ip4:YOUR_PUBLIC_IP -all"</code>
         • Implement rate limiting<br>
         • Monitor for attacks on port 25
       </p>
+      <h3>📚 Reference Links</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li>
+          <a href="https://www.alitajran.com/exchange-hybrid-firewall-ports/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 Exchange Hybrid firewall ports - ALI TAJRAN
+          </a>
+        </li>
+      </ul>
     `
   },
 
@@ -1827,11 +2028,11 @@ TXT     @                      "v=spf1 ip4:YOUR_PUBLIC_IP -all"</code>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="2">
-          <label>2. Add Subject Name: mail.velocitylab.ga</label>
+          <label>2. Add Subject Name: mail.yourdomain.com</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="3">
-          <label>3. Add SANs: mail.velocitylab.ga, autodiscover.velocitylab.ga, velocitylab.ga</label>
+          <label>3. Add SANs: mail.yourdomain.com, autodiscover.yourdomain.com, yourdomain.com</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="4">
@@ -1855,7 +2056,7 @@ TXT     @                      "v=spf1 ip4:YOUR_PUBLIC_IP -all"</code>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="9">
-          <label>9. Test: https://mail.velocitylab.ga/owa (no certificate warning)</label>
+          <label>9. Test: https://mail.yourdomain.com/owa (no certificate warning)</label>
         </div>
       </div>
       <h3>🔐 Let's Encrypt PowerShell</h3>
@@ -1866,11 +2067,11 @@ TXT     @                      "v=spf1 ip4:YOUR_PUBLIC_IP -all"</code>
 # Select IIS site, include SANs
 # Auto-renews every 60 days</code>
       </pre>
-      <h3>🔗 Reference</h3>
+      <h3>📚 Reference Links</h3>
       <ul style="list-style: none; padding: 0;">
         <li>
-          <a href="https://www.youtube.com/watch?v=U1BcABwHQxo" target="_blank" style="color: var(--primary); text-decoration: none;">
-            🎥 Install Let's Encrypt certificate in Exchange
+          <a href="https://www.youtube.com/watch?v=KkwWar5CiMg&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=12" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 Install Lets Encrypt free SSL certificate in Exchange Server 2019
           </a>
         </li>
       </ul>
@@ -1905,11 +2106,11 @@ TXT     @                      "v=spf1 ip4:YOUR_PUBLIC_IP -all"</code>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="6">
-          <label>6. Update Accepted Domains: Add velocitylab.ga as Authoritative</label>
+          <label>6. Update Accepted Domains: Add yourdomain.com as Authoritative</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="7">
-          <label>7. Update Email Address Policy to include @velocitylab.ga</label>
+          <label>7. Update Email Address Policy to include @yourdomain.com</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="8">
@@ -1927,17 +2128,22 @@ TXT     @                      "v=spf1 ip4:YOUR_PUBLIC_IP -all"</code>
       <h3>📧 Testing Commands</h3>
       <pre style="background: var(--bg-secondary); padding: 12px; border-radius: 8px; margin-top: 16px; overflow-x: auto;">
 <code># Test mail flow from Exchange Management Shell
-Send-MailMessage -From john@velocitylab.ga -To external@gmail.com -Subject "Test" -Body "External mail test" -SmtpServer ex01
+Send-MailMessage -From john@yourdomain.com -To external@gmail.com -Subject "Test" -Body "External mail test" -SmtpServer ex01
 
 # Check mail queue
 Get-Queue
 Get-Message -Queue "Internet Send Connector"</code>
       </pre>
-      <h3>🔗 Reference</h3>
+      <h3>📚 Reference Links</h3>
       <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.youtube.com/watch?v=MjXCzV_wL1I&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=11" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 Configure external inbound and outbound email flow in Exchange Server 2019
+          </a>
+        </li>
         <li>
-          <a href="https://www.youtube.com/watch?v=xPVeHhd8Ipw" target="_blank" style="color: var(--primary); text-decoration: none;">
-            🎥 Configure external inbound and outbound email flow
+          <a href="https://www.youtube.com/watch?v=o2siD4goFwk&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=16" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 Understanding Accepted Domains | How to add and configure additional domains
           </a>
         </li>
       </ul>
@@ -2006,7 +2212,7 @@ Get-Message -Queue "Internet Send Connector"</code>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="3">
-          <label>3. Add and verify your custom domain (velocitylab.ga)</label>
+          <label>3. Add and verify your custom domain (yourdomain.com)</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="4">
@@ -2026,7 +2232,7 @@ Get-Message -Queue "Internet Send Connector"</code>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="8">
-          <label>8. Note your tenant name: velocitylab.onmicrosoft.com</label>
+          <label>8. Note your tenant name: yourdomain.onmicrosoft.com</label>
         </div>
       </div>
       <h3>☁️ Tenant Preparation Tips</h3>
@@ -2037,6 +2243,19 @@ Get-Message -Queue "Internet Send Connector"</code>
         • Verify all DNS records except MX<br>
         • 25 license E3 trial lasts 30 days
       </p>
+      <h3>📚 Reference Links</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.alitajran.com/create-office-365-tenant/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 Create an Office 365 trial tenant - ALI TAJRAN
+          </a>
+        </li>
+        <li>
+          <a href="https://www.alitajran.com/add-domain-office-365-tenant/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 Add domain to Office 365 tenant - ALI TAJRAN
+          </a>
+        </li>
+      </ul>
     `
   },
 
@@ -2068,7 +2287,7 @@ Get-Message -Queue "Internet Send Connector"</code>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="6">
-          <label>6. Add Forest: velocitylab.local with Enterprise Admin creds</label>
+          <label>6. Add Forest: yourdomain.com with Enterprise Admin creds</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="7">
@@ -2100,6 +2319,19 @@ Get-ADSyncScheduler
 # In Microsoft 365 admin center
 # Users should appear as "Synced with Active Directory"</code>
       </pre>
+      <h3>📚 Reference Links</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.alitajran.com/install-and-configure-microsoft-entra-connect/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 Install and Configure Microsoft Entra Connect - ALI TAJRAN
+          </a>
+        </li>
+        <li>
+          <a href="https://www.alitajran.com/idfix-directory-synchronization-error-remediation-tool/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 IdFix - Directory synchronization error remediation tool - ALI TAJRAN
+          </a>
+        </li>
+      </ul>
     `
   },
 
@@ -2139,7 +2371,7 @@ Get-ADSyncScheduler
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="8">
-          <label>8. Configure external URLs (mail.velocitylab.ga)</label>
+          <label>8. Configure external URLs (mail.yourdomain.com)</label>
         </div>
         <div class="subtask-item">
           <input type="checkbox" class="subtask-checkbox" data-step="9">
@@ -2166,11 +2398,26 @@ Get-ADSyncScheduler
         ✓ Migration endpoint for mailbox moves<br>
         ✓ Accepted domains and email address policies
       </p>
-      <h3>🔗 Reference</h3>
+      <h3>📚 Reference Links</h3>
       <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.youtube.com/watch?v=lU5aCFVR9_k&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=24" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 What is Exchange Hybrid | A deep dive session on Exchange Hybrid
+          </a>
+        </li>
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.youtube.com/watch?v=Yt0VNzPuDNI&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=25" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 Exchange Hybrid prerequisites | step by step guide
+          </a>
+        </li>
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.youtube.com/watch?v=rMPLsbJRIkc&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=26" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 Hybrid Configuration Wizard (HCW) | Step by step guide to run HCW
+          </a>
+        </li>
         <li>
-          <a href="https://www.youtube.com/watch?v=xXgAojVP9kw" target="_blank" style="color: var(--primary); text-decoration: none;">
-            🎥 Step by step guide to run HCW
+          <a href="https://www.alitajran.com/hybrid-configuration-wizard/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 Run the Hybrid Configuration Wizard (HCW) - ALI TAJRAN
           </a>
         </li>
       </ul>
@@ -2231,11 +2478,21 @@ Get-ADSyncScheduler
         • Cross-premises: Direct connection between environments<br>
         • All mail scanned by Exchange Online Protection
       </p>
-      <h3>🔗 Reference</h3>
+      <h3>📚 Reference Links</h3>
       <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.youtube.com/watch?v=kY4HD17GsHM&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=13" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 Send emails using Smart Host | Route inbound and outbound emails through EOP
+          </a>
+        </li>
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.alitajran.com/update-mx-records-to-office-365/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 Update MX records to Office 365 - ALI TAJRAN
+          </a>
+        </li>
         <li>
-          <a href="https://www.youtube.com/watch?v=2psVx1JYYlA" target="_blank" style="color: var(--primary); text-decoration: none;">
-            🎥 Route emails through EOP in Exchange hybrid
+          <a href="https://www.alitajran.com/configure-outbound-mail-office-365/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 Configure outbound mail via Office 365 - ALI TAJRAN
           </a>
         </li>
       </ul>
@@ -2293,7 +2550,7 @@ Get-ADSyncScheduler
       <p style="background: var(--success); color: white; padding: 16px; border-radius: 8px; margin-top: 16px;">
         <strong>You've successfully completed the Exchange Hybrid Migration Lab!</strong><br><br>
         You've learned:<br>
-        ✓ Active Directory deployment and management<br>
+        ✓ Active Directory deployment and management with PUBLIC domains<br>
         ✓ Exchange Server 2019 installation and configuration<br>
         ✓ External mail publishing with security<br>
         ✓ Microsoft 365 integration and hybrid features<br>
@@ -2307,7 +2564,7 @@ Get-ADSyncScheduler
         • Study decommissioning on-premises Exchange<br>
         • Consider Microsoft 365 security and compliance
       </p>
-      <h3>🔗 Additional Resources</h3>
+      <h3>📚 Additional Resources</h3>
       <ul style="list-style: none; padding: 0;">
         <li style="margin-bottom: 8px;">
           <a href="https://www.alitajran.com/exchange-hybrid/" target="_blank" style="color: var(--primary); text-decoration: none;">
@@ -2315,13 +2572,43 @@ Get-ADSyncScheduler
           </a>
         </li>
         <li style="margin-bottom: 8px;">
-          <a href="https://www.youtube.com/watch?v=JFvKbQJJJrw" target="_blank" style="color: var(--primary); text-decoration: none;">
+          <a href="https://www.alitajran.com/exchange-hybrid-architecture/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 Exchange Hybrid architecture - ALI TAJRAN
+          </a>
+        </li>
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.alitajran.com/exchange-hybrid-design-planning/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 Exchange Hybrid design and planning - ALI TAJRAN
+          </a>
+        </li>
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.youtube.com/watch?v=MWPSusu8evk&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=27" target="_blank" style="color: var(--primary); text-decoration: none;">
             🎥 How mailbox migration works in Exchange Hybrid
           </a>
         </li>
         <li style="margin-bottom: 8px;">
-          <a href="https://www.youtube.com/watch?v=ZkfEwhEiHB8" target="_blank" style="color: var(--primary); text-decoration: none;">
-            🎥 Enable cloud based archive for on-premises mailbox
+          <a href="https://www.youtube.com/watch?v=mX21bao2k8U&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=28" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 Hybrid migration guide | Migrate mailboxes to office 365
+          </a>
+        </li>
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.youtube.com/watch?v=_DVLCZLFzew&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=29" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 Enable cloud based archive (online archive) for on premise Exchange mailbox
+          </a>
+        </li>
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.alitajran.com/migrate-mailboxes-to-office-365/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 Migrate mailboxes to Office 365 - ALI TAJRAN
+          </a>
+        </li>
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.alitajran.com/exchange-hybrid-test-plan-checklist/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 Exchange Hybrid test plan checklist - ALI TAJRAN
+          </a>
+        </li>
+        <li style="margin-bottom: 8px;">
+          <a href="https://www.alitajran.com/autodiscover-url-exchange-hybrid/" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 Autodiscover URL in Exchange Hybrid - ALI TAJRAN
           </a>
         </li>
         <li>
