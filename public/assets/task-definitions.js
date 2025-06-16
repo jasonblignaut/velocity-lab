@@ -38,19 +38,9 @@ const TASK_DEFINITIONS = {
       </div>
       <h3>📚 Reference Links</h3>
       <ul style="list-style: none; padding: 0;">
-        <li style="margin-bottom: 8px;">
-          <a href="https://learn.microsoft.com/en-us/windows-server/get-started/installation-and-upgrade" target="_blank" style="color: var(--primary); text-decoration: none;">
-            📖 MS Learn: Server Installation Guide
-          </a>
-        </li>
-        <li style="margin-bottom: 8px;">
-          <a href="https://www.youtube.com/watch?v=hBuCOf4ht9o&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=2" target="_blank" style="color: var(--primary); text-decoration: none;">
-            🎥 Install Active Directory Domain Controller on Windows Server 2019
-          </a>
-        </li>
         <li>
-          <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-active-directory-domain-services" target="_blank" style="color: var(--primary); text-decoration: none;">
-            📖 MS Learn: Install Active Directory Domain Services
+          <a href="https://learn.microsoft.com/en-us/windows-server/get-started/installation-and-upgrade" target="_blank" style="color: var(--primary); text-decoration: none;">
+            📖 MS Learn: Windows Server Installation and Upgrade
           </a>
         </li>
       </ul>
@@ -110,14 +100,9 @@ const TASK_DEFINITIONS = {
             🌐 Freenom - Free Domain Registration
           </a>
         </li>
-        <li style="margin-bottom: 8px;">
+        <li>
           <a href="https://www.alitajran.com/add-domain-office-365-tenant/" target="_blank" style="color: var(--primary); text-decoration: none;">
             📖 Add domain to Office 365 tenant - ALI TAJRAN
-          </a>
-        </li>
-        <li>
-          <a href="https://learn.microsoft.com/en-us/microsoft-365/admin/setup/add-domain" target="_blank" style="color: var(--primary); text-decoration: none;">
-            📖 MS Learn: Add a domain to Microsoft 365
           </a>
         </li>
       </ul>
@@ -169,14 +154,6 @@ const TASK_DEFINITIONS = {
         • Document your IP scheme for future reference<br>
         • Consider using 10.x.x.x or 172.16.x.x for larger labs
       </p>
-      <h3>📚 Reference Links</h3>
-      <ul style="list-style: none; padding: 0;">
-        <li>
-          <a href="https://learn.microsoft.com/en-us/windows-server/networking/technologies/ipam/ipam-top" target="_blank" style="color: var(--primary); text-decoration: none;">
-            📖 MS Learn: IP Address Management (IPAM)
-          </a>
-        </li>
-      </ul>
     `
   },
 
@@ -288,14 +265,9 @@ const TASK_DEFINITIONS = {
       </p>
       <h3>📚 Reference Links</h3>
       <ul style="list-style: none; padding: 0;">
-        <li style="margin-bottom: 8px;">
+        <li>
           <a href="https://www.youtube.com/watch?v=hBuCOf4ht9o&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=2" target="_blank" style="color: var(--primary); text-decoration: none;">
             🎥 Install Active Directory Domain Controller on Windows Server 2019
-          </a>
-        </li>
-        <li>
-          <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-a-new-windows-server-2012-active-directory-forest" target="_blank" style="color: var(--primary); text-decoration: none;">
-            📖 MS Learn: Install a New Active Directory Forest
           </a>
         </li>
       </ul>
@@ -350,14 +322,9 @@ const TASK_DEFINITIONS = {
       </p>
       <h3>📚 Reference Links</h3>
       <ul style="list-style: none; padding: 0;">
-        <li style="margin-bottom: 8px;">
+        <li>
           <a href="https://www.youtube.com/watch?v=Q_1RLwyLwaE&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=3" target="_blank" style="color: var(--primary); text-decoration: none;">
             🎥 Domain Name System (DNS) management | Exchange Server 2019
-          </a>
-        </li>
-        <li>
-          <a href="https://learn.microsoft.com/en-us/windows-server/networking/dns/dns-top" target="_blank" style="color: var(--primary); text-decoration: none;">
-            📖 MS Learn: Domain Name System (DNS)
           </a>
         </li>
       </ul>
@@ -416,14 +383,9 @@ const TASK_DEFINITIONS = {
       </p>
       <h3>📚 Reference Links</h3>
       <ul style="list-style: none; padding: 0;">
-        <li style="margin-bottom: 8px;">
+        <li>
           <a href="https://www.alitajran.com/change-users-upn-with-powershell/" target="_blank" style="color: var(--primary); text-decoration: none;">
             📖 Change Users UPN with PowerShell - ALI TAJRAN
-          </a>
-        </li>
-        <li>
-          <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-default-user-accounts" target="_blank" style="color: var(--primary); text-decoration: none;">
-            📖 MS Learn: Active Directory User Account Management
           </a>
         </li>
       </ul>
@@ -676,8 +638,7 @@ const TASK_DEFINITIONS = {
 net use I: \\DC01\HiddenShare$ /persistent:yes
 
 # PowerShell Method
-$credential = Get-Credential
-New-PSDrive -Name "J" -PSProvider FileSystem -Root "\\DC01\HiddenShare$" -Credential $credential -Persist</code>
+New-PSDrive -Name "J" -PSProvider FileSystem -Root "\\DC01\HiddenShare$" -Persist</code>
       </pre>
     `
   },
@@ -836,14 +797,6 @@ New-PSDrive -Name "J" -PSProvider FileSystem -Root "\\DC01\HiddenShare$" -Creden
         • Test user authentication against DC02<br>
         • Run dcdiag on both DCs
       </p>
-      <h3>📚 Reference Links</h3>
-      <ul style="list-style: none; padding: 0;">
-        <li>
-          <a href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/deploy/install-a-replica-windows-server-2012-domain-controller-in-an-existing-domain" target="_blank" style="color: var(--primary); text-decoration: none;">
-            📖 MS Learn: Install a Replica Domain Controller
-          </a>
-        </li>
-      </ul>
     `
   },
 
@@ -894,14 +847,6 @@ New-PSDrive -Name "J" -PSProvider FileSystem -Root "\\DC01\HiddenShare$" -Creden
         • Reporting on update compliance<br>
         • Critical for Exchange updates
       </p>
-      <h3>📚 Reference Links</h3>
-      <ul style="list-style: none; padding: 0;">
-        <li>
-          <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-server-update-services/get-started/windows-server-update-services-wsus" target="_blank" style="color: var(--primary); text-decoration: none;">
-            📖 MS Learn: Windows Server Update Services (WSUS)
-          </a>
-        </li>
-      </ul>
     `
   },
 
@@ -1208,14 +1153,6 @@ New-PSDrive -Name "J" -PSProvider FileSystem -Root "\\DC01\HiddenShare$" -Creden
         • Document backup passwords<br>
         • Verify backup integrity
       </p>
-      <h3>📚 Reference Links</h3>
-      <ul style="list-style: none; padding: 0;">
-        <li>
-          <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-server-backup/windows-server-backup-cmdlets-in-windows-powershell" target="_blank" style="color: var(--primary); text-decoration: none;">
-            📖 MS Learn: Windows Server Backup
-          </a>
-        </li>
-      </ul>
     `
   },
 
@@ -1428,14 +1365,9 @@ New-PSDrive -Name "J" -PSProvider FileSystem -Root "\\DC01\HiddenShare$" -Creden
       </p>
       <h3>📚 Reference Links</h3>
       <ul style="list-style: none; padding: 0;">
-        <li style="margin-bottom: 8px;">
+        <li>
           <a href="https://www.youtube.com/watch?v=dKbelH9IFPc&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=4" target="_blank" style="color: var(--primary); text-decoration: none;">
             🎥 Exchange Server Architecture | What is new in Exchange 2019
-          </a>
-        </li>
-        <li>
-          <a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/system-requirements" target="_blank" style="color: var(--primary); text-decoration: none;">
-            📖 MS Learn: Exchange Server System Requirements
           </a>
         </li>
       </ul>
@@ -1488,14 +1420,9 @@ Install-WindowsFeature -Name Server-Media-Foundation, NET-Framework-45-Features,
       </pre>
       <h3>📚 Reference Links</h3>
       <ul style="list-style: none; padding: 0;">
-        <li style="margin-bottom: 8px;">
+        <li>
           <a href="https://www.youtube.com/watch?v=efzVDdBYHIs&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=5" target="_blank" style="color: var(--primary); text-decoration: none;">
             🎥 System requirements and prerequisites for Exchange 2019 installation
-          </a>
-        </li>
-        <li>
-          <a href="https://learn.microsoft.com/en-us/exchange/plan-and-deploy/prerequisites" target="_blank" style="color: var(--primary); text-decoration: none;">
-            📖 MS Learn: Exchange Server Prerequisites
           </a>
         </li>
       </ul>
