@@ -1480,6 +1480,14 @@ Install-WindowsFeature -Name Server-Media-Foundation, NET-Framework-45-Features,
         • Adds Exchange attributes to AD objects<br>
         • Required before Exchange installation
       </p>
+      <h3>📚 Reference Links</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li>
+          <a href="https://www.youtube.com/watch?v=Yt0VNzPuDNI&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=25" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 Exchange Hybrid prerequisites | step by step guide
+          </a>
+        </li>
+      </ul>
     `
   },
 
@@ -1736,6 +1744,14 @@ New-Mailbox -Name "Conference Room A" -Room</code>
         • Test-OutlookWebServices for diagnostics<br>
         • Check Event Viewer for errors
       </p>
+      <h3>📚 Reference Links</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li>
+          <a href="https://www.youtube.com/watch?v=LxRslmpx0Q0&list=PL5oyXP-xEiGAlrOJimtH9xppVX7ZVrNIq&index=20" target="_blank" style="color: var(--primary); text-decoration: none;">
+            🎥 How Autodiscover works in Exchange Server
+          </a>
+        </li>
+      </ul>
     `
   },
 
