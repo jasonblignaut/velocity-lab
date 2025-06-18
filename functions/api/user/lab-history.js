@@ -87,7 +87,7 @@ export async function onRequestGet(context) {
                 startedAt: new Date().toISOString(),
                 completedAt: null,
                 tasksCompleted: 0,
-                totalTasks: 42
+                totalTasks: 43
             };
             
             labHistory = [defaultLab];
