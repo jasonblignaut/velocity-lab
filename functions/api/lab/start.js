@@ -91,7 +91,7 @@ export async function onRequestPost(context) {
                 completedTasks = Object.values(progress).filter(task => task && task.completed).length;
             }
             
-            const totalTasks = 42;
+            const totalTasks = 43;
             const isLabCompleted = completedTasks === totalTasks;
             
             if (isLabCompleted) {
@@ -134,7 +134,7 @@ export async function onRequestPost(context) {
             startedAt: new Date().toISOString(),
             completedAt: null,
             tasksCompleted: 0,
-            totalTasks: 42
+            totalTasks: 43
         };
         
         // Add new lab to history
