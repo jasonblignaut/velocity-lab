@@ -8,7 +8,7 @@
     <!-- PWA Meta Tags -->
     <meta name="application-name" content="Velocity Lab">
     <meta name="apple-mobile-web-app-title" content="Velocity Lab">
-    <meta name="description" content="Comprehensive Exchange Hybrid training with 42 hands-on tasks across 4 weeks">
+    <meta name="description" content="Comprehensive Exchange Hybrid training with 43 hands-on tasks across 4 weeks">
     <meta name="theme-color" content="#00a8ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -28,7 +28,7 @@
     
     <!-- Open Graph for sharing -->
     <meta property="og:title" content="Velocity Lab - Exchange Hybrid">
-    <meta property="og:description" content="4 week journey with 42 tasks to build a complete Exchange Hybrid lab environment">
+    <meta property="og:description" content="4 week journey with 43 tasks to build a complete Exchange Hybrid lab environment">
     <meta property="og:image" content="/assets/Android_512.png">
     <meta property="og:url" content="https://labverse.co.za">
     <meta property="og:type" content="website">
@@ -36,7 +36,7 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Velocity Lab - Exchange Hybrid">
-    <meta name="twitter:description" content="4 week journey with 42 tasks to build a complete Exchange Hybrid lab environment">
+    <meta name="twitter:description" content="4 week journey with 43 tasks to build a complete Exchange Hybrid lab environment">
     <meta name="twitter:image" content="/assets/Android_512.png">
     
     <style>
@@ -1699,7 +1699,7 @@
         
         <h1 class="welcome-title">Exchange Hybrid LAB</h1>
         <p class="welcome-subtitle">
-            4 week journey with 42 tasks<br>
+            4 week journey with 43 tasks<br>
             to build a Exchange Hybrid lab environment
         </p>
         
@@ -1717,7 +1717,7 @@
     <div class="main-content hidden" id="mainContent">
         <div class="dashboard-header">
             <h1 class="dashboard-title">Your Hybrid Journey</h1>
-            <p class="dashboard-subtitle">Track your progress through 42 lab environment tasks across 4 weeks</p>
+            <p class="dashboard-subtitle">Track your progress through 43 lab environment tasks across 4 weeks</p>
         </div>
 
         <!-- Progress Ring -->
@@ -2480,7 +2480,7 @@
                             startedAt: new Date().toISOString(),
                             completedAt: null,
                             tasksCompleted: 0,
-                            totalTasks: 42
+                            totalTasks: 43
                         };
                         appState.labHistory = [defaultLab];
                         localStorage.setItem('velocity_lab_history', JSON.stringify(appState.labHistory));
@@ -2509,7 +2509,7 @@
                             startedAt: new Date().toISOString(),
                             completedAt: null,
                             tasksCompleted: 0,
-                            totalTasks: 42
+                            totalTasks: 43
                         };
                         appState.labHistory = [defaultLab];
                         await saveLabHistory(appState.labHistory);
@@ -2533,7 +2533,7 @@
                             startedAt: new Date().toISOString(),
                             completedAt: null,
                             tasksCompleted: 0,
-                            totalTasks: 42
+                            totalTasks: 43
                         };
                         appState.labHistory = [defaultLab];
                         localStorage.setItem('velocity_lab_history', JSON.stringify(appState.labHistory));
@@ -2581,7 +2581,7 @@
         }
 
         function checkLabCompletion() {
-            const totalTasks = appState.tasks.length || 42;
+            const totalTasks = appState.tasks.length || 43;
             const completedTasks = Object.values(appState.progress).filter(task => task.completed).length;
             
             if (completedTasks === totalTasks && totalTasks > 0 && appState.labHistory.length > 0) {
@@ -3228,7 +3228,7 @@
                     labTitle = `${statusIcon} Lab ${labNumber} (${session.labId})`;
                 }
                 
-                const progressPercentage = Math.round((completedTasks / (session.totalTasks || 42)) * 100);
+                const progressPercentage = Math.round((completedTasks / (session.totalTasks || 43)) * 100);
                 
                 return `
                     <div style="padding: 1rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; ${isInProgress ? 'border-color: var(--primary); background: linear-gradient(135deg, rgba(0, 168, 255, 0.05), transparent);' : ''}">
@@ -3246,7 +3246,7 @@
                         
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                             <span style="color: ${isInProgress ? 'var(--primary)' : 'var(--success)'}; font-size: 0.9rem; font-weight: 600;">
-                                Tasks: ${completedTasks}/${session.totalTasks || 42} (${progressPercentage}%)
+                                Tasks: ${completedTasks}/${session.totalTasks || 43} (${progressPercentage}%)
                             </span>
                             ${isInProgress ? 
                                 '<span style="color: var(--primary); font-size: 0.8rem; font-weight: 600;">⚡ ACTIVE</span>' : 
@@ -3267,7 +3267,7 @@
         }
 
         function getCurrentLabProgress() {
-            const totalTasks = 42;
+            const totalTasks = 43;
             const completedTasks = Object.values(appState.progress).filter(task => task.completed).length;
             return { completedTasks, totalTasks };
         }
@@ -3512,7 +3512,7 @@
         }
 
         function updateProgressDisplay() {
-            const totalTasks = appState.tasks.length || 42;
+            const totalTasks = appState.tasks.length || 43;
             const completedTasks = Object.values(appState.progress).filter(task => task.completed).length;
             const percentage = Math.round((completedTasks / totalTasks) * 100);
             
@@ -3610,7 +3610,7 @@
                                 </div>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 0.5rem;">
                                     <div style="text-align: center; background: var(--bg-secondary); padding: 0.5rem; border-radius: 6px;">
-                                        <div style="font-weight: 600; color: var(--primary);">${user.completedTasks}/42</div>
+                                        <div style="font-weight: 600; color: var(--primary);">${user.completedTasks}/43</div>
                                         <div style="font-size: 0.75rem; color: var(--text-secondary);">Tasks Done</div>
                                     </div>
                                     <div style="text-align: center; background: var(--bg-secondary); padding: 0.5rem; border-radius: 6px;">
