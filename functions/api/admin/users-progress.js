@@ -114,7 +114,7 @@ export async function onRequestGet(context) {
                         if (progressRaw) {
                             const progress = JSON.parse(progressRaw);
                             completedTasks = Object.values(progress).filter(task => task && task.completed).length;
-                            progressPercentage = Math.round((completedTasks / 42) * 100);
+                            progressPercentage = Math.round((completedTasks / 43) * 100);
                             
                             // Check if user has notes
                             hasNotes = Object.values(progress).some(task => 
@@ -164,7 +164,7 @@ export async function onRequestGet(context) {
             });
             
             console.log('✅ Admin data compiled successfully for', allUsers.length, 'users');
-            console.log('📊 User breakdown:', allUsers.map(u => `${u.name} (${u.completedTasks}/42 tasks)`));
+            console.log('📊 User breakdown:', allUsers.map(u => `${u.name} (${u.completedTasks}/43 tasks)`));
             
             return new Response(JSON.stringify({
                 success: true,
