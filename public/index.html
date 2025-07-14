@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Velocity Lab - Exchange Hybrid Training</title>
+    <title>Velocity Lab - Comprehensive MSP Training Platform</title>
     
     <!-- PWA Meta Tags -->
     <meta name="application-name" content="Velocity Lab">
     <meta name="apple-mobile-web-app-title" content="Velocity Lab">
-    <meta name="description" content="Comprehensive Exchange Hybrid training with 43 hands-on tasks across 4 weeks">
+    <meta name="description" content="Comprehensive MSP training platform covering Networking, Azure, Exchange, Firewalls, Linux, and more">
     <meta name="theme-color" content="#00a8ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -27,16 +27,16 @@
     <link rel="manifest" href="/manifest.json">
     
     <!-- Open Graph for sharing -->
-    <meta property="og:title" content="Velocity Lab - Exchange Hybrid">
-    <meta property="og:description" content="4 week journey with 43 tasks to build a complete Exchange Hybrid lab environment">
+    <meta property="og:title" content="Velocity Lab - MSP Training Platform">
+    <meta property="og:description" content="Comprehensive training covering Networking, Microsoft Azure, Exchange, Firewalls, Linux, and more">
     <meta property="og:image" content="/assets/Android_512.png">
     <meta property="og:url" content="https://labverse.co.za">
     <meta property="og:type" content="website">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Velocity Lab - Exchange Hybrid">
-    <meta name="twitter:description" content="4 week journey with 43 tasks to build a complete Exchange Hybrid lab environment">
+    <meta name="twitter:title" content="Velocity Lab - MSP Training Platform">
+    <meta name="twitter:description" content="Comprehensive training covering Networking, Microsoft Azure, Exchange, Firewalls, Linux, and more">
     <meta name="twitter:image" content="/assets/Android_512.png">
     
     <style>
@@ -732,6 +732,87 @@
             font-size: 15px;
         }
 
+        /* Request Access Form Styles */
+        .request-form {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 8px 25px var(--shadow-heavy);
+        }
+
+        .request-form h3 {
+            margin-bottom: 1rem;
+            color: var(--text);
+            text-align: center;
+        }
+
+        .request-form p {
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--background);
+            color: var(--text);
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 168, 255, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .form-submit {
+            width: 100%;
+            margin-top: 1rem;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .form-submit:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
         /* Non-Apple modals keep original styling */
         .modal-header {
             text-align: center;
@@ -898,44 +979,6 @@
             flex: 1;
         }
 
-        /* Form Styles */
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--text);
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 16px;
-            background: var(--background);
-            color: var(--text);
-            transition: border-color 0.2s ease;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 168, 255, 0.1);
-        }
-
-        .form-checkbox {
-            margin-right: 8px;
-        }
-
-        .form-submit {
-            width: 100%;
-            margin-top: 1rem;
-        }
-
         /* Main Dashboard */
         .main-content {
             margin-top: 70px;
@@ -1010,6 +1053,73 @@
         .progress-label {
             font-size: 0.9rem;
             color: var(--text-secondary);
+        }
+
+        /* Category Cards - New Design */
+        .categories-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .category-card {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px var(--shadow);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--shadow-heavy);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .category-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+
+        .category-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .category-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .category-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .category-count {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .category-progress {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--success);
         }
 
         /* Week Cards */
@@ -1351,6 +1461,11 @@
                 font-size: 1.5rem;
             }
 
+            .categories-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
             .weeks-container {
                 flex-direction: column;
                 gap: 1rem;
@@ -1589,11 +1704,6 @@
             border: 1px solid rgba(255, 59, 48, 0.2);
         }
 
-        /* Hide elements by default */
-        .hidden {
-            display: none !important;
-        }
-
         /* Notification System */
         .notification {
             position: fixed;
@@ -1642,10 +1752,10 @@
         <!-- Logo only (no text) -->
         <div class="logo" onclick="goHome()"></div>
         
-        <!-- Desktop Navigation - Always shows both Sign In and Get Started -->
+        <!-- Desktop Navigation - Shows Sign In and Request Access -->
         <div class="header-buttons" id="headerButtons">
             <button class="btn btn-secondary" onclick="showSignInModal()">Sign In</button>
-            <button class="btn btn-primary" onclick="showRegisterModal()">Get Started</button>
+            <button class="btn btn-primary" onclick="showRequestAccessModal()">Request Access</button>
         </div>
         
         <!-- Mobile Hamburger Menu -->
@@ -1694,21 +1804,21 @@
     <!-- Welcome Screen -->
     <div class="welcome-screen" id="welcomeScreen">
         <div class="welcome-notification">
-            Welcome to Velocity Lab! Sign in to access your Exchange Hybrid training journey.
+            Welcome to Velocity Lab! Request access to begin your comprehensive MSP training journey.
         </div>
         
-        <h1 class="welcome-title">Exchange Hybrid LAB</h1>
+        <h1 class="welcome-title">MSP Training Platform</h1>
         <p class="welcome-subtitle">
-            4 week journey with 43 tasks<br>
-            to build a Exchange Hybrid lab environment
+            Comprehensive training covering Networking, Microsoft Azure, Exchange, Firewalls, Linux, and more<br>
+            Professional development for managed service providers
         </p>
         
         <div class="welcome-buttons">
             <button class="btn btn-primary btn-large" onclick="showSignInModal()">
                 Sign In
             </button>
-            <button class="btn btn-secondary btn-large" onclick="showRegisterModal()">
-                Get Started
+            <button class="btn btn-secondary btn-large" onclick="showRequestAccessModal()">
+                Request Access
             </button>
         </div>
     </div>
@@ -1716,28 +1826,40 @@
     <!-- Main Dashboard -->
     <div class="main-content hidden" id="mainContent">
         <div class="dashboard-header">
-            <h1 class="dashboard-title">Your Hybrid Journey</h1>
-            <p class="dashboard-subtitle">Track your progress through 43 lab environment tasks across 4 weeks</p>
+            <h1 class="dashboard-title">Your Training Journey</h1>
+            <p class="dashboard-subtitle">Comprehensive MSP training across multiple technology categories</p>
         </div>
 
-        <!-- Progress Ring -->
-        <div class="progress-section">
-            <div class="progress-ring">
-                <svg viewBox="0 0 120 120">
-                    <circle class="progress-ring-bg" cx="60" cy="60" r="54"/>
-                    <circle class="progress-ring-fill" cx="60" cy="60" r="54" 
-                            stroke-dasharray="0 339.292" id="progressRing"/>
-                </svg>
-                <div class="progress-text">
-                    <div class="progress-percentage" id="progressPercentage">0%</div>
-                    <div class="progress-label">Complete</div>
+        <!-- Categories Grid (replaces the single course view) -->
+        <div class="categories-container" id="categoriesContainer">
+            <!-- Category cards will be populated by JavaScript -->
+        </div>
+
+        <!-- Course View (shows when a category is selected) -->
+        <div class="course-view hidden" id="courseView">
+            <!-- Progress Ring -->
+            <div class="progress-section">
+                <div class="progress-ring">
+                    <svg viewBox="0 0 120 120">
+                        <circle class="progress-ring-bg" cx="60" cy="60" r="54"/>
+                        <circle class="progress-ring-fill" cx="60" cy="60" r="54" 
+                                stroke-dasharray="0 339.292" id="progressRing"/>
+                    </svg>
+                    <div class="progress-text">
+                        <div class="progress-percentage" id="progressPercentage">0%</div>
+                        <div class="progress-label">Complete</div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Week Cards -->
-        <div class="weeks-container" id="weeksContainer">
-            <!-- Week cards will be populated by JavaScript -->
+            <!-- Week Cards -->
+            <div class="weeks-container" id="weeksContainer">
+                <!-- Week cards will be populated by JavaScript -->
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn btn-secondary" onclick="showCategoriesView()">← Back to Categories</button>
+            </div>
         </div>
     </div>
 
@@ -1782,42 +1904,56 @@
         </div>
     </div>
 
-    <!-- Apple-style Register Modal -->
-    <div class="modal" id="registerModal">
-        <div class="modal-content apple-modal">
-            <button class="modal-close" onclick="closeModal('registerModal')">&times;</button>
+    <!-- Request Access Modal -->
+    <div class="modal" id="requestAccessModal">
+        <div class="modal-content large">
+            <button class="modal-close" onclick="closeModal('requestAccessModal')">&times;</button>
             
-            <!-- Clean header with logo -->
-            <div class="modal-header-clean">
-                <div class="modal-logo"></div>
+            <div class="modal-header">
+                <h2>🚀 Request Training Access</h2>
+                <p style="color: var(--text-secondary);">Join our comprehensive MSP training platform</p>
             </div>
             
             <div class="modal-body">
-                <h2 class="modal-title">Create Account</h2>
-                
-                <form id="registerForm">
-                    <div class="apple-form-group">
-                        <input type="text" class="apple-form-input" id="registerName" name="name" 
-                               placeholder="Full Name" required>
-                    </div>
+                <div class="request-form">
+                    <h3>Access Request Form</h3>
+                    <p>Please fill out the form below to request access to our training platform. Our team will review your request and create your account manually.</p>
                     
-                    <div class="apple-form-group">
-                        <input type="email" class="apple-form-input" id="registerEmail" name="email" 
-                               placeholder="Email" required>
-                    </div>
-                    
-                    <div class="apple-form-group">
-                        <div class="password-field">
-                            <input type="password" class="apple-form-input" id="registerPassword" name="password" 
-                                   placeholder="Password" required>
-                            <button type="submit" class="password-toggle" title="Create Account">
-                                →
-                            </button>
+                    <form action="https://api.web3forms.com/submit" method="POST" id="requestAccessForm">
+                        <!-- Replace with your Access Key -->
+                        <input type="hidden" name="access_key" value="fe37519c-2a4b-48ee-a090-1746e3ad0010">
+                        
+                        <!-- Form Inputs -->
+                        <div class="form-group">
+                            <label class="form-label" for="requestName">Full Name *</label>
+                            <input type="text" class="form-input" id="requestName" name="name" required>
                         </div>
-                    </div>
-                    
-                    <div id="registerMessage"></div>
-                </form>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="requestEmail">Email Address *</label>
+                            <input type="email" class="form-input" id="requestEmail" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="requestCompany">Company/Organization</label>
+                            <input type="text" class="form-input" id="requestCompany" name="company">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="requestMessage">Tell us about your training goals *</label>
+                            <textarea class="form-input form-textarea" id="requestMessage" name="message" required 
+                                      placeholder="What specific areas are you interested in? (Networking, Azure, Exchange, etc.)"></textarea>
+                        </div>
+                        
+                        <!-- Honeypot Spam Protection -->
+                        <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+                        
+                        <!-- Custom Confirmation / Success Page -->
+                        <input type="hidden" name="redirect" value="https://labverse.co.za/thanks.html">
+                        
+                        <button type="submit" class="form-submit">Submit Access Request</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -1875,12 +2011,136 @@
             authenticated: false,
             labHistory: [],
             tasks: [],
+            categories: [],
+            currentCategory: null,
             isWelcomeShown: false,
             shownNotifications: new Set()
         };
 
         // API configuration
         const API_BASE = '/api';
+
+        // Training categories configuration
+        const TRAINING_CATEGORIES = {
+            'networking': {
+                id: 'networking',
+                title: 'Networking',
+                icon: '🌐',
+                description: 'Network infrastructure, monitoring, and management tools including Zabbix, PRTG, DNS, and Cisco configurations.',
+                courses: [
+                    'Setting up Zabbix',
+                    'Monitoring Zabbix',
+                    'Adding new hosts to Zabbix',
+                    'Cisco ISR voice router configuration',
+                    'Cisco monitored interfaces',
+                    'PRTG 100 free setup',
+                    'DNS',
+                    'Creating Network Diagrams in Microsoft Visio and draw.io',
+                    'Cisco Backup Report Script Automation via SSH and telnet',
+                    'Grandstream setup',
+                    'Grandstream SSID radius auth config for Corp network',
+                    'Creating backup config with highlighting text in putty'
+                ]
+            },
+            'azure': {
+                id: 'azure',
+                title: 'Microsoft Azure',
+                icon: '☁️',
+                description: 'Comprehensive Azure cloud services including security, compliance, analytics, and infrastructure management.',
+                courses: [
+                    'Microsoft Defender for Servers',
+                    'Microsoft Defender for Cloud',
+                    'Microsoft Intune',
+                    'Microsoft Sentinel',
+                    'Azure Firewall Standard vs Premium',
+                    'Log analytics',
+                    'Azure VM backup and restore',
+                    'Azure disaster recovery',
+                    'Azure VPN setup site to site vs point to site'
+                ]
+            },
+            'exchange': {
+                id: 'exchange',
+                title: 'Microsoft Exchange',
+                icon: '📧',
+                description: 'Exchange Server, Exchange Online, and hybrid configurations with step-by-step implementations.',
+                courses: [
+                    'Exchange Hybrid project step by step',
+                    'Exchange Online project step by step',
+                    'Exchange Hybrid autodiscovery function',
+                    'Exchange Hybrid with defender mx record',
+                    'Exchange Hybrid with Mimecast mx record',
+                    'Mimecast configuration when doing Exchange Hybrid Migration'
+                ]
+            },
+            'microsoft365': {
+                id: 'microsoft365',
+                title: 'Microsoft 365',
+                icon: '🏢',
+                description: 'Microsoft 365 services including tenant management, SharePoint, and automation workflows.',
+                courses: [
+                    'Creating new M365 tenant for new customer',
+                    'Migrating small company tenant merge to bigger company without losing mails',
+                    'Send as option tick in 365',
+                    'Sharepoint Online landing page creation',
+                    'Microsoft Power Automate - Creating power automate flow shared mailbox to Sharepoint'
+                ]
+            },
+            'firewalls': {
+                id: 'firewalls',
+                title: 'Firewalls & Security',
+                icon: '🔥',
+                description: 'Firewall configuration and management including Sophos, Fortinet FortiGate, and security policies.',
+                courses: [
+                    'Sophos configuration',
+                    'Fortinet FortiGate - Creating firewall policies',
+                    'Fortinet FortiGate - Creating SDWAN zone and members',
+                    'Fortinet FortiGate - creating custom ipsec vpn tunnels',
+                    'Fortinet FortiGate - creating SSL integration with Azure Enterprise application',
+                    'Fortinet FortiGate - Forti LDAP configuration',
+                    'Fortinet FortiGate - Static routes',
+                    'Fortinet FortiGate - Setup fortigate from scratch',
+                    'Fortinet FortiGate - DDNS for LTE wan sites',
+                    'Fortinet FortiGate - Diagnosing and debug in CLI',
+                    'Fortinet FortiGate - set source CLI command',
+                    'Fortinet FortiGate - exec ping and traceroute source options'
+                ]
+            },
+            'backup': {
+                id: 'backup',
+                title: 'Backup & Recovery',
+                icon: '💾',
+                description: 'Backup solutions, disaster recovery, and data protection strategies.',
+                courses: [
+                    'Veeam backups',
+                    'Backup radar',
+                    'Block64 Report combine'
+                ]
+            },
+            'linux': {
+                id: 'linux',
+                title: 'Linux Administration',
+                icon: '🐧',
+                description: 'Linux system administration, server management, and automation.',
+                courses: [
+                    'Linux basics and administration',
+                    'Server configuration and management',
+                    'Shell scripting and automation'
+                ]
+            },
+            'tools': {
+                id: 'tools',
+                title: 'Management Tools',
+                icon: '🛠️',
+                description: 'Professional management and monitoring tools for MSPs.',
+                courses: [
+                    'Atera - Connecting via splashtop',
+                    'Atera - Which scripts to run in Atera',
+                    'Atera - Choosing different customers',
+                    'Atera - Alerting and reports'
+                ]
+            }
+        };
 
         // Utility functions for cookies and DOM manipulation
         const utils = {
@@ -2033,7 +2293,7 @@
             }
         };
 
-        // Authentication system
+        // Authentication system (same as before but without register)
         const authSystem = {
             async login(formData) {
                 const submitBtn = document.querySelector('#signInForm .password-toggle');
@@ -2102,78 +2362,6 @@
                 }
             },
             
-            async register(formData) {
-                const submitBtn = document.querySelector('#registerForm .password-toggle');
-                
-                try {
-                    if (submitBtn) {
-                        submitBtn.classList.add('loading');
-                    }
-                    
-                    const name = formData.get('name');
-                    const email = formData.get('email');
-                    const password = formData.get('password');
-                    
-                    if (!name || !email || !password) {
-                        throw new Error('Please fill in all required fields.');
-                    }
-                    
-                    if (password.length < 8) {
-                        throw new Error('Password must be at least 8 characters long.');
-                    }
-
-                    console.log('Attempting registration with backend APIs...');
-                    
-                    const { data } = await api.call('/api/users/register', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    console.log('Registration successful with backend APIs');
-                    
-                    const { name: userName, email: userEmail, role, sessionToken } = data;
-                    
-                    utils.cookies.set('user', JSON.stringify({ name: userName, email: userEmail, role }));
-                    utils.cookies.set('session', sessionToken);
-                    
-                    appState.user = { name: userName, email: userEmail, role };
-                    appState.sessionToken = sessionToken;
-                    appState.authenticated = true;
-                    
-                    if (role === 'admin') {
-                        const adminBtn = document.getElementById('adminButton');
-                        if (adminBtn) adminBtn.style.display = 'block';
-                    }
-                    
-                    showDashboard();
-                    await loadUserProgress();
-                    await loadLabHistory();
-                    closeModal('registerModal');
-                    
-                    closeMobileMenu();
-                    
-                    setTimeout(() => {
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }, 100);
-                    
-                    if (!appState.isWelcomeShown) {
-                        notificationSystem.success(`Welcome to Velocity Lab, ${userName}! 🚀`);
-                    }
-                    
-                } catch (err) {
-                    console.error('Registration failed:', err);
-                    if (err.message === 'BACKEND_NOT_AVAILABLE') {
-                        notificationSystem.error('Backend service not available. Please ensure the API functions are deployed.');
-                    } else {
-                        notificationSystem.error(err.message || 'Registration failed. Please try again.');
-                    }
-                } finally {
-                    if (submitBtn) {
-                        submitBtn.classList.remove('loading');
-                    }
-                }
-            },
-            
             async logout() {
                 try {
                     if (appState.sessionToken) {
@@ -2196,6 +2384,7 @@
                 appState.authenticated = false;
                 appState.sessionToken = null;
                 appState.labHistory = [];
+                appState.currentCategory = null;
                 
                 localStorage.removeItem('velocity_progress');
                 localStorage.removeItem('velocity_lab_history');
@@ -2211,7 +2400,7 @@
             }
         };
 
-        // Theme management
+        // Theme management (same as before)
         const themeSystem = {
             async setTheme(theme) {
                 document.body.setAttribute('data-theme', theme);
@@ -2281,7 +2470,7 @@
             }
         };
 
-        // Load task definitions
+        // Load task definitions and categorize them
         function loadTaskDefinitions() {
             if (typeof window !== 'undefined' && window.TASK_DEFINITIONS) {
                 appState.tasks = [];
@@ -2292,7 +2481,7 @@
                         title: task.title,
                         description: task.description || 'No description available',
                         week: parseInt(taskId.split('-')[0].replace('week', '')) || 1,
-                        category: task.category || 'General'
+                        category: task.category || 'exchange' // Default to exchange for existing tasks
                     });
                 });
                 console.log('Task definitions loaded:', appState.tasks.length, 'tasks');
@@ -2300,13 +2489,17 @@
                 console.warn('Task definitions not loaded from task-definitions.js');
                 appState.tasks = generateFallbackTasks();
             }
+            
+            // Initialize categories
+            appState.categories = Object.values(TRAINING_CATEGORIES);
         }
 
         function generateFallbackTasks() {
+            // Generate tasks for Exchange category as fallback
             const weeks = [
                 {
                     title: 'Foundation & Domain Setup',
-                    description: 'Domain Controller, network shares, and security groups',
+                    description: '2012 Server promoted to DC, VM joined to domain, network shares with security groups',
                     tasks: [
                         'Install Windows Server 2012 R2',
                         'Configure Domain Controller',
@@ -2324,7 +2517,7 @@
                 },
                 {
                     title: 'Infrastructure & Updates',
-                    description: 'WSUS setup, time servers, and server upgrades',
+                    description: 'Install 2nd server, setup WSUS, configure time servers',
                     tasks: [
                         'Install Exchange Server 2016',
                         'Configure Exchange Organization',
@@ -2340,7 +2533,7 @@
                 },
                 {
                     title: 'Exchange & Mail Flow',
-                    description: 'Exchange installation and internal mail communication',
+                    description: 'Upgrade to Server 2016, install Exchange, create mailboxes, internal mail flow',
                     tasks: [
                         'Create M365 Tenant',
                         'Configure Domain',
@@ -2356,7 +2549,7 @@
                 },
                 {
                     title: 'Hybrid & External Access',
-                    description: 'External mail publishing and 365 hybrid environment',
+                    description: 'Publish mail externally, setup Office 365 hybrid environment',
                     tasks: [
                         'Install Azure AD Connect',
                         'Configure Directory Sync',
@@ -2380,7 +2573,7 @@
                         week: weekIndex + 1,
                         title: task,
                         description: `Complete ${task} as part of Week ${weekIndex + 1}`,
-                        category: week.title
+                        category: 'exchange'
                     });
                 });
             });
@@ -2388,7 +2581,7 @@
             return tasks;
         }
 
-        // Progress management
+        // Progress management (same as before)
         async function loadUserProgress() {
             try {
                 if (!appState.sessionToken) {
@@ -2463,7 +2656,7 @@
             }
         }
 
-        // Lab history management
+        // Lab history management (same as before)
         async function loadLabHistory() {
             try {
                 if (!appState.sessionToken) {
@@ -2581,8 +2774,13 @@
         }
 
         function checkLabCompletion() {
-            const totalTasks = appState.tasks.length || 43;
-            const completedTasks = Object.values(appState.progress).filter(task => task.completed).length;
+            if (!appState.currentCategory) return;
+            
+            const categoryTasks = appState.tasks.filter(task => task.category === appState.currentCategory);
+            const totalTasks = categoryTasks.length;
+            const completedTasks = categoryTasks.filter(task => 
+                appState.progress[task.id] && appState.progress[task.id].completed
+            ).length;
             
             if (completedTasks === totalTasks && totalTasks > 0 && appState.labHistory.length > 0) {
                 const currentLab = appState.labHistory.find(lab => lab.status === 'started');
@@ -2700,30 +2898,6 @@
                     await authSystem.login(formData);
                 });
             }
-
-            const registerForm = utils.getId('registerForm');
-            if (registerForm) {
-                registerForm.addEventListener('submit', async (event) => {
-                    event.preventDefault();
-                    const formData = new FormData(registerForm);
-                    const name = formData.get('name');
-                    const email = formData.get('email');
-                    const password = formData.get('password');
-                    
-                    if (!name || !email || !password) {
-                        notificationSystem.error('Please fill in all required fields.');
-                        return;
-                    }
-                    
-                    if (password.length < 8) {
-                        notificationSystem.error('Password must be at least 8 characters long.');
-                        return;
-                    }
-                    
-                    console.log('Registration attempt for:', email);
-                    await authSystem.register(formData);
-                });
-            }
         }
 
         // Global functions for HTML event handlers
@@ -2737,7 +2911,7 @@
 
         window.goHome = function() {
             if (appState.authenticated) {
-                return;
+                showCategoriesView();
             } else {
                 showWelcomeScreen();
             }
@@ -3132,6 +3306,62 @@
             notificationSystem.info('User lab history requires backend implementation');
         };
 
+        // New functions for category management
+        window.showCategoryView = function(categoryId) {
+            appState.currentCategory = categoryId;
+            const category = TRAINING_CATEGORIES[categoryId];
+            
+            if (!category) {
+                notificationSystem.error('Category not found');
+                return;
+            }
+            
+            // Update dashboard title
+            const dashboardTitle = document.querySelector('.dashboard-title');
+            const dashboardSubtitle = document.querySelector('.dashboard-subtitle');
+            
+            if (dashboardTitle) {
+                dashboardTitle.textContent = category.title + ' Training';
+            }
+            if (dashboardSubtitle) {
+                dashboardSubtitle.textContent = category.description;
+            }
+            
+            // Show course view, hide categories
+            document.getElementById('categoriesContainer').classList.add('hidden');
+            document.getElementById('courseView').classList.remove('hidden');
+            
+            // Generate week cards for this category
+            generateWeekCards();
+            updateProgressDisplay();
+        };
+
+        window.showCategoriesView = function() {
+            appState.currentCategory = null;
+            
+            // Reset dashboard title
+            const dashboardTitle = document.querySelector('.dashboard-title');
+            const dashboardSubtitle = document.querySelector('.dashboard-subtitle');
+            
+            if (dashboardTitle) {
+                dashboardTitle.textContent = 'Your Training Journey';
+            }
+            if (dashboardSubtitle) {
+                dashboardSubtitle.textContent = 'Comprehensive MSP training across multiple technology categories';
+            }
+            
+            // Show categories, hide course view
+            document.getElementById('categoriesContainer').classList.remove('hidden');
+            document.getElementById('courseView').classList.add('hidden');
+            
+            // Generate category cards
+            generateCategoryCards();
+        };
+
+        window.showRequestAccessModal = function() {
+            showModal('requestAccessModal');
+        };
+
         // Mobile menu functionality
         function setupMobileMenuHandlers() {
             document.addEventListener('click', function(event) {
@@ -3267,8 +3497,19 @@
         }
 
         function getCurrentLabProgress() {
-            const totalTasks = 43;
-            const completedTasks = Object.values(appState.progress).filter(task => task.completed).length;
+            let totalTasks = 43;
+            let completedTasks = 0;
+            
+            if (appState.currentCategory) {
+                const categoryTasks = appState.tasks.filter(task => task.category === appState.currentCategory);
+                totalTasks = categoryTasks.length;
+                completedTasks = categoryTasks.filter(task => 
+                    appState.progress[task.id] && appState.progress[task.id].completed
+                ).length;
+            } else {
+                completedTasks = Object.values(appState.progress).filter(task => task.completed).length;
+            }
+            
             return { completedTasks, totalTasks };
         }
 
@@ -3410,15 +3651,48 @@
                 }
             }
             
-            generateWeekCards();
-            updateProgressDisplay();
+            // Show categories view by default
+            showCategoriesView();
             closeMobileMenu();
             updateMobileMenuItems();
+        }
+
+        function generateCategoryCards() {
+            const container = document.getElementById('categoriesContainer');
+            if (!container) return;
+
+            container.innerHTML = appState.categories.map(category => {
+                const categoryTasks = appState.tasks.filter(task => task.category === category.id);
+                const completedTasks = categoryTasks.filter(task => 
+                    appState.progress[task.id] && appState.progress[task.id].completed
+                ).length;
+                const totalTasks = categoryTasks.length || category.courses.length;
+                const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+                
+                return `
+                    <div class="category-card" onclick="showCategoryView('${category.id}')">
+                        <div class="category-header">
+                            <div class="category-icon">${category.icon}</div>
+                            <div class="category-title">${category.title}</div>
+                        </div>
+                        <div class="category-description">${category.description}</div>
+                        <div class="category-stats">
+                            <div class="category-count">${totalTasks} courses</div>
+                            <div class="category-progress">${progressPercentage}% complete</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function generateWeekCards() {
             const container = document.getElementById('weeksContainer');
             if (!container) return;
+
+            if (!appState.currentCategory) {
+                container.innerHTML = '<p>Please select a category first.</p>';
+                return;
+            }
 
             const weekGroups = groupTasksByWeek();
             
@@ -3471,37 +3745,15 @@
         function groupTasksByWeek() {
             const weeks = {};
             
-            // Define proper week descriptions based on CTO instructions
-            const weekDescriptions = {
-                1: {
-                    title: 'Foundation & Domain Setup',
-                    description: '2012 Server promoted to DC, VM joined to domain, network shares with security groups'
-                },
-                2: {
-                    title: 'Infrastructure & Updates', 
-                    description: 'Install 2nd server, setup WSUS, configure time servers'
-                },
-                3: {
-                    title: 'Exchange & Mail Flow',
-                    description: 'Upgrade to Server 2016, install Exchange, create mailboxes, internal mail flow'
-                },
-                4: {
-                    title: 'Hybrid & External Access',
-                    description: 'Publish mail externally, setup Office 365 hybrid environment'
-                }
-            };
+            // Filter tasks by current category
+            const categoryTasks = appState.tasks.filter(task => task.category === appState.currentCategory);
             
-            appState.tasks.forEach(task => {
+            categoryTasks.forEach(task => {
                 const weekNum = task.week || 1;
                 if (!weeks[weekNum]) {
-                    const weekInfo = weekDescriptions[weekNum] || {
-                        title: `Week ${weekNum}: Training`,
-                        description: `Complete ${appState.tasks.filter(t => t.week === weekNum).length} tasks in this week`
-                    };
-                    
                     weeks[weekNum] = {
-                        title: `Week ${weekNum}: ${weekInfo.title}`,
-                        description: weekInfo.description,
+                        title: `Week ${weekNum}: Training`,
+                        description: `Complete training tasks for week ${weekNum}`,
                         tasks: []
                     };
                 }
@@ -3512,8 +3764,13 @@
         }
 
         function updateProgressDisplay() {
-            const totalTasks = appState.tasks.length || 43;
-            const completedTasks = Object.values(appState.progress).filter(task => task.completed).length;
+            if (!appState.currentCategory) return;
+            
+            const categoryTasks = appState.tasks.filter(task => task.category === appState.currentCategory);
+            const totalTasks = categoryTasks.length || 1;
+            const completedTasks = categoryTasks.filter(task => 
+                appState.progress[task.id] && appState.progress[task.id].completed
+            ).length;
             const percentage = Math.round((completedTasks / totalTasks) * 100);
             
             const circumference = 2 * Math.PI * 54;
@@ -3528,8 +3785,8 @@
                 progressPercentage.textContent = `${percentage}%`;
             }
             
-            const mainContent = document.getElementById('mainContent');
-            if (mainContent && !mainContent.classList.contains('hidden')) {
+            const courseView = document.getElementById('courseView');
+            if (courseView && !courseView.classList.contains('hidden')) {
                 generateWeekCards();
             }
             
@@ -3551,7 +3808,7 @@
                     <div style="margin-top: 2rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
                         <h4 style="margin-bottom: 1rem;">📚 To enable full admin features:</h4>
                         <ol style="text-align: left; max-width: 400px; margin: 0 auto;">
-                            <li>Deploy the 3 Functions files to <code>/functions/api/</code></li>
+                            <li>Deploy the Functions files to <code>/functions/api/</code></li>
                             <li>Configure your serverless functions</li>
                             <li>Admin panel will automatically work</li>
                         </ol>
@@ -3671,18 +3928,6 @@
             if (modalBody) modalBody.classList.add('initial-state');
             
             showModal('signInModal');
-        };
-
-        window.showRegisterModal = function() {
-            const registerForm = document.getElementById('registerForm');
-            const submitBtn = document.querySelector('#registerForm .password-toggle');
-            const passwordInput = document.getElementById('registerPassword');
-            
-            if (registerForm) registerForm.reset();
-            if (submitBtn) submitBtn.classList.remove('loading');
-            if (passwordInput) passwordInput.type = 'password';
-            
-            showModal('registerModal');
         };
 
         window.toggleUserMenu = function() {
