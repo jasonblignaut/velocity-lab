@@ -1,908 +1,591 @@
-/**
- * Velocity Lab - Microsoft Azure Tutorials
- * Comprehensive Azure guides for MSP professionals
- */
+/* ===================================================================
+   Microsoft Azure Tutorials - Comprehensive Cloud Security and Management
+   =================================================================== */
 
 window.AZURE_TUTORIALS = {
-  'defender-servers': {
-    title: 'Microsoft Defender for Servers deployment',
-    category: 'azure',
-    difficulty: 'intermediate',
-    estimatedTime: '2-3 hours',
-    content: `
-      <div class="tutorial-content">
-        <h2>🛡️ Microsoft Defender for Servers Deployment</h2>
-        
-        <div class="tutorial-tips">
-          <h4>💡 What you'll learn</h4>
-          <p>Deploy and configure Microsoft Defender for Servers across your infrastructure for advanced threat protection, vulnerability management, and security monitoring.</p>
-        </div>
-
-        <h3>📋 Prerequisites</h3>
-        <ul>
-          <li>Azure subscription with Security Center access</li>
-          <li>Global Administrator or Security Administrator role</li>
-          <li>Servers running Windows Server 2012 R2+ or Linux</li>
-          <li>Log Analytics workspace (recommended)</li>
-        </ul>
-
-        <h3>🚀 Step 1: Enable Defender for Servers</h3>
-        <h4>Via Azure Portal</h4>
-        <ol>
-          <li>Navigate to <strong>Microsoft Defender for Cloud</strong></li>
-          <li>Go to <strong>Environment settings</strong></li>
-          <li>Select your subscription</li>
-          <li>Enable <strong>Defender for Servers Plan 2</strong>:
-            <ul>
-              <li>Includes vulnerability assessment</li>
-              <li>Just-in-time VM access</li>
-              <li>File integrity monitoring</li>
-              <li>Behavioral analytics</li>
-            </ul>
-          </li>
-          <li>Configure data collection settings</li>
-        </ol>
-
-        <h4>Via PowerShell</h4>
-        <div class="code-block">
-          <code># Connect to Azure
+    'defender-servers': {
+        title: 'Microsoft Defender for Servers deployment',
+        content: `
+            <div class="tutorial-content">
+                <h2>Microsoft Defender for Servers Deployment</h2>
+                
+                <h3>Overview</h3>
+                <p>Microsoft Defender for Servers provides advanced threat protection for Windows and Linux servers both in Azure and hybrid environments.</p>
+                
+                <h3>Prerequisites</h3>
+                <ul>
+                    <li>Azure subscription with Security Center enabled</li>
+                    <li>Appropriate permissions (Security Admin or Contributor)</li>
+                    <li>Log Analytics workspace</li>
+                    <li>Target servers (Azure VMs, on-premises, or other clouds)</li>
+                </ul>
+                
+                <h3>Enable Defender for Servers</h3>
+                
+                <h4>1. Enable in Azure Security Center</h4>
+                <div class="code-block">
+                    <code>Azure Portal Steps:
+1. Navigate to Microsoft Defender for Cloud
+2. Go to Environment Settings
+3. Select your subscription
+4. Enable "Servers" protection plan
+5. Configure settings and save</code>
+                </div>
+                
+                <h4>2. PowerShell Deployment</h4>
+                <div class="code-block">
+                    <code># Connect to Azure
 Connect-AzAccount
 
-# Enable Defender for Servers
+# Enable Defender for Servers on subscription
+$subscriptionId = "your-subscription-id"
+Set-AzContext -SubscriptionId $subscriptionId
+
+# Enable the pricing tier
 Set-AzSecurityPricing -Name "VirtualMachines" -PricingTier "Standard"
 
-# Configure auto-provisioning for Log Analytics agent
-Set-AzSecurityAutoProvisioningSetting -Name "default" -EnableAutoProvisioning</code>
-        </div>
+# Verify deployment
+Get-AzSecurityPricing | Where-Object {$_.Name -eq "VirtualMachines"}</code>
+                </div>
+                
+                <h3>Agent Deployment</h3>
+                
+                <h4>Automatic Agent Installation</h4>
+                <ol>
+                    <li>Enable auto-provisioning in Security Center</li>
+                    <li>Configure Log Analytics workspace</li>
+                    <li>Set workspace region and retention</li>
+                    <li>Agents deploy automatically to new VMs</li>
+                </ol>
+                
+                <h4>Manual Agent Installation</h4>
+                <div class="code-block">
+                    <code># Windows Server installation
+# Download and install Log Analytics agent
+$WorkspaceID = "your-workspace-id"
+$WorkspaceKey = "your-workspace-key"
 
-        <h3>🔧 Step 2: Deploy Log Analytics Agent</h3>
-        <h4>Automatic Deployment</h4>
-        <div class="code-block">
-          <code># Enable auto-provisioning via PowerShell
-Set-AzSecurityAutoProvisioningSetting -Name "default" -EnableAutoProvisioning
+# Install via PowerShell
+$agent = New-Object -ComObject AgentConfigManager.MgmtSvcCfg
+$agent.AddCloudWorkspace($WorkspaceID, $WorkspaceKey)
+$agent.ReloadConfiguration()</code>
+                </div>
+                
+                <h4>Linux Server Installation</h4>
+                <div class="code-block">
+                    <code># Download and install for Linux
+wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh
 
-# Configure workspace
-$workspace = Get-AzOperationalInsightsWorkspace -ResourceGroupName "security-rg" -Name "security-workspace"
-Set-AzSecurityWorkspaceSetting -Name "default" -Scope "/subscriptions/subscription-id" -WorkspaceId $workspace.ResourceId</code>
-        </div>
+# Make executable and run
+chmod +x onboard_agent.sh
+sudo ./onboard_agent.sh -w workspace-id -s workspace-key
 
-        <h4>Manual Deployment for Specific VMs</h4>
-        <div class="code-block">
-          <code># Deploy to Windows VM
-$vm = Get-AzVM -ResourceGroupName "myRG" -Name "myWindowsVM"
-Set-AzVMExtension -ResourceGroupName "myRG" -VMName "myWindowsVM" -Name "MicrosoftMonitoringAgent" -Publisher "Microsoft.EnterpriseCloud.Monitoring" -Type "MicrosoftMonitoringAgent" -TypeHandlerVersion "1.0" -Settings @{"workspaceId" = "workspace-id"} -ProtectedSettings @{"workspaceKey" = "workspace-key"}
+# Verify installation
+sudo /opt/microsoft/omsagent/bin/service_control status</code>
+                </div>
+                
+                <h3>Configuration and Features</h3>
+                
+                <h4>Security Policies</h4>
+                <ul>
+                    <li>Endpoint protection assessment</li>
+                    <li>OS vulnerability assessment</li>
+                    <li>Just-in-time VM access</li>
+                    <li>Adaptive application controls</li>
+                    <li>File integrity monitoring</li>
+                </ul>
+                
+                <h4>Threat Detection</h4>
+                <div class="tutorial-tips">
+                    <h4>💡 Detection Capabilities</h4>
+                    <ul>
+                        <li>Behavioral analytics for anomaly detection</li>
+                        <li>Machine learning-based threat detection</li>
+                        <li>Integration with Microsoft Threat Intelligence</li>
+                        <li>Fileless attack detection</li>
+                        <li>Network layer attack detection</li>
+                    </ul>
+                </div>
+                
+                <h3>Monitoring and Alerts</h3>
+                
+                <h4>Security Alerts Configuration</h4>
+                <div class="code-block">
+                    <code># PowerShell - Configure alert notifications
+$resourceGroup = "security-rg"
+$actionGroupName = "security-alerts"
 
-# Deploy to Linux VM  
-Set-AzVMExtension -ResourceGroupName "myRG" -VMName "myLinuxVM" -Name "OmsAgentForLinux" -Publisher "Microsoft.EnterpriseCloud.Monitoring" -Type "OmsAgentForLinux" -TypeHandlerVersion "1.13" -Settings @{"workspaceId" = "workspace-id"} -ProtectedSettings @{"workspaceKey" = "workspace-key"}</code>
-        </div>
+# Create action group for notifications
+$emailReceiver = New-AzActionGroupReceiver -Name "SecurityTeam" -EmailReceiver -EmailAddress "security@company.com"
+$smsReceiver = New-AzActionGroupReceiver -Name "OnCall" -SmsReceiver -CountryCode "1" -PhoneNumber "5551234567"
 
-        <h3>🔍 Step 3: Configure Vulnerability Assessment</h3>
-        <h4>Enable Qualys Scanner</h4>
-        <ol>
-          <li>In Defender for Cloud, go to <strong>Recommendations</strong></li>
-          <li>Find "Vulnerability assessment solution should be enabled on virtual machines"</li>
-          <li>Select VMs and click <strong>Remediate</strong></li>
-          <li>Choose deployment method:
-            <ul>
-              <li><strong>Microsoft Defender vulnerability management:</strong> Built-in scanner</li>
-              <li><strong>Qualys:</strong> Third-party integration</li>
-            </ul>
-          </li>
-        </ol>
-
-        <h4>PowerShell Deployment</h4>
-        <div class="code-block">
-          <code># Enable Qualys vulnerability assessment
-$vm = Get-AzVM -ResourceGroupName "myRG" -Name "myVM"
-Set-AzVMExtension -ResourceGroupName "myRG" -VMName "myVM" -Name "WindowsAgent.AzureSecurityCenter" -Publisher "Qualys" -Type "WindowsAgent.AzureSecurityCenter" -TypeHandlerVersion "1.0"</code>
-        </div>
-
-        <h3>🔐 Step 4: Configure Just-in-Time Access</h3>
-        <h4>Enable JIT for VMs</h4>
-        <ol>
-          <li>Navigate to <strong>Workload protections</strong> → <strong>Just-in-time VM access</strong></li>
-          <li>Select VMs to protect</li>
-          <li>Click <strong>Enable JIT on VMs</strong></li>
-          <li>Configure port access rules:
-            <div class="code-block">
-              <code># Default JIT configuration
-RDP (3389): 3 hours max, source IP restrictions
-SSH (22): 3 hours max, source IP restrictions  
-WinRM (5985/5986): 3 hours max, source IP restrictions
-PowerShell (5985): 3 hours max, source IP restrictions</code>
-            </div>
-          </li>
-        </ol>
-
-        <h4>Request JIT Access</h4>
-        <div class="code-block">
-          <code># PowerShell to request JIT access
-$vm = Get-AzVM -ResourceGroupName "myRG" -Name "myVM"
-$requestTimeString = [DateTime]::Now.AddHours(2).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
-
-$jitPolicy = @{
-    "kind" = "initiate"
-    "virtualMachines" = @(
-        @{
-            "id" = $vm.Id
-            "ports" = @(
-                @{
-                    "number" = 3389
-                    "endTimeUtc" = $requestTimeString
-                    "allowedSourceAddressPrefix" = "192.168.1.100"
-                }
-            )
-        }
-    )
-}
-
-Invoke-AzRestMethod -Path "/subscriptions/subscription-id/resourceGroups/myRG/providers/Microsoft.Security/locations/centralus/jitNetworkAccessPolicies/default/initiate?api-version=2020-01-01" -Method POST -Payload ($jitPolicy | ConvertTo-Json -Depth 5)</code>
-        </div>
-
-        <h3>📊 Step 5: Configure Advanced Threat Protection</h3>
-        <h4>Enable Behavioral Analytics</h4>
-        <div class="code-block">
-          <code># Configure advanced threat detection
-# This is done through workspace configuration
-$workspace = Get-AzOperationalInsightsWorkspace -ResourceGroupName "security-rg" -Name "security-workspace"
-
-# Enable security solutions
-Set-AzOperationalInsightsIntelligencePack -ResourceGroupName "security-rg" -WorkspaceName "security-workspace" -IntelligencePackName "Security" -Enabled $true
-Set-AzOperationalInsightsIntelligencePack -ResourceGroupName "security-rg" -WorkspaceName "security-workspace" -IntelligencePackName "SecurityCenterFree" -Enabled $true</code>
-        </div>
-
-        <h4>Custom Detection Rules</h4>
-        <div class="code-block">
-          <code>// KQL query for suspicious PowerShell activity
+Set-AzActionGroup -ResourceGroupName $resourceGroup -Name $actionGroupName -Receiver $emailReceiver,$smsReceiver</code>
+                </div>
+                
+                <h4>Custom Detection Rules</h4>
+                <div class="code-block">
+                    <code>// KQL query for custom detection
 SecurityEvent
-| where EventID == 4688
-| where Process contains "powershell.exe"
-| where CommandLine contains "-EncodedCommand" or CommandLine contains "-enc"
-| where CommandLine contains "DownloadString" or CommandLine contains "IEX"
-| project TimeGenerated, Computer, Account, CommandLine
-| order by TimeGenerated desc</code>
-        </div>
-
-        <h3>🔍 Step 6: File Integrity Monitoring</h3>
-        <h4>Configure FIM Settings</h4>
-        <ol>
-          <li>Go to <strong>Workload protections</strong> → <strong>File Integrity Monitoring</strong></li>
-          <li>Enable FIM for desired workspaces</li>
-          <li>Configure monitoring settings:
-            <ul>
-              <li><strong>Windows files:</strong> System32, Program Files, Windows</li>
-              <li><strong>Windows registry:</strong> Security, System, Software hives</li>
-              <li><strong>Linux files:</strong> /etc, /usr/bin, /sbin</li>
-            </ul>
-          </li>
-        </ol>
-
-        <h4>Custom FIM Rules</h4>
-        <div class="code-block">
-          <code># Add custom Windows path
-$customPath = @{
-    "path" = "C:\\MyApp\\Config"
-    "recursive" = $true
-    "uploadOnChange" = $false
-}
-
-# Add custom Linux path  
-$linuxPath = @{
-    "path" = "/opt/myapp/config"
-    "recursive" = $true
-    "uploadOnChange" = $false
+| where EventID == 4625 // Failed logon
+| where TimeGenerated > ago(1h)
+| summarize FailedAttempts = count() by Account, Computer, bin(TimeGenerated, 5m)
+| where FailedAttempts > 5
+| project TimeGenerated, Computer, Account, FailedAttempts</code>
+                </div>
+                
+                <h3>Integration with SIEM</h3>
+                
+                <h4>Azure Sentinel Integration</h4>
+                <ol>
+                    <li>Enable Defender for Cloud connector in Sentinel</li>
+                    <li>Configure data collection rules</li>
+                    <li>Set up workbooks and analytics rules</li>
+                    <li>Create incident response playbooks</li>
+                </ol>
+                
+                <h4>Third-party SIEM Export</h4>
+                <div class="code-block">
+                    <code># Continuous export configuration
+{
+    "properties": {
+        "dataTypes": [
+            "SecurityAlert",
+            "SecurityRecommendation"
+        ],
+        "isEnabled": true,
+        "targetResourceId": "/subscriptions/subscription-id/resourceGroups/rg-name/providers/Microsoft.EventHub/namespaces/namespace-name/eventhubs/hub-name"
+    }
 }</code>
-        </div>
-
-        <h3>📈 Step 7: Security Monitoring and Alerting</h3>
-        <h4>Configure Security Alerts</h4>
-        <div class="code-block">
-          <code># Create action group for notifications
-$actionGroup = Set-AzActionGroup -ResourceGroupName "security-rg" -Name "security-alerts" -ShortName "SecAlerts" -EmailReceiver @{Name="SecurityTeam"; EmailAddress="security@company.com"}
-
-# Create alert rule for high severity findings
-$criteria = New-AzMetricAlertRuleV2Criteria -MetricName "High severity recommendations" -Operator "GreaterThan" -Threshold 0
-
-New-AzMetricAlertRuleV2 -ResourceGroupName "security-rg" -Name "HighSeverityFindings" -Description "Alert on high severity security findings" -Severity 1 -Enabled $true -Scopes "/subscriptions/subscription-id" -TargetResourceType "Microsoft.Security/assessments" -WindowSize "PT5M" -EvaluationFrequency "PT1M" -Criteria $criteria -ActionGroupId $actionGroup.Id</code>
-        </div>
-
-        <h4>Custom Alert Queries</h4>
-        <div class="code-block">
-          <code>// Alert on new vulnerabilities
-SecurityRecommendation
-| where RecommendationSeverity == "High"
-| where TimeGenerated > ago(1h)
-| summarize count() by RecommendationDisplayName, AssessedResourceType
-| where count_ > 0
-
-// Alert on suspicious login activities  
-SecurityEvent
-| where EventID in (4624, 4625)
-| where TimeGenerated > ago(1h)
-| where LogonType in (2, 3, 10)
-| summarize FailedLogins = countif(EventID == 4625), SuccessfulLogins = countif(EventID == 4624) by Account, Computer
-| where FailedLogins > 5</code>
-        </div>
-
-        <h3>🔧 Step 8: Integration with SIEM</h3>
-        <h4>Export to Azure Sentinel</h4>
-        <div class="code-block">
-          <code># Connect Defender for Cloud to Sentinel
-# In Azure Sentinel, go to Data connectors
-# Enable "Azure Security Center" connector
-# This automatically ingests security alerts and recommendations
-
-# Custom data export setup
-$exportConfiguration = @{
-    "properties" = @{
-        "dataTypes" = @("SecurityRecommendations", "SecurityAlerts", "RegulatoryComplianceAssessment")
-        "isEnabled" = $true
-        "targetResourceId" = "/subscriptions/subscription-id/resourceGroups/sentinel-rg/providers/Microsoft.OperationalInsights/workspaces/sentinel-workspace"
-    }
-}
-
-Invoke-AzRestMethod -Path "/subscriptions/subscription-id/providers/Microsoft.Security/dataExportSettings/default?api-version=2021-01-15-preview" -Method PUT -Payload ($exportConfiguration | ConvertTo-Json -Depth 5)</code>
-        </div>
-
-        <h3>💰 Step 9: Cost Optimization</h3>
-        <h4>Monitor Defender Costs</h4>
-        <div class="code-block">
-          <code># Get Defender for Servers pricing
-Get-AzSecurityPricing | Where-Object {$_.Name -eq "VirtualMachines"}
-
-# Monitor usage and costs
-$usage = Get-AzConsumptionUsageDetail -StartDate (Get-Date).AddDays(-30) -EndDate (Get-Date) | Where-Object {$_.ConsumedService -like "*Security*"}
-$usage | Group-Object ConsumedService | Select-Object Name, @{Name="TotalCost";Expression={($_.Group | Measure-Object PretaxCost -Sum).Sum}}</code>
-        </div>
-
-        <div class="tutorial-warning">
-          <h4>💡 Cost Management Tips</h4>
-          <ul>
-            <li>Use Plan 1 for basic protection if advanced features aren't needed</li>
-            <li>Selectively enable Defender for critical servers only</li>
-            <li>Monitor and optimize Log Analytics data ingestion</li>
-            <li>Use resource tagging for cost allocation</li>
-          </ul>
-        </div>
-
-        <h3>🚨 Troubleshooting Common Issues</h3>
-        <div class="tutorial-warning">
-          <h4>⚠️ Common Problems</h4>
-          <ul>
-            <li><strong>Agent not installing:</strong> Check VM extensions and network connectivity</li>
-            <li><strong>No vulnerability data:</strong> Verify Qualys extension is running</li>
-            <li><strong>JIT access fails:</strong> Check NSG rules and firewall settings</li>
-            <li><strong>Missing recommendations:</strong> Ensure proper permissions and policy assignment</li>
-          </ul>
-        </div>
-
-        <h4>Diagnostic Commands</h4>
-        <div class="code-block">
-          <code># Check VM extensions
-Get-AzVMExtension -ResourceGroupName "myRG" -VMName "myVM"
-
-# Verify Log Analytics connectivity
-# On Windows VM:
-C:\\Windows\\System32\\config\\systemprofile\\AppData\\Local\\SCOM\\Logs\\OpsMgrTrace.log
-
-# Check security events
-Get-WinEvent -LogName Security -MaxEvents 100 | Where-Object {$_.Id -eq 4624 -or $_.Id -eq 4625}</code>
-        </div>
-
-        <h3>📊 Step 10: Reporting and Compliance</h3>
-        <h4>Generate Security Reports</h4>
-        <div class="code-block">
-          <code># PowerShell script for security posture report
+                </div>
+                
+                <div class="tutorial-warning">
+                    <h4>⚠️ Cost Considerations</h4>
+                    <p>Defender for Servers charges per server per month. Monitor usage and optimize coverage based on criticality.</p>
+                </div>
+            </div>
+        `
+    },
+    
+    'defender-cloud': {
+        title: 'Microsoft Defender for Cloud configuration',
+        content: `
+            <div class="tutorial-content">
+                <h2>Microsoft Defender for Cloud Configuration</h2>
+                
+                <h3>Initial Setup</h3>
+                
+                <h4>Enable Defender for Cloud</h4>
+                <div class="code-block">
+                    <code>Azure Portal Navigation:
+1. Search for "Microsoft Defender for Cloud"
+2. Go to Environment Settings
+3. Select subscription
+4. Enable enhanced security features
+5. Configure each protection plan</code>
+                </div>
+                
+                <h3>Protection Plans</h3>
+                
+                <h4>Available Protection Plans</h4>
+                <ul>
+                    <li>Servers - Advanced threat protection for VMs</li>
+                    <li>App Service - Web application security</li>
+                    <li>Databases - SQL database protection</li>
+                    <li>Storage - Blob storage security</li>
+                    <li>Containers - Kubernetes security</li>
+                    <li>Key Vault - Key management protection</li>
+                </ul>
+                
+                <h4>PowerShell Configuration</h4>
+                <div class="code-block">
+                    <code># Enable all protection plans
 $subscriptionId = "your-subscription-id"
-$assessments = Get-AzSecurityAssessment
+Set-AzContext -SubscriptionId $subscriptionId
 
-$report = @()
-foreach ($assessment in $assessments) {
-    $report += [PSCustomObject]@{
-        ResourceName = $assessment.ResourceDetails.Id.Split('/')[-1]
-        AssessmentName = $assessment.DisplayName
-        Severity = $assessment.Status.Severity
-        Status = $assessment.Status.Code
-        Description = $assessment.Status.Description
-    }
-}
+# List available pricing tiers
+Get-AzSecurityPricing
 
-$report | Export-Csv -Path "SecurityPostureReport.csv" -NoTypeInformation</code>
-        </div>
+# Enable specific protection plans
+Set-AzSecurityPricing -Name "VirtualMachines" -PricingTier "Standard"
+Set-AzSecurityPricing -Name "SqlServers" -PricingTier "Standard"
+Set-AzSecurityPricing -Name "AppServices" -PricingTier "Standard"
+Set-AzSecurityPricing -Name "StorageAccounts" -PricingTier "Standard"</code>
+                </div>
+                
+                <h3>Security Policies</h3>
+                
+                <h4>Built-in Security Policies</h4>
+                <div class="code-block">
+                    <code>Policy Categories:
+- Azure Security Benchmark
+- CIS Microsoft Azure Foundations
+- PCI DSS 3.2.1
+- SOC TSP
+- ISO 27001
+- NIST SP 800-53
 
-        <h4>Compliance Dashboard</h4>
-        <ul>
-          <li><strong>Regulatory compliance:</strong> Monitor PCI DSS, ISO 27001, SOC TSP</li>
-          <li><strong>Security score:</strong> Track improvement over time</li>
-          <li><strong>Vulnerability trends:</strong> Analyze risk reduction</li>
-          <li><strong>Incident response:</strong> Track alert resolution times</li>
-        </ul>
-
-        <div class="tutorial-tips">
-          <h4>🎯 Best Practices</h4>
-          <ul>
-            <li>Enable Defender for all production servers</li>
-            <li>Regularly review and act on security recommendations</li>
-            <li>Implement JIT access for all internet-facing VMs</li>
-            <li>Set up automated alerting for high-severity issues</li>
-            <li>Integrate with existing SIEM/SOAR solutions</li>
-            <li>Regular security posture reviews and reporting</li>
-          </ul>
-        </div>
-
-        <h3>🔄 Automation and Scaling</h3>
-        <h4>Azure Policy for Auto-Enablement</h4>
-        <div class="code-block">
-          <code>{
-  "mode": "All",
-  "policyRule": {
+Assignment Levels:
+- Management Group
+- Subscription  
+- Resource Group
+- Individual Resources</code>
+                </div>
+                
+                <h4>Custom Policy Creation</h4>
+                <div class="code-block">
+                    <code># Azure Policy JSON example
+{
     "if": {
-      "field": "type",
-      "equals": "Microsoft.Compute/virtualMachines"
+        "allOf": [
+            {
+                "field": "type",
+                "equals": "Microsoft.Storage/storageAccounts"
+            },
+            {
+                "field": "Microsoft.Storage/storageAccounts/supportsHttpsTrafficOnly",
+                "notEquals": "true"
+            }
+        ]
     },
     "then": {
-      "effect": "DeployIfNotExists",
-      "details": {
-        "type": "Microsoft.Compute/virtualMachines/extensions",
-        "name": "MicrosoftMonitoringAgent",
-        "deployment": {
-          "properties": {
-            "mode": "incremental",
-            "template": {
-              "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-              "contentVersion": "1.0.0.0",
-              "resources": [
-                {
-                  "type": "Microsoft.Compute/virtualMachines/extensions",
-                  "name": "[concat(parameters('vmName'), '/MicrosoftMonitoringAgent')]",
-                  "properties": {
-                    "publisher": "Microsoft.EnterpriseCloud.Monitoring",
-                    "type": "MicrosoftMonitoringAgent",
-                    "settings": {
-                      "workspaceId": "[parameters('workspaceId')]"
-                    },
-                    "protectedSettings": {
-                      "workspaceKey": "[parameters('workspaceKey')]"
-                    }
-                  }
-                }
-              ]
-            }
-          }
+        "effect": "audit"
+    }
+}</code>
+                </div>
+                
+                <h3>Secure Score</h3>
+                
+                <h4>Understanding Secure Score</h4>
+                <div class="tutorial-tips">
+                    <h4>💡 Secure Score Components</h4>
+                    <ul>
+                        <li>Current score out of maximum points</li>
+                        <li>Recommendations by category</li>
+                        <li>Impact assessment for each recommendation</li>
+                        <li>Historical trends and comparisons</li>
+                    </ul>
+                </div>
+                
+                <h4>Improving Secure Score</h4>
+                <ol>
+                    <li>Review high-impact recommendations first</li>
+                    <li>Implement security controls systematically</li>
+                    <li>Monitor score improvements over time</li>
+                    <li>Address compliance requirements</li>
+                </ol>
+                
+                <h3>Vulnerability Assessment</h3>
+                
+                <h4>Enable Vulnerability Assessment</h4>
+                <div class="code-block">
+                    <code># Enable VA for SQL databases
+$resourceGroupName = "database-rg"
+$serverName = "sql-server-01"
+
+# Configure vulnerability assessment
+Set-AzSqlServerVulnerabilityAssessmentSetting -ResourceGroupName $resourceGroupName -ServerName $serverName -StorageAccountName "vastorage" -ScanResultsContainerName "vulnerability-assessment" -RecurringScansInterval Weekly -EmailSubscriptionAdmins $true</code>
+                </div>
+                
+                <h4>VM Vulnerability Scanning</h4>
+                <ol>
+                    <li>Deploy vulnerability assessment extension</li>
+                    <li>Configure scanning schedules</li>
+                    <li>Review vulnerability reports</li>
+                    <li>Implement remediation recommendations</li>
+                </ol>
+                
+                <h3>Regulatory Compliance</h3>
+                
+                <h4>Compliance Dashboard</h4>
+                <div class="code-block">
+                    <code>Compliance Standards Available:
+- Azure Security Benchmark
+- NIST SP 800-53 R4
+- PCI DSS 3.2.1  
+- ISO 27001:2013
+- SOC TSP
+- HIPAA HITRUST
+- Canada Federal PBMM</code>
+                </div>
+                
+                <h4>Custom Compliance Assessment</h4>
+                <ol>
+                    <li>Create custom initiative definitions</li>
+                    <li>Group related policy definitions</li>
+                    <li>Assign to appropriate scopes</li>
+                    <li>Monitor compliance status</li>
+                </ol>
+                
+                <h3>Integration and Automation</h3>
+                
+                <h4>Logic Apps Integration</h4>
+                <div class="code-block">
+                    <code># Workflow trigger for security alerts
+{
+    "triggers": {
+        "When_a_HTTP_request_is_received": {
+            "type": "Request",
+            "kind": "Http"
         }
-      }
-    }
-  }
-}</code>
-        </div>
-      </div>
-    `
-  },
-
-  'defender-cloud': {
-    title: 'Microsoft Defender for Cloud configuration',
-    category: 'azure',
-    difficulty: 'advanced',
-    estimatedTime: '3-4 hours',
-    content: `
-      <div class="tutorial-content">
-        <h2>☁️ Microsoft Defender for Cloud Configuration</h2>
-        
-        <div class="tutorial-tips">
-          <h4>💡 What you'll learn</h4>
-          <p>Comprehensive setup and configuration of Microsoft Defender for Cloud for multi-cloud security posture management, regulatory compliance, and threat protection.</p>
-        </div>
-
-        <h3>🏗️ Architecture Overview</h3>
-        <ul>
-          <li><strong>Security Posture Management:</strong> CSPM across Azure, AWS, GCP</li>
-          <li><strong>Workload Protection:</strong> CWPP for servers, containers, databases</li>
-          <li><strong>Regulatory Compliance:</strong> Built-in compliance standards</li>
-          <li><strong>Threat Intelligence:</strong> Microsoft security research integration</li>
-        </ul>
-
-        <h3>🚀 Step 1: Initial Setup and Configuration</h3>
-        <h4>Enable Enhanced Security Features</h4>
-        <div class="code-block">
-          <code># PowerShell setup
-Connect-AzAccount
-Set-AzContext -SubscriptionId "your-subscription-id"
-
-# Enable all Defender plans
-$plans = @(
-    "AppServices",
-    "ContainerRegistry", 
-    "KeyVaults",
-    "KubernetesService",
-    "SqlServers",
-    "SqlServerVirtualMachines",
-    "StorageAccounts",
-    "VirtualMachines",
-    "Arm",
-    "Dns",
-    "OpenSourceRelationalDatabases",
-    "Containers"
-)
-
-foreach ($plan in $plans) {
-    Set-AzSecurityPricing -Name $plan -PricingTier "Standard"
-    Write-Host "Enabled Defender for $plan"
-}</code>
-        </div>
-
-        <h4>Configure Environment Settings</h4>
-        <div class="code-block">
-          <code># Configure data collection settings
-Set-AzSecurityAutoProvisioningSetting -Name "default" -EnableAutoProvisioning
-
-# Set up workspace configuration
-$workspace = Get-AzOperationalInsightsWorkspace -ResourceGroupName "security-rg" -Name "central-security-workspace"
-Set-AzSecurityWorkspaceSetting -Name "default" -Scope "/subscriptions/your-subscription-id" -WorkspaceId $workspace.ResourceId
-
-# Configure email notifications
-Set-AzSecurityContact -Email "security-team@company.com" -Phone "+1234567890" -AlertAdmin -AlertNotificationPref</code>
-        </div>
-
-        <h3>🌐 Step 2: Multi-Cloud Integration</h3>
-        <h4>Connect AWS Account</h4>
-        <ol>
-          <li>In Defender for Cloud, go to <strong>Environment settings</strong></li>
-          <li>Click <strong>Add environment</strong> → <strong>Amazon Web Services</strong></li>
-          <li>Configure AWS connector:
-            <ul>
-              <li>Create IAM role in AWS with required permissions</li>
-              <li>Configure CloudFormation template</li>
-              <li>Set up cross-account trust</li>
-            </ul>
-          </li>
-        </ol>
-
-        <h4>AWS CloudFormation Template (excerpts)</h4>
-        <div class="code-block">
-          <code>{
-  "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Microsoft Defender for Cloud AWS Connector",
-  "Resources": {
-    "DefenderForCloudRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": {
-                "AWS": "arn:aws:iam::158177204117:root"
-              },
-              "Action": "sts:AssumeRole",
-              "Condition": {
-                "StringEquals": {
-                  "sts:ExternalId": "your-external-id"
-                }
-              }
-            }
-          ]
-        },
-        "ManagedPolicyArns": [
-          "arn:aws:iam::aws:policy/SecurityAudit",
-          "arn:aws:iam::aws:policy/AmazonSSMAutomationRole"
-        ]
-      }
-    }
-  }
-}</code>
-        </div>
-
-        <h4>Connect GCP Project</h4>
-        <div class="code-block">
-          <code># GCP setup commands
-# Create service account
-gcloud iam service-accounts create defender-for-cloud --display-name="Microsoft Defender for Cloud"
-
-# Grant required roles
-gcloud projects add-iam-policy-binding PROJECT_ID --member="serviceAccount:defender-for-cloud@PROJECT_ID.iam.gserviceaccount.com" --role="roles/iam.securityReviewer"
-
-gcloud projects add-iam-policy-binding PROJECT_ID --member="serviceAccount:defender-for-cloud@PROJECT_ID.iam.gserviceaccount.com" --role="roles/cloudasset.viewer"
-
-# Create and download key
-gcloud iam service-accounts keys create defender-key.json --iam-account=defender-for-cloud@PROJECT_ID.iam.gserviceaccount.com</code>
-        </div>
-
-        <h3>📊 Step 3: Advanced Security Policies</h3>
-        <h4>Custom Security Initiatives</h4>
-        <div class="code-block">
-          <code># Create custom initiative definition
-$initiative = @{
-    "properties" = @{
-        "displayName" = "Company Security Baseline"
-        "description" = "Custom security requirements for company infrastructure"
-        "policyDefinitions" = @(
-            @{
-                "policyDefinitionId" = "/providers/Microsoft.Authorization/policyDefinitions/404c3081-a854-4457-ae30-26a93ef643f9"
-                "parameters" = @{
-                    "effect" = @{
-                        "value" = "Audit"
-                    }
-                }
-            },
-            @{
-                "policyDefinitionId" = "/providers/Microsoft.Authorization/policyDefinitions/1a5b4dca-0b6f-4cf5-907c-56316bc1bf3d" 
-                "parameters" = @{
-                    "effect" = @{
-                        "value" = "Deny"
+    },
+    "actions": {
+        "Parse_JSON": {
+            "type": "ParseJson",
+            "inputs": {
+                "content": "@triggerBody()",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "alertDisplayName": {"type": "string"},
+                        "severity": {"type": "string"},
+                        "compromisedEntity": {"type": "string"}
                     }
                 }
             }
-        )
-    }
-}
-
-# Deploy initiative
-New-AzPolicySetDefinition -Name "CompanySecurityBaseline" -PolicyDefinition ($initiative | ConvertTo-Json -Depth 10)</code>
-        </div>
-
-        <h4>Regulatory Compliance Configuration</h4>
-        <div class="code-block">
-          <code># Enable specific compliance standards
-$complianceStandards = @(
-    "Azure-Security-Benchmark",
-    "PCI-DSS-3.2.1",
-    "ISO-27001",
-    "SOC-TSP",
-    "NIST-SP-800-53-R4",
-    "NIST-SP-800-171-R2"
-)
-
-foreach ($standard in $complianceStandards) {
-    # This is typically done through the portal or REST API
-    Write-Host "Configure compliance standard: $standard"
-}</code>
-        </div>
-
-        <h3>🔧 Step 4: Advanced Threat Protection</h3>
-        <h4>Container Security Configuration</h4>
-        <div class="code-block">
-          <code># Enable Defender for Containers
-Set-AzSecurityPricing -Name "Containers" -PricingTier "Standard"
-
-# Configure container registry scanning
-$acrPolicy = @{
-    "properties" = @{
-        "displayName" = "Configure container registries to scan images"
-        "policyType" = "BuiltIn"
-        "mode" = "All"
-        "description" = "Enable vulnerability scanning for container images"
-    }
-}
-
-# Kubernetes configuration
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: defender-config
-  namespace: kube-system
-data:
-  config.yaml: |
-    cluster:
-      name: "production-cluster"
-      region: "eastus"
-    defender:
-      enabled: true
-      workspaceId: "your-workspace-id"
-      workspaceKey: "your-workspace-key"</code>
-        </div>
-
-        <h4>Database Protection Setup</h4>
-        <div class="code-block">
-          <code># Enable Defender for SQL Servers
-Set-AzSecurityPricing -Name "SqlServers" -PricingTier "Standard"
-Set-AzSecurityPricing -Name "SqlServerVirtualMachines" -PricingTier "Standard"
-Set-AzSecurityPricing -Name "OpenSourceRelationalDatabases" -PricingTier "Standard"
-
-# Configure SQL vulnerability assessment
-$sqlServerName = "your-sql-server"
-$resourceGroupName = "your-rg"
-
-# Enable Advanced Data Security
-Set-AzSqlServerAdvancedDataSecurityPolicy -ResourceGroupName $resourceGroupName -ServerName $sqlServerName -IsEnabled $true
-
-# Configure vulnerability assessment storage
-Set-AzSqlServerVulnerabilityAssessmentSetting -ResourceGroupName $resourceGroupName -ServerName $sqlServerName -StorageAccountName "sqlvastorage" -ScanTriggerType "Recurring" -RecurringScansInterval "Weekly" -EmailAdmins $true</code>
-        </div>
-
-        <h3>📈 Step 5: Advanced Analytics and Hunting</h3>
-        <h4>Custom KQL Queries for Security Insights</h4>
-        <div class="code-block">
-          <code>// Advanced threat hunting queries
-
-// Suspicious PowerShell activity across all machines
-SecurityEvent
-| where TimeGenerated > ago(24h)
-| where EventID == 4688
-| where Process endswith "powershell.exe" or Process endswith "pwsh.exe"
-| where CommandLine contains "-EncodedCommand" or CommandLine contains "-enc" or CommandLine contains "downloadstring" or CommandLine contains "iex"
-| extend DecodedCommand = base64_decode_tostring(extract(@"-EncodedCommand\s+([A-Za-z0-9+/=]+)", 1, CommandLine))
-| project TimeGenerated, Computer, Account, Process, CommandLine, DecodedCommand
-| order by TimeGenerated desc
-
-// Network connection anomalies
-SecurityEvent 
-| where TimeGenerated > ago(7d)
-| where EventID == 5156
-| summarize count() by Computer, DestAddress, DestPort
-| where count_ > 1000
-| order by count_ desc
-
-// Failed login attempts with geo-location analysis
-SigninLogs
-| where TimeGenerated > ago(24h)
-| where ResultType != 0
-| extend Country = tostring(LocationDetails.countryOrRegion)
-| extend City = tostring(LocationDetails.city)
-| summarize FailedAttempts = count() by UserPrincipalName, Country, City, IPAddress
-| where FailedAttempts > 10
-| order by FailedAttempts desc</code>
-        </div>
-
-        <h4>Custom Analytics Rules</h4>
-        <div class="code-block">
-          <code># Create custom detection rule
-$ruleProperties = @{
-    "displayName" = "Suspicious Process Execution"
-    "description" = "Detects suspicious process execution patterns"
-    "severity" = "High"
-    "enabled" = $true
-    "query" = @"
-SecurityEvent
-| where TimeGenerated > ago(1h)
-| where EventID == 4688
-| where Process in ('net.exe', 'net1.exe', 'whoami.exe', 'nltest.exe')
-| where CommandLine contains 'domain admins' or CommandLine contains 'enterprise admins'
-| summarize count() by Computer, Account
-| where count_ > 3
-"@
-    "queryFrequency" = "PT1H"
-    "queryPeriod" = "PT4H"
-    "triggerOperator" = "GreaterThan"
-    "triggerThreshold" = 0
-}
-
-# Deploy via REST API or ARM template</code>
-        </div>
-
-        <h3>🚨 Step 6: Incident Response Automation</h3>
-        <h4>Logic Apps Integration</h4>
-        <div class="code-block">
-          <code>{
-  "$schema": "https://schema.management.azure.com/schemas/2016-06-01/Microsoft.Logic.json",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "connections_azureloganalyticsdatacollector_externalid": {
-      "defaultValue": "/subscriptions/subscription-id/resourceGroups/rg/providers/Microsoft.Web/connections/azureloganalyticsdatacollector",
-      "type": "String"
-    }
-  },
-  "triggers": {
-    "When_a_response_to_an_Azure_Sentinel_alert_is_triggered": {
-      "type": "ApiConnectionWebhook",
-      "inputs": {
-        "host": {
-          "connection": {
-            "name": "@parameters('connections_azuresentinel_externalid')"
-          }
-        },
-        "body": {
-          "callback_url": "@{listCallbackUrl()}"
-        },
-        "path": "/subscribe"
-      }
-    }
-  },
-  "actions": {
-    "Isolate_machine": {
-      "type": "Http",
-      "inputs": {
-        "uri": "https://graph.microsoft.com/v1.0/security/alerts/@{triggerBody()?['SystemAlertId']}/isolateMachine",
-        "method": "POST",
-        "authentication": {
-          "type": "ManagedServiceIdentity"
         }
-      }
     }
-  }
 }</code>
-        </div>
-
-        <h4>PowerShell Automation Scripts</h4>
-        <div class="code-block">
-          <code># Automated response to high-severity alerts
-function Invoke-SecurityResponse {
-    param(
-        [Parameter(Mandatory=$true)]
-        [string]$AlertId,
-        
-        [Parameter(Mandatory=$true)]
-        [string]$Severity,
-        
-        [Parameter(Mandatory=$true)]
-        [string]$ComputerName
-    )
+                </div>
+                
+                <h4>PowerBI Reporting</h4>
+                <ol>
+                    <li>Connect PowerBI to Log Analytics workspace</li>
+                    <li>Import security data using KQL queries</li>
+                    <li>Create security dashboards</li>
+                    <li>Schedule automated report delivery</li>
+                </ol>
+                
+                <div class="tutorial-warning">
+                    <h4>⚠️ Cost Management</h4>
+                    <p>Monitor Defender for Cloud costs regularly and optimize protection plans based on actual usage and criticality.</p>
+                </div>
+            </div>
+        `
+    },
     
-    if ($Severity -eq "High") {
-        # Isolate machine
-        Invoke-AzRestMethod -Path "/subscriptions/subscription-id/resourceGroups/rg/providers/Microsoft.Security/advancedThreatProtectionSettings/current/isolateMachine" -Method POST -Payload @{computerName=$ComputerName}
-        
-        # Create incident ticket
-        $ticketData = @{
-            title = "High Severity Security Alert: $AlertId"
-            description = "Automated isolation performed for computer: $ComputerName"
-            severity = "High"
-            assignee = "security-team@company.com"
-        }
-        
-        # Send to ticketing system
-        Invoke-RestMethod -Uri "https://api.ticketsystem.com/incidents" -Method POST -Body ($ticketData | ConvertTo-Json) -ContentType "application/json"
-        
-        # Notify security team
-        Send-MailMessage -To "security-team@company.com" -Subject "URGENT: Security Incident $AlertId" -Body "Machine $ComputerName has been isolated due to high-severity security alert."
-    }
-}
+    'intune-setup': {
+        title: 'Microsoft Intune device management setup',
+        content: `
+            <div class="tutorial-content">
+                <h2>Microsoft Intune Device Management Setup</h2>
+                
+                <h3>Initial Configuration</h3>
+                
+                <h4>Enable Intune Services</h4>
+                <div class="code-block">
+                    <code>Microsoft 365 Admin Center:
+1. Navigate to Setup > Domains
+2. Verify domain ownership
+3. Go to Azure AD > Mobility (MDM and MAM)
+4. Configure Microsoft Intune MDM authority
+5. Set user scope (All, Some, None)</code>
+                </div>
+                
+                <h4>PowerShell Configuration</h4>
+                <div class="code-block">
+                    <code># Connect to Microsoft Graph
+Connect-MgGraph -Scopes "DeviceManagementConfiguration.ReadWrite.All"
 
-# Schedule this script to run periodically or trigger from alerts</code>
-        </div>
+# Get Intune service configuration
+Get-MgDeviceManagementDeviceConfiguration
 
-        <h3>📊 Step 7: Advanced Reporting and Dashboards</h3>
-        <h4>PowerBI Integration</h4>
-        <div class="code-block">
-          <code># Export security data to PowerBI
-$workspace = Get-AzOperationalInsightsWorkspace -ResourceGroupName "security-rg" -Name "security-workspace"
-
-# Create data export rule
-$exportRule = @{
-    "properties" = @{
-        "dataExportId" = "security-export"
-        "tableNames" = @("SecurityAlert", "SecurityRecommendation", "SecurityEvent")
-        "enable" = $true
-        "destination" = @{
-            "resourceId" = "/subscriptions/subscription-id/resourceGroups/rg/providers/Microsoft.Storage/storageAccounts/securitydata"
-            "type" = "StorageAccount"
-        }
-    }
-}
-
-# PowerBI query examples
-let SecurityTrends = 
-    SecurityAlert
-    | where TimeGenerated > ago(30d)
-    | summarize AlertCount = count() by bin(TimeGenerated, 1d), AlertSeverity
-    | order by TimeGenerated asc;
-
-let ComplianceScore = 
-    SecurityRecommendation
-    | where TimeGenerated > ago(1d)
-    | summarize 
-        TotalRecommendations = count(),
-        HealthyResources = countif(RecommendationState == "Healthy"),
-        UnhealthyResources = countif(RecommendationState == "Unhealthy")
-    | extend CompliancePercentage = (HealthyResources * 100.0) / TotalRecommendations;</code>
-        </div>
-
-        <h4>Executive Dashboard Queries</h4>
-        <div class="code-block">
-          <code>// Executive security dashboard KQL queries
-
-// Security score over time
-SecurityRecommendation
-| where TimeGenerated > ago(90d)
-| summarize 
-    HealthyResources = countif(RecommendationState == "Healthy"),
-    TotalResources = count() 
-    by bin(TimeGenerated, 1d)
-| extend SecurityScore = (HealthyResources * 100.0) / TotalResources
-| project TimeGenerated, SecurityScore
-| render timechart
-
-// Top security risks
-SecurityRecommendation
-| where RecommendationState == "Unhealthy"
-| where RecommendationSeverity in ("High", "Medium")
-| summarize AffectedResources = dcount(ResourceId) by RecommendationDisplayName, RecommendationSeverity
-| top 10 by AffectedResources
-| render barchart
-
-// Compliance status by standard
-SecurityRegulatoryCompliance
-| where TimeGenerated > ago(1d)
-| summarize 
-    PassedControls = countif(State == "Passed"),
-    FailedControls = countif(State == "Failed"),
-    TotalControls = count()
-    by ComplianceStandardId
-| extend CompliancePercentage = (PassedControls * 100.0) / TotalControls
-| project ComplianceStandardId, CompliancePercentage, FailedControls
-| order by CompliancePercentage asc</code>
-        </div>
-
-        <h3>🔒 Step 8: Advanced Security Configuration</h3>
-        <h4>Zero Trust Network Architecture</h4>
-        <div class="code-block">
-          <code># Implement Zero Trust principles
-# Conditional Access policies
-$caPolicy = @{
-    "displayName" = "Require MFA for Azure Management"
-    "state" = "enabled"
-    "conditions" = @{
-        "applications" = @{
-            "includeApplications" = @("797f4846-ba00-4fd7-ba43-dac1f8f63013")
-        }
-        "users" = @{
-            "includeUsers" = @("All")
-            "excludeUsers" = @("break-glass-account-id")
-        }
-    }
-    "grantControls" = @{
-        "operator" = "OR"
-        "builtInControls" = @("mfa")
-    }
-}
-
-# Network segmentation policies
-$nsgRules = @(
-    @{
-        "name" = "DenyAllInbound"
-        "priority" = 4000
-        "direction" = "Inbound"
-        "access" = "Deny"
-        "protocol" = "*"
-        "sourcePortRange" = "*"
-        "destinationPortRange" = "*"
-        "sourceAddressPrefix" = "*"
-        "destinationAddressPrefix" = "*"
-    }
-)</code>
-        </div>
-
-        <h3>🚀 Step 9: Performance Optimization</h3>
-        <h4>Cost Management</h4>
-        <div class="code-block">
-          <code># Monitor Defender costs
-$usage = Get-AzConsumptionUsageDetail -StartDate (Get-Date).AddDays(-30) -EndDate (Get-Date)
-$defenderCosts = $usage | Where-Object {$_.ConsumedService -like "*Security*" -or $_.ConsumedService -like "*Defender*"}
-
-$monthlyCost = ($defenderCosts | Measure-Object PretaxCost -Sum).Sum
-Write-Host "Monthly Defender for Cloud cost: $monthlyCost"
-
-# Optimize by disabling unnecessary features
-$unnecessaryPlans = @("Dns", "Arm")  # Example - review based on your needs
-foreach ($plan in $unnecessaryPlans) {
-    Set-AzSecurityPricing -Name $plan -PricingTier "Free"
+# Create configuration profile
+$configProfile = @{
+    "@odata.type" = "#microsoft.graph.windows10GeneralConfiguration"
+    displayName = "Corporate Security Policy"
+    description = "Standard security configuration for corporate devices"
 }</code>
-        </div>
+                </div>
+                
+                <h3>Device Enrollment</h3>
+                
+                <h4>Windows Autopilot Setup</h4>
+                <ol>
+                    <li>Upload device hardware hashes</li>
+                    <li>Create Autopilot deployment profiles</li>
+                    <li>Assign profiles to device groups</li>
+                    <li>Configure Windows Autopilot settings</li>
+                </ol>
+                
+                <h4>Device Enrollment Restrictions</h4>
+                <div class="code-block">
+                    <code>Enrollment Restrictions Configuration:
+Device Type Restrictions:
+- Allow/Block Android devices
+- Allow/Block iOS devices  
+- Allow/Block Windows devices
+- Allow/Block macOS devices
 
-        <div class="tutorial-tips">
-          <h4>🎯 Best Practices</h4>
-          <ul>
-            <li>Enable all relevant Defender plans for comprehensive protection</li>
-            <li>Implement custom analytics rules for organization-specific threats</li>
-            <li>Integrate with existing SIEM and SOAR solutions</li>
-            <li>Regular security posture reviews and compliance assessments</li>
-            <li>Automate incident response for high-severity alerts</li>
-            <li>Continuous monitoring and optimization of security policies</li>
-          </ul>
-        </div>
+Device Limit Restrictions:
+- Maximum devices per user
+- Platform-specific limits</code>
+                </div>
+                
+                <h3>Configuration Profiles</h3>
+                
+                <h4>Windows 10/11 Configuration</h4>
+                <div class="code-block">
+                    <code>Key Configuration Areas:
+Device Restrictions:
+- Camera and recording settings
+- Cloud and storage settings
+- Connectivity options
+- Control panel and settings access
 
-        <h3>🔄 Continuous Improvement</h3>
-        <ul>
-          <li><strong>Monthly security reviews:</strong> Analyze trends and adjust policies</li>
-          <li><strong>Threat landscape updates:</strong> Adapt to new attack vectors</li>
-          <li><strong>Compliance monitoring:</strong> Ensure ongoing regulatory adherence</li>
-          <li><strong>Cost optimization:</strong> Balance security coverage with budget</li>
-          <li><strong>Team training:</strong> Keep security teams updated on new features</li>
-        </ul>
-      </div>
-    `
-  }
+Security Settings:
+- BitLocker encryption
+- Windows Defender settings
+- Windows Update policies
+- Password requirements</code>
+                </div>
+                
+                <h4>iOS/iPadOS Configuration</h4>
+                <div class="code-block">
+                    <code>iOS Device Configuration:
+General Settings:
+- Passcode requirements
+- Touch ID/Face ID settings
+- App Store restrictions
+- Safari security settings
+
+Security Features:
+- VPN configuration
+- Wi-Fi profiles
+- Certificate deployment
+- Email account setup</code>
+                </div>
+                
+                <h3>Application Management</h3>
+                
+                <h4>App Deployment Strategies</h4>
+                <ul>
+                    <li>Required apps (automatically install)</li>
+                    <li>Available apps (user installs from portal)</li>
+                    <li>Uninstall apps (remove from devices)</li>
+                    <li>App configuration policies</li>
+                </ul>
+                
+                <h4>Line-of-Business App Deployment</h4>
+                <div class="code-block">
+                    <code>LOB App Upload Process:
+1. Prepare app package (.msi, .exe, .appx for Windows)
+2. Upload to Intune Apps section
+3. Configure app information and requirements
+4. Create assignments to user/device groups
+5. Monitor deployment status</code>
+                </div>
+                
+                <h3>Compliance Policies</h3>
+                
+                <h4>Device Compliance Settings</h4>
+                <div class="code-block">
+                    <code>Compliance Requirements:
+Device Health:
+- Minimum OS version
+- Maximum OS version
+- Device encryption required
+- Jailbreak/Root detection
+
+Security Settings:
+- Antivirus protection required
+- Real-time protection enabled
+- Firewall enabled
+- Secure boot enabled
+
+Password Policy:
+- Minimum password length
+- Password complexity
+- Maximum password age
+- Previous password reuse</code>
+                </div>
+                
+                <h4>Conditional Access Integration</h4>
+                <ol>
+                    <li>Create compliance policies in Intune</li>
+                    <li>Configure conditional access in Azure AD</li>
+                    <li>Set compliance as requirement for access</li>
+                    <li>Define actions for non-compliant devices</li>
+                </ol>
+                
+                <h3>Mobile Application Management (MAM)</h3>
+                
+                <h4>App Protection Policies</h4>
+                <div class="code-block">
+                    <code>MAM Policy Configuration:
+Data Transfer:
+- Backup restrictions
+- Cut, copy, paste restrictions
+- Data transfer between apps
+- Save-as restrictions
+
+Access Requirements:
+- PIN requirements
+- Corporate credentials
+- Fingerprint authentication
+- Minimum app version
+
+Conditional Launch:
+- Max PIN attempts
+- Offline grace period
+- Jailbroken/rooted device check
+- Min OS version requirement</code>
+                </div>
+                
+                <h3>Monitoring and Reporting</h3>
+                
+                <h4>Device Status Monitoring</h4>
+                <div class="tutorial-tips">
+                    <h4>💡 Key Monitoring Areas</h4>
+                    <ul>
+                        <li>Device enrollment status</li>
+                        <li>Compliance policy adherence</li>
+                        <li>Configuration profile deployment</li>
+                        <li>Application installation status</li>
+                        <li>Security baseline compliance</li>
+                    </ul>
+                </div>
+                
+                <h4>Custom Reports</h4>
+                <div class="code-block">
+                    <code># PowerShell - Export device compliance report
+$devices = Get-MgDeviceManagementManagedDevice -All
+
+$complianceReport = $devices | ForEach-Object {
+    [PSCustomObject]@{
+        DeviceName = $_.DeviceName
+        UserName = $_.UserDisplayName
+        OS = $_.OperatingSystem
+        ComplianceState = $_.ComplianceState
+        LastCheckIn = $_.LastSyncDateTime
+        DeviceId = $_.Id
+    }
+}
+
+$complianceReport | Export-Csv -Path "DeviceComplianceReport.csv" -NoTypeInformation</code>
+                </div>
+                
+                <h3>Troubleshooting</h3>
+                
+                <h4>Common Issues and Solutions</h4>
+                <div class="code-block">
+                    <code>Enrollment Issues:
+- Check DNS configuration
+- Verify firewall ports (443, 80)
+- Validate certificates
+- Review enrollment restrictions
+
+Policy Deployment Issues:
+- Check group assignments
+- Verify device check-in status
+- Review policy conflicts
+- Check assignment filters</code>
+                </div>
+                
+                <div class="tutorial-warning">
+                    <h4>⚠️ Security Considerations</h4>
+                    <p>Always test configuration profiles and compliance policies in a pilot group before broad deployment to avoid business disruption.</p>
+                </div>
+            </div>
+        `
+    }
 };
-
-// Additional Azure tutorials would continue here with similar comprehensive content structure
-// Including Intune, Sentinel, Azure Firewall, Log Analytics, VM backup, Site Recovery, and VPN guides

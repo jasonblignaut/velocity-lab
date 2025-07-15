@@ -1,240 +1,192 @@
 /* ===================================================================
-   Velocity Lab - API Interface
-   Cloudflare Workers integration and API communication layer
+   Velocity Lab - API Client System
+   Handles all backend communication with error handling and offline detection
    =================================================================== */
 
-/* ===================================================================
-   API Configuration
-   =================================================================== */
 const API_CONFIG = {
-    baseURL: '/api',
+    baseUrl: '/api',
     timeout: 30000, // 30 seconds
     retryAttempts: 3,
-    retryDelay: 1000, // 1 second
-    endpoints: {
-        // Authentication
-        login: '/users/login',
-        logout: '/users/logout',
-        register: '/users/register',
-        
-        // User Management
-        progress: '/user/progress',
-        preferences: '/user/preferences',
-        labHistory: '/user/lab-history',
-        profile: '/user/profile',
-        
-        // Lab Management
-        labStart: '/lab/start',
-        labComplete: '/lab/complete',
-        labReset: '/lab/reset',
-        
-        // Admin
-        adminUsers: '/admin/users-progress',
-        adminStats: '/admin/stats'
-    }
+    retryDelay: 1000 // 1 second
 };
 
-/* ===================================================================
-   Main API Class
-   =================================================================== */
 const velocityAPI = {
     
     /* ===================================================================
-       Core API Methods
+       Core API Communication
        =================================================================== */
 
     /**
      * Make API call with comprehensive error handling
-     * @param {string} url - API endpoint URL
+     * @param {string} endpoint - API endpoint
      * @param {object} options - Request options
      * @returns {Promise<object>} API response
      */
-    async call(url, options = {}) {
-        const startTime = performance.now();
-        let attempt = 0;
+    async call(endpoint, options = {}) {
+        const url = endpoint.startsWith('http') ? endpoint : `${API_CONFIG.baseUrl}${endpoint}`;
+        
+        try {
+            console.log('🌐 API Call:', options.method || 'GET', url);
+            
+            // Log FormData contents for debugging
+            if (options.body instanceof FormData) {
+                console.log('📝 FormData contents:');
+                for (let [key, value] of options.body.entries()) {
+                    if (key === 'password') {
+                        console.log(`  ${key}: [${value.length} characters]`);
+                    } else {
+                        console.log(`  ${key}:`, value);
+                    }
+                }
+            } else if (options.body && typeof options.body === 'string') {
+                try {
+                    const bodyData = JSON.parse(options.body);
+                    console.log('📝 Request body:', bodyData);
+                } catch (e) {
+                    console.log('📝 Request body (string):', options.body);
+                }
+            }
+            
+            // Check if offline
+            if (!navigator.onLine) {
+                throw new Error('OFFLINE');
+            }
+            
+            // Make the request
+            const response = await fetch(url, {
+                method: options.method || 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    ...options.headers
+                },
+                body: options.body,
+                signal: this.createTimeoutSignal(options.timeout || API_CONFIG.timeout)
+            });
 
-        while (attempt < API_CONFIG.retryAttempts) {
+            console.log('📡 Response status:', response.status, response.statusText);
+
+            // Check content type
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                if (contentType && contentType.includes('text/html')) {
+                    console.warn('❌ Backend API not deployed - received HTML instead of JSON');
+                    throw new Error('BACKEND_NOT_AVAILABLE');
+                }
+                
+                console.error('❌ Expected JSON response but got:', contentType);
+                const responseText = await response.text();
+                console.error('Response body:', responseText);
+                throw new Error(`API returned ${response.status}: Expected JSON response but got ${contentType}`);
+            }
+
+            // Parse JSON response
+            const result = await response.json();
+            console.log('✅ Response data:', result);
+            
+            // Check for API-level errors
+            if (!response.ok) {
+                throw new Error(result.message || `HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            if (!result.success) {
+                throw new Error(result.message || result.error || 'API call failed');
+            }
+            
+            return result;
+            
+        } catch (error) {
+            console.error('❌ API call failed:', error);
+            
+            // Handle specific error types
+            if (error.name === 'AbortError') {
+                throw new Error('Request timeout - please try again');
+            }
+            
+            if (!navigator.onLine) {
+                throw new Error('OFFLINE');
+            }
+            
+            // Re-throw the error for caller to handle
+            throw error;
+        }
+    },
+
+    /**
+     * Create timeout signal for fetch requests
+     * @param {number} timeout - Timeout in milliseconds
+     * @returns {AbortSignal} Abort signal
+     */
+    createTimeoutSignal(timeout) {
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), timeout);
+        return controller.signal;
+    },
+
+    /**
+     * Retry API call with exponential backoff
+     * @param {function} apiCall - API call function
+     * @param {number} attempts - Number of retry attempts
+     * @returns {Promise<object>} API response
+     */
+    async retryCall(apiCall, attempts = API_CONFIG.retryAttempts) {
+        for (let i = 0; i < attempts; i++) {
             try {
-                console.log(`API Call [Attempt ${attempt + 1}]:`, options.method || 'GET', url);
-                
-                // Log request body for debugging (safely)
-                if (options.body) {
-                    if (options.body instanceof FormData) {
-                        console.log('FormData contents:');
-                        for (let [key, value] of options.body.entries()) {
-                            if (key === 'password') {
-                                console.log(`  ${key}: [${value.length} characters]`);
-                            } else {
-                                console.log(`  ${key}:`, value);
-                            }
-                        }
-                    } else if (typeof options.body === 'string') {
-                        try {
-                            const bodyObj = JSON.parse(options.body);
-                            const safeBody = { ...bodyObj };
-                            if (safeBody.password) safeBody.password = '[REDACTED]';
-                            console.log('Request body:', safeBody);
-                        } catch {
-                            console.log('Request body: [Non-JSON string]');
-                        }
-                    }
-                }
-
-                // Check network connectivity
-                if (!navigator.onLine) {
-                    throw new APIError('OFFLINE', 'You are offline. Please check your internet connection.');
-                }
-
-                // Make the request with timeout
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
-
-                const response = await fetch(url, {
-                    method: options.method || 'GET',
-                    body: options.body,
-                    headers: {
-                        ...this.getDefaultHeaders(),
-                        ...options.headers
-                    },
-                    signal: controller.signal,
-                    credentials: 'same-origin'
-                });
-
-                clearTimeout(timeoutId);
-
-                console.log(`Response [${performance.now() - startTime}ms]:`, response.status, response.statusText);
-
-                // Handle different response types
-                const contentType = response.headers.get('content-type');
-                let result;
-
-                if (!contentType || !contentType.includes('application/json')) {
-                    if (contentType && contentType.includes('text/html')) {
-                        console.warn('Backend API not deployed - received HTML response');
-                        throw new APIError('BACKEND_NOT_AVAILABLE', 'Backend API is not deployed. Please deploy the Cloudflare Workers functions.');
-                    }
-                    
-                    const responseText = await response.text();
-                    console.error('Expected JSON response but got:', contentType);
-                    console.error('Response body:', responseText.substring(0, 500));
-                    throw new APIError('INVALID_RESPONSE', `API returned ${response.status}: Expected JSON response but got ${contentType}`);
-                }
-
-                result = await response.json();
-                console.log('Response data:', result);
-
-                // Handle HTTP error status codes
-                if (!response.ok) {
-                    const errorMessage = result.message || result.error || `HTTP ${response.status}: ${response.statusText}`;
-                    throw new APIError('HTTP_ERROR', errorMessage, response.status);
-                }
-
-                // Handle API-level errors
-                if (!result.success) {
-                    throw new APIError('API_ERROR', result.message || 'API call failed');
-                }
-
-                return result;
-
+                return await apiCall();
             } catch (error) {
-                attempt++;
+                if (i === attempts - 1) throw error;
                 
-                // Handle specific error types
-                if (error.name === 'AbortError') {
-                    console.error('Request timeout:', url);
-                    if (attempt >= API_CONFIG.retryAttempts) {
-                        throw new APIError('TIMEOUT', 'Request timed out. Please try again.');
-                    }
-                } else if (error instanceof APIError) {
-                    // Don't retry API errors or backend unavailable
-                    if (error.code === 'BACKEND_NOT_AVAILABLE' || error.code === 'OFFLINE' || error.code === 'API_ERROR') {
-                        throw error;
-                    }
-                    if (attempt >= API_CONFIG.retryAttempts) {
-                        throw error;
-                    }
-                } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
-                    console.error('Network error:', error);
-                    if (attempt >= API_CONFIG.retryAttempts) {
-                        throw new APIError('NETWORK_ERROR', 'Network connection failed. Please check your internet connection.');
-                    }
-                } else {
-                    console.error('Unexpected error:', error);
-                    if (attempt >= API_CONFIG.retryAttempts) {
-                        throw new APIError('UNKNOWN_ERROR', error.message || 'An unexpected error occurred');
-                    }
+                // Don't retry certain errors
+                if (error.message === 'BACKEND_NOT_AVAILABLE' || 
+                    error.message === 'OFFLINE' ||
+                    error.message.includes('401') ||
+                    error.message.includes('403')) {
+                    throw error;
                 }
-
-                // Wait before retry
-                if (attempt < API_CONFIG.retryAttempts) {
-                    console.log(`Retrying in ${API_CONFIG.retryDelay}ms...`);
-                    await this.delay(API_CONFIG.retryDelay * attempt);
-                }
+                
+                const delay = API_CONFIG.retryDelay * Math.pow(2, i);
+                console.log(`🔄 Retrying API call in ${delay}ms (attempt ${i + 1}/${attempts})`);
+                await this.sleep(delay);
             }
         }
     },
 
     /**
-     * Get default headers for API requests
-     * @returns {object} Default headers
+     * Sleep utility for retry delays
+     * @param {number} ms - Milliseconds to sleep
+     * @returns {Promise<void>}
      */
-    getDefaultHeaders() {
-        const headers = {
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-Client-Version': '1.0.0'
-        };
-
-        // Add CSRF token if available
-        const csrfToken = velocityUtils.cookies.get('csrf_token');
-        if (csrfToken) {
-            headers['X-CSRF-Token'] = csrfToken;
-        }
-
-        return headers;
-    },
-
-    /**
-     * Delay utility for retries
-     * @param {number} ms - Milliseconds to delay
-     * @returns {Promise} Promise that resolves after delay
-     */
-    delay(ms) {
+    sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     },
 
     /* ===================================================================
-       Authentication API Methods
+       Authentication API Calls
        =================================================================== */
 
     /**
      * User login
-     * @param {FormData|object} credentials - Login credentials
+     * @param {object} credentials - Login credentials
      * @returns {Promise<object>} Login response
      */
     async login(credentials) {
-        try {
-            const body = credentials instanceof FormData ? credentials : this.createFormData(credentials);
-            
-            const response = await this.call(API_CONFIG.endpoints.login, {
+        const formData = new FormData();
+        
+        if (credentials instanceof FormData) {
+            return this.call('/auth/login', {
                 method: 'POST',
-                body: body
+                body: credentials
             });
-
-            // Store session info securely
-            if (response.success && response.data) {
-                const { sessionToken, user } = response.data;
-                if (sessionToken && user) {
-                    velocityUtils.cookies.set('session', sessionToken, 30);
-                    velocityUtils.cookies.set('user', JSON.stringify(user), 30);
-                    console.log('Session stored successfully');
-                }
+        } else {
+            formData.append('email', credentials.email);
+            formData.append('password', credentials.password);
+            if (credentials.remember) {
+                formData.append('remember', credentials.remember);
             }
-
-            return response;
-        } catch (error) {
-            console.error('Login API error:', error);
-            throw error;
+            
+            return this.call('/auth/login', {
+                method: 'POST',
+                body: formData
+            });
         }
     },
 
@@ -244,411 +196,339 @@ const velocityAPI = {
      * @returns {Promise<object>} Logout response
      */
     async logout(sessionToken) {
-        try {
-            const response = await this.call(API_CONFIG.endpoints.logout, {
-                method: 'POST',
-                headers: sessionToken ? { 'Authorization': `Bearer ${sessionToken}` } : {}
-            });
+        return this.call('/auth/logout', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${sessionToken}`
+            }
+        });
+    },
 
-            // Clear session info
-            velocityUtils.cookies.delete('session');
-            velocityUtils.cookies.delete('user');
-            console.log('Session cleared');
-
-            return response;
-        } catch (error) {
-            // Always clear local session on logout, even if API fails
-            velocityUtils.cookies.delete('session');
-            velocityUtils.cookies.delete('user');
-            console.warn('Logout API failed, but session cleared locally:', error);
-            return { success: true, message: 'Logged out locally' };
-        }
+    /**
+     * Validate session
+     * @param {string} sessionToken - Session token
+     * @returns {Promise<object>} Validation response
+     */
+    async validateSession(sessionToken) {
+        return this.call('/auth/validate', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${sessionToken}`
+            }
+        });
     },
 
     /* ===================================================================
-       User Data API Methods
+       User Data API Calls
        =================================================================== */
 
     /**
-     * Load user progress
+     * Get user progress
      * @param {string} sessionToken - Session token
      * @returns {Promise<object>} Progress data
      */
-    async loadProgress(sessionToken) {
-        try {
-            return await this.call(API_CONFIG.endpoints.progress, {
-                headers: { 'Authorization': `Bearer ${sessionToken}` }
-            });
-        } catch (error) {
-            console.warn('Failed to load progress from API:', error);
-            throw error;
-        }
+    async getUserProgress(sessionToken) {
+        return this.call('/user/progress', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${sessionToken}`
+            }
+        });
     },
 
     /**
      * Save user progress
      * @param {string} sessionToken - Session token
-     * @param {string} taskId - Task ID
-     * @param {object} progress - Progress data
+     * @param {object} progressData - Progress data to save
      * @returns {Promise<object>} Save response
      */
-    async saveProgress(sessionToken, taskId, progress) {
-        try {
-            return await this.call(API_CONFIG.endpoints.progress, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${sessionToken}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ taskId, progress })
-            });
-        } catch (error) {
-            console.warn('Failed to save progress to API:', error);
-            throw error;
-        }
+    async saveUserProgress(sessionToken, progressData) {
+        return this.call('/user/progress', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${sessionToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(progressData)
+        });
     },
 
     /**
-     * Load user preferences
-     * @param {string} sessionToken - Session token
-     * @returns {Promise<object>} Preferences data
-     */
-    async loadPreferences(sessionToken) {
-        try {
-            return await this.call(API_CONFIG.endpoints.preferences, {
-                headers: { 'Authorization': `Bearer ${sessionToken}` }
-            });
-        } catch (error) {
-            console.warn('Failed to load preferences from API:', error);
-            throw error;
-        }
-    },
-
-    /**
-     * Save user preferences
-     * @param {string} sessionToken - Session token
-     * @param {object} preferences - Preferences data
-     * @returns {Promise<object>} Save response
-     */
-    async savePreferences(sessionToken, preferences) {
-        try {
-            return await this.call(API_CONFIG.endpoints.preferences, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${sessionToken}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(preferences)
-            });
-        } catch (error) {
-            console.warn('Failed to save preferences to API:', error);
-            throw error;
-        }
-    },
-
-    /* ===================================================================
-       Lab Management API Methods
-       =================================================================== */
-
-    /**
-     * Load lab history
+     * Get user lab history
      * @param {string} sessionToken - Session token
      * @returns {Promise<object>} Lab history data
      */
-    async loadLabHistory(sessionToken) {
-        try {
-            return await this.call(API_CONFIG.endpoints.labHistory, {
-                headers: { 'Authorization': `Bearer ${sessionToken}` }
-            });
-        } catch (error) {
-            console.warn('Failed to load lab history from API:', error);
-            throw error;
-        }
+    async getLabHistory(sessionToken) {
+        return this.call('/user/lab-history', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${sessionToken}`
+            }
+        });
     },
 
     /**
      * Save lab history
      * @param {string} sessionToken - Session token
-     * @param {array|object} historyData - Lab history data
+     * @param {object} historyData - History data to save
      * @returns {Promise<object>} Save response
      */
     async saveLabHistory(sessionToken, historyData) {
-        try {
-            return await this.call(API_CONFIG.endpoints.labHistory, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${sessionToken}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(historyData)
-            });
-        } catch (error) {
-            console.warn('Failed to save lab history to API:', error);
-            throw error;
-        }
+        return this.call('/user/lab-history', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${sessionToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(historyData)
+        });
     },
 
     /**
-     * Start new lab environment
+     * Get user preferences
      * @param {string} sessionToken - Session token
-     * @param {object} labConfig - Lab configuration
-     * @returns {Promise<object>} Lab start response
+     * @returns {Promise<object>} User preferences
      */
-    async startLab(sessionToken, labConfig = {}) {
-        try {
-            return await this.call(API_CONFIG.endpoints.labStart, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${sessionToken}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(labConfig)
-            });
-        } catch (error) {
-            console.warn('Failed to start lab via API:', error);
-            throw error;
-        }
+    async getUserPreferences(sessionToken) {
+        return this.call('/user/preferences', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${sessionToken}`
+            }
+        });
+    },
+
+    /**
+     * Save user preferences
+     * @param {string} sessionToken - Session token
+     * @param {object} preferences - Preferences to save
+     * @returns {Promise<object>} Save response
+     */
+    async saveUserPreferences(sessionToken, preferences) {
+        return this.call('/user/preferences', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${sessionToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(preferences)
+        });
     },
 
     /* ===================================================================
-       Admin API Methods
+       Lab Management API Calls
        =================================================================== */
 
     /**
-     * Get admin users progress data
+     * Start new lab session
      * @param {string} sessionToken - Session token
+     * @param {object} labData - Lab configuration
+     * @returns {Promise<object>} Lab start response
+     */
+    async startLab(sessionToken, labData = {}) {
+        return this.call('/lab/start', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${sessionToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(labData)
+        });
+    },
+
+    /**
+     * Complete lab session
+     * @param {string} sessionToken - Session token
+     * @param {string} labId - Lab ID
+     * @param {object} completionData - Completion data
+     * @returns {Promise<object>} Lab completion response
+     */
+    async completeLab(sessionToken, labId, completionData) {
+        return this.call('/lab/complete', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${sessionToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                labId,
+                ...completionData
+            })
+        });
+    },
+
+    /* ===================================================================
+       Admin API Calls
+       =================================================================== */
+
+    /**
+     * Get all users progress (admin only)
+     * @param {string} sessionToken - Admin session token
      * @returns {Promise<object>} Users progress data
      */
     async getAdminUsersProgress(sessionToken) {
-        try {
-            return await this.call(API_CONFIG.endpoints.adminUsers, {
-                headers: {
-                    'Authorization': `Bearer ${sessionToken}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-        } catch (error) {
-            console.warn('Failed to load admin data from API:', error);
-            throw error;
-        }
+        return this.call('/admin/users-progress', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${sessionToken}`
+            }
+        });
     },
 
     /**
-     * Get admin statistics
-     * @param {string} sessionToken - Session token
-     * @returns {Promise<object>} Admin statistics
+     * Get admin dashboard data
+     * @param {string} sessionToken - Admin session token
+     * @returns {Promise<object>} Dashboard data
      */
-    async getAdminStats(sessionToken) {
-        try {
-            return await this.call(API_CONFIG.endpoints.adminStats, {
-                headers: {
-                    'Authorization': `Bearer ${sessionToken}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-        } catch (error) {
-            console.warn('Failed to load admin stats from API:', error);
-            throw error;
-        }
+    async getAdminDashboard(sessionToken) {
+        return this.call('/admin/dashboard', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${sessionToken}`
+            }
+        });
+    },
+
+    /**
+     * Manage user account (admin only)
+     * @param {string} sessionToken - Admin session token
+     * @param {string} userId - User ID to manage
+     * @param {object} userData - User data updates
+     * @returns {Promise<object>} Management response
+     */
+    async manageUser(sessionToken, userId, userData) {
+        return this.call('/admin/users', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${sessionToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userId,
+                ...userData
+            })
+        });
     },
 
     /* ===================================================================
-       Utility Methods
+       Utility Functions
        =================================================================== */
 
     /**
-     * Create FormData from object
-     * @param {object} data - Data object
-     * @returns {FormData} FormData instance
+     * Check API health
+     * @returns {Promise<object>} Health check response
      */
-    createFormData(data) {
-        const formData = new FormData();
-        for (const [key, value] of Object.entries(data)) {
-            if (value !== null && value !== undefined) {
-                formData.append(key, value);
-            }
-        }
-        return formData;
+    async healthCheck() {
+        return this.call('/health', {
+            method: 'GET'
+        });
     },
 
     /**
-     * Check API health
-     * @returns {Promise<boolean>} True if API is healthy
+     * Get API version
+     * @returns {Promise<object>} Version response
      */
-    async checkHealth() {
+    async getVersion() {
+        return this.call('/version', {
+            method: 'GET'
+        });
+    },
+
+    /**
+     * Test connection to backend
+     * @returns {Promise<boolean>} True if backend is available
+     */
+    async testConnection() {
         try {
-            const response = await this.call('/health', {
-                method: 'GET'
-            });
-            return response.success === true;
+            await this.healthCheck();
+            return true;
         } catch (error) {
-            console.warn('API health check failed:', error);
+            console.warn('Backend connection test failed:', error.message);
             return false;
         }
     },
 
-    /**
-     * Get API status information
-     * @returns {Promise<object>} API status
-     */
-    async getStatus() {
-        try {
-            return await this.call('/status', {
-                method: 'GET'
-            });
-        } catch (error) {
-            console.warn('Failed to get API status:', error);
-            return {
-                success: false,
-                status: 'unknown',
-                message: error.message
-            };
-        }
-    },
-
     /* ===================================================================
-       Request Caching (Simple In-Memory Cache)
+       Error Handling Helpers
        =================================================================== */
 
-    cache: new Map(),
-    cacheTimeout: 5 * 60 * 1000, // 5 minutes
-
     /**
-     * Get cached response if valid
-     * @param {string} key - Cache key
-     * @returns {any|null} Cached data or null
+     * Check if error is due to backend not being available
+     * @param {Error} error - Error to check
+     * @returns {boolean} True if backend not available
      */
-    getCached(key) {
-        const cached = this.cache.get(key);
-        if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
-            console.log('Using cached response for:', key);
-            return cached.data;
-        }
-        return null;
+    isBackendUnavailable(error) {
+        return error.message === 'BACKEND_NOT_AVAILABLE' ||
+               error.message.includes('Failed to fetch') ||
+               error.message.includes('NetworkError');
     },
 
     /**
-     * Set cache entry
-     * @param {string} key - Cache key
-     * @param {any} data - Data to cache
+     * Check if error is due to being offline
+     * @param {Error} error - Error to check
+     * @returns {boolean} True if offline
      */
-    setCached(key, data) {
-        this.cache.set(key, {
-            data: data,
-            timestamp: Date.now()
-        });
+    isOfflineError(error) {
+        return error.message === 'OFFLINE' || !navigator.onLine;
+    },
+
+    /**
+     * Check if error is authentication related
+     * @param {Error} error - Error to check
+     * @returns {boolean} True if auth error
+     */
+    isAuthError(error) {
+        return error.message.includes('401') ||
+               error.message.includes('403') ||
+               error.message.includes('Unauthorized') ||
+               error.message.includes('Invalid token');
+    },
+
+    /**
+     * Get user-friendly error message
+     * @param {Error} error - Error to process
+     * @returns {string} User-friendly error message
+     */
+    getErrorMessage(error) {
+        if (this.isOfflineError(error)) {
+            return 'You are offline. Please check your internet connection.';
+        }
         
-        // Simple cache cleanup - remove old entries
-        if (this.cache.size > 100) {
-            const oldestKey = this.cache.keys().next().value;
-            this.cache.delete(oldestKey);
+        if (this.isBackendUnavailable(error)) {
+            return 'Backend service is unavailable. Please try again later.';
         }
-    },
-
-    /**
-     * Clear cache
-     * @param {string} pattern - Optional pattern to match keys
-     */
-    clearCache(pattern = null) {
-        if (pattern) {
-            for (const key of this.cache.keys()) {
-                if (key.includes(pattern)) {
-                    this.cache.delete(key);
-                }
-            }
-        } else {
-            this.cache.clear();
+        
+        if (this.isAuthError(error)) {
+            return 'Authentication failed. Please sign in again.';
         }
-        console.log('Cache cleared:', pattern || 'all');
+        
+        if (error.message.includes('timeout')) {
+            return 'Request timed out. Please try again.';
+        }
+        
+        if (error.message.includes('500')) {
+            return 'Server error. Please try again later.';
+        }
+        
+        // Return the original error message if it's user-friendly
+        if (error.message && !error.message.includes('fetch')) {
+            return error.message;
+        }
+        
+        return 'An unexpected error occurred. Please try again.';
     }
 };
 
 /* ===================================================================
-   Custom API Error Class
-   =================================================================== */
-class APIError extends Error {
-    constructor(code, message, status = null) {
-        super(message);
-        this.name = 'APIError';
-        this.code = code;
-        this.status = status;
-        this.timestamp = new Date().toISOString();
-    }
-
-    toString() {
-        return `APIError [${this.code}]: ${this.message}`;
-    }
-}
-
-/* ===================================================================
-   Offline Support System
-   =================================================================== */
-const velocityOffline = {
-    isOnline: navigator.onLine,
-    
-    /**
-     * Initialize offline detection
-     */
-    init() {
-        window.addEventListener('online', this.handleOnline.bind(this));
-        window.addEventListener('offline', this.handleOffline.bind(this));
-        this.updateStatus();
-    },
-
-    /**
-     * Handle online event
-     */
-    handleOnline() {
-        this.isOnline = true;
-        this.updateStatus();
-        console.log('Connection restored');
-        
-        // Clear API cache to force fresh data
-        velocityAPI.clearCache();
-        
-        // Notify user
-        if (window.velocityNotifications) {
-            velocityNotifications.success('Connection restored!');
-        }
-    },
-
-    /**
-     * Handle offline event
-     */
-    handleOffline() {
-        this.isOnline = false;
-        this.updateStatus();
-        console.log('Connection lost');
-        
-        // Notify user
-        if (window.velocityNotifications) {
-            velocityNotifications.error('You are offline - some features may be limited');
-        }
-    },
-
-    /**
-     * Update UI offline indicator
-     */
-    updateStatus() {
-        const indicator = velocityUtils.getId('offlineIndicator');
-        if (indicator) {
-            indicator.style.display = this.isOnline ? 'none' : 'block';
-        }
-    }
-};
-
-/* ===================================================================
-   Global Registration
+   Global Export
    =================================================================== */
 
-// Make API available globally
+// Make available globally
 if (typeof window !== 'undefined') {
     window.velocityAPI = velocityAPI;
-    window.velocityOffline = velocityOffline;
-    window.APIError = APIError;
 }
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { velocityAPI, velocityOffline, APIError };
+    module.exports = velocityAPI;
 }

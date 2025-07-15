@@ -1,242 +1,334 @@
-/**
- * Velocity Lab - Microsoft 365 Tutorials
- * Comprehensive Microsoft 365 guides for MSP professionals
- */
+/* ===================================================================
+   Microsoft 365 Tutorials - Properly Escaped Content
+   =================================================================== */
 
 window.MICROSOFT365_TUTORIALS = {
-  'tenant-creation': {
-    title: 'Creating new M365 tenant for customers',
-    category: 'microsoft365',
-    difficulty: 'intermediate',
-    estimatedTime: '1-2 hours',
-    content: `
-      <div class="tutorial-content">
-        <h2>🏢 Creating New M365 Tenant for Customers</h2>
-        
-        <div class="tutorial-tips">
-          <h4>💡 What you'll learn</h4>
-          <p>Complete process for creating and configuring new Microsoft 365 tenants for customers, including domain setup, user provisioning, and initial security configuration.</p>
-        </div>
-
-        <h3>📋 Prerequisites</h3>
-        <ul>
-          <li>Microsoft Partner Center access (CSP program recommended)</li>
-          <li>Customer's domain information and DNS access</li>
-          <li>Customer requirements document</li>
-          <li>Valid payment method for subscription</li>
-        </ul>
-
-        <h3>🚀 Step 1: Tenant Creation Process</h3>
-        <h4>Via Microsoft Partner Center (CSP)</h4>
-        <ol>
-          <li>Log into <strong>Microsoft Partner Center</strong></li>
-          <li>Navigate to <strong>Customers → Add Customer</strong></li>
-          <li>Fill customer information:
-            <div class="code-block">
-              <code># Customer Details
-Company Name: Acme Corporation
-Contact Person: John Smith
-Email: john.smith@acmecorp.com
-Phone: +1-555-0123
-Address: 123 Business St, City, State 12345
-Country: United States
-Industry: Manufacturing
-Company Size: 50-250 employees</code>
+    'new-tenant': {
+        title: 'Creating new M365 tenant for customers',
+        content: `
+            <div class="tutorial-content">
+                <h2>Creating a New Microsoft 365 Tenant for Customers</h2>
+                
+                <h3>Prerequisites</h3>
+                <ul>
+                    <li>Microsoft Partner Center access</li>
+                    <li>Customer domain information</li>
+                    <li>Customer contact details</li>
+                </ul>
+                
+                <h3>Step-by-Step Process</h3>
+                
+                <h4>1. Access Partner Center</h4>
+                <div class="code-block">
+                    <code>https://partner.microsoft.com/dashboard</code>
+                </div>
+                
+                <h4>2. Create New Customer</h4>
+                <ol>
+                    <li>Navigate to Customers section</li>
+                    <li>Click "Add Customer"</li>
+                    <li>Enter customer details:
+                        <ul>
+                            <li>Company name</li>
+                            <li>Contact information</li>
+                            <li>Domain preferences</li>
+                        </ul>
+                    </li>
+                </ol>
+                
+                <h4>3. Configure Initial Settings</h4>
+                <div class="tutorial-tips">
+                    <h4>💡 Best Practices</h4>
+                    <ul>
+                        <li>Use customer's primary domain</li>
+                        <li>Set up admin accounts properly</li>
+                        <li>Configure security defaults</li>
+                    </ul>
+                </div>
+                
+                <h4>4. License Assignment</h4>
+                <p>Choose appropriate licenses based on customer needs:</p>
+                <ul>
+                    <li>Microsoft 365 Business Basic</li>
+                    <li>Microsoft 365 Business Standard</li>
+                    <li>Microsoft 365 Business Premium</li>
+                </ul>
+                
+                <h3>Post-Setup Configuration</h3>
+                <ol>
+                    <li>Domain verification</li>
+                    <li>DNS record configuration</li>
+                    <li>User account creation</li>
+                    <li>Security policy setup</li>
+                </ol>
+                
+                <div class="tutorial-warning">
+                    <h4>⚠️ Important Notes</h4>
+                    <p>Always verify customer domain ownership before proceeding with tenant creation.</p>
+                </div>
             </div>
-          </li>
-        </ol>
-
-        <h3>👥 Step 3: User Account Setup</h3>
-        <h4>Bulk User Creation via PowerShell</h4>
-        <div class="code-block">
-          <code># Connect to Microsoft 365
-Install-Module -Name MSOnline -Force
-Import-Module MSOnline
-Connect-MsolService
-
-# CSV format for bulk user import
-# UserPrincipalName,FirstName,LastName,DisplayName,Department,JobTitle,PhoneNumber,UsageLocation,LicenseAssignment
-john.smith@acmecorp.com,John,Smith,John Smith,IT,IT Manager,555-0101,US,acmecorp:ENTERPRISEPACK
-jane.doe@acmecorp.com,Jane,Doe,Jane Doe,Sales,Sales Rep,555-0102,US,acmecorp:ENTERPRISEPACK
-
-# PowerShell script for bulk import
-\\$users = Import-Csv "C:\\Users.csv"
-
-foreach (\\$user in \\$users) {
-    \\$upn = \\$user.UserPrincipalName
-    \\$password = "TempPass123!"
+        `
+    },
     
-    # Create user
-    New-MsolUser -UserPrincipalName \\$upn \\`
-        -FirstName \\$user.FirstName \\`
-        -LastName \\$user.LastName \\`
-        -DisplayName \\$user.DisplayName \\`
-        -Department \\$user.Department \\`
-        -Title \\$user.JobTitle \\`
-        -PhoneNumber \\$user.PhoneNumber \\`
-        -UsageLocation \\$user.UsageLocation \\`
-        -Password \\$password \\`
-        -ForceChangePassword \\$true \\`
-        -PasswordNeverExpires \\$false
+    'tenant-migration': {
+        title: 'Tenant migration and merger procedures',
+        content: `
+            <div class="tutorial-content">
+                <h2>Tenant Migration and Merger Procedures</h2>
+                
+                <h3>Overview</h3>
+                <p>This guide covers the process of migrating data between Microsoft 365 tenants or merging multiple tenants.</p>
+                
+                <h3>Pre-Migration Planning</h3>
+                <ol>
+                    <li>Inventory source tenant data</li>
+                    <li>Assess destination tenant capacity</li>
+                    <li>Plan user migration strategy</li>
+                    <li>Document current configurations</li>
+                </ol>
+                
+                <h4>Data Assessment</h4>
+                <div class="code-block">
+                    <code># PowerShell command to get mailbox sizes
+Get-Mailbox | Get-MailboxStatistics | Select DisplayName, TotalItemSize</code>
+                </div>
+                
+                <h3>Migration Tools</h3>
+                <ul>
+                    <li>Microsoft 365 Migration tools</li>
+                    <li>Third-party migration solutions</li>
+                    <li>PowerShell scripts for automation</li>
+                </ul>
+                
+                <h3>Step-by-Step Migration</h3>
+                <ol>
+                    <li>Prepare destination tenant</li>
+                    <li>Create user accounts</li>
+                    <li>Migrate mailbox data</li>
+                    <li>Migrate SharePoint sites</li>
+                    <li>Update DNS records</li>
+                </ol>
+                
+                <div class="tutorial-tips">
+                    <h4>💡 Migration Tips</h4>
+                    <ul>
+                        <li>Perform migration during off-hours</li>
+                        <li>Test with pilot group first</li>
+                        <li>Maintain communication with users</li>
+                    </ul>
+                </div>
+            </div>
+        `
+    },
     
-    # Assign license
-    Set-MsolUserLicense -UserPrincipalName \\$upn -AddLicenses \\$user.LicenseAssignment
-    
-    Write-Host "Created user: \\$upn"
-}</code>
-        </div>
-
-        <h3>🔐 Step 4: Initial Security Configuration</h3>
-        <h4>Enable Multi-Factor Authentication</h4>
-        <div class="code-block">
-          <code># Enable MFA for all users via PowerShell
-Connect-MsolService
-
-# Get all users
-\\$users = Get-MsolUser -All | Where-Object {\\$_.IsLicensed -eq \\$true}
-
-# Create MFA requirement
-\\$mfaSettings = New-Object -TypeName Microsoft.Online.Administration.StrongAuthenticationRequirement
-\\$mfaSettings.RelyingParty = "*"
-\\$mfaSettings.State = "Enabled"  # or "Enforced"
-
-# Apply to all users
-foreach (\\$user in \\$users) {
-    Set-MsolUser -UserPrincipalName \\$user.UserPrincipalName -StrongAuthenticationRequirements \\$mfaSettings
-    Write-Host "Enabled MFA for: \\$(\\$user.UserPrincipalName)"
-}</code>
-        </div>
-
-        <h3>📧 Step 5: Exchange Online Configuration</h3>
-        <h4>Basic Exchange Settings</h4>
-        <div class="code-block">
-          <code># Connect to Exchange Online
-Install-Module -Name ExchangeOnlineManagement -Force
+    'send-as-permissions': {
+        title: 'Send-as permissions configuration in 365',
+        content: `
+            <div class="tutorial-content">
+                <h2>Configuring Send-As Permissions in Microsoft 365</h2>
+                
+                <h3>PowerShell Method</h3>
+                <div class="code-block">
+                    <code># Connect to Exchange Online
 Connect-ExchangeOnline
 
-# Set default timezone and language
-Set-MailboxRegionalConfiguration -Identity "john.smith@acmecorp.com" \\`
-    -TimeZone "Eastern Standard Time" \\`
-    -Language "en-US"
+# Grant Send-As permission
+Add-RecipientPermission -Identity "shared@company.com" -Trustee "user@company.com" -AccessRights SendAs
 
-# Configure organization settings
-Set-OrganizationConfig -DefaultPublicFolderMailbox "DefaultPublicFolderMailbox"
-
-# Set message size limits
-Set-TransportConfig -MaxSendSize 25MB -MaxReceiveSize 25MB
-
-# Apply retention policy to all mailboxes
-Get-Mailbox | Set-Mailbox -RetentionPolicy "Corporate Retention Policy"</code>
-        </div>
-
-        <div class="tutorial-tips">
-          <h4>🎯 Best Practices</h4>
-          <ul>
-            <li>Always use the principle of least privilege</li>
-            <li>Enable MFA from day one</li>
-            <li>Document all configurations and decisions</li>
-            <li>Plan for user training and adoption</li>
-            <li>Implement proper backup and recovery procedures</li>
-            <li>Regular security and compliance reviews</li>
-            <li>Monitor usage and costs continuously</li>
-          </ul>
-        </div>
-      </div>
-    `
-  },
-
-  'tenant-migration': {
-    title: 'Tenant migration and merger procedures',
-    category: 'microsoft365',
-    difficulty: 'advanced',
-    estimatedTime: '4-6 hours',
-    content: `
-      <div class="tutorial-content">
-        <h2>🔄 Tenant Migration and Merger Procedures</h2>
-        
-        <div class="tutorial-tips">
-          <h4>💡 What you'll learn</h4>
-          <p>Complete procedures for migrating between M365 tenants, merging multiple tenants, and handling complex organizational changes while preserving data and user experience.</p>
-        </div>
-
-        <h3>🚀 Step 1: Pre-Migration Assessment</h3>
-        <h4>Source Tenant Analysis</h4>
-        <div class="code-block">
-          <code># PowerShell assessment script
-Connect-MsolService
-Connect-ExchangeOnline
-
-# Get user inventory
-\\$users = Get-MsolUser -All
-\\$userStats = @()
-
-foreach (\\$user in \\$users) {
-    \\$mailboxStats = Get-MailboxStatistics \\$user.UserPrincipalName -ErrorAction SilentlyContinue
-    \\$oneDriveUrl = "https://sourcetenant-my.sharepoint.com/personal/" + \\$user.UserPrincipalName.Replace("@","_").Replace(".","_")
-    
-    \\$userStats += [PSCustomObject]@{
-        UserPrincipalName = \\$user.UserPrincipalName
-        DisplayName = \\$user.DisplayName
-        IsLicensed = \\$user.IsLicensed
-        Licenses = (\\$user.Licenses | ForEach-Object {\\$_.AccountSkuId}) -join ";"
-        MailboxSize = if(\\$mailboxStats) {\\$mailboxStats.TotalItemSize} else {"No Mailbox"}
-        LastLogon = if(\\$mailboxStats) {\\$mailboxStats.LastLogonTime} else {"N/A"}
-        OneDriveUrl = \\$oneDriveUrl
-        Department = \\$user.Department
-        Title = \\$user.Title
-    }
-}
-
-\\$userStats | Export-Csv "SourceTenantUsers.csv" -NoTypeInformation</code>
-        </div>
-
-        <h3>👥 Step 4: User and Identity Migration</h3>
-        <h4>User Account Creation</h4>
-        <div class="code-block">
-          <code># Bulk user creation in destination tenant
-Connect-MsolService
-
-\\$sourceUsers = Import-Csv "SourceTenantUsers.csv"
-
-foreach (\\$user in \\$sourceUsers) {
-    if (\\$user.IsLicensed -eq "True") {
-        \\$newUpn = \\$user.UserPrincipalName.Replace("@source.com", "@destination.com")
-        \\$tempPassword = "TempPass\\$(Get-Random -Maximum 9999)!"
-        
-        try {
-            # Create user account
-            New-MsolUser -UserPrincipalName \\$newUpn \\`
-                -DisplayName \\$user.DisplayName \\`
-                -FirstName (\\$user.DisplayName.Split(' ')[0]) \\`
-                -LastName (\\$user.DisplayName.Split(' ')[-1]) \\`
-                -Department \\$user.Department \\`
-                -Title \\$user.Title \\`
-                -UsageLocation "US" \\`
-                -Password \\$tempPassword \\`
-                -ForceChangePassword \\$true \\`
-                -PasswordNeverExpires \\$false
-            
-            Write-Host "Created user: \\$newUpn"
-            
-        } catch {
-            Write-Error "Failed to create user \\$newUpn : \\$(\\$_.Exception.Message)"
-        }
-    }
+# Verify permissions
+Get-RecipientPermission -Identity "shared@company.com"</code>
+                </div>
+                
+                <h3>Admin Center Method</h3>
+                <ol>
+                    <li>Go to Exchange Admin Center</li>
+                    <li>Navigate to Recipients > Mailboxes</li>
+                    <li>Select the mailbox</li>
+                    <li>Click "Manage mailbox delegation"</li>
+                    <li>Add users to "Send as" permissions</li>
+                </ol>
+                
+                <h3>Bulk Configuration</h3>
+                <div class="code-block">
+                    <code># CSV import for bulk permissions
+$csv = Import-Csv "permissions.csv"
+foreach ($row in $csv) {
+    Add-RecipientPermission -Identity $row.Mailbox -Trustee $row.User -AccessRights SendAs
 }</code>
-        </div>
+                </div>
+                
+                <div class="tutorial-warning">
+                    <h4>⚠️ Security Considerations</h4>
+                    <p>Only grant Send-As permissions to users who absolutely need them for business purposes.</p>
+                </div>
+            </div>
+        `
+    },
+    
+    'sharepoint-landing': {
+        title: 'SharePoint Online landing page creation',
+        content: `
+            <div class="tutorial-content">
+                <h2>Creating SharePoint Online Landing Pages</h2>
+                
+                <h3>Modern Page Creation</h3>
+                <ol>
+                    <li>Navigate to your SharePoint site</li>
+                    <li>Click "New" > "Page"</li>
+                    <li>Choose template or start blank</li>
+                    <li>Add web parts and content</li>
+                </ol>
+                
+                <h3>Recommended Web Parts</h3>
+                <ul>
+                    <li>Hero web part for featured content</li>
+                    <li>News web part for announcements</li>
+                    <li>Quick links for navigation</li>
+                    <li>Document library for resources</li>
+                </ul>
+                
+                <h3>Page Settings</h3>
+                <div class="tutorial-tips">
+                    <h4>💡 Configuration Tips</h4>
+                    <ul>
+                        <li>Set as homepage if needed</li>
+                        <li>Configure page permissions</li>
+                        <li>Enable comments if appropriate</li>
+                        <li>Set up page approval workflow</li>
+                    </ul>
+                </div>
+                
+                <h3>Publishing Process</h3>
+                <ol>
+                    <li>Review page content</li>
+                    <li>Check mobile responsiveness</li>
+                    <li>Publish the page</li>
+                    <li>Set as site homepage if needed</li>
+                </ol>
+            </div>
+        `
+    },
+    
+    'power-automate-flow': {
+        title: 'Power Automate: shared mailbox to SharePoint flow',
+        content: `
+            <div class="tutorial-content">
+                <h2>Power Automate: Shared Mailbox to SharePoint Flow</h2>
+                
+                <h3>Flow Overview</h3>
+                <p>Create an automated flow to save email attachments from shared mailboxes to SharePoint document libraries.</p>
+                
+                <h3>Prerequisites</h3>
+                <ul>
+                    <li>Power Automate license</li>
+                    <li>SharePoint site and document library</li>
+                    <li>Shared mailbox access</li>
+                </ul>
+                
+                <h3>Flow Configuration</h3>
+                
+                <h4>1. Trigger Setup</h4>
+                <div class="code-block">
+                    <code>Trigger: When a new email arrives (V3)
+- Folder: Inbox
+- Include Attachments: Yes
+- Mailbox Address: shared@company.com</code>
+                </div>
+                
+                <h4>2. Condition Check</h4>
+                <p>Add condition to check if email has attachments:</p>
+                <div class="code-block">
+                    <code>Condition: length(triggerBody()?['attachments']) is greater than 0</code>
+                </div>
+                
+                <h4>3. Apply to Each Attachment</h4>
+                <ol>
+                    <li>Add "Apply to each" action</li>
+                    <li>Select attachments from dynamic content</li>
+                    <li>Add "Create file" action for SharePoint</li>
+                </ol>
+                
+                <h4>4. SharePoint File Creation</h4>
+                <div class="code-block">
+                    <code>Site Address: https://company.sharepoint.com/sites/documents
+Library: Shared Documents
+File Name: items('Apply_to_each')?['name']
+File Content: items('Apply_to_each')?['contentBytes']</code>
+                </div>
+                
+                <div class="tutorial-tips">
+                    <h4>💡 Enhancement Ideas</h4>
+                    <ul>
+                        <li>Add metadata to saved files</li>
+                        <li>Create folders based on email subject</li>
+                        <li>Send confirmation notifications</li>
+                        <li>Filter by file types</li>
+                    </ul>
+                </div>
+            </div>
+        `
+    },
+    
+    'exchange-online-admin': {
+        title: 'Exchange Online administration best practices',
+        content: `
+            <div class="tutorial-content">
+                <h2>Exchange Online Administration Best Practices</h2>
+                
+                <h3>Security Configuration</h3>
+                <ol>
+                    <li>Enable MFA for all admin accounts</li>
+                    <li>Configure ATP Safe Attachments</li>
+                    <li>Set up ATP Safe Links</li>
+                    <li>Enable audit logging</li>
+                </ol>
+                
+                <h3>Mail Flow Management</h3>
+                <div class="code-block">
+                    <code># PowerShell commands for mail flow
+# Check message trace
+Get-MessageTrace -SenderAddress user@company.com
 
-        <div class="tutorial-tips">
-          <h4>🎯 Migration Success Factors</h4>
-          <ul>
-            <li>Thorough planning and testing with pilot groups</li>
-            <li>Clear communication timeline and expectations</li>
-            <li>Dedicated migration team with defined roles</li>
-            <li>24/7 monitoring during critical migration phases</li>
-            <li>Comprehensive backup and rollback procedures</li>
-            <li>Post-migration optimization and cleanup</li>
-          </ul>
-        </div>
-      </div>
-    `
-  }
+# View transport rules
+Get-TransportRule
+
+# Check connector status
+Get-InboundConnector
+Get-OutboundConnector</code>
+                </div>
+                
+                <h3>Mailbox Management</h3>
+                <ul>
+                    <li>Regular mailbox size monitoring</li>
+                    <li>Archive policy configuration</li>
+                    <li>Retention policy setup</li>
+                    <li>Shared mailbox optimization</li>
+                </ul>
+                
+                <h3>Monitoring and Reporting</h3>
+                <div class="tutorial-tips">
+                    <h4>💡 Key Metrics to Monitor</h4>
+                    <ul>
+                        <li>Mail flow statistics</li>
+                        <li>Mailbox growth trends</li>
+                        <li>Security incident reports</li>
+                        <li>User adoption metrics</li>
+                    </ul>
+                </div>
+                
+                <h3>Backup and Recovery</h3>
+                <ol>
+                    <li>Understand Microsoft's data retention</li>
+                    <li>Implement third-party backup if needed</li>
+                    <li>Test recovery procedures regularly</li>
+                    <li>Document recovery processes</li>
+                </ol>
+                
+                <div class="tutorial-warning">
+                    <h4>⚠️ Important Considerations</h4>
+                    <p>Microsoft 365 provides availability, not backup. Consider third-party solutions for comprehensive data protection.</p>
+                </div>
+            </div>
+        `
+    }
 };
