@@ -8,7 +8,7 @@
     <!-- PWA Meta Tags -->
     <meta name="application-name" content="Velocity Lab">
     <meta name="apple-mobile-web-app-title" content="Velocity Lab">
-    <meta name="description" content="Comprehensive MSP training platform covering Networking, Azure, Exchange, Firewalls, Linux, and more">
+    <meta name="description" content="Comprehensive MSP training platform covering Exchange Hybrid LAB plus tutorials for Networking, Azure, Firewalls, Linux, and more">
     <meta name="theme-color" content="#00a8ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -28,7 +28,7 @@
     
     <!-- Open Graph for sharing -->
     <meta property="og:title" content="Velocity Lab - MSP Training Platform">
-    <meta property="og:description" content="Comprehensive training covering Networking, Microsoft Azure, Exchange, Firewalls, Linux, and more">
+    <meta property="og:description" content="Exchange Hybrid LAB plus comprehensive tutorials covering Networking, Microsoft Azure, Firewalls, Linux, and more">
     <meta property="og:image" content="/assets/Android_512.png">
     <meta property="og:url" content="https://labverse.co.za">
     <meta property="og:type" content="website">
@@ -36,8 +36,12 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Velocity Lab - MSP Training Platform">
-    <meta name="twitter:description" content="Comprehensive training covering Networking, Microsoft Azure, Exchange, Firewalls, Linux, and more">
+    <meta name="twitter:description" content="Exchange Hybrid LAB plus comprehensive tutorials covering Networking, Microsoft Azure, Firewalls, Linux, and more">
     <meta name="twitter:image" content="/assets/Android_512.png">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/assets/Velocity-Logo.png" as="image">
+    <link rel="preload" href="/assets/VelocityBackground.jpg" as="image">
     
     <style>
         /* Apple White + Unifi Cloud Color Scheme with Dark Mode */
@@ -171,13 +175,18 @@
             cursor: pointer;
             position: relative;
             z-index: 10001;
+            transition: transform 0.2s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
         }
 
         [data-theme="dark"] .logo {
             filter: invert(1) brightness(1.2);
         }
 
-        /* Desktop Navigation */
+        /* Desktop Navigation - Only Request Access in header */
         .header-buttons {
             display: flex;
             gap: 12px;
@@ -190,13 +199,14 @@
             cursor: pointer;
             padding: 8px;
             border-radius: 6px;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
             position: relative;
             z-index: 10001;
         }
 
         .hamburger:hover {
             background: var(--surface-hover);
+            transform: scale(1.05);
         }
 
         .hamburger span {
@@ -235,6 +245,7 @@
             padding: 1rem;
             max-height: calc(100vh - 70px);
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         [data-theme="dark"] .mobile-menu {
@@ -258,7 +269,7 @@
             border: none;
             color: var(--text);
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
             border-radius: 8px;
             text-decoration: none;
             font-size: 16px;
@@ -267,6 +278,7 @@
         .mobile-menu-item:hover, .mobile-menu-item.primary {
             background: var(--primary);
             color: white;
+            transform: translateY(-1px);
         }
 
         .mobile-menu-item.secondary {
@@ -288,11 +300,13 @@
             background: none;
             width: 100%;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
+            border-radius: 8px;
         }
 
         .theme-menu-toggle:hover {
             background: var(--surface-hover);
+            transform: translateY(-1px);
         }
 
         .theme-submenu {
@@ -329,6 +343,7 @@
 
         .theme-option:hover {
             background: var(--surface-hover);
+            transform: translateX(-2px);
         }
 
         .theme-option.active {
@@ -360,6 +375,10 @@
             font-size: 14px;
         }
 
+        .btn:active {
+            transform: scale(0.98);
+        }
+
         .btn-primary {
             background: var(--primary);
             color: white;
@@ -368,6 +387,7 @@
         .btn-primary:hover {
             background: var(--primary-hover);
             transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 168, 255, 0.3);
         }
 
         .btn-secondary {
@@ -378,9 +398,11 @@
 
         .btn-secondary:hover {
             background: var(--surface-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--shadow);
         }
 
-        /* Welcome Screen */
+        /* Welcome Screen - Only Sign In button in center */
         .welcome-screen {
             min-height: 100vh;
             display: flex;
@@ -420,6 +442,12 @@
             background-clip: text;
             line-height: 1.2;
             padding: 0.2rem 0;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from { filter: brightness(1); }
+            to { filter: brightness(1.1); }
         }
 
         .welcome-subtitle {
@@ -427,6 +455,12 @@
             color: var(--text-secondary);
             max-width: 600px;
             margin: 0 auto 2.5rem;
+            animation: fadeInUp 0.8s ease 0.3s both;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .welcome-buttons {
@@ -434,6 +468,7 @@
             gap: 1rem;
             flex-wrap: wrap;
             justify-content: center;
+            animation: fadeInUp 0.8s ease 0.6s both;
         }
 
         .btn-large {
@@ -454,6 +489,7 @@
             z-index: 10000;
             padding: 2rem;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .modal.active {
@@ -573,12 +609,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
             z-index: 20;
+            font-size: 18px;
         }
 
         .modal-close:hover {
             background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .modal-close:active {
+            transform: scale(0.9);
         }
 
         /* Form Styles for Apple Modal */
@@ -603,21 +645,22 @@
             transition: all 0.3s ease;
         }
 
-        .password-field .apple-form-input {
-            padding-right: 56px;
-        }
-
         .apple-form-input:focus {
             outline: none;
             border-color: #0a84ff;
             box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
+            transform: scale(1.02);
         }
 
         .apple-form-input::placeholder {
             color: #6d6d70;
         }
 
-        /* Updated loading spinner for email field - moves left to right */
+        .password-field .apple-form-input {
+            padding-right: 56px;
+        }
+
+        /* Enhanced loading spinner for email field */
         .apple-form-input.loading {
             background: #2c2c2e;
             position: relative;
@@ -775,13 +818,14 @@
             font-size: 16px;
             background: var(--background);
             color: var(--text);
-            transition: border-color 0.2s ease;
+            transition: all 0.2s ease;
         }
 
         .form-input:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(0, 168, 255, 0.1);
+            transform: scale(1.02);
         }
 
         .form-textarea {
@@ -807,6 +851,11 @@
         .form-submit:hover {
             background: var(--primary-hover);
             transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 168, 255, 0.3);
+        }
+
+        .form-submit:active {
+            transform: scale(0.98);
         }
 
         .hidden {
@@ -831,6 +880,7 @@
             overflow-y: auto;
             padding: 1rem;
             flex: 1;
+            -webkit-overflow-scrolling: touch;
         }
 
         .task-detail-close {
@@ -857,6 +907,10 @@
             background: var(--danger);
             color: white;
             transform: scale(1.1);
+        }
+
+        .task-detail-close:active {
+            transform: scale(0.9);
         }
 
         .notes-container {
@@ -894,6 +948,10 @@
             transform: translateY(-1px);
         }
 
+        .save-note-btn:active {
+            transform: scale(0.95);
+        }
+
         .save-note-btn.saved {
             background: var(--success);
         }
@@ -908,7 +966,7 @@
             color: var(--text);
             font-family: inherit;
             resize: vertical;
-            transition: border-color 0.2s ease;
+            transition: all 0.2s ease;
         }
 
         .notes-textarea:focus {
@@ -942,12 +1000,13 @@
             margin: 0.75rem 0;
             padding: 0.5rem;
             border-radius: 6px;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
             cursor: pointer;
         }
 
         .subtask-item:hover {
             background: var(--surface-hover);
+            transform: translateX(2px);
         }
 
         .subtask-checkbox {
@@ -977,6 +1036,7 @@
             overflow-y: auto;
             padding: 1rem;
             flex: 1;
+            -webkit-overflow-scrolling: touch;
         }
 
         /* Main Dashboard */
@@ -996,11 +1056,13 @@
             font-weight: 700;
             margin-bottom: 0.5rem;
             color: var(--text);
+            animation: fadeInUp 0.6s ease;
         }
 
         .dashboard-subtitle {
             color: var(--text-secondary);
             font-size: 1.1rem;
+            animation: fadeInUp 0.6s ease 0.2s both;
         }
 
         /* Progress Ring */
@@ -1008,6 +1070,7 @@
             display: flex;
             justify-content: center;
             margin: 2rem 0;
+            animation: fadeInUp 0.6s ease 0.4s both;
         }
 
         .progress-ring {
@@ -1055,13 +1118,14 @@
             color: var(--text-secondary);
         }
 
-        /* Category Cards - New Design */
+        /* Category Cards - Enhanced Design */
         .categories-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 1.5rem;
             max-width: 1200px;
             margin: 0 auto;
+            animation: fadeInUp 0.6s ease 0.6s both;
         }
 
         .category-card {
@@ -1070,13 +1134,56 @@
             border-radius: 12px;
             padding: 1.5rem;
             box-shadow: 0 4px 12px var(--shadow);
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
 
         .category-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px var(--shadow-heavy);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 30px var(--shadow-heavy);
+        }
+
+        .category-card:active {
+            transform: translateY(-2px) scale(1.01);
+        }
+
+        .category-card.lab-card {
+            border: 2px solid var(--primary);
+            background: linear-gradient(135deg, rgba(0, 168, 255, 0.05), var(--background));
+        }
+
+        .category-card.lab-card::before {
+            content: '🧪 LAB';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .category-card.tutorial-card::before {
+            content: '📚 TUTORIAL';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--success);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
         }
 
         .category-header {
@@ -1088,6 +1195,13 @@
         .category-icon {
             font-size: 2rem;
             margin-right: 1rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-5px); }
+            60% { transform: translateY(-2px); }
         }
 
         .category-title {
@@ -1122,6 +1236,154 @@
             color: var(--success);
         }
 
+        /* Tutorial View Styles */
+        .tutorial-view {
+            padding: 2rem 0;
+        }
+
+        .tutorial-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tutorial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tutorial-card {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .tutorial-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px var(--shadow-heavy);
+        }
+
+        .tutorial-header h3 {
+            margin: 0 0 1rem 0;
+            color: var(--text);
+            font-size: 1.1rem;
+        }
+
+        .tutorial-preview {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .tutorial-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .tutorial-type {
+            font-size: 0.8rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .tutorial-arrow {
+            color: var(--text-secondary);
+            font-weight: bold;
+            transition: transform 0.2s ease;
+        }
+
+        .tutorial-card:hover .tutorial-arrow {
+            transform: translateX(5px);
+        }
+
+        /* Tutorial Content Styles */
+        .tutorial-content {
+            line-height: 1.6;
+        }
+
+        .tutorial-content h2 {
+            color: var(--text);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+
+        .tutorial-content h3 {
+            color: var(--text);
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        .tutorial-content h4 {
+            color: var(--text);
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        .tutorial-content p {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .tutorial-content ul, .tutorial-content ol {
+            margin: 1rem 0 1rem 1.5rem;
+            color: var(--text);
+        }
+
+        .tutorial-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .code-block {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: var(--text);
+            white-space: pre;
+        }
+
+        .tutorial-tips {
+            background: rgba(0, 168, 255, 0.1);
+            border: 1px solid rgba(0, 168, 255, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .tutorial-tips h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .tutorial-warning {
+            background: rgba(255, 149, 0, 0.1);
+            border: 1px solid rgba(255, 149, 0, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .tutorial-warning h4 {
+            color: var(--warning);
+            margin-bottom: 0.5rem;
+        }
+
         /* Week Cards */
         .weeks-container {
             display: flex;
@@ -1137,7 +1399,7 @@
             border-radius: 12px;
             padding: 1.5rem;
             box-shadow: 0 4px 12px var(--shadow);
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             cursor: pointer;
         }
 
@@ -1207,6 +1469,12 @@
 
         .week-card.expanded .task-list {
             display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .task-item {
@@ -1221,6 +1489,7 @@
 
         .task-item:hover {
             background: var(--surface-hover);
+            transform: translateX(2px);
         }
 
         .task-checkbox {
@@ -1233,7 +1502,7 @@
         .task-content {
             flex: 1;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
             padding: 0.25rem;
             border-radius: 4px;
         }
@@ -1272,11 +1541,12 @@
             border-radius: 4px;
             cursor: pointer;
             opacity: 0.7;
-            transition: opacity 0.2s ease;
+            transition: all 0.2s ease;
         }
 
         .task-item:hover .task-detail-btn {
             opacity: 1;
+            transform: scale(1.05);
         }
 
         /* User Menu */
@@ -1294,11 +1564,12 @@
             border-radius: 8px;
             cursor: pointer;
             color: var(--text);
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
         }
 
         .user-menu-toggle:hover {
             background: var(--surface-hover);
+            transform: scale(1.05);
         }
 
         .user-menu-dropdown {
@@ -1333,12 +1604,13 @@
             border: none;
             color: var(--text);
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
             text-decoration: none;
         }
 
         .user-menu-item:hover {
             background: var(--surface-hover);
+            transform: translateX(2px);
         }
 
         /* Quick Actions */
@@ -1464,6 +1736,15 @@
             .categories-container {
                 grid-template-columns: 1fr;
                 gap: 1rem;
+            }
+
+            .tutorial-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .tutorial-view {
+                padding: 1rem 0;
             }
 
             .weeks-container {
@@ -1744,6 +2025,64 @@
         .task-item-wrapper {
             /* Wrapper to prevent event bubbling */
         }
+
+        /* Offline indicator */
+        .offline-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--warning);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            z-index: 9999;
+            display: none;
+        }
+
+        /* Performance optimizations */
+        .category-card,
+        .tutorial-card,
+        .week-card,
+        .task-item {
+            will-change: transform;
+        }
+
+        /* Accessibility improvements */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus improvements */
+        .btn:focus,
+        .form-input:focus,
+        .apple-form-input:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        /* Enhanced loading state for buttons */
+        .btn.loading {
+            cursor: not-allowed;
+        }
+
+        /* Better mobile touch targets */
+        @media (max-width: 768px) {
+            .btn,
+            .mobile-menu-item,
+            .task-checkbox,
+            .subtask-checkbox {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
     </style>
 </head>
 <body data-theme="dark" class="no-scroll landing-page">
@@ -1752,9 +2091,8 @@
         <!-- Logo only (no text) -->
         <div class="logo" onclick="goHome()"></div>
         
-        <!-- Desktop Navigation - Shows Sign In and Request Access -->
+        <!-- Desktop Navigation - Only Request Access in header -->
         <div class="header-buttons" id="headerButtons">
-            <button class="btn btn-secondary" onclick="showSignInModal()">Sign In</button>
             <button class="btn btn-primary" onclick="showRequestAccessModal()">Request Access</button>
         </div>
         
@@ -1801,24 +2139,21 @@
         </div>
     </div>
 
-    <!-- Welcome Screen -->
+    <!-- Welcome Screen - Only Sign In button in center -->
     <div class="welcome-screen" id="welcomeScreen">
         <div class="welcome-notification">
-            Welcome to Velocity Lab! Request access to begin your comprehensive MSP training journey.
+            Welcome to Velocity Lab! Request access to begin your MSP training journey with our Exchange Hybrid LAB and comprehensive tutorials.
         </div>
         
         <h1 class="welcome-title">MSP Training Platform</h1>
         <p class="welcome-subtitle">
-            Comprehensive training covering Networking, Microsoft Azure, Exchange, Firewalls, Linux, and more<br>
+            Exchange Hybrid LAB + Comprehensive Tutorials<br>
             Professional development for managed service providers
         </p>
         
         <div class="welcome-buttons">
             <button class="btn btn-primary btn-large" onclick="showSignInModal()">
                 Sign In
-            </button>
-            <button class="btn btn-secondary btn-large" onclick="showRequestAccessModal()">
-                Request Access
             </button>
         </div>
     </div>
@@ -1827,15 +2162,15 @@
     <div class="main-content hidden" id="mainContent">
         <div class="dashboard-header">
             <h1 class="dashboard-title">Your Training Journey</h1>
-            <p class="dashboard-subtitle">Comprehensive MSP training across multiple technology categories</p>
+            <p class="dashboard-subtitle">Exchange Hybrid LAB with progress tracking + comprehensive MSP tutorials</p>
         </div>
 
-        <!-- Categories Grid (replaces the single course view) -->
+        <!-- Categories Grid (shows by default) -->
         <div class="categories-container" id="categoriesContainer">
             <!-- Category cards will be populated by JavaScript -->
         </div>
 
-        <!-- Course View (shows when a category is selected) -->
+        <!-- Course View (shows when Exchange LAB is selected) -->
         <div class="course-view hidden" id="courseView">
             <!-- Progress Ring -->
             <div class="progress-section">
@@ -1860,6 +2195,11 @@
             <div style="text-align: center; margin-top: 2rem;">
                 <button class="btn btn-secondary" onclick="showCategoriesView()">← Back to Categories</button>
             </div>
+        </div>
+
+        <!-- Tutorial View (shows when tutorial category is selected) -->
+        <div class="tutorial-view hidden" id="tutorialView">
+            <!-- Tutorial content will be populated by JavaScript -->
         </div>
     </div>
 
@@ -1942,7 +2282,7 @@
                         <div class="form-group">
                             <label class="form-label" for="requestMessage">Tell us about your training goals *</label>
                             <textarea class="form-input form-textarea" id="requestMessage" name="message" required 
-                                      placeholder="What specific areas are you interested in? (Networking, Azure, Exchange, etc.)"></textarea>
+                                      placeholder="What specific areas are you interested in? (Exchange LAB, Networking, Azure, Firewalls, etc.)"></textarea>
                         </div>
                         
                         <!-- Honeypot Spam Protection -->
@@ -1971,13 +2311,26 @@
         </div>
     </div>
 
+    <!-- Tutorial Detail Modal -->
+    <div class="modal" id="tutorialDetailModal">
+        <div class="modal-content large">
+            <button class="modal-close" onclick="closeModal('tutorialDetailModal')">&times;</button>
+            <div class="modal-header">
+                <h2 id="tutorialDetailTitle">Tutorial Guide</h2>
+            </div>
+            <div class="task-detail-content" id="tutorialDetailContent">
+                <!-- Tutorial details will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <!-- Lab History Modal -->
     <div class="modal" id="labHistoryModal">
         <div class="modal-content large">
             <button class="modal-close" onclick="closeModal('labHistoryModal')">&times;</button>
             <div class="modal-header">
                 <h2>📊 Lab History</h2>
-                <p style="color: var(--text-secondary);">Your training progress timeline</p>
+                <p style="color: var(--text-secondary);">Your Exchange Hybrid LAB progress timeline</p>
             </div>
             <div class="lab-history-modal-content" id="labHistoryModalContent">
                 <!-- Lab history content will be populated by JavaScript -->
@@ -1991,7 +2344,7 @@
             <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
             <div class="modal-header">
                 <h2>👑 Admin Panel</h2>
-                <p style="color: var(--text-secondary);">User progress leaderboard</p>
+                <p style="color: var(--text-secondary);">Exchange LAB progress leaderboard</p>
             </div>
             <div class="lab-history-modal-content" id="adminContent">
                 <!-- Admin content will be populated by JavaScript -->
@@ -1999,8 +2352,22 @@
         </div>
     </div>
 
-    <!-- Load Task Definitions -->
+    <!-- Offline Indicator -->
+    <div class="offline-indicator" id="offlineIndicator">
+        📡 You're offline - some features may be limited
+    </div>
+
+    <!-- Load Task Definitions (Exchange LAB only) -->
     <script src="/assets/task-definitions.js"></script>
+    
+    <!-- Load Tutorial Content -->
+    <script src="/assets/tutorials/networking.js"></script>
+    <script src="/assets/tutorials/azure.js"></script>
+    <script src="/assets/tutorials/microsoft365.js"></script>
+    <script src="/assets/tutorials/firewalls.js"></script>
+    <script src="/assets/tutorials/backup.js"></script>
+    <script src="/assets/tutorials/linux.js"></script>
+    <script src="/assets/tutorials/tools.js"></script>
 
     <script>
         // Global application state
@@ -2013,6 +2380,7 @@
             tasks: [],
             categories: [],
             currentCategory: null,
+            currentView: 'categories', // 'categories', 'lab', 'tutorial'
             isWelcomeShown: false,
             shownNotifications: new Set()
         };
@@ -2020,124 +2388,133 @@
         // API configuration
         const API_BASE = '/api';
 
-        // Training categories configuration
+        // Training categories configuration - HYBRID APPROACH
         const TRAINING_CATEGORIES = {
+            'exchange-lab': {
+                id: 'exchange-lab',
+                title: 'Exchange Hybrid LAB',
+                icon: '🧪',
+                type: 'lab', // Trackable progress
+                description: 'Complete 4-week hands-on lab building Exchange Hybrid environment. Full progress tracking with sessions, completion rates, and detailed task management.',
+                courses: [
+                    'Week 1: Foundation & Domain Setup',
+                    'Week 2: Infrastructure & Updates', 
+                    'Week 3: Exchange & Mail Flow',
+                    'Week 4: Hybrid & External Access'
+                ]
+            },
             'networking': {
                 id: 'networking',
-                title: 'Networking',
+                title: 'Networking Guides',
                 icon: '🌐',
-                description: 'Network infrastructure, monitoring, and management tools including Zabbix, PRTG, DNS, and Cisco configurations.',
+                type: 'tutorial', // Informational only
+                description: 'Comprehensive step-by-step tutorials for network infrastructure, monitoring tools, and configurations. Reference materials for daily operations.',
                 courses: [
-                    'Setting up Zabbix',
-                    'Monitoring Zabbix',
+                    'Setting up Zabbix monitoring server',
+                    'Monitoring with Zabbix advanced features',
                     'Adding new hosts to Zabbix',
                     'Cisco ISR voice router configuration',
-                    'Cisco monitored interfaces',
-                    'PRTG 100 free setup',
-                    'DNS',
-                    'Creating Network Diagrams in Microsoft Visio and draw.io',
-                    'Cisco Backup Report Script Automation via SSH and telnet',
-                    'Grandstream setup',
-                    'Grandstream SSID radius auth config for Corp network',
-                    'Creating backup config with highlighting text in putty'
+                    'Cisco monitored interfaces setup',
+                    'PRTG 100 sensors free setup',
+                    'DNS server configuration and management',
+                    'Creating network diagrams in Visio/draw.io',
+                    'Cisco backup automation via SSH/Telnet',
+                    'Grandstream PBX setup and configuration',
+                    'Grandstream RADIUS authentication for corporate WiFi',
+                    'PuTTY configuration backup with syntax highlighting'
                 ]
             },
             'azure': {
                 id: 'azure',
-                title: 'Microsoft Azure',
+                title: 'Microsoft Azure Guides',
                 icon: '☁️',
-                description: 'Comprehensive Azure cloud services including security, compliance, analytics, and infrastructure management.',
+                type: 'tutorial',
+                description: 'Complete step-by-step guides for Azure cloud services, security solutions, analytics, and infrastructure management.',
                 courses: [
-                    'Microsoft Defender for Servers',
-                    'Microsoft Defender for Cloud',
-                    'Microsoft Intune',
-                    'Microsoft Sentinel',
-                    'Azure Firewall Standard vs Premium',
-                    'Log analytics',
-                    'Azure VM backup and restore',
-                    'Azure disaster recovery',
-                    'Azure VPN setup site to site vs point to site'
-                ]
-            },
-            'exchange': {
-                id: 'exchange',
-                title: 'Microsoft Exchange',
-                icon: '📧',
-                description: 'Exchange Server, Exchange Online, and hybrid configurations with step-by-step implementations.',
-                courses: [
-                    'Exchange Hybrid project step by step',
-                    'Exchange Online project step by step',
-                    'Exchange Hybrid autodiscovery function',
-                    'Exchange Hybrid with defender mx record',
-                    'Exchange Hybrid with Mimecast mx record',
-                    'Mimecast configuration when doing Exchange Hybrid Migration'
+                    'Microsoft Defender for Servers deployment',
+                    'Microsoft Defender for Cloud configuration',
+                    'Microsoft Intune device management setup',
+                    'Microsoft Sentinel SIEM configuration',
+                    'Azure Firewall Standard vs Premium comparison',
+                    'Log Analytics workspace setup and queries',
+                    'Azure VM backup and restore procedures',
+                    'Azure Site Recovery disaster recovery',
+                    'Azure VPN setup: site-to-site vs point-to-site'
                 ]
             },
             'microsoft365': {
                 id: 'microsoft365',
-                title: 'Microsoft 365',
+                title: 'Microsoft 365 Guides',
                 icon: '🏢',
-                description: 'Microsoft 365 services including tenant management, SharePoint, and automation workflows.',
+                type: 'tutorial',
+                description: 'Comprehensive guides for Microsoft 365 administration, tenant management, and automation workflows.',
                 courses: [
-                    'Creating new M365 tenant for new customer',
-                    'Migrating small company tenant merge to bigger company without losing mails',
-                    'Send as option tick in 365',
-                    'Sharepoint Online landing page creation',
-                    'Microsoft Power Automate - Creating power automate flow shared mailbox to Sharepoint'
+                    'Creating new M365 tenant for customers',
+                    'Tenant migration and merger procedures',
+                    'Send-as permissions configuration in 365',
+                    'SharePoint Online landing page creation',
+                    'Power Automate: shared mailbox to SharePoint flow',
+                    'Exchange Online administration best practices'
                 ]
             },
             'firewalls': {
                 id: 'firewalls',
-                title: 'Firewalls & Security',
+                title: 'Firewall Configuration Guides',
                 icon: '🔥',
-                description: 'Firewall configuration and management including Sophos, Fortinet FortiGate, and security policies.',
+                type: 'tutorial',
+                description: 'Detailed configuration guides for enterprise firewalls, security policies, and advanced network protection.',
                 courses: [
-                    'Sophos configuration',
-                    'Fortinet FortiGate - Creating firewall policies',
-                    'Fortinet FortiGate - Creating SDWAN zone and members',
-                    'Fortinet FortiGate - creating custom ipsec vpn tunnels',
-                    'Fortinet FortiGate - creating SSL integration with Azure Enterprise application',
-                    'Fortinet FortiGate - Forti LDAP configuration',
-                    'Fortinet FortiGate - Static routes',
-                    'Fortinet FortiGate - Setup fortigate from scratch',
-                    'Fortinet FortiGate - DDNS for LTE wan sites',
-                    'Fortinet FortiGate - Diagnosing and debug in CLI',
-                    'Fortinet FortiGate - set source CLI command',
-                    'Fortinet FortiGate - exec ping and traceroute source options'
+                    'Sophos firewall initial setup and configuration',
+                    'FortiGate firewall policy creation and management',
+                    'FortiGate SD-WAN zone and member configuration',
+                    'Custom IPsec VPN tunnel setup on FortiGate',
+                    'SSL VPN integration with Azure Enterprise apps',
+                    'FortiGate LDAP authentication configuration',
+                    'Static routing configuration and troubleshooting',
+                    'FortiGate setup from scratch - complete guide',
+                    'DDNS configuration for LTE WAN sites',
+                    'CLI debugging and diagnostics on FortiGate',
+                    'Advanced CLI commands: set source and exec options'
                 ]
             },
             'backup': {
                 id: 'backup',
-                title: 'Backup & Recovery',
+                title: 'Backup & Recovery Guides',
                 icon: '💾',
-                description: 'Backup solutions, disaster recovery, and data protection strategies.',
+                type: 'tutorial',
+                description: 'Comprehensive backup solution guides, monitoring tools, and disaster recovery strategies.',
                 courses: [
-                    'Veeam backups',
-                    'Backup radar',
-                    'Block64 Report combine'
+                    'Veeam Backup & Replication setup and configuration',
+                    'Backup monitoring with Backup Radar platform',
+                    'Block64 reporting setup and automation'
                 ]
             },
             'linux': {
                 id: 'linux',
-                title: 'Linux Administration',
+                title: 'Linux Administration Guides',
                 icon: '🐧',
-                description: 'Linux system administration, server management, and automation.',
+                type: 'tutorial',
+                description: 'Linux system administration tutorials, server management, automation scripts, and security hardening.',
                 courses: [
-                    'Linux basics and administration',
-                    'Server configuration and management',
-                    'Shell scripting and automation'
+                    'Linux basics and system administration',
+                    'Server configuration and service management',
+                    'Shell scripting and task automation',
+                    'System monitoring and log analysis',
+                    'Package management across distributions',
+                    'Security hardening and best practices'
                 ]
             },
             'tools': {
                 id: 'tools',
-                title: 'Management Tools',
+                title: 'MSP Tools Guides',
                 icon: '🛠️',
-                description: 'Professional management and monitoring tools for MSPs.',
+                type: 'tutorial',
+                description: 'Professional MSP tool usage guides, remote access solutions, and automation techniques.',
                 courses: [
-                    'Atera - Connecting via splashtop',
-                    'Atera - Which scripts to run in Atera',
-                    'Atera - Choosing different customers',
-                    'Atera - Alerting and reports'
+                    'Atera: remote access via Splashtop integration',
+                    'Atera: script management and automation',
+                    'Atera: multi-customer environment management',
+                    'Atera: alerting system and reporting setup'
                 ]
             }
         };
@@ -2169,7 +2546,7 @@
             }
         };
 
-        // API call function
+        // API call function (enhanced with offline detection)
         const api = {
             async call(url, options = {}) {
                 try {
@@ -2219,6 +2596,12 @@
                     return result;
                 } catch (error) {
                     console.error('API call failed:', error);
+                    
+                    // Handle offline state
+                    if (!navigator.onLine) {
+                        throw new Error('OFFLINE');
+                    }
+                    
                     throw error;
                 }
             }
@@ -2293,7 +2676,7 @@
             }
         };
 
-        // Authentication system (same as before but without register)
+        // Authentication system (enhanced with offline handling)
         const authSystem = {
             async login(formData) {
                 const submitBtn = document.querySelector('#signInForm .password-toggle');
@@ -2352,6 +2735,8 @@
                     console.error('Login failed:', err);
                     if (err.message === 'BACKEND_NOT_AVAILABLE') {
                         notificationSystem.error('Backend service not available. Please ensure the API functions are deployed.');
+                    } else if (err.message === 'OFFLINE') {
+                        notificationSystem.error('You are offline. Please check your internet connection.');
                     } else {
                         notificationSystem.error(err.message || 'Login failed. Please check your credentials.');
                     }
@@ -2385,6 +2770,7 @@
                 appState.sessionToken = null;
                 appState.labHistory = [];
                 appState.currentCategory = null;
+                appState.currentView = 'categories';
                 
                 localStorage.removeItem('velocity_progress');
                 localStorage.removeItem('velocity_lab_history');
@@ -2420,7 +2806,7 @@
                         throw new Error('BACKEND_NOT_AVAILABLE');
                     }
                 } catch (error) {
-                    if (error.message === 'BACKEND_NOT_AVAILABLE') {
+                    if (error.message === 'BACKEND_NOT_AVAILABLE' || error.message === 'OFFLINE') {
                         console.warn('Saving theme to localStorage fallback');
                         utils.cookies.set('theme', theme);
                     } else {
@@ -2470,6 +2856,36 @@
             }
         };
 
+        // Offline detection system
+        const offlineSystem = {
+            init() {
+                window.addEventListener('online', this.handleOnline.bind(this));
+                window.addEventListener('offline', this.handleOffline.bind(this));
+                this.updateStatus();
+            },
+
+            handleOnline() {
+                this.updateStatus();
+                notificationSystem.success('🌐 Connection restored!');
+            },
+
+            handleOffline() {
+                this.updateStatus();
+                notificationSystem.error('📡 You are offline - some features may be limited');
+            },
+
+            updateStatus() {
+                const indicator = document.getElementById('offlineIndicator');
+                if (indicator) {
+                    if (navigator.onLine) {
+                        indicator.style.display = 'none';
+                    } else {
+                        indicator.style.display = 'block';
+                    }
+                }
+            }
+        };
+
         // Load task definitions and categorize them
         function loadTaskDefinitions() {
             if (typeof window !== 'undefined' && window.TASK_DEFINITIONS) {
@@ -2481,12 +2897,12 @@
                         title: task.title,
                         description: task.description || 'No description available',
                         week: parseInt(taskId.split('-')[0].replace('week', '')) || 1,
-                        category: task.category || 'exchange' // Default to exchange for existing tasks
+                        category: 'exchange-lab' // All task-definitions.js tasks belong to Exchange LAB
                     });
                 });
-                console.log('Task definitions loaded:', appState.tasks.length, 'tasks');
+                console.log('Exchange LAB task definitions loaded:', appState.tasks.length, 'tasks');
             } else {
-                console.warn('Task definitions not loaded from task-definitions.js');
+                console.warn('Task definitions not loaded from task-definitions.js - Exchange LAB will have fallback content');
                 appState.tasks = generateFallbackTasks();
             }
             
@@ -2495,7 +2911,7 @@
         }
 
         function generateFallbackTasks() {
-            // Generate tasks for Exchange category as fallback
+            // Generate basic Exchange lab tasks as fallback
             const weeks = [
                 {
                     title: 'Foundation & Domain Setup',
@@ -2504,15 +2920,7 @@
                         'Install Windows Server 2012 R2',
                         'Configure Domain Controller',
                         'Create Organizational Units',
-                        'Add Domain Users',
-                        'Configure DNS',
-                        'Setup DHCP',
-                        'Join Client Machine',
-                        'Test Domain Authentication',
-                        'Configure Group Policy',
-                        'Create Security Groups',
-                        'Configure File Shares',
-                        'Verify Network Services'
+                        'Add Domain Users'
                     ]
                 },
                 {
@@ -2522,13 +2930,7 @@
                         'Install Exchange Server 2016',
                         'Configure Exchange Organization',
                         'Create Mailboxes',
-                        'Setup Distribution Groups',
-                        'Configure Public Folders',
-                        'Setup OWA',
-                        'Configure SMTP Connectors',
-                        'Setup Message Routing',
-                        'Configure Anti-Spam',
-                        'Test Internal Mail Flow'
+                        'Setup Distribution Groups'
                     ]
                 },
                 {
@@ -2538,13 +2940,7 @@
                         'Create M365 Tenant',
                         'Configure Domain',
                         'Setup Exchange Online',
-                        'Create Cloud Users',
-                        'Configure Licensing',
-                        'Setup Teams',
-                        'Configure SharePoint',
-                        'Setup OneDrive',
-                        'Configure Compliance',
-                        'Test Cloud Services'
+                        'Create Cloud Users'
                     ]
                 },
                 {
@@ -2554,13 +2950,7 @@
                         'Install Azure AD Connect',
                         'Configure Directory Sync',
                         'Setup Hybrid Exchange',
-                        'Configure Mail Flow',
-                        'Test Hybrid Connectivity',
-                        'Migrate Test Mailbox',
-                        'Configure Hybrid Features',
-                        'Setup Single Sign-On',
-                        'Test User Experience',
-                        'Document Configuration'
+                        'Configure Mail Flow'
                     ]
                 }
             ];
@@ -2573,7 +2963,7 @@
                         week: weekIndex + 1,
                         title: task,
                         description: `Complete ${task} as part of Week ${weekIndex + 1}`,
-                        category: 'exchange'
+                        category: 'exchange-lab'
                     });
                 });
             });
@@ -2581,7 +2971,7 @@
             return tasks;
         }
 
-        // Progress management (same as before)
+        // Progress management (enhanced with offline handling)
         async function loadUserProgress() {
             try {
                 if (!appState.sessionToken) {
@@ -2606,7 +2996,7 @@
                     appState.progress = {};
                 }
             } catch (error) {
-                if (error.message === 'BACKEND_NOT_AVAILABLE') {
+                if (error.message === 'BACKEND_NOT_AVAILABLE' || error.message === 'OFFLINE') {
                     console.warn('Using localStorage fallback for progress');
                     appState.progress = JSON.parse(localStorage.getItem('velocity_progress') || '{}');
                 } else {
@@ -2646,7 +3036,7 @@
                     console.warn('Failed to save progress:', response.message);
                 }
             } catch (error) {
-                if (error.message === 'BACKEND_NOT_AVAILABLE') {
+                if (error.message === 'BACKEND_NOT_AVAILABLE' || error.message === 'OFFLINE') {
                     console.warn('Saving progress to localStorage fallback');
                     localStorage.setItem('velocity_progress', JSON.stringify(appState.progress));
                 } else {
@@ -2656,7 +3046,7 @@
             }
         }
 
-        // Lab history management (same as before)
+        // Lab history management (enhanced with offline handling)
         async function loadLabHistory() {
             try {
                 if (!appState.sessionToken) {
@@ -2712,7 +3102,7 @@
                     appState.labHistory = [];
                 }
             } catch (error) {
-                if (error.message === 'BACKEND_NOT_AVAILABLE') {
+                if (error.message === 'BACKEND_NOT_AVAILABLE' || error.message === 'OFFLINE') {
                     console.warn('Using localStorage fallback for lab history');
                     appState.labHistory = JSON.parse(localStorage.getItem('velocity_lab_history') || '[]');
                     
@@ -2763,7 +3153,7 @@
                     console.warn('Failed to save lab history:', response.message);
                 }
             } catch (error) {
-                if (error.message === 'BACKEND_NOT_AVAILABLE') {
+                if (error.message === 'BACKEND_NOT_AVAILABLE' || error.message === 'OFFLINE') {
                     console.warn('Saving lab history to localStorage fallback');
                     localStorage.setItem('velocity_lab_history', JSON.stringify(appState.labHistory));
                 } else {
@@ -2774,9 +3164,9 @@
         }
 
         function checkLabCompletion() {
-            if (!appState.currentCategory) return;
+            if (appState.currentCategory !== 'exchange-lab') return;
             
-            const categoryTasks = appState.tasks.filter(task => task.category === appState.currentCategory);
+            const categoryTasks = appState.tasks.filter(task => task.category === 'exchange-lab');
             const totalTasks = categoryTasks.length;
             const completedTasks = categoryTasks.filter(task => 
                 appState.progress[task.id] && appState.progress[task.id].completed
@@ -2798,7 +3188,7 @@
                     if (labIndex >= 0) {
                         appState.labHistory[labIndex] = completionEntry;
                         saveLabHistory(completionEntry);
-                        notificationSystem.success('🎉 Lab completed successfully!');
+                        notificationSystem.success('🎉 Exchange Hybrid LAB completed successfully!');
                     }
                 }
             }
@@ -2898,6 +3288,21 @@
                     await authSystem.login(formData);
                 });
             }
+
+            // Request access form handler
+            const requestForm = utils.getId('requestAccessForm');
+            if (requestForm) {
+                requestForm.addEventListener('submit', function(event) {
+                    const submitBtn = event.target.querySelector('.form-submit');
+                    if (submitBtn) {
+                        submitBtn.classList.add('loading');
+                        submitBtn.textContent = 'Submitting...';
+                    }
+                    
+                    // Form will submit to web3forms naturally
+                    // Success is handled by redirect to thanks.html
+                });
+            }
         }
 
         // Global functions for HTML event handlers
@@ -2929,7 +3334,7 @@
 
         window.startLabEnvironment = async function() {
             try {
-                console.log('Starting new lab environment...');
+                console.log('Starting new Exchange Hybrid lab environment...');
                 
                 const response = await api.call('/api/lab/start', {
                     method: 'POST',
@@ -2950,7 +3355,7 @@
                     if (response.data.previousLabCompleted) {
                         notificationSystem.success(`🎉 Previous lab completed! New ${response.data.labId} started!`);
                     } else {
-                        notificationSystem.success(`🚀 New lab ${response.data.labId} started!`);
+                        notificationSystem.success(`🚀 New Exchange LAB ${response.data.labId} started!`);
                     }
                 }
                 
@@ -2959,6 +3364,8 @@
                 
                 if (error.message === 'BACKEND_NOT_AVAILABLE') {
                     notificationSystem.error('Backend API not available. Please deploy the functions first.');
+                } else if (error.message === 'OFFLINE') {
+                    notificationSystem.error('You are offline. Please check your internet connection.');
                 } else {
                     notificationSystem.error('Failed to start lab environment. Please try again.');
                 }
@@ -2971,9 +3378,9 @@
             if (appState.labHistory.length === 0) {
                 content.innerHTML = `
                     <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">🚀</div>
-                        <p>No lab sessions yet!</p>
-                        <p style="margin-top: 0.5rem;">Click "Start New Lab" to begin your first training session.</p>
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🧪</div>
+                        <p>No Exchange LAB sessions yet!</p>
+                        <p style="margin-top: 0.5rem;">Click "Start New Lab" to begin your first Exchange Hybrid training session.</p>
                     </div>
                 `;
             } else {
@@ -2990,7 +3397,7 @@
                 
                 content.innerHTML = filterButtons + `
                     <div style="margin-bottom: 1rem; color: var(--text-secondary);">
-                        <strong>Total Sessions: <span id="filteredCount">${appState.labHistory.length}</span></strong>
+                        <strong>Total Exchange LAB Sessions: <span id="filteredCount">${appState.labHistory.length}</span></strong>
                     </div>
                     <div id="labHistoryContent">
                         ${generateLabHistoryHTML(appState.labHistory)}
@@ -3028,6 +3435,9 @@
                 if (error.message === 'BACKEND_NOT_AVAILABLE') {
                     console.log('Backend APIs not deployed, showing fallback');
                     showAdminPanelFallback('Backend APIs not deployed yet. Please deploy the Functions to enable admin features.');
+                } else if (error.message === 'OFFLINE') {
+                    console.log('Offline mode, showing fallback');
+                    showAdminPanelFallback('Admin panel requires internet connection. Please check your connection and try again.');
                 } else {
                     console.log('Admin panel API unavailable, showing fallback');
                     showAdminPanelFallback('Admin panel temporarily unavailable. Please try again later.');
@@ -3306,9 +3716,8 @@
             notificationSystem.info('User lab history requires backend implementation');
         };
 
-        // New functions for category management
+        // Category management functions
         window.showCategoryView = function(categoryId) {
-            appState.currentCategory = categoryId;
             const category = TRAINING_CATEGORIES[categoryId];
             
             if (!category) {
@@ -3316,28 +3725,66 @@
                 return;
             }
             
+            if (category.type === 'lab') {
+                // Show Exchange LAB interface with progress tracking
+                appState.currentCategory = categoryId;
+                appState.currentView = 'lab';
+                
+                // Update dashboard title
+                const dashboardTitle = document.querySelector('.dashboard-title');
+                const dashboardSubtitle = document.querySelector('.dashboard-subtitle');
+                
+                if (dashboardTitle) {
+                    dashboardTitle.textContent = category.title;
+                }
+                if (dashboardSubtitle) {
+                    dashboardSubtitle.textContent = category.description;
+                }
+                
+                // Show course view with progress tracking
+                document.getElementById('categoriesContainer').classList.add('hidden');
+                document.getElementById('courseView').classList.remove('hidden');
+                document.getElementById('tutorialView').classList.add('hidden');
+                
+                // Generate week cards for Exchange LAB
+                generateWeekCards();
+                updateProgressDisplay();
+                
+            } else if (category.type === 'tutorial') {
+                // Show tutorial interface (no progress tracking)
+                showTutorialView(categoryId);
+            }
+        };
+
+        window.showTutorialView = function(categoryId) {
+            const category = TRAINING_CATEGORIES[categoryId];
+            
+            appState.currentCategory = categoryId;
+            appState.currentView = 'tutorial';
+            
             // Update dashboard title
             const dashboardTitle = document.querySelector('.dashboard-title');
             const dashboardSubtitle = document.querySelector('.dashboard-subtitle');
             
             if (dashboardTitle) {
-                dashboardTitle.textContent = category.title + ' Training';
+                dashboardTitle.textContent = category.title;
             }
             if (dashboardSubtitle) {
                 dashboardSubtitle.textContent = category.description;
             }
             
-            // Show course view, hide categories
+            // Hide categories and course view, show tutorial view
             document.getElementById('categoriesContainer').classList.add('hidden');
-            document.getElementById('courseView').classList.remove('hidden');
+            document.getElementById('courseView').classList.add('hidden');
+            document.getElementById('tutorialView').classList.remove('hidden');
             
-            // Generate week cards for this category
-            generateWeekCards();
-            updateProgressDisplay();
+            // Generate tutorial content
+            generateTutorialContent(categoryId);
         };
 
         window.showCategoriesView = function() {
             appState.currentCategory = null;
+            appState.currentView = 'categories';
             
             // Reset dashboard title
             const dashboardTitle = document.querySelector('.dashboard-title');
@@ -3347,12 +3794,13 @@
                 dashboardTitle.textContent = 'Your Training Journey';
             }
             if (dashboardSubtitle) {
-                dashboardSubtitle.textContent = 'Comprehensive MSP training across multiple technology categories';
+                dashboardSubtitle.textContent = 'Exchange Hybrid LAB with progress tracking + comprehensive MSP tutorials';
             }
             
-            // Show categories, hide course view
+            // Show categories, hide other views
             document.getElementById('categoriesContainer').classList.remove('hidden');
             document.getElementById('courseView').classList.add('hidden');
+            document.getElementById('tutorialView').classList.add('hidden');
             
             // Generate category cards
             generateCategoryCards();
@@ -3361,6 +3809,93 @@
         window.showRequestAccessModal = function() {
             showModal('requestAccessModal');
         };
+
+        window.showTutorialDetail = function(categoryId, courseIndex) {
+            const category = TRAINING_CATEGORIES[categoryId];
+            const courseName = category.courses[courseIndex];
+            
+            // Get tutorial content from loaded tutorial files
+            let tutorialContent = null;
+            
+            // Try to get content from tutorial modules
+            switch(categoryId) {
+                case 'networking':
+                    tutorialContent = window.NETWORKING_TUTORIALS && window.NETWORKING_TUTORIALS[Object.keys(window.NETWORKING_TUTORIALS)[courseIndex]];
+                    break;
+                case 'azure':
+                    tutorialContent = window.AZURE_TUTORIALS && window.AZURE_TUTORIALS[Object.keys(window.AZURE_TUTORIALS)[courseIndex]];
+                    break;
+                case 'microsoft365':
+                    tutorialContent = window.MICROSOFT365_TUTORIALS && window.MICROSOFT365_TUTORIALS[Object.keys(window.MICROSOFT365_TUTORIALS)[courseIndex]];
+                    break;
+                case 'firewalls':
+                    tutorialContent = window.FIREWALL_TUTORIALS && window.FIREWALL_TUTORIALS[Object.keys(window.FIREWALL_TUTORIALS)[courseIndex]];
+                    break;
+                case 'backup':
+                    tutorialContent = window.BACKUP_TUTORIALS && window.BACKUP_TUTORIALS[Object.keys(window.BACKUP_TUTORIALS)[courseIndex]];
+                    break;
+                case 'linux':
+                    tutorialContent = window.LINUX_TUTORIALS && window.LINUX_TUTORIALS[Object.keys(window.LINUX_TUTORIALS)[courseIndex]];
+                    break;
+                case 'tools':
+                    tutorialContent = window.TOOLS_TUTORIALS && window.TOOLS_TUTORIALS[Object.keys(window.TOOLS_TUTORIALS)[courseIndex]];
+                    break;
+            }
+            
+            // Set modal content
+            document.getElementById('tutorialDetailTitle').textContent = courseName;
+            
+            if (tutorialContent && tutorialContent.content) {
+                document.getElementById('tutorialDetailContent').innerHTML = tutorialContent.content;
+            } else {
+                document.getElementById('tutorialDetailContent').innerHTML = `
+                    <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
+                        <h3>Tutorial Available</h3>
+                        <p>This tutorial contains step-by-step instructions for:</p>
+                        <p><strong>${courseName}</strong></p>
+                        <p style="margin-top: 2rem; font-size: 0.9rem;">
+                            Tutorial content loaded from <code>/assets/tutorials/${categoryId}.js</code>
+                        </p>
+                    </div>
+                `;
+            }
+            
+            showModal('tutorialDetailModal');
+        };
+
+        // Tutorial content generation
+        function generateTutorialContent(categoryId) {
+            const category = TRAINING_CATEGORIES[categoryId];
+            const tutorialView = document.getElementById('tutorialView');
+            
+            const tutorialHtml = `
+                <div class="tutorial-container">
+                    <div class="tutorial-grid">
+                        ${category.courses.map((course, index) => `
+                            <div class="tutorial-card" onclick="showTutorialDetail('${categoryId}', ${index})">
+                                <div class="tutorial-header">
+                                    <h3>${course}</h3>
+                                </div>
+                                <div class="tutorial-preview">
+                                    Click to view comprehensive step-by-step guide with examples and best practices.
+                                </div>
+                                <div class="tutorial-meta">
+                                    <span class="tutorial-type">📚 Tutorial Guide</span>
+                                    <span class="tutorial-arrow">→</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button class="btn btn-secondary" onclick="showCategoriesView()">← Back to Categories</button>
+                    </div>
+                </div>
+            `;
+            
+            tutorialView.innerHTML = tutorialHtml;
+        }
 
         // Mobile menu functionality
         function setupMobileMenuHandlers() {
@@ -3431,7 +3966,7 @@
 
         function generateLabHistoryHTML(history) {
             if (history.length === 0) {
-                return '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">No sessions found for this period.</div>';
+                return '<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">No Exchange LAB sessions found for this period.</div>';
             }
             
             const sortedHistory = [...history].sort((a, b) => {
@@ -3443,7 +3978,7 @@
             
             return sortedHistory.map(session => {
                 const isInProgress = session.status === 'started';
-                const statusIcon = session.status === 'completed' ? '✅' : '🚀';
+                const statusIcon = session.status === 'completed' ? '✅' : '🧪';
                 const statusText = session.status === 'completed' ? 'Completed' : 'In Progress';
                 const statusColor = session.status === 'completed' ? 'var(--success)' : 'var(--primary)';
                 
@@ -3452,10 +3987,10 @@
                 
                 let labTitle;
                 if (isInProgress) {
-                    labTitle = `${statusIcon} Current Lab (${session.labId})`;
+                    labTitle = `${statusIcon} Current Exchange LAB (${session.labId})`;
                 } else {
                     const labNumber = session.labId ? session.labId.replace('LAB', '').replace(/^0+/, '') : session.session;
-                    labTitle = `${statusIcon} Lab ${labNumber} (${session.labId})`;
+                    labTitle = `${statusIcon} Exchange LAB ${labNumber} (${session.labId})`;
                 }
                 
                 const progressPercentage = Math.round((completedTasks / (session.totalTasks || 43)) * 100);
@@ -3488,7 +4023,7 @@
                             ${session.completedAt ? 
                                 `✅ Completed: ${new Date(session.completedAt).toLocaleDateString()} at ${new Date(session.completedAt).toLocaleTimeString()}` : 
                                 session.startedAt ? 
-                                `🚀 Started: ${new Date(session.startedAt).toLocaleDateString()} at ${new Date(session.startedAt).toLocaleTimeString()}` : ''
+                                `🧪 Started: ${new Date(session.startedAt).toLocaleDateString()} at ${new Date(session.startedAt).toLocaleTimeString()}` : ''
                             }
                         </div>
                     </div>
@@ -3500,9 +4035,9 @@
             let totalTasks = 43;
             let completedTasks = 0;
             
-            if (appState.currentCategory) {
-                const categoryTasks = appState.tasks.filter(task => task.category === appState.currentCategory);
-                totalTasks = categoryTasks.length;
+            if (appState.currentCategory === 'exchange-lab') {
+                const categoryTasks = appState.tasks.filter(task => task.category === 'exchange-lab');
+                totalTasks = categoryTasks.length || 43;
                 completedTasks = categoryTasks.filter(task => 
                     appState.progress[task.id] && appState.progress[task.id].completed
                 ).length;
@@ -3662,23 +4197,38 @@
             if (!container) return;
 
             container.innerHTML = appState.categories.map(category => {
-                const categoryTasks = appState.tasks.filter(task => task.category === category.id);
-                const completedTasks = categoryTasks.filter(task => 
-                    appState.progress[task.id] && appState.progress[task.id].completed
-                ).length;
-                const totalTasks = categoryTasks.length || category.courses.length;
-                const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+                let progressInfo = '';
+                let cardClass = 'category-card';
+                
+                if (category.type === 'lab') {
+                    // Show actual progress for Exchange LAB
+                    const categoryTasks = appState.tasks.filter(task => task.category === category.id);
+                    const completedTasks = categoryTasks.filter(task => 
+                        appState.progress[task.id] && appState.progress[task.id].completed
+                    ).length;
+                    const totalTasks = categoryTasks.length || 43;
+                    const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+                    
+                    progressInfo = `${progressPercentage}% complete`;
+                    cardClass += ' lab-card';
+                } else {
+                    // No progress tracking for tutorials
+                    progressInfo = 'Reference guides';
+                    cardClass += ' tutorial-card';
+                }
+                
+                const totalCourses = category.courses.length;
                 
                 return `
-                    <div class="category-card" onclick="showCategoryView('${category.id}')">
+                    <div class="${cardClass}" onclick="showCategoryView('${category.id}')">
                         <div class="category-header">
                             <div class="category-icon">${category.icon}</div>
                             <div class="category-title">${category.title}</div>
                         </div>
                         <div class="category-description">${category.description}</div>
                         <div class="category-stats">
-                            <div class="category-count">${totalTasks} courses</div>
-                            <div class="category-progress">${progressPercentage}% complete</div>
+                            <div class="category-count">${totalCourses} ${category.type === 'lab' ? 'weeks' : 'guides'}</div>
+                            <div class="category-progress">${progressInfo}</div>
                         </div>
                     </div>
                 `;
@@ -3689,8 +4239,8 @@
             const container = document.getElementById('weeksContainer');
             if (!container) return;
 
-            if (!appState.currentCategory) {
-                container.innerHTML = '<p>Please select a category first.</p>';
+            if (appState.currentCategory !== 'exchange-lab') {
+                container.innerHTML = '<p>Week cards are only available for the Exchange Hybrid LAB.</p>';
                 return;
             }
 
@@ -3745,15 +4295,40 @@
         function groupTasksByWeek() {
             const weeks = {};
             
-            // Filter tasks by current category
-            const categoryTasks = appState.tasks.filter(task => task.category === appState.currentCategory);
+            // Define proper week descriptions for Exchange LAB
+            const weekDescriptions = {
+                1: {
+                    title: 'Week 1: Foundation & Domain Setup',
+                    description: '2012 Server promoted to DC, VM joined to domain, network shares with security groups'
+                },
+                2: {
+                    title: 'Week 2: Infrastructure & Updates', 
+                    description: 'Install 2nd server, setup WSUS, configure time servers'
+                },
+                3: {
+                    title: 'Week 3: Exchange & Mail Flow',
+                    description: 'Upgrade to Server 2016, install Exchange, create mailboxes, internal mail flow'
+                },
+                4: {
+                    title: 'Week 4: Hybrid & External Access',
+                    description: 'Publish mail externally, setup Office 365 hybrid environment'
+                }
+            };
             
-            categoryTasks.forEach(task => {
+            // Filter tasks for Exchange LAB only
+            const labTasks = appState.tasks.filter(task => task.category === 'exchange-lab');
+            
+            labTasks.forEach(task => {
                 const weekNum = task.week || 1;
                 if (!weeks[weekNum]) {
-                    weeks[weekNum] = {
+                    const weekInfo = weekDescriptions[weekNum] || {
                         title: `Week ${weekNum}: Training`,
-                        description: `Complete training tasks for week ${weekNum}`,
+                        description: `Complete ${labTasks.filter(t => t.week === weekNum).length} tasks in this week`
+                    };
+                    
+                    weeks[weekNum] = {
+                        title: weekInfo.title,
+                        description: weekInfo.description,
                         tasks: []
                     };
                 }
@@ -3764,10 +4339,10 @@
         }
 
         function updateProgressDisplay() {
-            if (!appState.currentCategory) return;
+            if (appState.currentCategory !== 'exchange-lab') return;
             
-            const categoryTasks = appState.tasks.filter(task => task.category === appState.currentCategory);
-            const totalTasks = categoryTasks.length || 1;
+            const categoryTasks = appState.tasks.filter(task => task.category === 'exchange-lab');
+            const totalTasks = categoryTasks.length || 43;
             const completedTasks = categoryTasks.filter(task => 
                 appState.progress[task.id] && appState.progress[task.id].completed
             ).length;
@@ -3848,7 +4423,7 @@
                 
                 content.innerHTML = `
                     <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
-                        <strong>Leaderboard - ${usersData.length} Users</strong>
+                        <strong>Exchange LAB Leaderboard - ${usersData.length} Users</strong>
                         <small style="color: var(--text-secondary);">📊 Sorted by Progress</small>
                     </div>
                     ${usersData.map((user, index) => {
@@ -3941,11 +4516,14 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, checking session...');
             
+            // Initialize systems
             loadTaskDefinitions();
+            offlineSystem.init();
             checkExistingSession();
             setupMobileMenuHandlers();
             setupFormHandlers();
             
+            // Clean up mobile menu state
             const mobileMenu = document.getElementById('mobileMenu');
             const hamburger = document.querySelector('.hamburger');
             if (mobileMenu) {
@@ -3955,10 +4533,12 @@
                 hamburger.classList.remove('active');
             }
             
+            // Handle window resize
             window.addEventListener('resize', function() {
                 closeMobileMenu();
             });
             
+            // Progressive Web App registration
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/sw.js').then(function(registration) {
                     console.log('PWA Service Worker registered successfully:', registration.scope);
@@ -3985,12 +4565,23 @@
             }
         });
 
+        // Global error handling
         window.addEventListener('error', function(e) {
             console.error('Global error:', e.error, e.filename, e.lineno);
+            notificationSystem.error('An unexpected error occurred. Please refresh the page.');
         });
 
         window.addEventListener('unhandledrejection', function(e) {
             console.error('Unhandled promise rejection:', e.reason);
+            notificationSystem.error('A network error occurred. Please check your connection.');
+        });
+
+        // Performance monitoring
+        window.addEventListener('load', function() {
+            if ('performance' in window) {
+                const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                console.log('Page load time:', loadTime + 'ms');
+            }
         });
     </script>
 </body>
