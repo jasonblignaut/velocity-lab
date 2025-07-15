@@ -106,7 +106,7 @@ DBUser=zabbix</code>
                     <code># Custom script example
 #!/bin/bash
 # Check disk usage percentage
-df -h / | awk 'NR==2 {print $5}' | sed 's/%//'
+df -h / | awk 'NR==2 {print $5}' | sed 's/%//g'
 
 # Make executable
 chmod +x /usr/local/bin/disk_usage.sh</code>
