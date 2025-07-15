@@ -1175,14 +1175,15 @@
 
         .tutorial-header {
             display: flex;
+            flex-direction: column;
             align-items: center;
             gap: 1rem;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .tutorial-image {
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             flex-shrink: 0;
         }
 
@@ -1797,15 +1798,21 @@
 
             .tutorial-category-card {
                 padding: 1.25rem;
+                min-height: 180px;
             }
 
             .tutorial-image {
-                width: 50px;
-                height: 50px;
+                width: 60px;
+                height: 60px;
             }
 
             .tutorial-title {
                 font-size: 1.1rem;
+            }
+
+            .tutorial-count {
+                bottom: 1.25rem;
+                left: 1.25rem;
             }
 
             .tutorial-grid {
@@ -4297,9 +4304,7 @@
                                 <div class="tutorial-image ${category.id}"></div>
                                 <h3 class="tutorial-title">${category.title}</h3>
                             </div>
-                            <div class="tutorial-stats">
-                                <div class="tutorial-count">${category.courses.length} guides</div>
-                            </div>
+                            <div class="tutorial-count">${category.courses.length} guides</div>
                         </div>
                     `).join('')}
                 </div>
