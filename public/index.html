@@ -2202,6 +2202,12 @@
             margin-right: 6px;
         }
 
+        /* Disable pointer events during loading */
+        .loading-disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
         /* Success/Error Messages */
         .message {
             padding: 12px 16px;
@@ -3129,6 +3135,7 @@
             
             // Initialize categories
             appState.categories = Object.values(TRAINING_CATEGORIES);
+            console.log('Categories loaded:', appState.categories.length, 'categories');
         }
 
         function generateFallbackTasks() {
@@ -3689,11 +3696,16 @@
             if (adminButton) {
                 adminButton.innerHTML = '<span class="loading-spinner"></span> Loading...';
                 adminButton.disabled = true;
+                adminButton.style.pointerEvents = 'none';
             }
             if (mobileAdminButton) {
                 mobileAdminButton.innerHTML = '<span class="loading-spinner"></span> Loading...';
                 mobileAdminButton.disabled = true;
+                mobileAdminButton.style.pointerEvents = 'none';
             }
+
+            // Close mobile menu immediately
+            closeMobileMenu();
             
             try {
                 if (!appState.user || appState.user.role !== 'admin') {
@@ -3702,6 +3714,10 @@
                 }
 
                 console.log('Loading admin data from backend APIs...');
+                
+                // Add artificial delay to show loading spinner
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
                 const response = await api.call(`${API_BASE}/admin/users-progress`, {
                     headers: {
                         'Authorization': `Bearer ${appState.sessionToken}`,
@@ -3730,14 +3746,18 @@
                 }
             } finally {
                 // Restore button states
-                if (adminButton) {
-                    adminButton.innerHTML = 'Admin Panel';
-                    adminButton.disabled = false;
-                }
-                if (mobileAdminButton) {
-                    mobileAdminButton.innerHTML = 'Admin Panel';
-                    mobileAdminButton.disabled = false;
-                }
+                setTimeout(() => {
+                    if (adminButton) {
+                        adminButton.innerHTML = 'Admin Panel';
+                        adminButton.disabled = false;
+                        adminButton.style.pointerEvents = 'auto';
+                    }
+                    if (mobileAdminButton) {
+                        mobileAdminButton.innerHTML = 'Admin Panel';
+                        mobileAdminButton.disabled = false;
+                        mobileAdminButton.style.pointerEvents = 'auto';
+                    }
+                }, 500);
             }
         };
 
