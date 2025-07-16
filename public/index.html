@@ -8,7 +8,7 @@
     <!-- PWA Meta Tags -->
     <meta name="application-name" content="Velocity Training Platform">
     <meta name="apple-mobile-web-app-title" content="Velocity Training Platform">
-    <meta name="description" content="Comprehensive MSP training platform covering Exchange Hybrid LAB plus tutorials for Networking, Azure, Firewalls, Linux, and more">
+    <meta name="description" content="Professional MSP training platform covering Exchange Hybrid LAB plus tutorials for Networking, Azure, Firewalls, Linux, and more">
     <meta name="theme-color" content="#00a8ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -28,7 +28,7 @@
     
     <!-- Open Graph for sharing -->
     <meta property="og:title" content="Velocity Training Platform - MSP Training">
-    <meta property="og:description" content="Exchange Hybrid LAB plus comprehensive tutorials covering Networking, Microsoft Azure, Firewalls, Linux, and more">
+    <meta property="og:description" content="Exchange Hybrid LAB plus tutorials covering Networking, Microsoft Azure, Firewalls, Linux, and more">
     <meta property="og:image" content="/assets/Android_512.png">
     <meta property="og:url" content="https://thevtp.com">
     <meta property="og:type" content="website">
@@ -36,7 +36,7 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Velocity Training Platform - MSP Training">
-    <meta name="twitter:description" content="Exchange Hybrid LAB plus comprehensive tutorials covering Networking, Microsoft Azure, Firewalls, Linux, and more">
+    <meta name="twitter:description" content="Exchange Hybrid LAB plus tutorials covering Networking, Microsoft Azure, Firewalls, Linux, and more">
     <meta name="twitter:image" content="/assets/Android_512.png">
     
     <!-- Preload critical resources -->
@@ -2485,13 +2485,13 @@
             
             <div class="modal-header">
                 <h2>Request Training Access</h2>
-                <p style="color: var(--text-secondary);">Join our comprehensive MSP training platform</p>
+                <p style="color: var(--text-secondary);">Join our MSP training platform</p>
             </div>
             
             <div class="modal-body">
                 <div class="request-form">
                     <h3>Access Request Form</h3>
-                    <p>Please fill out the form below to request access to Velocity Training Platform. Our team will review your request and create your account manually.</p>
+                    <p>Please fill out the form below to request access to Velocity Training Platform. Our team will review your request and create your account.</p>
                     
                     <form action="https://api.web3forms.com/submit" method="POST" id="requestAccessForm">
                         <!-- Replace with your Access Key -->
@@ -3571,6 +3571,14 @@
             try {
                 console.log('Starting new Exchange Hybrid lab environment...');
                 
+                // Check if there's an active lab and mark it as abandoned
+                const currentLab = appState.labHistory.find(lab => lab.status === 'started');
+                if (currentLab) {
+                    currentLab.status = 'abandoned';
+                    currentLab.abandonedAt = new Date().toISOString();
+                    console.log('Previous lab marked as abandoned:', currentLab.labId);
+                }
+                
                 const response = await api.call('/api/lab/start', {
                     method: 'POST',
                     headers: {
@@ -3587,8 +3595,8 @@
                     updateProgressDisplay();
                     await loadLabHistory();
                     
-                    if (response.data.previousLabCompleted) {
-                        notificationSystem.success(`Previous lab completed! New ${response.data.labId} started!`);
+                    if (response.data.previousLabAbandoned) {
+                        notificationSystem.success(`Previous lab abandoned. New ${response.data.labId} started!`);
                     } else {
                         notificationSystem.success(`New Exchange LAB ${response.data.labId} started!`);
                     }
@@ -3598,7 +3606,35 @@
                 console.error('Failed to start lab:', error);
                 
                 if (error.message === 'BACKEND_NOT_AVAILABLE') {
-                    notificationSystem.error('Backend API not available. Please deploy the functions first.');
+                    // Handle frontend-only abandoned logic
+                    if (appState.labHistory.length > 0) {
+                        const currentLab = appState.labHistory.find(lab => lab.status === 'started');
+                        if (currentLab) {
+                            currentLab.status = 'abandoned';
+                            currentLab.abandonedAt = new Date().toISOString();
+                            
+                            // Create new lab
+                            const newLabId = `LAB${String(appState.labHistory.length + 1).padStart(3, '0')}`;
+                            const newLab = {
+                                session: appState.labHistory.length + 1,
+                                date: new Date().toISOString().split('T')[0],
+                                status: 'started',
+                                labId: newLabId,
+                                startedAt: new Date().toISOString(),
+                                completedAt: null,
+                                tasksCompleted: 0,
+                                totalTasks: 43
+                            };
+                            
+                            appState.labHistory.push(newLab);
+                            localStorage.setItem('velocity_lab_history', JSON.stringify(appState.labHistory));
+                            
+                            appState.progress = {};
+                            updateProgressDisplay();
+                            
+                            notificationSystem.success(`Previous lab abandoned. New ${newLabId} started!`);
+                        }
+                    }
                 } else if (error.message === 'OFFLINE') {
                     notificationSystem.error('You are offline. Please check your internet connection.');
                 } else {
