@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Velocity Lab - Comprehensive MSP Training Platform</title>
+    <title>Velocity Training Platform - Comprehensive MSP Training</title>
     
     <!-- PWA Meta Tags -->
-    <meta name="application-name" content="Velocity Lab">
-    <meta name="apple-mobile-web-app-title" content="Velocity Lab">
+    <meta name="application-name" content="Velocity Training Platform">
+    <meta name="apple-mobile-web-app-title" content="Velocity Training Platform">
     <meta name="description" content="Comprehensive MSP training platform covering Exchange Hybrid LAB plus tutorials for Networking, Azure, Firewalls, Linux, and more">
     <meta name="theme-color" content="#00a8ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -27,15 +27,15 @@
     <link rel="manifest" href="/manifest.json">
     
     <!-- Open Graph for sharing -->
-    <meta property="og:title" content="Velocity Lab - MSP Training Platform">
+    <meta property="og:title" content="Velocity Training Platform - MSP Training">
     <meta property="og:description" content="Exchange Hybrid LAB plus comprehensive tutorials covering Networking, Microsoft Azure, Firewalls, Linux, and more">
     <meta property="og:image" content="/assets/Android_512.png">
-    <meta property="og:url" content="https://labverse.co.za">
+    <meta property="og:url" content="https://thevtp.com">
     <meta property="og:type" content="website">
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Velocity Lab - MSP Training Platform">
+    <meta name="twitter:title" content="Velocity Training Platform - MSP Training">
     <meta name="twitter:description" content="Exchange Hybrid LAB plus comprehensive tutorials covering Networking, Microsoft Azure, Firewalls, Linux, and more">
     <meta name="twitter:image" content="/assets/Android_512.png">
     
@@ -196,6 +196,15 @@
         .header-buttons {
             display: flex;
             gap: 12px;
+        }
+
+        /* Show header buttons on desktop only */
+        @media (min-width: 769px) {
+            .landing-page .header-buttons {
+                display: flex !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
         }
 
         /* Mobile Hamburger Menu */
@@ -482,6 +491,11 @@
             flex-wrap: wrap;
             justify-content: center;
             animation: fadeInUp 0.8s ease 0.6s both;
+        }
+
+        /* Hide Request Access button in welcome screen on desktop */
+        .welcome-request-access {
+            display: none;
         }
 
         .btn-large {
@@ -1824,6 +1838,11 @@
                 font-size: 2.5rem;
             }
 
+            /* Show Request Access button in welcome screen only on mobile */
+            .welcome-request-access {
+                display: block;
+            }
+
             .welcome-buttons {
                 flex-direction: column;
                 width: 100%;
@@ -2012,6 +2031,11 @@
                 visibility: hidden !important;
                 opacity: 0 !important;
             }
+
+            /* Show Request Access button in welcome screen only on mobile */
+            .welcome-request-access {
+                display: block;
+            }
         }
 
         @media (max-width: 480px) {
@@ -2162,6 +2186,18 @@
 
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+
+        /* Loading spinner for admin button */
+        .loading-spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid var(--text-secondary);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 6px;
         }
 
         /* Success/Error Messages */
@@ -2342,7 +2378,7 @@
     <!-- Welcome Screen - Only Sign In button in center -->
     <div class="welcome-screen" id="welcomeScreen">
         <div class="welcome-notification" id="welcomeNotification">
-            Welcome to Velocity Lab! Request access to begin your MSP training journey.
+            Welcome to Velocity Training Platform! Request access to begin your MSP training journey.
         </div>
         
         <h1 class="welcome-title">Training Platform</h1>
@@ -2355,7 +2391,7 @@
             <button class="btn btn-primary btn-large" onclick="showSignInModal()">
                 Sign In
             </button>
-            <button class="btn btn-secondary btn-large" onclick="showRequestAccessModal()">
+            <button class="btn btn-secondary btn-large welcome-request-access" onclick="showRequestAccessModal()">
                 Request Access
             </button>
         </div>
@@ -2412,7 +2448,7 @@
             </div>
             
             <div class="modal-body">
-                <h2 class="modal-title">Sign in to Velocity Lab</h2>
+                <h2 class="modal-title">Sign in to Velocity Training Platform</h2>
                 <p class="modal-subtitle">Welcome back to your training</p>
                 
                 <form id="signInForm">
@@ -2455,7 +2491,7 @@
             <div class="modal-body">
                 <div class="request-form">
                     <h3>Access Request Form</h3>
-                    <p>Please fill out the form below to request access to our training platform. Our team will review your request and create your account manually.</p>
+                    <p>Please fill out the form below to request access to Velocity Training Platform. Our team will review your request and create your account manually.</p>
                     
                     <form action="https://api.web3forms.com/submit" method="POST" id="requestAccessForm">
                         <!-- Replace with your Access Key -->
@@ -2487,7 +2523,7 @@
                         <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
                         
                         <!-- Custom Confirmation / Success Page -->
-                        <input type="hidden" name="redirect" value="https://labverse.co.za/thanks.html">
+                        <input type="hidden" name="redirect" value="https://thevtp.com/thanks.html">
                         
                         <button type="submit" class="form-submit">Submit Access Request</button>
                     </form>
@@ -2817,7 +2853,7 @@
                     return;
                 }
                 
-                if (message.includes('Welcome back') || message.includes('Welcome to Velocity Lab')) {
+                if (message.includes('Welcome back') || message.includes('Welcome to Velocity Training Platform')) {
                     if (appState.isWelcomeShown) {
                         console.log('Duplicate welcome notification prevented:', message);
                         return;
@@ -3583,9 +3619,20 @@
                     </div>
                 `;
             } else {
-                content.innerHTML = `
+                const filterButtons = `
+                    <div style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        <button onclick="filterLabHistory('week')" class="lab-filter-btn" data-filter="week" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last Week</button>
+                        <button onclick="filterLabHistory('month')" class="lab-filter-btn" data-filter="month" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last 30 Days</button>
+                        <button onclick="filterLabHistory('quarter')" class="lab-filter-btn" data-filter="quarter" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last 3 Months</button>
+                        <button onclick="filterLabHistory('halfyear')" class="lab-filter-btn" data-filter="halfyear" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last 6 Months</button>
+                        <button onclick="filterLabHistory('year')" class="lab-filter-btn" data-filter="year" style="padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem;">Last Year</button>
+                        <button onclick="filterLabHistory('lifetime')" class="lab-filter-btn active" data-filter="lifetime" style="padding: 0.5rem 1rem; border: 1px solid var(--primary); border-radius: 6px; background: var(--primary); color: white; cursor: pointer; font-size: 0.8rem;">Lifetime</button>
+                    </div>
+                `;
+                
+                content.innerHTML = filterButtons + `
                     <div style="margin-bottom: 1rem; color: var(--text-secondary);">
-                        <strong>Total Exchange LAB Sessions: ${appState.labHistory.length}</strong>
+                        <strong>Total Exchange LAB Sessions: <span id="filteredCount">${appState.labHistory.length}</span></strong>
                     </div>
                     <div id="labHistoryContent">
                         ${generateLabHistoryHTML(appState.labHistory)}
@@ -3594,6 +3641,370 @@
             }
             
             showModal('labHistoryModal');
+        };
+
+        window.showAdminPanel = async function() {
+            // Show loading state immediately
+            const adminButton = document.getElementById('adminButton');
+            const mobileAdminButton = document.querySelector('.mobile-menu-item[onclick*="showAdminPanel"]');
+            
+            if (adminButton) {
+                adminButton.innerHTML = '<span class="loading-spinner"></span> Loading...';
+                adminButton.disabled = true;
+            }
+            if (mobileAdminButton) {
+                mobileAdminButton.innerHTML = '<span class="loading-spinner"></span> Loading...';
+                mobileAdminButton.disabled = true;
+            }
+            
+            try {
+                if (!appState.user || appState.user.role !== 'admin') {
+                    notificationSystem.error('Admin access required');
+                    return;
+                }
+
+                console.log('Loading admin data from backend APIs...');
+                const response = await api.call(`${API_BASE}/admin/users-progress`, {
+                    headers: {
+                        'Authorization': `Bearer ${appState.sessionToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.success) {
+                    console.log('Admin data loaded from backend APIs');
+                    displayAdminPanel(response.data);
+                } else {
+                    notificationSystem.error(`Failed to load admin data: ${response.message}`);
+                }
+            } catch (error) {
+                console.error('Failed to load admin data:', error);
+                
+                if (error.message === 'BACKEND_NOT_AVAILABLE') {
+                    console.log('Backend APIs not deployed, showing fallback');
+                    showAdminPanelFallback('Backend APIs not deployed yet. Please deploy the Functions to enable admin features.');
+                } else if (error.message === 'OFFLINE') {
+                    console.log('Offline mode, showing fallback');
+                    showAdminPanelFallback('Admin panel requires internet connection. Please check your connection and try again.');
+                } else {
+                    console.log('Admin panel API unavailable, showing fallback');
+                    showAdminPanelFallback('Admin panel temporarily unavailable. Please try again later.');
+                }
+            } finally {
+                // Restore button states
+                if (adminButton) {
+                    adminButton.innerHTML = 'Admin Panel';
+                    adminButton.disabled = false;
+                }
+                if (mobileAdminButton) {
+                    mobileAdminButton.innerHTML = 'Admin Panel';
+                    mobileAdminButton.disabled = false;
+                }
+            }
+        };
+
+        window.filterLabHistory = function(period) {
+            const now = new Date();
+            let filteredHistory = appState.labHistory;
+            
+            if (period !== 'lifetime') {
+                const cutoffDate = new Date();
+                switch(period) {
+                    case 'week':
+                        cutoffDate.setDate(now.getDate() - 7);
+                        break;
+                    case 'month':
+                        cutoffDate.setDate(now.getDate() - 30);
+                        break;
+                    case 'quarter':
+                        cutoffDate.setMonth(now.getMonth() - 3);
+                        break;
+                    case 'halfyear':
+                        cutoffDate.setMonth(now.getMonth() - 6);
+                        break;
+                    case 'year':
+                        cutoffDate.setFullYear(now.getFullYear() - 1);
+                        break;
+                }
+                
+                filteredHistory = appState.labHistory.filter(session => 
+                    new Date(session.date) >= cutoffDate
+                );
+            }
+            
+            document.querySelectorAll('.lab-filter-btn').forEach(btn => {
+                btn.style.background = 'var(--surface)';
+                btn.style.color = 'var(--text)';
+                btn.style.border = '1px solid var(--border)';
+            });
+            
+            const activeBtn = document.querySelector(`[data-filter="${period}"]`);
+            if (activeBtn) {
+                activeBtn.style.background = 'var(--primary)';
+                activeBtn.style.color = 'white';
+                activeBtn.style.border = '1px solid var(--primary)';
+            }
+            
+            document.getElementById('filteredCount').textContent = filteredHistory.length;
+            document.getElementById('labHistoryContent').innerHTML = generateLabHistoryHTML(filteredHistory);
+        };
+
+        window.showTaskDetail = function(taskId) {
+            const taskDefinition = window.TASK_DEFINITIONS && window.TASK_DEFINITIONS[taskId];
+            
+            if (taskDefinition) {
+                document.getElementById('taskDetailTitle').textContent = taskDefinition.title;
+                
+                if (!appState.progress[taskId]) {
+                    appState.progress[taskId] = {
+                        completed: false,
+                        subtasks: {},
+                        notes: ''
+                    };
+                }
+                
+                const taskProgress = appState.progress[taskId];
+                const hasNotes = taskProgress.notes && taskProgress.notes.trim().length > 0;
+                
+                const notesSection = `
+                    <div class="notes-container">
+                        <div class="notes-header">
+                            <h4 class="notes-title">Your Notes</h4>
+                            <button class="save-note-btn" id="saveNoteBtn_${taskId}" onclick="saveTaskNotes('${taskId}')">
+                                Save Note
+                            </button>
+                        </div>
+                        <textarea 
+                            id="taskNotes_${taskId}" 
+                            class="notes-textarea ${hasNotes ? 'has-content' : ''}"
+                            placeholder="Add your notes, observations, or troubleshooting steps here..."
+                            ${hasNotes ? 'title="Click to edit your notes"' : ''}
+                        >${taskProgress.notes || ''}</textarea>
+                        <div class="notes-tip">
+                            Tip: Document any issues, solutions, or key learnings for future reference
+                            ${hasNotes ? ' • Click the textarea to edit your saved notes' : ''}
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('taskDetailContent').innerHTML = taskDefinition.description + notesSection;
+                
+                setTimeout(() => {
+                    const subtaskItems = document.querySelectorAll('.subtask-item');
+                    subtaskItems.forEach(item => {
+                        const checkbox = item.querySelector('.subtask-checkbox');
+                        const label = item.querySelector('label');
+                        const step = checkbox ? checkbox.getAttribute('data-step') : null;
+                        
+                        if (step && checkbox && label) {
+                            if (taskProgress.subtasks && taskProgress.subtasks[step]) {
+                                checkbox.checked = taskProgress.subtasks[step].completed;
+                                if (checkbox.checked) {
+                                    item.classList.add('completed');
+                                }
+                            }
+                            
+                            const clickHandler = function(e) {
+                                if (e.target === checkbox) return;
+                                
+                                e.preventDefault();
+                                e.stopPropagation();
+                                
+                                checkbox.checked = !checkbox.checked;
+                                handleSubtaskChange(taskId, step, checkbox.checked);
+                            };
+                            
+                            item.addEventListener('click', clickHandler);
+                            label.addEventListener('click', clickHandler);
+                            
+                            checkbox.addEventListener('change', function(e) {
+                                e.stopPropagation();
+                                handleSubtaskChange(taskId, step, this.checked);
+                            });
+                        }
+                    });
+
+                    const notesTextarea = document.getElementById(`taskNotes_${taskId}`);
+                    const saveBtn = document.getElementById(`saveNoteBtn_${taskId}`);
+                    
+                    if (notesTextarea && saveBtn) {
+                        let saveTimeout;
+                        notesTextarea.addEventListener('input', function() {
+                            clearTimeout(saveTimeout);
+                            saveBtn.textContent = 'Save Note';
+                            saveBtn.classList.remove('saved');
+                            
+                            saveTimeout = setTimeout(() => {
+                                saveTaskNotes(taskId);
+                            }, 2000);
+                        });
+
+                        if (hasNotes) {
+                            notesTextarea.addEventListener('click', function() {
+                                this.focus();
+                                this.setSelectionRange(this.value.length, this.value.length);
+                            });
+                        }
+                    }
+                }, 100);
+                
+                showModal('taskDetailModal');
+            } else {
+                notificationSystem.error('Task details not available');
+            }
+        };
+
+        window.saveTaskNotes = function(taskId) {
+            const notesTextarea = document.getElementById(`taskNotes_${taskId}`);
+            const saveBtn = document.getElementById(`saveNoteBtn_${taskId}`);
+            
+            if (notesTextarea && appState.progress[taskId]) {
+                appState.progress[taskId].notes = notesTextarea.value;
+                appState.progress[taskId].lastUpdated = new Date().toISOString();
+                saveUserProgress(taskId, appState.progress[taskId]);
+                
+                if (saveBtn) {
+                    saveBtn.textContent = 'Saved!';
+                    saveBtn.classList.add('saved');
+                    
+                    setTimeout(() => {
+                        saveBtn.textContent = 'Save Note';
+                        saveBtn.classList.remove('saved');
+                    }, 2000);
+                }
+                
+                const hasContent = notesTextarea.value.trim().length > 0;
+                if (hasContent) {
+                    notesTextarea.classList.add('has-content');
+                    notesTextarea.title = 'Click to edit your notes';
+                } else {
+                    notesTextarea.classList.remove('has-content');
+                    notesTextarea.title = '';
+                }
+                
+                console.log('Notes saved for task:', taskId);
+                
+                if (hasContent) {
+                    notificationSystem.success('Notes saved successfully!');
+                } else {
+                    notificationSystem.info('Notes cleared');
+                }
+            }
+        };
+
+        window.toggleTaskCompletion = async function(taskId) {
+            try {
+                if (!appState.progress[taskId]) {
+                    appState.progress[taskId] = {
+                        completed: false,
+                        subtasks: {},
+                        notes: ''
+                    };
+                }
+                
+                const isCompleted = appState.progress[taskId].completed;
+                
+                appState.progress[taskId].completed = !isCompleted;
+                appState.progress[taskId].completedAt = !isCompleted ? new Date().toISOString() : null;
+                appState.progress[taskId].lastUpdated = new Date().toISOString();
+                
+                const taskCheckbox = document.querySelector(`input[onchange="toggleTaskCompletion('${taskId}')"]`);
+                const taskItem = taskCheckbox?.closest('.task-item');
+                
+                if (taskCheckbox && taskItem) {
+                    taskCheckbox.checked = !isCompleted;
+                    if (!isCompleted) {
+                        taskItem.classList.add('completed');
+                    } else {
+                        taskItem.classList.remove('completed');
+                    }
+                }
+                
+                await saveUserProgress(taskId, appState.progress[taskId]);
+                
+                updateProgressDisplay();
+                
+                checkLabCompletion();
+                
+            } catch (error) {
+                console.error('Failed to toggle task completion:', error);
+                notificationSystem.error('Failed to save progress. Please try again.');
+            }
+        };
+
+        window.toggleWeekExpansion = function(weekNum, event) {
+            if (event && event.target) {
+                const taskItem = event.target.closest('.task-item');
+                const taskList = event.target.closest('.task-list');
+                
+                if (taskItem || taskList) {
+                    return;
+                }
+            }
+            
+            const weekCards = document.querySelectorAll('.week-card');
+            const targetCard = weekCards[weekNum - 1];
+            
+            if (targetCard) {
+                targetCard.classList.toggle('expanded');
+            }
+        };
+
+        window.showUserLabHistory = function(userName, userEmail) {
+            notificationSystem.info('User lab history requires backend implementation');
+        };
+
+        window.showTutorialDetail = function(categoryId, courseIndex) {
+            const category = TRAINING_CATEGORIES[categoryId];
+            const courseName = category.courses[courseIndex];
+            
+            // Get tutorial content from loaded tutorial files
+            let tutorialContent = null;
+            
+            // Try to get content from tutorial modules
+            switch(categoryId) {
+                case 'networking':
+                    tutorialContent = window.NETWORKING_TUTORIALS && window.NETWORKING_TUTORIALS[Object.keys(window.NETWORKING_TUTORIALS)[courseIndex]];
+                    break;
+                case 'azure':
+                    tutorialContent = window.AZURE_TUTORIALS && window.AZURE_TUTORIALS[Object.keys(window.AZURE_TUTORIALS)[courseIndex]];
+                    break;
+                case 'microsoft365':
+                    tutorialContent = window.MICROSOFT365_TUTORIALS && window.MICROSOFT365_TUTORIALS[Object.keys(window.MICROSOFT365_TUTORIALS)[courseIndex]];
+                    break;
+                case 'firewalls':
+                    tutorialContent = window.FIREWALL_TUTORIALS && window.FIREWALL_TUTORIALS[Object.keys(window.FIREWALL_TUTORIALS)[courseIndex]];
+                    break;
+                case 'backup':
+                    tutorialContent = window.BACKUP_TUTORIALS && window.BACKUP_TUTORIALS[Object.keys(window.BACKUP_TUTORIALS)[courseIndex]];
+                    break;
+                case 'linux':
+                    tutorialContent = window.LINUX_TUTORIALS && window.LINUX_TUTORIALS[Object.keys(window.LINUX_TUTORIALS)[courseIndex]];
+                    break;
+                case 'tools':
+                    tutorialContent = window.TOOLS_TUTORIALS && window.TOOLS_TUTORIALS[Object.keys(window.TOOLS_TUTORIALS)[courseIndex]];
+                    break;
+            }
+            
+            // Set modal content
+            document.getElementById('tutorialDetailTitle').textContent = courseName;
+            
+            if (tutorialContent && tutorialContent.content) {
+                document.getElementById('tutorialDetailContent').innerHTML = tutorialContent.content;
+            } else {
+                document.getElementById('tutorialDetailContent').innerHTML = `
+                    <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
+                        <h3>Tutorial Available</h3>
+                        <p>This tutorial contains step-by-step instructions for:</p>
+                        <p><strong>${courseName}</strong></p>
+                        <p style="margin-top: 2rem; font-size: 0.9rem;">
+                            Tutorial content loaded from <code>/assets/tutorials/${categoryId}.js</code>
+                        </p>
+                    </div>
+                `;
+            }
+            
+            showModal('tutorialDetailModal');
         };
 
         // UI state management
@@ -3606,6 +4017,7 @@
             const headerButtons = document.getElementById('headerButtons');
             const userMenu = document.getElementById('userMenu');
             
+            // Show header buttons on desktop, hide on mobile (handled by CSS)
             if (headerButtons) headerButtons.classList.remove('hidden');
             if (userMenu) userMenu.classList.add('hidden');
             
@@ -3783,15 +4195,45 @@
                     <button class="mobile-menu-item" onclick="startLabEnvironment(); closeMobileMenu();">Start New Lab</button>
                     <button class="mobile-menu-item" onclick="showLabHistoryModal(); closeMobileMenu();">Lab History</button>
                     ${adminItem}
-                    <button class="mobile-menu-item" onclick="setTheme('light'); closeMobileMenu();">Light Theme</button>
-                    <button class="mobile-menu-item" onclick="setTheme('dark'); closeMobileMenu();">Dark Theme</button>
+                    <button class="mobile-menu-item" onclick="toggleMobileThemeMenu(event)" id="mobileThemeToggle">
+                        Theme ▶
+                    </button>
+                    <div id="mobileThemeOptions" style="display: none;">
+                        <button class="mobile-menu-item" onclick="setTheme('light'); closeMobileMenu();">
+                            Light Jedi
+                        </button>
+                        <button class="mobile-menu-item" onclick="setTheme('dark'); closeMobileMenu();">
+                            Dark Sith
+                        </button>
+                    </div>
                     <button class="mobile-menu-item" onclick="logout(); closeMobileMenu();">Sign Out</button>
                 `;
             } else {
+                // On mobile, don't show Request Access in menu since it's in welcome screen
                 mobileMenuItems.innerHTML = `
                     <button class="mobile-menu-item" onclick="showSignInModal(); closeMobileMenu();">Sign In</button>
-                    <button class="mobile-menu-item" onclick="showRequestAccessModal(); closeMobileMenu();">Request Access</button>
                 `;
+            }
+        }
+
+        function closeMobileMenu() {
+            const hamburger = document.getElementById('hamburger');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (hamburger) hamburger.classList.remove('active');
+            if (mobileMenu) mobileMenu.classList.remove('active');
+            
+            closeMobileThemeMenu();
+            
+            setTimeout(() => {
+                updateMobileMenuItems();
+            }, 100);
+        }
+
+        function closeMobileThemeMenu() {
+            const themeOptions = document.getElementById('mobileThemeOptions');
+            if (themeOptions) {
+                themeOptions.style.display = 'none';
             }
         }
 
