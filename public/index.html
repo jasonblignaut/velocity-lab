@@ -2585,7 +2585,7 @@
         <div class="modal-content large">
             <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
             <div class="modal-header">
-                <h2>Admin Panel</h2>
+                <h2>👑 Admin Panel</h2>
                 <p style="color: var(--text-secondary);">Exchange LAB progress leaderboard</p>
             </div>
             <div class="lab-history-modal-content" id="adminContent">
@@ -3427,6 +3427,8 @@
             const userCookie = utils.cookies.get('user');
             const sessionCookie = utils.cookies.get('session');
             
+            console.log('Checking existing session:', { userCookie, sessionCookie });
+            
             if (userCookie && sessionCookie) {
                 try {
                     appState.user = JSON.parse(userCookie);
@@ -3435,7 +3437,19 @@
                     
                     appState.isWelcomeShown = true;
                     
-                    console.log('Found existing session for:', appState.user.name);
+                    console.log('Found existing session for:', appState.user.name, 'Role:', appState.user.role);
+                    
+                    // Show admin button if user is admin
+                    if (appState.user.role === 'admin') {
+                        setTimeout(() => {
+                            const adminBtn = document.getElementById('adminButton');
+                            if (adminBtn) {
+                                adminBtn.style.display = 'block';
+                                console.log('Admin button shown for admin user');
+                            }
+                        }, 100);
+                    }
+                    
                     showDashboard();
                     loadUserProgress();
                     loadLabHistory();
@@ -3464,6 +3478,39 @@
                 }
             } else {
                 console.log('No existing session found');
+                
+                // For testing purposes, create a test admin user
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    console.log('Development mode: Creating test admin user');
+                    const testUser = {
+                        name: 'Test Admin',
+                        email: 'admin@test.com',
+                        role: 'admin'
+                    };
+                    utils.cookies.set('user', JSON.stringify(testUser));
+                    utils.cookies.set('session', 'test-session-token');
+                    
+                    appState.user = testUser;
+                    appState.sessionToken = 'test-session-token';
+                    appState.authenticated = true;
+                    
+                    showDashboard();
+                    loadUserProgress();
+                    loadLabHistory();
+                    themeSystem.loadTheme();
+                    
+                    setTimeout(() => {
+                        const adminBtn = document.getElementById('adminButton');
+                        if (adminBtn) {
+                            adminBtn.style.display = 'block';
+                            console.log('Admin button shown for test admin user');
+                        }
+                    }, 100);
+                    
+                    updateMobileMenuItems();
+                    return;
+                }
+                
                 notificationSystem.clearShownNotifications();
                 showWelcomeScreen();
                 themeSystem.loadTheme();
