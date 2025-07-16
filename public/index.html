@@ -1231,20 +1231,29 @@
 
         .tutorial-header {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
+            text-align: center;
+            padding: 1.5rem;
             flex: 1;
         }
 
+        .tutorial-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0 0 1rem 0;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+
         .tutorial-image {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
             background-color: var(--surface);
-            box-shadow: 0 2px 8px var(--shadow);
+            box-shadow: 0 4px 12px var(--shadow);
             transition: transform 0.3s ease;
-            flex-shrink: 0;
         }
 
         .tutorial-category-card:hover .tutorial-image {
@@ -1277,15 +1286,6 @@
 
         .tutorial-image.tools {
             background: url('/assets/image8.png') center/contain no-repeat, var(--surface);
-        }
-
-        .tutorial-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text);
-            margin: 0;
-            line-height: 1.3;
-            letter-spacing: -0.01em;
         }
 
         .tutorial-count {
@@ -1903,20 +1903,21 @@
             }
 
             .tutorial-category-card {
-                min-height: 150px;
+                min-height: 180px;
             }
 
             .tutorial-header {
-                margin-bottom: 0.5rem;
+                padding: 1.25rem;
             }
 
             .tutorial-image {
-                width: 40px;
-                height: 40px;
+                width: 50px;
+                height: 50px;
             }
 
             .tutorial-title {
                 font-size: 1.1rem;
+                margin-bottom: 0.75rem;
             }
 
             .tutorial-grid {
@@ -2069,21 +2070,22 @@
             }
 
             .tutorial-category-card {
-                min-height: 140px;
+                min-height: 160px;
                 padding: 1rem;
             }
 
             .tutorial-header {
-                gap: 0.8rem;
+                padding: 1rem;
             }
 
             .tutorial-title {
                 font-size: 1rem;
+                margin-bottom: 0.5rem;
             }
 
             .tutorial-image {
-                width: 35px;
-                height: 35px;
+                width: 45px;
+                height: 45px;
             }
 
             .progress-ring {
@@ -2638,7 +2640,7 @@
             },
             'networking': {
                 id: 'networking',
-                title: 'Networking Guides',
+                title: 'Networking',
                 type: 'tutorial', // Informational only
                 courses: [
                     'Setting up Zabbix monitoring server',
@@ -2657,7 +2659,7 @@
             },
             'azure': {
                 id: 'azure',
-                title: 'Microsoft Azure Guides',
+                title: 'Microsoft Azure',
                 type: 'tutorial',
                 courses: [
                     'Microsoft Defender for Servers deployment',
@@ -2673,7 +2675,7 @@
             },
             'microsoft365': {
                 id: 'microsoft365',
-                title: 'Microsoft 365 Guides',
+                title: 'Microsoft 365',
                 type: 'tutorial',
                 courses: [
                     'Creating new M365 tenant for customers',
@@ -2686,7 +2688,7 @@
             },
             'firewalls': {
                 id: 'firewalls',
-                title: 'Firewall Configuration Guides',
+                title: 'Firewall Configuration',
                 type: 'tutorial',
                 courses: [
                     'Sophos firewall initial setup and configuration',
@@ -2704,7 +2706,7 @@
             },
             'backup': {
                 id: 'backup',
-                title: 'Backup & Recovery Guides',
+                title: 'Backup & Recovery',
                 type: 'tutorial',
                 courses: [
                     'Veeam Backup & Replication setup and configuration',
@@ -2714,7 +2716,7 @@
             },
             'linux': {
                 id: 'linux',
-                title: 'Linux Administration Guides',
+                title: 'Linux Administration',
                 type: 'tutorial',
                 courses: [
                     'Linux basics and system administration',
@@ -2727,7 +2729,7 @@
             },
             'tools': {
                 id: 'tools',
-                title: 'MSP Tools Guides',
+                title: 'MSP Tools',
                 type: 'tutorial',
                 courses: [
                     'Atera: remote access via Splashtop integration',
@@ -4128,12 +4130,16 @@
 
             // Create tutorials grid
             const tutorialsHtml = `
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <h2 style="font-size: 1.8rem; font-weight: 700; color: var(--text); margin: 0 0 0.5rem 0;">Step by Step Guides</h2>
+                    <p style="color: var(--text-secondary); font-size: 1rem; margin: 0;">Professional tutorials for MSP infrastructure and tools</p>
+                </div>
                 <div class="tutorials-grid">
                     ${tutorialCategories.map(category => `
                         <div class="tutorial-category-card" onclick="showCategoryView('${category.id}')">
                             <div class="tutorial-header">
-                                <div class="tutorial-image ${category.id}"></div>
                                 <h3 class="tutorial-title">${category.title}</h3>
+                                <div class="tutorial-image ${category.id}"></div>
                             </div>
                             <div class="tutorial-count">${category.courses.length} guides</div>
                         </div>
