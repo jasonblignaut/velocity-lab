@@ -3478,39 +3478,6 @@
                 }
             } else {
                 console.log('No existing session found');
-                
-                // For testing purposes, create a test admin user
-                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                    console.log('Development mode: Creating test admin user');
-                    const testUser = {
-                        name: 'Test Admin',
-                        email: 'admin@test.com',
-                        role: 'admin'
-                    };
-                    utils.cookies.set('user', JSON.stringify(testUser));
-                    utils.cookies.set('session', 'test-session-token');
-                    
-                    appState.user = testUser;
-                    appState.sessionToken = 'test-session-token';
-                    appState.authenticated = true;
-                    
-                    showDashboard();
-                    loadUserProgress();
-                    loadLabHistory();
-                    themeSystem.loadTheme();
-                    
-                    setTimeout(() => {
-                        const adminBtn = document.getElementById('adminButton');
-                        if (adminBtn) {
-                            adminBtn.style.display = 'block';
-                            console.log('Admin button shown for test admin user');
-                        }
-                    }, 100);
-                    
-                    updateMobileMenuItems();
-                    return;
-                }
-                
                 notificationSystem.clearShownNotifications();
                 showWelcomeScreen();
                 themeSystem.loadTheme();
@@ -3782,14 +3749,11 @@
                 console.error('Failed to load admin data:', error);
                 
                 if (error.message === 'BACKEND_NOT_AVAILABLE') {
-                    console.log('Backend APIs not deployed, showing fallback');
-                    showAdminPanelFallback('Backend APIs not deployed yet. Please deploy the Functions to enable admin features.');
+                    notificationSystem.error('Backend API not available. Please deploy the functions first.');
                 } else if (error.message === 'OFFLINE') {
-                    console.log('Offline mode, showing fallback');
-                    showAdminPanelFallback('Admin panel requires internet connection. Please check your connection and try again.');
+                    notificationSystem.error('You are offline. Please check your internet connection.');
                 } else {
-                    console.log('Admin panel API unavailable, showing fallback');
-                    showAdminPanelFallback('Admin panel temporarily unavailable. Please try again later.');
+                    notificationSystem.error('Admin panel temporarily unavailable. Please try again later.');
                 }
             } finally {
                 // Restore button states
