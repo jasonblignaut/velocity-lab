@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+<head>
+    <title>FortiGate Firewall Policy Creation and Management | MSP Training Platform</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Learn how to create and manage FortiGate firewall policies using the Web Interface or CLI with step-by-step instructions." />
+    <meta name="author" content="Velocity Lab" />
+    <meta name="date" content="2025-07-17T14:13:00Z" />
+
+    <!-- Open Graph and sharing metadata -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://labverse.co.za/media/open-graph-image.png" />
+    <meta property="og:title" content="FortiGate Firewall Policy Creation and Management" />
+    <meta property="og:url" content="https://labverse.co.za/assets/fortigate-policy.html" />
+    <meta property="og:description" content="Learn how to create and manage FortiGate firewall policies using the Web Interface or CLI with step-by-step instructions." />
+
+    <!-- Preload images -->
+    <link rel="preload" href="/assets/Velocity-Logo.png" as="image">
+    <link rel="preload" href="/assets/VelocityBackground.jpg" as="image">
+
+    <style>
+        :root {
+            --primary: #00a8ff;
+            --primary-hover: #0093e6;
+            --secondary: #f8f9fa;
+            --background: #ffffff;
+            --surface: #f8f9fa;
+            --surface-hover: #e9ecef;
+            --text: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --border: #d2d2d7;
+            --success: #34c759;
+            --warning: #ff9500;
+            --danger: #ff3b30;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-heavy: rgba(0, 0, 0, 0.15);
+            --jedi-glow: #00ff88;
+            --sith-glow: #ff0066;
+            --bg-secondary: #f0f0f5;
+        }
+
+        [data-theme="dark"] {
+            --primary: #00a8ff;
+            --primary-hover: #0093e6;
+            --secondary: #1e1e1e;
+            --background: #000000;
+            --surface: #1e1e1e;
+            --surface-hover: #2e2e2e;
+            --text: #ffffff;
+            --text-secondary: #a1a1a6;
+            --border: #2e2e2e;
+            --success: #30d158;
+            --warning: #ff9f0a;
+            --danger: #ff453a;
+            --shadow: rgba(255, 255, 255, 0.1);
+            --shadow-heavy: rgba(255, 255, 255, 0.2);
+            --bg-secondary: #2a2a2a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+            scroll-behavior: smooth;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('/assets/VelocityBackground.jpg') center/cover no-repeat;
+            opacity: 0.08;
+            z-index: -1;
+        }
+
+        [data-theme="dark"] body::before {
+            opacity: 0.05;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--background);
+            z-index: -2;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+            z-index: -1;
+        }
+
+        [data-theme="dark"] .header::after {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: url('/assets/Velocity-Logo.png') center/contain no-repeat;
+            cursor: pointer;
+            position: relative;
+            z-index: 10001;
+            transition: transform 0.2s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        [data-theme="dark"] .logo {
+            filter: invert(1) brightness(1.2);
+        }
+
+        /* User Menu - Same as main index */
+        .user-menu {
+            position: relative;
+        }
+
+        .user-menu-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text);
+            transition: all 0.2s ease;
+        }
+
+        .user-menu-toggle:hover {
+            background: var(--surface-hover);
+            transform: scale(1.05);
+        }
+
+        .user-menu-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 8px 25px var(--shadow-heavy);
+            min-width: 200px;
+            z-index: 9997;
+            display: none;
+        }
+
+        .user-menu-dropdown.active {
+            display: block;
+            animation: dropdownSlide 0.2s ease;
+        }
+
+        @keyframes dropdownSlide {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-menu-item {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .user-menu-item:hover {
+            background: var(--surface-hover);
+            transform: translateX(2px);
+        }
+
+        .theme-menu-item {
+            position: relative;
+        }
+
+        .theme-menu-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            color: var(--text);
+            border: none;
+            background: none;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme-menu-toggle:hover {
+            background: var(--surface-hover);
+            transform: translateX(2px);
+        }
+
+        .theme-submenu {
+            position: absolute;
+            right: 100%;
+            top: 0;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 8px 25px var(--shadow-heavy);
+            min-width: 150px;
+            z-index: 9996;
+            display: none;
+        }
+
+        .theme-menu-item:hover .theme-submenu {
+            display: block;
+            animation: dropdownSlide 0.2s ease;
+        }
+
+        .theme-option {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .theme-option:hover {
+            background: var(--surface-hover);
+            transform: translateX(-2px);
+        }
+
+        .theme-option.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .theme-option.jedi:hover {
+            background: linear-gradient(45deg, var(--jedi-glow), #00ff88);
+            color: white;
+        }
+
+        .theme-option.sith:hover {
+            background: linear-gradient(45deg, var(--sith-glow), #ff0066);
+            color: white;
+        }
+
+        .main-container {
+            margin-top: 70px;
+            padding: 2rem;
+            min-height: calc(100vh - 70px);
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--surface);
+            padding: 1.5rem;
+            position: fixed;
+            height: calc(100% - 70px);
+            overflow-y: auto;
+            border-right: 1px solid var(--border);
+            top: 70px;
+            left: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .sidebar h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: var(--text);
+            display: block;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar ul li a:hover {
+            color: var(--primary);
+            background: var(--surface-hover);
+            transform: translateX(4px);
+            border-left-color: var(--primary);
+        }
+
+        .content {
+            margin-left: 300px;
+            padding: 0 0 2rem;
+            max-width: 800px;
+        }
+
+        .content h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .content h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem;
+            color: var(--text);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+
+        .content p {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .content ul, .content ol {
+            margin: 1rem 0 1rem 1.5rem;
+            color: var(--text);
+        }
+
+        .content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .content .IMPORTANT {
+            background: rgba(0, 168, 255, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .content .IMPORTANT h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            margin-bottom: 2rem;
+        }
+
+        .back-button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .tabGroup {
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .tabGroup ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            background: var(--surface);
+            margin: 0;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .tabGroup li {
+            margin-right: 0;
+            margin-bottom: 0;
+        }
+
+        .tabGroup a {
+            text-decoration: none;
+            color: var(--primary);
+            padding: 0.75rem 1.5rem;
+            display: block;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .tabGroup a[aria-selected="true"] {
+            border-bottom: 2px solid var(--primary);
+            color: var(--text);
+            background: var(--background);
+        }
+
+        .tabGroup a:hover {
+            background: var(--surface-hover);
+            transform: translateY(-1px);
+        }
+
+        .tabpanel {
+            padding: 1rem;
+            display: none;
+            background: var(--background);
+            border-radius: 0 0 8px 8px;
+        }
+
+        .tabpanel[aria-hidden="false"] {
+            display: block;
+        }
+
+        .tabpanel.hidden {
+            display: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: var(--background);
+        }
+
+        table, th, td {
+            border: 1px solid var(--border);
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            color: var(--text);
+        }
+
+        th {
+            background: var(--surface);
+            font-weight: 600;
+        }
+
+        pre {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: var(--text);
+        }
+
+        .screenshot-placeholder {
+            width: 100%;
+            height: 200px;
+            background: var(--surface);
+            border: 1px dashed var(--border);
+            text-align: center;
+            line-height: 200px;
+            color: var(--text-secondary);
+            margin: 1rem 0;
+            border-radius: 8px;
+        }
+
+        footer {
+            background: var(--surface);
+            padding: 1rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+            border-radius: 8px 8px 0 0;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+            margin: 0 0.5rem;
+            transition: color 0.2s ease;
+        }
+
+        footer a:hover {
+            color: var(--primary-hover);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 1rem;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .main-container {
+                margin-top: 70px;
+                padding: 1rem;
+                margin-left: 0;
+            }
+
+            .content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .tabGroup ul {
+                flex-direction: column;
+            }
+
+            .tabGroup a {
+                padding: 0.75rem 1rem;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <header class="header">
+        <div class="logo" onclick="window.location.href='/'"></div>
+        
+        <!-- User Menu -->
+        <div class="user-menu">
+            <button class="user-menu-toggle" onclick="toggleUserMenu()">
+                <span id="userName">User</span>
+                <span>▼</span>
+            </button>
+            <div class="user-menu-dropdown" id="userMenuDropdown">
+                <button class="user-menu-item" onclick="startLabEnvironment()">Start New Lab</button>
+                <button class="user-menu-item" onclick="showLabHistoryModal()">Lab History</button>
+                <button class="user-menu-item" onclick="showAdminPanel()" id="adminButton" style="display: none;">Admin Panel</button>
+                <div class="theme-menu-item">
+                    <button class="theme-menu-toggle">
+                        <span>Theme</span>
+                        <span>▶</span>
+                    </button>
+                    <div class="theme-submenu">
+                        <button class="theme-option jedi" onclick="setTheme('light')">
+                            Light Jedi
+                        </button>
+                        <button class="theme-option sith active" onclick="setTheme('dark')">
+                            Dark Sith
+                        </button>
+                    </div>
+                </div>
+                <button class="user-menu-item" onclick="logout()">Sign Out</button>
+            </div>
+        </div>
+    </header>
+    
+    <div class="main-container">
+        <aside class="sidebar">
+            <h3>In this article</h3>
+            <ul>
+                <li><a href="#prerequisites">Prerequisites</a></li>
+                <li><a href="#create-policy">Create Policy</a></li>
+                <li><a href="#configure-security">Configure Security</a></li>
+                <li><a href="#verify-policy">Verify Policy</a></li>
+                <li><a href="#next-steps">Next Steps</a></li>
+            </ul>
+        </aside>
+        
+        <main class="content">
+            <a href="/assets/fortigate.html" class="back-button">← Back to FortiGate Guides</a>
+            
+            <h1>FortiGate Firewall Policy Creation and Management</h1>
+            <p>Last updated: July 17, 2025</p>
+            <p>This guide explains how to create and manage FortiGate firewall policies using the Web Interface or CLI with step-by-step instructions.</p>
+            
+            <div class="IMPORTANT">
+                <h4>Important</h4>
+                <p>Ensure you have administrator access to the FortiGate device and that FortiOS is running version 6.4 or later for best compatibility.</p>
+            </div>
+
+            <h2 id="prerequisites">Prerequisites</h2>
+            <ul>
+                <li>Administrator access to FortiGate device</li>
+                <li>FortiOS version 6.4 or later</li>
+                <li>Understanding of network zones and interfaces</li>
+                <li>Basic knowledge of firewall security concepts</li>
+            </ul>
+
+            <h2 id="create-policy">Create Firewall Policy</h2>
+            <div class="tabGroup" id="tabgroup_1">
+                <ul role="tablist">
+                    <li role="presentation">
+                        <a href="#tabpanel_1_webinterface" role="tab" aria-controls="tabpanel_1_webinterface" data-tab="webinterface" tabindex="0" aria-selected="true">FortiGate Web Interface</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#tabpanel_1_cli" role="tab" aria-controls="tabpanel_1_cli" data-tab="cli" tabindex="-1">CLI</a>
+                    </li>
+                </ul>
+                <section id="tabpanel_1_webinterface" role="tabpanel" data-tab="webinterface" aria-hidden="false">
+                    <ol>
+                        <li>Navigate to Policy & Objects > Firewall Policy in the FortiGate GUI
+                            <div class="screenshot-placeholder">Screenshot: FortiGate main menu showing Policy & Objects navigation</div>
+                        </li>
+                        <li>Click "Create New" to start creating a new firewall policy
+                            <div class="screenshot-placeholder">Screenshot: Firewall Policy list with Create New button highlighted</div>
+                        </li>
+                        <li>Configure the basic policy settings:
+                            <table>
+                                <tr>
+                                    <th>Setting</th>
+                                    <th>Action</th>
+                                </tr>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Enter a descriptive name for the policy</td>
+                                </tr>
+                                <tr>
+                                    <td>Incoming Interface</td>
+                                    <td>Select the source interface/zone</td>
+                                </tr>
+                                <tr>
+                                    <td>Outgoing Interface</td>
+                                    <td>Select the destination interface/zone</td>
+                                </tr>
+                                <tr>
+                                    <td>Source</td>
+                                    <td>Define source addresses or address groups</td>
+                                </tr>
+                                <tr>
+                                    <td>Destination</td>
+                                    <td>Define destination addresses or address groups</td>
+                                </tr>
+                                <tr>
+                                    <td>Service</td>
+                                    <td>Select the services/ports to allow</td>
+                                </tr>
+                                <tr>
+                                    <td>Action</td>
+                                    <td>Choose ACCEPT, DENY, or IPSEC</td>
+                                </tr>
+                            </table>
+                            <div class="screenshot-placeholder">Screenshot: New Firewall Policy configuration form</div>
+                        </li>
+                        <li>Click "OK" to create the policy
+                            <div class="screenshot-placeholder">Screenshot: Completed policy creation form with OK button</div>
+                        </li>
+                    </ol>
+                </section>
+                <section id="tabpanel_1_cli" role="tabpanel" data-tab="cli" aria-hidden="true" class="hidden">
+                    <ol>
+                        <li>Connect to FortiGate CLI and enter configuration mode
+                            <pre><code class="lang-bash">
+config firewall policy
+                            </code></pre>
+                        </li>
+                        <li>Create a new policy with a unique policy ID
+                            <pre><code class="lang-bash">
+edit 1
+                            </code></pre>
+                        </li>
+                        <li>Configure the policy parameters
+                            <pre><code class="lang-bash">
+set name "Allow_LAN_to_WAN"
+set srcintf "internal"
+set dstintf "wan1"
+set srcaddr "all"
+set dstaddr "all"
+set service "ALL"
+set action accept
+set schedule "always"
+                            </code></pre>
+                        </li>
+                        <li>Save the configuration
+                            <pre><code class="lang-bash">
+next
+end
+                            </code></pre>
+                        </li>
+                    </ol>
+                </section>
+            </div>
+
+            <h2 id="configure-security">Configure Security Features</h2>
+            <div class="tabGroup" id="tabgroup_2">
+                <ul role="tablist">
+                    <li role="presentation">
+                        <a href="#tabpanel_2_webinterface" role="tab" aria-controls="tabpanel_2_webinterface" data-tab="webinterface" tabindex="0" aria-selected="true">FortiGate Web Interface</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#tabpanel_2_cli" role="tab" aria-controls="tabpanel_2_cli" data-tab="cli" tabindex="-1">CLI</a>
+                    </li>
+                </ul>
+                <section id="tabpanel_2_webinterface" role="tabpanel" data-tab="webinterface" aria-hidden="false">
+                    <ol>
+                        <li>Edit the created policy to add security features
+                            <div class="screenshot-placeholder">Screenshot: Policy list with edit option highlighted</div>
+                        </li>
+                        <li>Navigate to the Security Profiles section
+                            <div class="screenshot-placeholder">Screenshot: Policy edit form showing Security Profiles tab</div>
+                        </li>
+                        <li>Enable and configure security profiles:
+                            <table>
+                                <tr>
+                                    <th>Security Profile</th>
+                                    <th>Configuration</th>
+                                </tr>
+                                <tr>
+                                    <td>Antivirus</td>
+                                    <td>Enable default or custom antivirus profile</td>
+                                </tr>
+                                <tr>
+                                    <td>Web Filtering</td>
+                                    <td>Configure web filtering categories</td>
+                                </tr>
+                                <tr>
+                                    <td>Application Control</td>
+                                    <td>Set application control policies</td>
+                                </tr>
+                                <tr>
+                                    <td>IPS</td>
+                                    <td>Enable intrusion prevention system</td>
+                                </tr>
+                            </table>
+                            <div class="screenshot-placeholder">Screenshot: Security Profiles configuration section</div>
+                        </li>
+                        <li>Apply the changes and save the policy
+                            <div class="screenshot-placeholder">Screenshot: Policy save confirmation</div>
+                        </li>
+                    </ol>
+                </section>
+                <section id="tabpanel_2_cli" role="tabpanel" data-tab="cli" aria-hidden="true" class="hidden">
+                    <ol>
+                        <li>Edit the existing policy to add security profiles
+                            <pre><code class="lang-bash">
+config firewall policy
+edit 1
+                            </code></pre>
+                        </li>
+                        <li>Configure antivirus profile
+                            <pre><code class="lang-bash">
+set av-profile "default"
+                            </code></pre>
+                        </li>
+                        <li>Configure web filtering
+                            <pre><code class="lang-bash">
+set webfilter-profile "default"
+                            </code></pre>
+                        </li>
+                        <li>Configure application control and IPS
+                            <pre><code class="lang-bash">
+set application-list "default"
+set ips-sensor "default"
+next
+end
+                            </code></pre>
+                        </li>
+                    </ol>
+                </section>
+            </div>
+
+            <h2 id="verify-policy">Verify Policy Configuration</h2>
+            <div class="tabGroup" id="tabgroup_3">
+                <ul role="tablist">
+                    <li role="presentation">
+                        <a href="#tabpanel_3_webinterface" role="tab" aria-controls="tabpanel_3_webinterface" data-tab="webinterface" tabindex="0" aria-selected="true">FortiGate Web Interface</a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#tabpanel_3_cli" role="tab" aria-controls="tabpanel_3_cli" data-tab="cli" tabindex="-1">CLI</a>
+                    </li>
+                </ul>
+                <section id="tabpanel_3_webinterface" role="tabpanel" data-tab="webinterface" aria-hidden="false">
+                    <ol>
+                        <li>Review the policy list to confirm creation
+                            <div class="screenshot-placeholder">Screenshot: Policy list showing newly created policy</div>
+                        </li>
+                        <li>Check policy hit counts in the statistics column
+                            <div class="screenshot-placeholder">Screenshot: Policy statistics showing hit counts</div>
+                        </li>
+                        <li>Test connectivity through the policy using network tools
+                            <div class="screenshot-placeholder">Screenshot: Policy monitoring or log viewer</div>
+                        </li>
+                    </ol>
+                </section>
+                <section id="tabpanel_3_cli" role="tabpanel" data-tab="cli" aria-hidden="true" class="hidden">
+                    <ol>
+                        <li>Display all firewall policies
+                            <pre><code class="lang-bash">
+show firewall policy
+                            </code></pre>
+                        </li>
+                        <li>Check specific policy details
+                            <pre><code class="lang-bash">
+show firewall policy 1
+                            </code></pre>
+                        </li>
+                        <li>Monitor policy hit counts
+                            <pre><code class="lang-bash">
+get firewall policy
+                            </code></pre>
+                        </li>
+                    </ol>
+                </section>
+            </div>
+
+            <h2 id="next-steps">Next Steps</h2>
+            <p>In this guide, you learned how to create and manage FortiGate firewall policies with security profiles.</p>
+            <p>For more information, explore these resources:</p>
+            <ul>
+                <li><a href="/assets/fortigate-sdwan.html">FortiGate SD-WAN Configuration</a></li>
+                <li><a href="/assets/fortigate-ipsec.html">FortiGate IPsec VPN Setup</a></li>
+                <li><a href="/assets/fortigate-ldap.html">FortiGate LDAP Authentication</a></li>
+            </ul>
+        </main>
+    </div>
+    
+    <footer>
+        <p><a href="/privacy">Privacy</a> | <a href="/terms">Terms of Use</a> | © Velocity Lab 2025</p>
+    </footer>
+
+    <script>
+        // Theme management
+        function setTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            
+            const themeOptions = document.querySelectorAll('.theme-option');
+            themeOptions.forEach(option => {
+                option.classList.remove('active');
+                if ((theme === 'light' && option.classList.contains('jedi')) || 
+                    (theme === 'dark' && option.classList.contains('sith'))) {
+                    option.classList.add('active');
+                }
+            });
+        }
+
+        // Load saved theme
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.setAttribute('data-theme', savedTheme);
+            
+            const themeOptions = document.querySelectorAll('.theme-option');
+            themeOptions.forEach(option => {
+                option.classList.remove('active');
+                if ((savedTheme === 'light' && option.classList.contains('jedi')) || 
+                    (savedTheme === 'dark' && option.classList.contains('sith'))) {
+                    option.classList.add('active');
+                }
+            });
+        }
+
+        // User menu toggle
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const userMenu = document.querySelector('.user-menu');
+            const dropdown = document.getElementById('userMenuDropdown');
+            if (userMenu && dropdown && !userMenu.contains(event.target) && dropdown.classList.contains('active')) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Placeholder functions for menu items
+        function startLabEnvironment() {
+            console.log('Start Lab Environment');
+        }
+
+        function showLabHistoryModal() {
+            console.log('Show Lab History');
+        }
+
+        function showAdminPanel() {
+            console.log('Show Admin Panel');
+        }
+
+        function logout() {
+            console.log('Logout');
+        }
+
+        // Tab switching functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTheme();
+            
+            // Set user name from localStorage or default
+            const userName = localStorage.getItem('userName') || 'User';
+            document.getElementById('userName').textContent = userName;
+            
+            // Initialize tabs
+            document.querySelectorAll('.tabGroup').forEach(tabGroup => {
+                const tabs = tabGroup.querySelectorAll('ul[role="tablist"] li a');
+                const panels = tabGroup.querySelectorAll('[role="tabpanel"]');
+
+                const activateTab = (tab) => {
+                    const tabId = tab.getAttribute('aria-controls');
+                    tabs.forEach(t => t.setAttribute('aria-selected', 'false'));
+                    tab.setAttribute('aria-selected', 'true');
+                    panels.forEach(panel => {
+                        panel.setAttribute('aria-hidden', 'true');
+                        panel.classList.add('hidden');
+                        if (panel.getAttribute('id') === tabId) {
+                            panel.setAttribute('aria-hidden', 'false');
+                            panel.classList.remove('hidden');
+                        }
+                    });
+                };
+
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        activateTab(tab);
+                    });
+
+                    // Set initial active tab
+                    if (tab.getAttribute('aria-selected') === 'true') {
+                        activateTab(tab);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

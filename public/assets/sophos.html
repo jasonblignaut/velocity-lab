@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+<head>
+    <title>Sophos Firewall Guides | MSP Training Platform</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Sophos firewall setup and configuration guides covering initial setup, security policies, and advanced features." />
+    <meta name="author" content="Velocity Lab" />
+    <meta name="date" content="2025-07-17T14:13:00Z" />
+
+    <!-- Preload images -->
+    <link rel="preload" href="/assets/Velocity-Logo.png" as="image">
+    <link rel="preload" href="/assets/VelocityBackground.jpg" as="image">
+
+    <style>
+        :root {
+            --primary: #00a8ff;
+            --primary-hover: #0093e6;
+            --secondary: #f8f9fa;
+            --background: #ffffff;
+            --surface: #f8f9fa;
+            --surface-hover: #e9ecef;
+            --text: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --border: #d2d2d7;
+            --success: #34c759;
+            --warning: #ff9500;
+            --danger: #ff3b30;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-heavy: rgba(0, 0, 0, 0.15);
+            --jedi-glow: #00ff88;
+            --sith-glow: #ff0066;
+            --bg-secondary: #f0f0f5;
+        }
+
+        [data-theme="dark"] {
+            --primary: #00a8ff;
+            --primary-hover: #0093e6;
+            --secondary: #1e1e1e;
+            --background: #000000;
+            --surface: #1e1e1e;
+            --surface-hover: #2e2e2e;
+            --text: #ffffff;
+            --text-secondary: #a1a1a6;
+            --border: #2e2e2e;
+            --success: #30d158;
+            --warning: #ff9f0a;
+            --danger: #ff453a;
+            --shadow: rgba(255, 255, 255, 0.1);
+            --shadow-heavy: rgba(255, 255, 255, 0.2);
+            --bg-secondary: #2a2a2a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+            scroll-behavior: smooth;
+        }
+
+        /* Background Image - Same as main index */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('/assets/VelocityBackground.jpg') center/cover no-repeat;
+            opacity: 0.08;
+            z-index: -1;
+        }
+
+        [data-theme="dark"] body::before {
+            opacity: 0.05;
+        }
+
+        /* Header - Same as main index */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--background);
+            z-index: -2;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+            z-index: -1;
+        }
+
+        [data-theme="dark"] .header::after {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: url('/assets/Velocity-Logo.png') center/contain no-repeat;
+            cursor: pointer;
+            position: relative;
+            z-index: 10001;
+            transition: transform 0.2s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        [data-theme="dark"] .logo {
+            filter: invert(1) brightness(1.2);
+        }
+
+        /* User Menu - Same as main index */
+        .user-menu {
+            position: relative;
+        }
+
+        .user-menu-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text);
+            transition: all 0.2s ease;
+        }
+
+        .user-menu-toggle:hover {
+            background: var(--surface-hover);
+            transform: scale(1.05);
+        }
+
+        .user-menu-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 8px 25px var(--shadow-heavy);
+            min-width: 200px;
+            z-index: 9997;
+            display: none;
+        }
+
+        .user-menu-dropdown.active {
+            display: block;
+            animation: dropdownSlide 0.2s ease;
+        }
+
+        @keyframes dropdownSlide {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-menu-item {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .user-menu-item:hover {
+            background: var(--surface-hover);
+            transform: translateX(2px);
+        }
+
+        .theme-menu-item {
+            position: relative;
+        }
+
+        .theme-menu-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            color: var(--text);
+            border: none;
+            background: none;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme-menu-toggle:hover {
+            background: var(--surface-hover);
+            transform: translateX(2px);
+        }
+
+        .theme-submenu {
+            position: absolute;
+            right: 100%;
+            top: 0;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 8px 25px var(--shadow-heavy);
+            min-width: 150px;
+            z-index: 9996;
+            display: none;
+        }
+
+        .theme-menu-item:hover .theme-submenu {
+            display: block;
+            animation: dropdownSlide 0.2s ease;
+        }
+
+        .theme-option {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .theme-option:hover {
+            background: var(--surface-hover);
+            transform: translateX(-2px);
+        }
+
+        .theme-option.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .theme-option.jedi:hover {
+            background: linear-gradient(45deg, var(--jedi-glow), #00ff88);
+            color: white;
+        }
+
+        .theme-option.sith:hover {
+            background: linear-gradient(45deg, var(--sith-glow), #ff0066);
+            color: white;
+        }
+
+        .main-content {
+            margin-top: 70px;
+            padding: 2rem;
+            min-height: calc(100vh - 70px);
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            animation: fadeInUp 0.6s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .dashboard-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            animation: fadeInUp 0.6s ease 0.2s both;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            margin-bottom: 2rem;
+        }
+
+        .back-button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Tutorial Grid */
+        .tutorial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeInUp 0.6s ease 0.4s both;
+        }
+
+        .tutorial-card {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .tutorial-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px var(--shadow-heavy);
+        }
+
+        .tutorial-header h3 {
+            margin: 0 0 1rem 0;
+            color: var(--text);
+            font-size: 1.1rem;
+        }
+
+        .tutorial-preview {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .tutorial-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .tutorial-type {
+            font-size: 0.8rem;
+            color: var(--primary);
+            font-weight: 500;
+            background: rgba(0, 168, 255, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .tutorial-arrow {
+            color: var(--text-secondary);
+            font-weight: bold;
+            transition: transform 0.2s ease;
+        }
+
+        .tutorial-card:hover .tutorial-arrow {
+            transform: translateX(5px);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 1rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .dashboard-title {
+                font-size: 2rem;
+            }
+
+            .tutorial-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <!-- Header -->
+    <div class="header">
+        <div class="logo" onclick="window.location.href='/'"></div>
+        
+        <!-- User Menu -->
+        <div class="user-menu">
+            <button class="user-menu-toggle" onclick="toggleUserMenu()">
+                <span id="userName">User</span>
+                <span>▼</span>
+            </button>
+            <div class="user-menu-dropdown" id="userMenuDropdown">
+                <button class="user-menu-item" onclick="startLabEnvironment()">Start New Lab</button>
+                <button class="user-menu-item" onclick="showLabHistoryModal()">Lab History</button>
+                <button class="user-menu-item" onclick="showAdminPanel()" id="adminButton" style="display: none;">Admin Panel</button>
+                <div class="theme-menu-item">
+                    <button class="theme-menu-toggle">
+                        <span>Theme</span>
+                        <span>▶</span>
+                    </button>
+                    <div class="theme-submenu">
+                        <button class="theme-option jedi" onclick="setTheme('light')">
+                            Light Jedi
+                        </button>
+                        <button class="theme-option sith active" onclick="setTheme('dark')">
+                            Dark Sith
+                        </button>
+                    </div>
+                </div>
+                <button class="user-menu-item" onclick="logout()">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <a href="/assets/firewalls.html" class="back-button">← Back to Firewalls</a>
+        
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">🔐 Sophos Firewall Guides</h1>
+            <p class="dashboard-subtitle">Sophos firewall setup and configuration guides covering initial setup, security policies, and advanced features</p>
+        </div>
+
+        <!-- Sophos Guides -->
+        <div class="tutorial-grid">
+            <div class="tutorial-card" onclick="window.location.href='/assets/sophos-setup.html'">
+                <div class="tutorial-header">
+                    <h3>Sophos firewall initial setup and configuration</h3>
+                </div>
+                <div class="tutorial-preview">
+                    Complete initial setup guide for Sophos firewalls including network configuration, security policies, and basic administration setup.
+                </div>
+                <div class="tutorial-meta">
+                    <span class="tutorial-type">🔧 Configuration</span>
+                    <span class="tutorial-arrow">→</span>
+                </div>
+            </div>
+
+            <div class="tutorial-card" onclick="window.location.href='/assets/sophos-policies.html'">
+                <div class="tutorial-header">
+                    <h3>Sophos security policies and web filtering</h3>
+                </div>
+                <div class="tutorial-preview">
+                    Configure advanced security policies, web filtering rules, and application control on Sophos firewalls for comprehensive network protection.
+                </div>
+                <div class="tutorial-meta">
+                    <span class="tutorial-type">🛡️ Security</span>
+                    <span class="tutorial-arrow">→</span>
+                </div>
+            </div>
+
+            <div class="tutorial-card" onclick="window.location.href='/assets/sophos-vpn.html'">
+                <div class="tutorial-header">
+                    <h3>Sophos VPN configuration and remote access</h3>
+                </div>
+                <div class="tutorial-preview">
+                    Set up site-to-site VPN connections and configure remote access VPN for secure connectivity through Sophos firewalls.
+                </div>
+                <div class="tutorial-meta">
+                    <span class="tutorial-type">🔗 VPN</span>
+                    <span class="tutorial-arrow">→</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme management
+        function setTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            
+            const themeOptions = document.querySelectorAll('.theme-option');
+            themeOptions.forEach(option => {
+                option.classList.remove('active');
+                if ((theme === 'light' && option.classList.contains('jedi')) || 
+                    (theme === 'dark' && option.classList.contains('sith'))) {
+                    option.classList.add('active');
+                }
+            });
+        }
+
+        // Load saved theme
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.setAttribute('data-theme', savedTheme);
+            
+            const themeOptions = document.querySelectorAll('.theme-option');
+            themeOptions.forEach(option => {
+                option.classList.remove('active');
+                if ((savedTheme === 'light' && option.classList.contains('jedi')) || 
+                    (savedTheme === 'dark' && option.classList.contains('sith'))) {
+                    option.classList.add('active');
+                }
+            });
+        }
+
+        // User menu toggle
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const userMenu = document.querySelector('.user-menu');
+            const dropdown = document.getElementById('userMenuDropdown');
+            if (userMenu && dropdown && !userMenu.contains(event.target) && dropdown.classList.contains('active')) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Placeholder functions for menu items
+        function startLabEnvironment() {
+            console.log('Start Lab Environment');
+        }
+
+        function showLabHistoryModal() {
+            console.log('Show Lab History');
+        }
+
+        function showAdminPanel() {
+            console.log('Show Admin Panel');
+        }
+
+        function logout() {
+            console.log('Logout');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            
+            // Set user name from localStorage or default
+            const userName = localStorage.getItem('userName') || 'User';
+            document.getElementById('userName').textContent = userName;
+        });
+    </script>
+</body>
+</html>
