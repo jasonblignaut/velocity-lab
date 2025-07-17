@@ -521,7 +521,8 @@
             background: var(--background);
             height: auto;
             min-height: unset;
-            max-height: 80vh;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         /* Apple-style signin has dark background */
@@ -570,6 +571,7 @@
             flex-direction: column;
             justify-content: center;
             min-height: 220px;
+            overflow-y: auto;
         }
 
         .modal-body.initial-state {
@@ -782,7 +784,7 @@
             border-radius: 12px;
             padding: 2rem;
             max-width: 500px;
-            margin: 0 auto;
+            margin: 0 auto 2rem;
             box-shadow: 0 8px 25px var(--shadow-heavy);
         }
 
@@ -1118,11 +1120,46 @@
             color: var(--text-secondary);
         }
 
-        /* Category Cards - Enhanced Design */
-        .categories-container {
+        /* Category Cards - Enhanced Design with Lab and Tutorial sections */
+        .lab-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .lab-section h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+        }
+
+        .lab-card-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .tutorials-section {
+            margin-top: 3rem;
+        }
+
+        .tutorials-section h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .tutorials-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .categories-container {
             max-width: 1200px;
             margin: 0 auto;
             animation: fadeInUp 0.6s ease 0.6s both;
@@ -1152,38 +1189,11 @@
         .category-card.lab-card {
             border: 2px solid var(--primary);
             background: linear-gradient(135deg, rgba(0, 168, 255, 0.05), var(--background));
+            max-width: 400px;
         }
 
-        .category-card.lab-card::before {
-            content: '🧪 LAB';
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: var(--primary);
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .category-card.tutorial-card::before {
-            content: '📚 TUTORIAL';
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: var(--success);
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: bold;
+        .category-card.tutorial-card {
+            /* Standard tutorial card styling */
         }
 
         .category-header {
@@ -1195,13 +1205,6 @@
         .category-icon {
             font-size: 2rem;
             margin-right: 1rem;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-5px); }
-            60% { transform: translateY(-2px); }
         }
 
         .category-title {
@@ -1734,8 +1737,25 @@
             }
 
             .categories-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .lab-card-container .category-card {
+                max-width: 100%;
+            }
+
+            .tutorials-container {
                 grid-template-columns: 1fr;
                 gap: 1rem;
+            }
+
+            .lab-card-container {
+                margin-bottom: 1rem;
+            }
+
+            .tutorials-section {
+                margin-top: 2rem;
             }
 
             .tutorial-grid {
@@ -1773,7 +1793,8 @@
 
             .modal-content.large {
                 max-width: 95vw;
-                max-height: 85vh;
+                max-height: 90vh;
+                overflow-y: auto;
             }
 
             .modal-body {
@@ -1844,6 +1865,10 @@
                 visibility: hidden !important;
                 opacity: 0 !important;
             }
+
+            .tutorials-section {
+                margin-top: 1.5rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1904,7 +1929,8 @@
 
             .modal-content.large {
                 max-width: 95vw;
-                max-height: 85vh;
+                max-height: 90vh;
+                overflow-y: auto;
             }
 
             .task-detail-close {
@@ -1942,6 +1968,14 @@
                 display: none !important;
                 visibility: hidden !important;
                 opacity: 0 !important;
+            }
+
+            .tutorials-section {
+                margin-top: 1.5rem;
+            }
+
+            .lab-card-container {
+                margin-bottom: 1rem;
             }
         }
 
@@ -2415,7 +2449,7 @@
             },
             'networking': {
                 id: 'networking',
-                title: 'Networking Guides',
+                title: 'Networking',
                 icon: '🌐',
                 type: 'tutorial', // Informational only
                 description: 'Comprehensive step-by-step tutorials for network infrastructure, monitoring tools, and configurations. Reference materials for daily operations.',
@@ -2436,7 +2470,7 @@
             },
             'azure': {
                 id: 'azure',
-                title: 'Microsoft Azure Guides',
+                title: 'Microsoft Azure',
                 icon: '☁️',
                 type: 'tutorial',
                 description: 'Complete step-by-step guides for Azure cloud services, security solutions, analytics, and infrastructure management.',
@@ -2454,7 +2488,7 @@
             },
             'microsoft365': {
                 id: 'microsoft365',
-                title: 'Microsoft 365 Guides',
+                title: 'Microsoft 365',
                 icon: '🏢',
                 type: 'tutorial',
                 description: 'Comprehensive guides for Microsoft 365 administration, tenant management, and automation workflows.',
@@ -2469,7 +2503,7 @@
             },
             'firewalls': {
                 id: 'firewalls',
-                title: 'Firewall Configuration Guides',
+                title: 'Firewall Configuration',
                 icon: '🔥',
                 type: 'tutorial',
                 description: 'Detailed configuration guides for enterprise firewalls, security policies, and advanced network protection.',
@@ -2489,7 +2523,7 @@
             },
             'backup': {
                 id: 'backup',
-                title: 'Backup & Recovery Guides',
+                title: 'Backup & Recovery',
                 icon: '💾',
                 type: 'tutorial',
                 description: 'Comprehensive backup solution guides, monitoring tools, and disaster recovery strategies.',
@@ -2501,7 +2535,7 @@
             },
             'linux': {
                 id: 'linux',
-                title: 'Linux Administration Guides',
+                title: 'Linux Administration',
                 icon: '🐧',
                 type: 'tutorial',
                 description: 'Linux system administration tutorials, server management, automation scripts, and security hardening.',
@@ -2516,7 +2550,7 @@
             },
             'tools': {
                 id: 'tools',
-                title: 'MSP Tools Guides',
+                title: 'MSP Tools',
                 icon: '🛠️',
                 type: 'tutorial',
                 description: 'Professional MSP tool usage guides, remote access solutions, and automation techniques.',
@@ -3419,7 +3453,20 @@
         };
 
         window.showAdminPanel = async function() {
+            const adminBtn = document.getElementById('adminButton');
+            const mobileAdminBtn = document.getElementById('mobileAdminButton');
+            
             try {
+                // Show loading state
+                if (adminBtn) {
+                    adminBtn.classList.add('loading');
+                    adminBtn.textContent = '';
+                }
+                if (mobileAdminBtn) {
+                    mobileAdminBtn.classList.add('loading');
+                    mobileAdminBtn.textContent = '';
+                }
+
                 if (!appState.user || appState.user.role !== 'admin') {
                     notificationSystem.error('Admin access required');
                     return;
@@ -3451,6 +3498,16 @@
                 } else {
                     console.log('Admin panel API unavailable, showing fallback');
                     showAdminPanelFallback('Admin panel temporarily unavailable. Please try again later.');
+                }
+            } finally {
+                // Remove loading state
+                if (adminBtn) {
+                    adminBtn.classList.remove('loading');
+                    adminBtn.textContent = 'Admin Panel';
+                }
+                if (mobileAdminBtn) {
+                    mobileAdminBtn.classList.remove('loading');
+                    mobileAdminBtn.textContent = 'Admin Panel';
                 }
             }
         };
@@ -3885,7 +3942,7 @@
             if (appState.authenticated && appState.user) {
                 let adminItem = '';
                 if (appState.user.role === 'admin') {
-                    adminItem = '<button class="mobile-menu-item" onclick="showAdminPanel(); closeMobileMenu();">Admin Panel</button>';
+                    adminItem = '<button class="mobile-menu-item" onclick="showAdminPanel(); closeMobileMenu();" id="mobileAdminButton">Admin Panel</button>';
                 }
                 
                 mobileMenuItems.innerHTML = `
@@ -4152,43 +4209,60 @@
             const container = document.getElementById('categoriesContainer');
             if (!container) return;
 
-            container.innerHTML = appState.categories.map(category => {
-                let progressInfo = '';
-                let cardClass = 'category-card';
+            // Separate Exchange Lab and tutorials
+            const labCategory = appState.categories.find(cat => cat.type === 'lab');
+            const tutorialCategories = appState.categories.filter(cat => cat.type === 'tutorial');
+
+            let labSection = '';
+            if (labCategory) {
+                const categoryTasks = appState.tasks.filter(task => task.category === labCategory.id);
+                const completedTasks = categoryTasks.filter(task => 
+                    appState.progress[task.id] && appState.progress[task.id].completed
+                ).length;
+                const totalTasks = categoryTasks.length || 43;
+                const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
                 
-                if (category.type === 'lab') {
-                    // Show actual progress for Exchange LAB
-                    const categoryTasks = appState.tasks.filter(task => task.category === category.id);
-                    const completedTasks = categoryTasks.filter(task => 
-                        appState.progress[task.id] && appState.progress[task.id].completed
-                    ).length;
-                    const totalTasks = categoryTasks.length || 43;
-                    const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-                    
-                    progressInfo = `${progressPercentage}% complete`;
-                    cardClass += ' lab-card';
-                } else {
-                    // No progress tracking for tutorials
-                    progressInfo = 'Reference guides';
-                    cardClass += ' tutorial-card';
-                }
-                
-                const totalCourses = category.courses.length;
-                
-                return `
-                    <div class="${cardClass}" onclick="showCategoryView('${category.id}')">
-                        <div class="category-header">
-                            <div class="category-icon">${category.icon}</div>
-                            <div class="category-title">${category.title}</div>
-                        </div>
-                        <div class="category-description">${category.description}</div>
-                        <div class="category-stats">
-                            <div class="category-count">${totalCourses} ${category.type === 'lab' ? 'weeks' : 'guides'}</div>
-                            <div class="category-progress">${progressInfo}</div>
+                labSection = `
+                    <div class="lab-section">
+                        <div class="lab-card-container">
+                            <div class="category-card lab-card" onclick="showCategoryView('${labCategory.id}')">
+                                <div class="category-header">
+                                    <div class="category-icon">${labCategory.icon}</div>
+                                    <div class="category-title">${labCategory.title}</div>
+                                </div>
+                                <div class="category-description">${labCategory.description}</div>
+                                <div class="category-stats">
+                                    <div class="category-count">${labCategory.courses.length} weeks</div>
+                                    <div class="category-progress">${progressPercentage}% complete</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 `;
-            }).join('');
+            }
+
+            const tutorialsSection = `
+                <div class="tutorials-section">
+                    <h2>Tutorials</h2>
+                    <div class="tutorials-container">
+                        ${tutorialCategories.map(category => `
+                            <div class="category-card tutorial-card" onclick="showCategoryView('${category.id}')">
+                                <div class="category-header">
+                                    <div class="category-icon">${category.icon}</div>
+                                    <div class="category-title">${category.title}</div>
+                                </div>
+                                <div class="category-description">${category.description}</div>
+                                <div class="category-stats">
+                                    <div class="category-count">${category.courses.length} topics</div>
+                                    <div class="category-progress">Step-by-step</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = labSection + tutorialsSection;
         }
 
         function generateWeekCards() {
