@@ -4,17 +4,9 @@
     <title>Networking Guides | MSP Training Platform</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Comprehensive step-by-step tutorials for network infrastructure, monitoring tools, and configurations. Reference materials for daily operations." />
+    <meta name="description" content="Comprehensive step-by-step tutorials for network infrastructure, monitoring tools, and configurations." />
     <meta name="author" content="Velocity Lab" />
     <meta name="date" content="2025-07-17T14:13:00Z" />
-
-    <!-- Open Graph and sharing metadata -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://labverse.co.za/media/open-graph-image.png" />
-    <meta property="og:title" content="Networking Guides - MSP Training Platform" />
-    <meta property="og:url" content="https://labverse.co.za/assets/networking.html" />
-    <meta property="og:description" content="Comprehensive step-by-step tutorials for network infrastructure, monitoring tools, and configurations." />
 
     <!-- Preload images -->
     <link rel="preload" href="/assets/Velocity-Logo.png" as="image">
@@ -91,6 +83,63 @@
             opacity: 0.05;
         }
 
+        /* Access Denied Screen */
+        .access-denied {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            background: var(--background);
+        }
+
+        .access-denied.hidden {
+            display: none;
+        }
+
+        .access-denied-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--danger);
+        }
+
+        .access-denied-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        .access-denied-button {
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+
+        .access-denied-button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Main Content */
+        .main-wrapper {
+            display: none;
+        }
+
+        .main-wrapper.authenticated {
+            display: block;
+        }
+
         .header {
             position: fixed;
             top: 0;
@@ -151,7 +200,172 @@
             filter: invert(1) brightness(1.2);
         }
 
+        .user-menu {
+            position: relative;
+        }
+
+        .user-menu-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text);
+            transition: all 0.2s ease;
+        }
+
+        .user-menu-toggle:hover {
+            background: var(--surface-hover);
+            transform: scale(1.05);
+        }
+
+        .user-menu-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 8px 25px var(--shadow-heavy);
+            min-width: 200px;
+            z-index: 9997;
+            display: none;
+        }
+
+        .user-menu-dropdown.active {
+            display: block;
+            animation: dropdownSlide 0.2s ease;
+        }
+
+        @keyframes dropdownSlide {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-menu-item {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .user-menu-item:hover {
+            background: var(--surface-hover);
+            transform: translateX(2px);
+        }
+
+        .theme-menu-item {
+            position: relative;
+        }
+
+        .theme-menu-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            color: var(--text);
+            border: none;
+            background: none;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme-menu-toggle:hover {
+            background: var(--surface-hover);
+            transform: translateX(2px);
+        }
+
+        .theme-submenu {
+            position: absolute;
+            right: 100%;
+            top: 0;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 8px 25px var(--shadow-heavy);
+            min-width: 150px;
+            z-index: 9996;
+            display: none;
+        }
+
+        .theme-menu-item:hover .theme-submenu {
+            display: block;
+            animation: dropdownSlide 0.2s ease;
+        }
+
+        .theme-option {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .theme-option:hover {
+            background: var(--surface-hover);
+            transform: translateX(-2px);
+        }
+
+        .theme-option.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .theme-option.jedi:hover {
+            background: linear-gradient(45deg, var(--jedi-glow), #00ff88);
+            color: white;
+        }
+
+        .theme-option.sith:hover {
+            background: linear-gradient(45deg, var(--sith-glow), #ff0066);
+            color: white;
+        }
+
+        .main-content {
+            margin-top: 70px;
+            padding: 2rem;
+            min-height: calc(100vh - 70px);
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .dashboard-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            animation: fadeInUp 0.6s ease 0.2s both;
+        }
+
         .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             padding: 8px 16px;
             background: var(--primary);
             color: white;
@@ -159,11 +373,9 @@
             border-radius: 8px;
             cursor: pointer;
             text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
             transition: all 0.2s ease;
             font-weight: 500;
+            margin-bottom: 2rem;
         }
 
         .back-button:hover {
@@ -171,109 +383,13 @@
             transform: translateY(-1px);
         }
 
-        .main-container {
-            margin-top: 70px;
-            padding: 2rem;
-            min-height: calc(100vh - 70px);
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .sidebar {
-            width: 280px;
-            background: var(--surface);
-            padding: 1.5rem;
-            position: fixed;
-            height: calc(100% - 70px);
-            overflow-y: auto;
-            border-right: 1px solid var(--border);
-            top: 70px;
-            left: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px var(--shadow);
-        }
-
-        .sidebar h3 {
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .sidebar ul li {
-            margin-bottom: 0.5rem;
-        }
-
-        .sidebar ul li a {
-            text-decoration: none;
-            color: var(--text);
-            display: block;
-            padding: 0.75rem 1rem;
-            transition: all 0.2s ease;
-            border-radius: 8px;
-            border-left: 3px solid transparent;
-        }
-
-        .sidebar ul li a:hover {
-            color: var(--primary);
-            background: var(--surface-hover);
-            transform: translateX(4px);
-            border-left-color: var(--primary);
-        }
-
-        .content {
-            margin-left: 300px;
-            padding: 0 0 2rem;
-            max-width: 800px;
-        }
-
-        .content h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--text);
-            animation: fadeInUp 0.6s ease;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .content h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 2rem 0 1rem;
-            color: var(--text);
-            border-bottom: 2px solid var(--primary);
-            padding-bottom: 0.5rem;
-        }
-
-        .content p {
-            margin-bottom: 1rem;
-            color: var(--text);
-        }
-
-        .content ul, .content ol {
-            margin: 1rem 0 1rem 1.5rem;
-            color: var(--text);
-        }
-
-        .content li {
-            margin-bottom: 0.5rem;
-        }
-
         .tutorial-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 1.5rem;
-            margin: 2rem 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeInUp 0.6s ease 0.4s both;
         }
 
         .tutorial-card {
@@ -331,64 +447,16 @@
             transform: translateX(5px);
         }
 
-        .category-info {
-            background: var(--surface);
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            border-left: 4px solid var(--primary);
-        }
-
-        .category-info h3 {
-            margin-bottom: 0.5rem;
-            color: var(--primary);
-        }
-
-        .category-info p {
-            color: var(--text-secondary);
-        }
-
-        footer {
-            background: var(--surface);
-            padding: 1rem;
-            text-align: center;
-            border-top: 1px solid var(--border);
-            margin-top: 2rem;
-            border-radius: 12px;
-        }
-
-        footer a {
-            color: var(--primary);
-            text-decoration: none;
-            margin: 0 0.5rem;
-            transition: color 0.2s ease;
-        }
-
-        footer a:hover {
-            color: var(--primary-hover);
-        }
-
         @media (max-width: 768px) {
             .header {
                 padding: 0 1rem;
             }
 
-            .sidebar {
-                display: none;
-            }
-
-            .main-container {
-                margin-top: 70px;
+            .main-content {
                 padding: 1rem;
-                margin-left: 0;
             }
 
-            .content {
-                margin-left: 0;
-                max-width: 100%;
-            }
-
-            .content h1 {
+            .dashboard-title {
                 font-size: 2rem;
             }
 
@@ -402,265 +470,353 @@
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        /* Theme toggle button */
-        .theme-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 1.2rem;
-            z-index: 1000;
-        }
-
-        .theme-toggle:hover {
-            background: var(--primary-hover);
-            transform: scale(1.1);
-        }
     </style>
 </head>
 <body data-theme="dark">
-    <header class="header">
-        <div class="logo" onclick="window.location.href='/'"></div>
-        <a href="/" class="back-button">← Back to Dashboard</a>
-    </header>
-    
-    <div class="main-container">
-        <aside class="sidebar">
-            <h3>🌐 Networking Guides</h3>
-            <ul>
-                <li><a href="#zabbix-setup">Zabbix Setup</a></li>
-                <li><a href="#zabbix-monitoring">Zabbix Monitoring</a></li>
-                <li><a href="#zabbix-hosts">Adding Hosts</a></li>
-                <li><a href="#cisco-isr">Cisco ISR Config</a></li>
-                <li><a href="#cisco-interfaces">Cisco Interfaces</a></li>
-                <li><a href="#prtg-setup">PRTG Setup</a></li>
-                <li><a href="#dns-config">DNS Configuration</a></li>
-                <li><a href="#network-diagrams">Network Diagrams</a></li>
-                <li><a href="#cisco-backup">Cisco Backup</a></li>
-                <li><a href="#grandstream-pbx">Grandstream PBX</a></li>
-                <li><a href="#grandstream-radius">RADIUS Auth</a></li>
-                <li><a href="#putty-config">PuTTY Config</a></li>
-            </ul>
-        </aside>
-        
-        <main class="content">
-            <h1>🌐 Networking Guides</h1>
-            <p>Last updated: July 17, 2025</p>
+    <!-- Access Denied Screen -->
+    <div class="access-denied" id="accessDenied">
+        <h1 class="access-denied-title">Access Denied</h1>
+        <p class="access-denied-subtitle">
+            You need to be logged in to access this tutorial content.<br>
+            Please sign in to continue with your MSP training.
+        </p>
+        <a href="/" class="access-denied-button">Go to Login</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-wrapper" id="mainWrapper">
+        <header class="header">
+            <div class="logo" onclick="window.location.href='/'"></div>
             
-            <div class="category-info">
-                <h3>About Networking Guides</h3>
-                <p>Comprehensive step-by-step tutorials for network infrastructure, monitoring tools, and configurations. Reference materials for daily operations.</p>
+            <div class="user-menu">
+                <button class="user-menu-toggle" onclick="toggleUserMenu()">
+                    <span id="userName">User</span>
+                    <span>▼</span>
+                </button>
+                <div class="user-menu-dropdown" id="userMenuDropdown">
+                    <button class="user-menu-item" onclick="showAdminPanel()" id="adminButton" style="display: none;">Admin Panel</button>
+                    <div class="theme-menu-item">
+                        <button class="theme-menu-toggle">
+                            <span>Theme</span>
+                            <span>▶</span>
+                        </button>
+                        <div class="theme-submenu">
+                            <button class="theme-option jedi" onclick="setTheme('light')">
+                                Light Jedi
+                            </button>
+                            <button class="theme-option sith active" onclick="setTheme('dark')">
+                                Dark Sith
+                            </button>
+                        </div>
+                    </div>
+                    <button class="user-menu-item" onclick="logout()">Sign Out</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <a href="/" class="back-button">← Back to Dashboard</a>
+            
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Networking Guides</h1>
+                <p class="dashboard-subtitle">Comprehensive step-by-step tutorials for network infrastructure, monitoring tools, and configurations</p>
             </div>
 
             <div class="tutorial-grid">
-                <div class="tutorial-card" id="zabbix-setup">
+                <div class="tutorial-card" onclick="window.location.href='/assets/zabbix-setup.html'">
                     <div class="tutorial-header">
                         <h3>Setting up Zabbix monitoring server</h3>
                     </div>
                     <div class="tutorial-preview">
-                        Complete guide to installing and configuring Zabbix monitoring server from scratch. Covers installation, initial configuration, and basic setup for monitoring infrastructure.
+                        Complete guide to installing and configuring Zabbix monitoring server for network infrastructure monitoring and alerting.
                     </div>
                     <div class="tutorial-meta">
-                        <span class="tutorial-type">📊 Monitoring</span>
+                        <span class="tutorial-type">Monitoring</span>
                         <span class="tutorial-arrow">→</span>
                     </div>
                 </div>
 
-                <div class="tutorial-card" id="zabbix-monitoring">
+                <div class="tutorial-card" onclick="window.location.href='/assets/zabbix-advanced.html'">
                     <div class="tutorial-header">
                         <h3>Monitoring with Zabbix advanced features</h3>
                     </div>
                     <div class="tutorial-preview">
-                        Advanced Zabbix monitoring techniques including custom triggers, templates, discovery rules, and automated actions for comprehensive infrastructure monitoring.
+                        Advanced Zabbix configuration including custom templates, triggers, and automated actions for enterprise monitoring.
                     </div>
                     <div class="tutorial-meta">
-                        <span class="tutorial-type">📊 Monitoring</span>
+                        <span class="tutorial-type">Advanced</span>
                         <span class="tutorial-arrow">→</span>
                     </div>
                 </div>
 
-                <div class="tutorial-card" id="zabbix-hosts">
+                <div class="tutorial-card" onclick="window.location.href='/assets/zabbix-hosts.html'">
                     <div class="tutorial-header">
                         <h3>Adding new hosts to Zabbix</h3>
                     </div>
                     <div class="tutorial-preview">
-                        Step-by-step process for adding new hosts to Zabbix monitoring system, including agent installation, configuration, and template assignment.
+                        Step-by-step process for adding and configuring new hosts in Zabbix with proper monitoring templates and items.
                     </div>
                     <div class="tutorial-meta">
-                        <span class="tutorial-type">📊 Monitoring</span>
+                        <span class="tutorial-type">Configuration</span>
                         <span class="tutorial-arrow">→</span>
                     </div>
                 </div>
 
-                <div class="tutorial-card" id="cisco-isr">
+                <div class="tutorial-card" onclick="window.location.href='/assets/cisco-isr.html'">
                     <div class="tutorial-header">
                         <h3>Cisco ISR voice router configuration</h3>
                     </div>
                     <div class="tutorial-preview">
-                        Complete configuration guide for Cisco ISR routers for voice services, including dial-peer configuration, voice gateways, and integration with phone systems.
+                        Configure Cisco ISR routers for voice services including VoIP, SIP trunking, and voice gateway functionality.
                     </div>
                     <div class="tutorial-meta">
-                        <span class="tutorial-type">📞 Voice</span>
+                        <span class="tutorial-type">Voice</span>
                         <span class="tutorial-arrow">→</span>
                     </div>
                 </div>
 
-                <div class="tutorial-card" id="cisco-interfaces">
+                <div class="tutorial-card" onclick="window.location.href='/assets/cisco-interfaces.html'">
                     <div class="tutorial-header">
                         <h3>Cisco monitored interfaces setup</h3>
                     </div>
                     <div class="tutorial-preview">
-                        Configure interface monitoring on Cisco devices including SNMP setup, interface descriptions, and integration with monitoring systems.
+                        Configure interface monitoring on Cisco devices including SNMP, logging, and performance metrics collection.
                     </div>
                     <div class="tutorial-meta">
-                        <span class="tutorial-type">🔧 Configuration</span>
+                        <span class="tutorial-type">Monitoring</span>
                         <span class="tutorial-arrow">→</span>
                     </div>
                 </div>
 
-                <div class="tutorial-card" id="prtg-setup">
+                <div class="tutorial-card" onclick="window.location.href='/assets/prtg-setup.html'">
                     <div class="tutorial-header">
                         <h3>PRTG 100 sensors free setup</h3>
                     </div>
                     <div class="tutorial-preview">
-                        Set up PRTG Network Monitor with the free 100 sensor license, including installation, initial configuration, and sensor optimization.
+                        Set up PRTG Network Monitor with the free 100 sensors license for small to medium network monitoring.
                     </div>
                     <div class="tutorial-meta">
-                        <span class="tutorial-type">📊 Monitoring</span>
+                        <span class="tutorial-type">Monitoring</span>
                         <span class="tutorial-arrow">→</span>
                     </div>
                 </div>
 
-                <div class="tutorial-card" id="dns-config">
+                <div class="tutorial-card" onclick="window.location.href='/assets/dns-server.html'">
                     <div class="tutorial-header">
                         <h3>DNS server configuration and management</h3>
                     </div>
                     <div class="tutorial-preview">
-                        Complete DNS server setup including zone configuration, record management, forwarders, and integration with Active Directory.
+                        Configure and manage DNS servers including zone management, record types, and DNS security best practices.
                     </div>
                     <div class="tutorial-meta">
-                        <span class="tutorial-type">🌐 Infrastructure</span>
+                        <span class="tutorial-type">Infrastructure</span>
                         <span class="tutorial-arrow">→</span>
                     </div>
                 </div>
 
-                <div class="tutorial-card" id="network-diagrams">
+                <div class="tutorial-card" onclick="window.location.href='/assets/network-diagrams.html'">
                     <div class="tutorial-header">
                         <h3>Creating network diagrams in Visio/draw.io</h3>
                     </div>
                     <div class="tutorial-preview">
-                        Professional network diagram creation using Microsoft Visio and draw.io, including templates, best practices, and documentation standards.
+                        Professional network diagram creation using Microsoft Visio and draw.io with best practices and templates.
                     </div>
                     <div class="tutorial-meta">
-                        <span class="tutorial-type">📋 Documentation</span>
+                        <span class="tutorial-type">Documentation</span>
                         <span class="tutorial-arrow">→</span>
                     </div>
                 </div>
 
-                <div class="tutorial-card" id="cisco-backup">
+                <div class="tutorial-card" onclick="window.location.href='/assets/cisco-backup.html'">
                     <div class="tutorial-header">
                         <h3>Cisco backup automation via SSH/Telnet</h3>
                     </div>
                     <div class="tutorial-preview">
-                        Automated backup solutions for Cisco devices using SSH and Telnet, including scripting, scheduling, and configuration management.
+                        Automate Cisco device configuration backups using SSH and Telnet with scheduled scripts and version control.
                     </div>
                     <div class="tutorial-meta">
-                        <span class="tutorial-type">🔒 Backup</span>
+                        <span class="tutorial-type">Automation</span>
                         <span class="tutorial-arrow">→</span>
                     </div>
                 </div>
 
-                <div class="tutorial-card" id="grandstream-pbx">
+                <div class="tutorial-card" onclick="window.location.href='/assets/grandstream-pbx.html'">
                     <div class="tutorial-header">
                         <h3>Grandstream PBX setup and configuration</h3>
                     </div>
                     <div class="tutorial-preview">
-                        Complete setup guide for Grandstream PBX systems including initial configuration, extension setup, and integration with existing infrastructure.
+                        Complete setup and configuration of Grandstream PBX systems including extensions, trunks, and call routing.
                     </div>
                     <div class="tutorial-meta">
-                        <span class="tutorial-type">📞 Voice</span>
+                        <span class="tutorial-type">Voice</span>
                         <span class="tutorial-arrow">→</span>
                     </div>
                 </div>
 
-                <div class="tutorial-card" id="grandstream-radius">
+                <div class="tutorial-card" onclick="window.location.href='/assets/grandstream-radius.html'">
                     <div class="tutorial-header">
                         <h3>Grandstream RADIUS authentication for corporate WiFi</h3>
                     </div>
                     <div class="tutorial-preview">
-                        Configure RADIUS authentication using Grandstream for corporate WiFi networks, including user management and security policies.
+                        Configure RADIUS authentication on Grandstream devices for secure corporate WiFi access and user management.
                     </div>
                     <div class="tutorial-meta">
-                        <span class="tutorial-type">🔐 Security</span>
+                        <span class="tutorial-type">Security</span>
                         <span class="tutorial-arrow">→</span>
                     </div>
                 </div>
 
-                <div class="tutorial-card" id="putty-config">
+                <div class="tutorial-card" onclick="window.location.href='/assets/putty-backup.html'">
                     <div class="tutorial-header">
                         <h3>PuTTY configuration backup with syntax highlighting</h3>
                     </div>
                     <div class="tutorial-preview">
-                        Advanced PuTTY configuration including session management, backup procedures, and syntax highlighting for better CLI experience.
+                        Backup and restore PuTTY configurations with custom syntax highlighting and session management best practices.
                     </div>
                     <div class="tutorial-meta">
-                        <span class="tutorial-type">🛠️ Tools</span>
+                        <span class="tutorial-type">Tools</span>
                         <span class="tutorial-arrow">→</span>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
-    
-    <footer>
-        <p><a href="/privacy">Privacy</a> | <a href="/terms">Terms of Use</a> | © Velocity Lab 2025</p>
-    </footer>
-
-    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
 
     <script>
+        // Authentication state
+        let userSession = null;
+        let isAuthenticated = false;
+
+        // Cookie utility functions
+        const cookieUtils = {
+            get(name) {
+                const nameEQ = name + "=";
+                const ca = document.cookie.split(';');
+                for(let i = 0; i < ca.length; i++) {
+                    let c = ca[i];
+                    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+                }
+                return null;
+            },
+            delete(name) {
+                document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict`;
+            }
+        };
+
+        // Check authentication status
+        function checkAuthentication() {
+            const userCookie = cookieUtils.get('user');
+            const sessionCookie = cookieUtils.get('session');
+            
+            if (userCookie && sessionCookie) {
+                try {
+                    userSession = JSON.parse(userCookie);
+                    isAuthenticated = true;
+                    return true;
+                } catch (error) {
+                    console.error('Invalid user session data');
+                    cookieUtils.delete('user');
+                    cookieUtils.delete('session');
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        // Show appropriate content based on authentication
+        function showContent() {
+            const accessDenied = document.getElementById('accessDenied');
+            const mainWrapper = document.getElementById('mainWrapper');
+            
+            if (isAuthenticated) {
+                accessDenied.classList.add('hidden');
+                mainWrapper.classList.add('authenticated');
+                
+                // Set user name
+                const userName = document.getElementById('userName');
+                if (userName && userSession) {
+                    userName.textContent = userSession.name || 'User';
+                }
+                
+                // Show admin panel for admins
+                if (userSession && userSession.role === 'admin') {
+                    const adminButton = document.getElementById('adminButton');
+                    if (adminButton) {
+                        adminButton.style.display = 'block';
+                    }
+                }
+            } else {
+                accessDenied.classList.remove('hidden');
+                mainWrapper.classList.remove('authenticated');
+            }
+        }
+
         // Theme management
-        function toggleTheme() {
-            const body = document.body;
-            const currentTheme = body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            body.setAttribute('data-theme', newTheme);
+        function setTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
             
-            const themeToggle = document.querySelector('.theme-toggle');
-            themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-            
-            localStorage.setItem('theme', newTheme);
+            const themeOptions = document.querySelectorAll('.theme-option');
+            themeOptions.forEach(option => {
+                option.classList.remove('active');
+                if ((theme === 'light' && option.classList.contains('jedi')) || 
+                    (theme === 'dark' && option.classList.contains('sith'))) {
+                    option.classList.add('active');
+                }
+            });
         }
 
         // Load saved theme
-        document.addEventListener('DOMContentLoaded', () => {
+        function loadTheme() {
             const savedTheme = localStorage.getItem('theme') || 'dark';
             document.body.setAttribute('data-theme', savedTheme);
             
-            const themeToggle = document.querySelector('.theme-toggle');
-            themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-        });
-
-        // Smooth scrolling for sidebar links
-        document.querySelectorAll('.sidebar a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+            const themeOptions = document.querySelectorAll('.theme-option');
+            themeOptions.forEach(option => {
+                option.classList.remove('active');
+                if ((savedTheme === 'light' && option.classList.contains('jedi')) || 
+                    (savedTheme === 'dark' && option.classList.contains('sith'))) {
+                    option.classList.add('active');
                 }
             });
+        }
+
+        // User menu toggle
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const userMenu = document.querySelector('.user-menu');
+            const dropdown = document.getElementById('userMenuDropdown');
+            if (userMenu && dropdown && !userMenu.contains(event.target) && dropdown.classList.contains('active')) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Navigation functions
+        function showAdminPanel() {
+            window.location.href = '/?admin=true';
+        }
+
+        function logout() {
+            cookieUtils.delete('user');
+            cookieUtils.delete('session');
+            window.location.href = '/';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            
+            if (checkAuthentication()) {
+                showContent();
+            } else {
+                showContent();
+            }
         });
     </script>
 </body>

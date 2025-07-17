@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+<head>
+    <title>Zabbix Monitoring Server Setup | MSP Training Platform</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Complete guide to installing and configuring Zabbix monitoring server for network infrastructure monitoring and alerting." />
+    <meta name="author" content="Velocity Lab" />
+    <meta name="date" content="2025-07-17T14:13:00Z" />
+
+    <!-- Preload images -->
+    <link rel="preload" href="/assets/Velocity-Logo.png" as="image">
+    <link rel="preload" href="/assets/VelocityBackground.jpg" as="image">
+
+    <style>
+        :root {
+            --primary: #00a8ff;
+            --primary-hover: #0093e6;
+            --secondary: #f8f9fa;
+            --background: #ffffff;
+            --surface: #f8f9fa;
+            --surface-hover: #e9ecef;
+            --text: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --border: #d2d2d7;
+            --success: #34c759;
+            --warning: #ff9500;
+            --danger: #ff3b30;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-heavy: rgba(0, 0, 0, 0.15);
+            --jedi-glow: #00ff88;
+            --sith-glow: #ff0066;
+            --bg-secondary: #f0f0f5;
+        }
+
+        [data-theme="dark"] {
+            --primary: #00a8ff;
+            --primary-hover: #0093e6;
+            --secondary: #1e1e1e;
+            --background: #000000;
+            --surface: #1e1e1e;
+            --surface-hover: #2e2e2e;
+            --text: #ffffff;
+            --text-secondary: #a1a1a6;
+            --border: #2e2e2e;
+            --success: #30d158;
+            --warning: #ff9f0a;
+            --danger: #ff453a;
+            --shadow: rgba(255, 255, 255, 0.1);
+            --shadow-heavy: rgba(255, 255, 255, 0.2);
+            --bg-secondary: #2a2a2a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+            scroll-behavior: smooth;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('/assets/VelocityBackground.jpg') center/cover no-repeat;
+            opacity: 0.08;
+            z-index: -1;
+        }
+
+        [data-theme="dark"] body::before {
+            opacity: 0.05;
+        }
+
+        /* Access Denied Screen */
+        .access-denied {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            background: var(--background);
+        }
+
+        .access-denied.hidden {
+            display: none;
+        }
+
+        .access-denied-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--danger);
+        }
+
+        .access-denied-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        .access-denied-button {
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+
+        .access-denied-button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Main Content */
+        .main-wrapper {
+            display: none;
+        }
+
+        .main-wrapper.authenticated {
+            display: block;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--background);
+            z-index: -2;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+            z-index: -1;
+        }
+
+        [data-theme="dark"] .header::after {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: url('/assets/Velocity-Logo.png') center/contain no-repeat;
+            cursor: pointer;
+            position: relative;
+            z-index: 10001;
+            transition: transform 0.2s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        [data-theme="dark"] .logo {
+            filter: invert(1) brightness(1.2);
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-menu-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text);
+            transition: all 0.2s ease;
+        }
+
+        .user-menu-toggle:hover {
+            background: var(--surface-hover);
+            transform: scale(1.05);
+        }
+
+        .user-menu-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 8px 25px var(--shadow-heavy);
+            min-width: 200px;
+            z-index: 9997;
+            display: none;
+        }
+
+        .user-menu-dropdown.active {
+            display: block;
+            animation: dropdownSlide 0.2s ease;
+        }
+
+        @keyframes dropdownSlide {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-menu-item {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .user-menu-item:hover {
+            background: var(--surface-hover);
+            transform: translateX(2px);
+        }
+
+        .theme-menu-item {
+            position: relative;
+        }
+
+        .theme-menu-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            color: var(--text);
+            border: none;
+            background: none;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme-menu-toggle:hover {
+            background: var(--surface-hover);
+            transform: translateX(2px);
+        }
+
+        .theme-submenu {
+            position: absolute;
+            right: 100%;
+            top: 0;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 8px 25px var(--shadow-heavy);
+            min-width: 150px;
+            z-index: 9996;
+            display: none;
+        }
+
+        .theme-menu-item:hover .theme-submenu {
+            display: block;
+            animation: dropdownSlide 0.2s ease;
+        }
+
+        .theme-option {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .theme-option:hover {
+            background: var(--surface-hover);
+            transform: translateX(-2px);
+        }
+
+        .theme-option.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .theme-option.jedi:hover {
+            background: linear-gradient(45deg, var(--jedi-glow), #00ff88);
+            color: white;
+        }
+
+        .theme-option.sith:hover {
+            background: linear-gradient(45deg, var(--sith-glow), #ff0066);
+            color: white;
+        }
+
+        .main-container {
+            margin-top: 70px;
+            padding: 2rem;
+            min-height: calc(100vh - 70px);
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--surface);
+            padding: 1.5rem;
+            position: fixed;
+            height: calc(100% - 70px);
+            overflow-y: auto;
+            border-right: 1px solid var(--border);
+            top: 70px;
+            left: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .sidebar h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: var(--text);
+            display: block;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar ul li a:hover {
+            color: var(--primary);
+            background: var(--surface-hover);
+            transform: translateX(4px);
+            border-left-color: var(--primary);
+        }
+
+        .content {
+            margin-left: 300px;
+            padding: 0 0 2rem;
+            max-width: 800px;
+        }
+
+        .content h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .content h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem;
+            color: var(--text);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+
+        .content p {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .content ul, .content ol {
+            margin: 1rem 0 1rem 1.5rem;
+            color: var(--text);
+        }
+
+        .content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .content .important {
+            background: rgba(0, 168, 255, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .content .important h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .content .warning {
+            background: rgba(255, 149, 0, 0.1);
+            border-left: 4px solid var(--warning);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .content .warning h4 {
+            color: var(--warning);
+            margin-bottom: 0.5rem;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            margin-bottom: 2rem;
+        }
+
+        .back-button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Enhanced Tab System */
+        .tab-section {
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--background);
+        }
+
+        .tab-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0;
+            display: flex;
+        }
+
+        .tab-button {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            flex: 1;
+            text-align: center;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button:hover {
+            background: var(--surface-hover);
+            color: var(--text);
+        }
+
+        .tab-button.active {
+            color: var(--primary);
+            background: var(--background);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            padding: 1.5rem;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Code and pre styling */
+        pre {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        code {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            background: var(--surface);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            color: var(--text);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: var(--background);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        table, th, td {
+            border: 1px solid var(--border);
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            color: var(--text);
+        }
+
+        th {
+            background: var(--surface);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: var(--bg-secondary);
+        }
+
+        /* Screenshot placeholders */
+        .screenshot-placeholder {
+            width: 100%;
+            height: 200px;
+            background: var(--surface);
+            border: 1px dashed var(--border);
+            text-align: center;
+            line-height: 200px;
+            color: var(--text-secondary);
+            margin: 1rem 0;
+            border-radius: 8px;
+        }
+
+        .step-image {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--surface);
+            padding: 1rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+            border-radius: 8px 8px 0 0;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+            margin: 0 0.5rem;
+            transition: color 0.2s ease;
+        }
+
+        footer a:hover {
+            color: var(--primary-hover);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 1rem;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .main-container {
+                margin-top: 70px;
+                padding: 1rem;
+                margin-left: 0;
+            }
+
+            .content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .tab-header {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                text-align: left;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <!-- Access Denied Screen -->
+    <div class="access-denied" id="accessDenied">
+        <h1 class="access-denied-title">Access Denied</h1>
+        <p class="access-denied-subtitle">
+            You need to be logged in to access this tutorial content.<br>
+            Please sign in to continue with your MSP training.
+        </p>
+        <a href="/" class="access-denied-button">Go to Login</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-wrapper" id="mainWrapper">
+        <header class="header">
+            <div class="logo" onclick="window.location.href='/'"></div>
+            
+            <div class="user-menu">
+                <button class="user-menu-toggle" onclick="toggleUserMenu()">
+                    <span id="userName">User</span>
+                    <span>▼</span>
+                </button>
+                <div class="user-menu-dropdown" id="userMenuDropdown">
+                    <button class="user-menu-item" onclick="showAdminPanel()" id="adminButton" style="display: none;">Admin Panel</button>
+                    <div class="theme-menu-item">
+                        <button class="theme-menu-toggle">
+                            <span>Theme</span>
+                            <span>▶</span>
+                        </button>
+                        <div class="theme-submenu">
+                            <button class="theme-option jedi" onclick="setTheme('light')">
+                                Light Jedi
+                            </button>
+                            <button class="theme-option sith active" onclick="setTheme('dark')">
+                                Dark Sith
+                            </button>
+                        </div>
+                    </div>
+                    <button class="user-menu-item" onclick="logout()">Sign Out</button>
+                </div>
+            </div>
+        </header>
+        
+        <div class="main-container">
+            <aside class="sidebar">
+                <h3>In this article</h3>
+                <ul>
+                    <li><a href="#overview">Overview</a></li>
+                    <li><a href="#prerequisites">Prerequisites</a></li>
+                    <li><a href="#installation">Installation</a></li>
+                    <li><a href="#configuration">Configuration</a></li>
+                    <li><a href="#monitoring">Setup Monitoring</a></li>
+                    <li><a href="#troubleshooting">Troubleshooting</a></li>
+                    <li><a href="#next-steps">Next Steps</a></li>
+                </ul>
+            </aside>
+            
+            <main class="content">
+                <a href="/assets/networking.html" class="back-button">← Back to Networking Guides</a>
+                
+                <h1>Zabbix Monitoring Server Setup</h1>
+                <p>Last updated: July 17, 2025</p>
+                <p>This guide provides step-by-step instructions for installing and configuring a Zabbix monitoring server for comprehensive network infrastructure monitoring.</p>
+                
+                <div class="important">
+                    <h4>Important</h4>
+                    <p>Ensure you have administrator access to your server and that ports 80, 443, and 10051 are available for Zabbix services.</p>
+                </div>
+
+                <h2 id="overview">Overview</h2>
+                <p>Zabbix is an enterprise-class monitoring solution that provides real-time monitoring of servers, networks, applications, and services. This tutorial covers the complete setup process.</p>
+                
+                <h2 id="prerequisites">Prerequisites</h2>
+                <ul>
+                    <li>Ubuntu 20.04 LTS or CentOS 8 server</li>
+                    <li>Minimum 4GB RAM, 2 CPU cores</li>
+                    <li>At least 20GB free disk space</li>
+                    <li>Root or sudo access</li>
+                    <li>Internet connectivity for package installation</li>
+                </ul>
+
+                <h2 id="installation">Installation</h2>
+                
+                <div class="tab-section">
+                    <div class="tab-header">
+                        <button class="tab-button active" onclick="switchTab('installation', 'gui')">GUI Installation</button>
+                        <button class="tab-button" onclick="switchTab('installation', 'cli')">CLI Installation</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="installation-gui">
+                        <h3>GUI Installation Process</h3>
+                        <ol>
+                            <li>Open your web browser and navigate to the Zabbix download page
+                                <div class="screenshot-placeholder">Screenshot: Zabbix download page with platform selection</div>
+                            </li>
+                            <li>Select your operating system and version
+                                <div class="screenshot-placeholder">Screenshot: OS selection dropdown with Ubuntu 20.04 highlighted</div>
+                            </li>
+                            <li>Download the appropriate repository package
+                                <div class="screenshot-placeholder">Screenshot: Download button for .deb package</div>
+                            </li>
+                            <li>Install the package using your system's package manager
+                                <div class="screenshot-placeholder">Screenshot: Package installation dialog</div>
+                            </li>
+                            <li>Configure the database connection through the web interface
+                                <div class="screenshot-placeholder">Screenshot: Database configuration form</div>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="tab-content" id="installation-cli">
+                        <h3>CLI Installation Process</h3>
+                        <ol>
+                            <li>Download and install Zabbix repository
+                                <pre><code># For Ubuntu 20.04
+wget https://repo.zabbix.com/zabbix/6.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.0-1+ubuntu20.04_all.deb
+sudo dpkg -i zabbix-release_6.0-1+ubuntu20.04_all.deb
+sudo apt update</code></pre>
+                            </li>
+                            <li>Install Zabbix server, web frontend, and agent
+                                <pre><code>sudo apt install zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-agent</code></pre>
+                            </li>
+                            <li>Install and configure MySQL database
+                                <pre><code>sudo apt install mysql-server
+sudo mysql_secure_installation
+sudo mysql -uroot -p</code></pre>
+                            </li>
+                            <li>Create Zabbix database and user
+                                <pre><code>mysql> create database zabbix character set utf8mb4 collate utf8mb4_bin;
+mysql> create user zabbix@localhost identified by 'password';
+mysql> grant all privileges on zabbix.* to zabbix@localhost;
+mysql> quit;</code></pre>
+                            </li>
+                            <li>Import initial schema and data
+                                <pre><code>sudo zcat /usr/share/doc/zabbix-sql-scripts/mysql/server.sql.gz | mysql -uzabbix -p zabbix</code></pre>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h2 id="configuration">Configuration</h2>
+                
+                <div class="tab-section">
+                    <div class="tab-header">
+                        <button class="tab-button active" onclick="switchTab('configuration', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('configuration', 'cli')">CLI Configuration</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="configuration-gui">
+                        <h3>Web Interface Configuration</h3>
+                        <ol>
+                            <li>Access the Zabbix web interface at <code>http://your-server/zabbix</code>
+                                <div class="screenshot-placeholder">Screenshot: Zabbix login page</div>
+                            </li>
+                            <li>Complete the setup wizard
+                                <div class="screenshot-placeholder">Screenshot: Setup wizard welcome screen</div>
+                            </li>
+                            <li>Configure database connection parameters
+                                <table>
+                                    <tr>
+                                        <th>Parameter</th>
+                                        <th>Value</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Database host</td>
+                                        <td>localhost</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Database name</td>
+                                        <td>zabbix</td>
+                                    </tr>
+                                    <tr>
+                                        <td>User</td>
+                                        <td>zabbix</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Password</td>
+                                        <td>Your database password</td>
+                                    </tr>
+                                </table>
+                            </li>
+                            <li>Set server name and timezone
+                                <div class="screenshot-placeholder">Screenshot: Server settings form</div>
+                            </li>
+                            <li>Login with default credentials (Admin/zabbix)
+                                <div class="screenshot-placeholder">Screenshot: Dashboard after successful login</div>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="tab-content" id="configuration-cli">
+                        <h3>Configuration File Setup</h3>
+                        <ol>
+                            <li>Edit the Zabbix server configuration file
+                                <pre><code>sudo nano /etc/zabbix/zabbix_server.conf</code></pre>
+                            </li>
+                            <li>Configure database connection
+                                <pre><code>DBHost=localhost
+DBName=zabbix
+DBUser=zabbix
+DBPassword=your_password</code></pre>
+                            </li>
+                            <li>Configure PHP settings for Zabbix frontend
+                                <pre><code>sudo nano /etc/zabbix/apache.conf</code></pre>
+                            </li>
+                            <li>Set timezone in PHP configuration
+                                <pre><code>php_value date.timezone Europe/London</code></pre>
+                            </li>
+                            <li>Start and enable Zabbix services
+                                <pre><code>sudo systemctl restart zabbix-server zabbix-agent apache2
+sudo systemctl enable zabbix-server zabbix-agent apache2</code></pre>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h2 id="monitoring">Setup Monitoring</h2>
+                
+                <div class="tab-section">
+                    <div class="tab-header">
+                        <button class="tab-button active" onclick="switchTab('monitoring', 'gui')">GUI Setup</button>
+                        <button class="tab-button" onclick="switchTab('monitoring', 'cli')">CLI Setup</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="monitoring-gui">
+                        <h3>Configure Monitoring via Web Interface</h3>
+                        <ol>
+                            <li>Navigate to Configuration → Hosts
+                                <div class="screenshot-placeholder">Screenshot: Hosts configuration page</div>
+                            </li>
+                            <li>Click "Create host" to add a new monitored device
+                                <div class="screenshot-placeholder">Screenshot: Create host form</div>
+                            </li>
+                            <li>Fill in host details and assign templates
+                                <div class="screenshot-placeholder">Screenshot: Host configuration with templates</div>
+                            </li>
+                            <li>Configure monitoring items and triggers
+                                <div class="screenshot-placeholder">Screenshot: Items and triggers configuration</div>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="tab-content" id="monitoring-cli">
+                        <h3>CLI-based Monitoring Setup</h3>
+                        <ol>
+                            <li>Install Zabbix agent on target hosts
+                                <pre><code>sudo apt install zabbix-agent</code></pre>
+                            </li>
+                            <li>Configure agent to connect to server
+                                <pre><code>sudo nano /etc/zabbix/zabbix_agentd.conf</code></pre>
+                            </li>
+                            <li>Set server IP address
+                                <pre><code>Server=192.168.1.100
+ServerActive=192.168.1.100
+Hostname=target-host</code></pre>
+                            </li>
+                            <li>Start and enable agent service
+                                <pre><code>sudo systemctl restart zabbix-agent
+sudo systemctl enable zabbix-agent</code></pre>
+                            </li>
+                            <li>Test connectivity from server
+                                <pre><code>zabbix_get -s 192.168.1.101 -k system.cpu.load[all,avg1]</code></pre>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h2 id="troubleshooting">Troubleshooting</h2>
+                
+                <div class="warning">
+                    <h4>Common Issues</h4>
+                    <p>If you encounter database connection errors, verify that MySQL is running and the zabbix user has proper permissions.</p>
+                </div>
+                
+                <h3>Database Connection Issues</h3>
+                <div class="tab-section">
+                    <div class="tab-header">
+                        <button class="tab-button active" onclick="switchTab('troubleshooting', 'gui')">GUI Troubleshooting</button>
+                        <button class="tab-button" onclick="switchTab('troubleshooting', 'cli')">CLI Troubleshooting</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="troubleshooting-gui">
+                        <p>Check the Zabbix frontend for database connection status indicators and error messages in the system information page.</p>
+                        <div class="screenshot-placeholder">Screenshot: System information page showing database status</div>
+                    </div>
+                    
+                    <div class="tab-content" id="troubleshooting-cli">
+                        <p>Check service status and logs for troubleshooting:</p>
+                        <pre><code>sudo systemctl status zabbix-server
+sudo tail -f /var/log/zabbix/zabbix_server.log
+sudo mysql -uzabbix -p zabbix -e "SELECT 1"</code></pre>
+                    </div>
+                </div>
+
+                <h2 id="next-steps">Next Steps</h2>
+                <p>After completing this setup, you can expand your monitoring capabilities:</p>
+                <ul>
+                    <li><a href="/assets/zabbix-advanced.html">Advanced Zabbix Configuration</a></li>
+                    <li><a href="/assets/zabbix-hosts.html">Adding Hosts to Zabbix</a></li>
+                    <li><a href="/assets/network-monitoring.html">Network Monitoring Best Practices</a></li>
+                </ul>
+            </main>
+        </div>
+        
+        <footer>
+            <p><a href="/privacy">Privacy</a> | <a href="/terms">Terms of Use</a> | © Velocity Lab 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        // Authentication state
+        let userSession = null;
+        let isAuthenticated = false;
+
+        // Cookie utility functions
+        const cookieUtils = {
+            get(name) {
+                const nameEQ = name + "=";
+                const ca = document.cookie.split(';');
+                for(let i = 0; i < ca.length; i++) {
+                    let c = ca[i];
+                    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+                }
+                return null;
+            },
+            delete(name) {
+                document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict`;
+            }
+        };
+
+        // Check authentication status
+        function checkAuthentication() {
+            const userCookie = cookieUtils.get('user');
+            const sessionCookie = cookieUtils.get('session');
+            
+            if (userCookie && sessionCookie) {
+                try {
+                    userSession = JSON.parse(userCookie);
+                    isAuthenticated = true;
+                    return true;
+                } catch (error) {
+                    console.error('Invalid user session data');
+                    cookieUtils.delete('user');
+                    cookieUtils.delete('session');
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        // Show appropriate content based on authentication
+        function showContent() {
+            const accessDenied = document.getElementById('accessDenied');
+            const mainWrapper = document.getElementById('mainWrapper');
+            
+            if (isAuthenticated) {
+                accessDenied.classList.add('hidden');
+                mainWrapper.classList.add('authenticated');
+                
+                // Set user name
+                const userName = document.getElementById('userName');
+                if (userName && userSession) {
+                    userName.textContent = userSession.name || 'User';
+                }
+                
+                // Show admin panel for admins
+                if (userSession && userSession.role === 'admin') {
+                    const adminButton = document.getElementById('adminButton');
+                    if (adminButton) {
+                        adminButton.style.display = 'block';
+                    }
+                }
+            } else {
+                accessDenied.classList.remove('hidden');
+                mainWrapper.classList.remove('authenticated');
+            }
+        }
+
+        // Tab switching system - PROFESSIONAL IMPLEMENTATION
+        function switchTab(section, tabType) {
+            // Hide all tab contents for this section
+            const tabContents = document.querySelectorAll(`#${section}-gui, #${section}-cli`);
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons in this section
+            const sectionElement = document.querySelector(`#${section}-gui`).closest('.tab-section');
+            const tabButtons = sectionElement.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const selectedContent = document.getElementById(`${section}-${tabType}`);
+            if (selectedContent) {
+                selectedContent.classList.add('active');
+            }
+            
+            // Add active class to clicked button
+            const clickedButton = event.target;
+            clickedButton.classList.add('active');
+        }
+
+        // Theme management
+        function setTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            
+            const themeOptions = document.querySelectorAll('.theme-option');
+            themeOptions.forEach(option => {
+                option.classList.remove('active');
+                if ((theme === 'light' && option.classList.contains('jedi')) || 
+                    (theme === 'dark' && option.classList.contains('sith'))) {
+                    option.classList.add('active');
+                }
+            });
+        }
+
+        // Load saved theme
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.setAttribute('data-theme', savedTheme);
+            
+            const themeOptions = document.querySelectorAll('.theme-option');
+            themeOptions.forEach(option => {
+                option.classList.remove('active');
+                if ((savedTheme === 'light' && option.classList.contains('jedi')) || 
+                    (savedTheme === 'dark' && option.classList.contains('sith'))) {
+                    option.classList.add('active');
+                }
+            });
+        }
+
+        // User menu toggle
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const userMenu = document.querySelector('.user-menu');
+            const dropdown = document.getElementById('userMenuDropdown');
+            if (userMenu && dropdown && !userMenu.contains(event.target) && dropdown.classList.contains('active')) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Navigation functions
+        function showAdminPanel() {
+            window.location.href = '/?admin=true';
+        }
+
+        function logout() {
+            cookieUtils.delete('user');
+            cookieUtils.delete('session');
+            window.location.href = '/';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            
+            if (checkAuthentication()) {
+                showContent();
+            } else {
+                showContent();
+            }
+        });
+    </script>
+</body>
+</html>
