@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en-us" dir="ltr">
 <head>
-    <title>FortiGate Firewall Policy Configuration | MSP Training Platform</title>
+    <title>FortiGate SD-WAN Configuration | MSP Training Platform</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Complete guide to configuring firewall policies on FortiGate devices for security and traffic management." />
+    <meta name="description" content="Complete guide to configuring SD-WAN on FortiGate devices for optimized network performance and redundancy." />
     <meta name="author" content="Velocity Lab" />
     <meta name="date" content="2025-07-17T14:13:00Z" />
 
@@ -714,10 +714,11 @@
                 <ul>
                     <li><a href="#overview">Overview</a></li>
                     <li><a href="#prerequisites">Prerequisites</a></li>
-                    <li><a href="#policy-basics">Policy Basics</a></li>
-                    <li><a href="#creating-policies">Creating Policies</a></li>
-                    <li><a href="#security-profiles">Security Profiles</a></li>
-                    <li><a href="#advanced-settings">Advanced Settings</a></li>
+                    <li><a href="#interface-setup">Interface Setup</a></li>
+                    <li><a href="#sdwan-zones">SD-WAN Zones</a></li>
+                    <li><a href="#performance-sla">Performance SLA</a></li>
+                    <li><a href="#load-balancing">Load Balancing</a></li>
+                    <li><a href="#monitoring">Monitoring</a></li>
                     <li><a href="#troubleshooting">Troubleshooting</a></li>
                     <li><a href="#next-steps">Next Steps</a></li>
                 </ul>
@@ -726,255 +727,517 @@
             <main class="content">
                 <a href="/assets/fortigate.html" class="back-button">← Back to FortiGate Guides</a>
                 
-                <h1>FortiGate Firewall Policy Configuration</h1>
+                <h1>FortiGate SD-WAN Configuration</h1>
                 <p>Last updated: July 17, 2025</p>
-                <p>This comprehensive guide covers creating and managing firewall policies on FortiGate devices to control network traffic flow and implement security measures.</p>
+                <p>This comprehensive guide covers configuring Software-Defined WAN (SD-WAN) on FortiGate devices to optimize network performance, provide redundancy, and improve application delivery.</p>
                 
                 <div class="important">
                     <h4>Important</h4>
-                    <p>Always test policy changes in a controlled environment before applying them to production networks. Misconfigured policies can block legitimate traffic.</p>
+                    <p>SD-WAN configuration requires FortiOS 5.4 or later. Ensure you have multiple WAN connections configured before proceeding with SD-WAN setup.</p>
                 </div>
 
                 <h2 id="overview">Overview</h2>
-                <p>FortiGate firewall policies are rules that determine how traffic flows through the firewall. These policies define what traffic is allowed or denied based on various criteria such as source, destination, service, and time. Understanding policy configuration is fundamental to securing your network infrastructure.</p>
+                <p>FortiGate SD-WAN provides intelligent path selection, load balancing, and failover capabilities for multiple WAN connections. It uses real-time application and link quality metrics to optimize traffic routing and ensure optimal user experience.</p>
+                
+                <h3>Key Benefits</h3>
+                <ul>
+                    <li>Automatic failover and load balancing</li>
+                    <li>Application-aware routing</li>
+                    <li>Real-time link quality monitoring</li>
+                    <li>Bandwidth optimization</li>
+                    <li>Centralized management and visibility</li>
+                </ul>
                 
                 <h2 id="prerequisites">Prerequisites</h2>
                 <ul>
-                    <li>FortiGate device with FortiOS 7.0 or later</li>
+                    <li>FortiGate device with FortiOS 5.4 or later</li>
+                    <li>Multiple WAN connections (minimum 2)</li>
+                    <li>Configured WAN interfaces with IP addresses</li>
+                    <li>Static routes or default routes configured</li>
                     <li>Administrator access to FortiGate management interface</li>
-                    <li>Basic understanding of network security concepts</li>
-                    <li>Knowledge of your network topology and requirements</li>
-                    <li>Configured interfaces and routing</li>
                 </ul>
 
-                <h2 id="policy-basics">Policy Basics</h2>
-                <p>FortiGate policies are processed in order from top to bottom. When a packet matches a policy rule, that rule is applied and processing stops. Understanding this sequence is crucial for effective policy management.</p>
-                
-                <h3>Policy Components</h3>
-                <table>
-                    <tr>
-                        <th>Component</th>
-                        <th>Description</th>
-                        <th>Example</th>
-                    </tr>
-                    <tr>
-                        <td>Source Interface</td>
-                        <td>Interface traffic originates from</td>
-                        <td>port1 (LAN)</td>
-                    </tr>
-                    <tr>
-                        <td>Destination Interface</td>
-                        <td>Interface traffic is destined for</td>
-                        <td>port2 (WAN)</td>
-                    </tr>
-                    <tr>
-                        <td>Source Address</td>
-                        <td>IP address or range of source</td>
-                        <td>192.168.1.0/24</td>
-                    </tr>
-                    <tr>
-                        <td>Destination Address</td>
-                        <td>IP address or range of destination</td>
-                        <td>0.0.0.0/0 (any)</td>
-                    </tr>
-                    <tr>
-                        <td>Service</td>
-                        <td>Protocol and port definition</td>
-                        <td>HTTP, HTTPS, ALL</td>
-                    </tr>
-                    <tr>
-                        <td>Action</td>
-                        <td>Allow or deny traffic</td>
-                        <td>ACCEPT, DENY</td>
-                    </tr>
-                </table>
-
-                <h2 id="creating-policies">Creating Policies</h2>
+                <h2 id="interface-setup">Interface Setup</h2>
+                <p>Before configuring SD-WAN, ensure your WAN interfaces are properly configured and operational.</p>
                 
                 <div class="tab-section">
                     <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('creating-policies', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('creating-policies', 'cli')">CLI Configuration</button>
+                        <button class="tab-button active" onclick="switchTab('interface-setup', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('interface-setup', 'cli')">CLI Configuration</button>
                     </div>
                     
-                    <div class="tab-content active" id="creating-policies-gui">
-                        <h3>Creating Policies via Web Interface</h3>
+                    <div class="tab-content active" id="interface-setup-gui">
+                        <h3>Interface Configuration via GUI</h3>
                         <ol>
-                            <li>Navigate to Policy & Objects > Firewall Policy
-                                <div class="screenshot-placeholder">Screenshot: Firewall Policy page showing existing policies</div>
+                            <li>Navigate to Network > Interfaces
+                                <div class="screenshot-placeholder">Screenshot: Network Interfaces page showing WAN interfaces</div>
                             </li>
-                            <li>Click "Create New" to add a new policy
-                                <div class="screenshot-placeholder">Screenshot: Create New Policy button highlighted</div>
+                            <li>Edit each WAN interface (port2, port3, etc.)
+                                <div class="screenshot-placeholder">Screenshot: Interface configuration form</div>
                             </li>
-                            <li>Configure basic policy settings
-                                <div class="screenshot-placeholder">Screenshot: Basic policy configuration form</div>
-                                <ul>
-                                    <li>Name: Descriptive policy name</li>
-                                    <li>Incoming Interface: Select source interface</li>
-                                    <li>Outgoing Interface: Select destination interface</li>
-                                    <li>Source: Define source addresses or groups</li>
-                                    <li>Destination: Define destination addresses or groups</li>
-                                    <li>Service: Select protocols and ports</li>
-                                    <li>Action: Accept or Deny</li>
-                                </ul>
+                            <li>Configure IP addressing and administrative settings
+                                <table>
+                                    <tr>
+                                        <th>Setting</th>
+                                        <th>Description</th>
+                                        <th>Example</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Role</td>
+                                        <td>Interface role</td>
+                                        <td>WAN</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Administrative Status</td>
+                                        <td>Interface state</td>
+                                        <td>Up</td>
+                                    </tr>
+                                    <tr>
+                                        <td>IP/Network Mask</td>
+                                        <td>Interface IP address</td>
+                                        <td>192.168.100.2/24</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Administrative Distance</td>
+                                        <td>Route preference</td>
+                                        <td>10</td>
+                                    </tr>
+                                </table>
                             </li>
-                            <li>Configure advanced options
-                                <div class="screenshot-placeholder">Screenshot: Advanced policy options panel</div>
-                            </li>
-                            <li>Apply security profiles if needed
-                                <div class="screenshot-placeholder">Screenshot: Security profiles selection</div>
-                            </li>
-                            <li>Save the policy configuration
-                                <div class="screenshot-placeholder">Screenshot: Save button and policy confirmation</div>
+                            <li>Configure DNS settings for each interface
+                                <div class="screenshot-placeholder">Screenshot: DNS configuration section</div>
                             </li>
                         </ol>
                     </div>
                     
-                    <div class="tab-content" id="creating-policies-cli">
-                        <h3>CLI Policy Configuration</h3>
+                    <div class="tab-content" id="interface-setup-cli">
+                        <h3>CLI Interface Configuration</h3>
                         <ol>
-                            <li>Access the FortiGate CLI and enter policy configuration mode
-                                <pre><code>config firewall policy
-edit 0</code></pre>
+                            <li>Configure WAN interface 1 (port2)
+                                <pre><code>config system interface
+edit "port2"
+    set vdom "root"
+    set ip 192.168.100.2 255.255.255.0
+    set allowaccess ping https ssh
+    set type physical
+    set role wan
+    set interface port2
+    set distance 10
+next</code></pre>
                             </li>
-                            <li>Configure basic policy parameters
-                                <pre><code>set name "LAN_to_WAN_HTTP"
-set srcintf "port1"
-set dstintf "port2"
-set srcaddr "LAN_Network"
-set dstaddr "all"
-set service "HTTP" "HTTPS"
-set action accept</code></pre>
+                            <li>Configure WAN interface 2 (port3)
+                                <pre><code>edit "port3"
+    set vdom "root"
+    set ip 192.168.200.2 255.255.255.0
+    set allowaccess ping https ssh
+    set type physical
+    set role wan
+    set interface port3
+    set distance 20
+next
+end</code></pre>
                             </li>
-                            <li>Enable logging for the policy
-                                <pre><code>set logtraffic all
-set comments "Allow HTTP/HTTPS from LAN to WAN"</code></pre>
-                            </li>
-                            <li>Configure NAT if required
-                                <pre><code>set nat enable
-set ippool "SNAT_Pool"</code></pre>
-                            </li>
-                            <li>Apply security profiles
-                                <pre><code>set av-profile "default"
-set ips-sensor "default"
-set application-list "default"
-set ssl-ssh-profile "certificate-inspection"</code></pre>
-                            </li>
-                            <li>Save the configuration
-                                <pre><code>next
+                            <li>Configure static routes
+                                <pre><code>config router static
+edit 1
+    set gateway 192.168.100.1
+    set device "port2"
+    set distance 10
+next
+edit 2
+    set gateway 192.168.200.1
+    set device "port3"
+    set distance 20
+next
 end</code></pre>
                             </li>
                         </ol>
                     </div>
                 </div>
 
-                <h2 id="security-profiles">Security Profiles</h2>
-                <p>Security profiles provide additional protection layers that can be applied to firewall policies. These profiles inspect traffic for various threats and can block or log suspicious activity.</p>
+                <h2 id="sdwan-zones">SD-WAN Zones</h2>
+                <p>SD-WAN zones group interfaces and define how traffic is distributed across multiple WAN links.</p>
                 
                 <div class="tab-section">
                     <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('security-profiles', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('security-profiles', 'cli')">CLI Configuration</button>
+                        <button class="tab-button active" onclick="switchTab('sdwan-zones', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('sdwan-zones', 'cli')">CLI Configuration</button>
                     </div>
                     
-                    <div class="tab-content active" id="security-profiles-gui">
-                        <h3>Applying Security Profiles</h3>
+                    <div class="tab-content active" id="sdwan-zones-gui">
+                        <h3>Creating SD-WAN Zones</h3>
                         <ol>
-                            <li>In the policy configuration, scroll to Security Profiles section
-                                <div class="screenshot-placeholder">Screenshot: Security Profiles section in policy editor</div>
+                            <li>Navigate to Network > SD-WAN
+                                <div class="screenshot-placeholder">Screenshot: SD-WAN configuration page</div>
                             </li>
-                            <li>Configure Antivirus Profile
-                                <div class="screenshot-placeholder">Screenshot: Antivirus profile selection dropdown</div>
+                            <li>Click "Enable SD-WAN"
+                                <div class="screenshot-placeholder">Screenshot: Enable SD-WAN button</div>
                             </li>
-                            <li>Configure IPS (Intrusion Prevention System)
-                                <div class="screenshot-placeholder">Screenshot: IPS sensor configuration</div>
+                            <li>Add WAN interfaces to SD-WAN zone
+                                <div class="screenshot-placeholder">Screenshot: Add interface to SD-WAN zone</div>
                             </li>
-                            <li>Configure Application Control
-                                <div class="screenshot-placeholder">Screenshot: Application control list selection</div>
+                            <li>Configure interface priorities and weights
+                                <table>
+                                    <tr>
+                                        <th>Interface</th>
+                                        <th>Priority</th>
+                                        <th>Weight</th>
+                                        <th>Description</th>
+                                    </tr>
+                                    <tr>
+                                        <td>port2</td>
+                                        <td>1</td>
+                                        <td>100</td>
+                                        <td>Primary WAN</td>
+                                    </tr>
+                                    <tr>
+                                        <td>port3</td>
+                                        <td>2</td>
+                                        <td>50</td>
+                                        <td>Secondary WAN</td>
+                                    </tr>
+                                </table>
                             </li>
-                            <li>Configure Web Filter
-                                <div class="screenshot-placeholder">Screenshot: Web filter profile options</div>
-                            </li>
-                            <li>Configure SSL/SSH Inspection
-                                <div class="screenshot-placeholder">Screenshot: SSL inspection profile settings</div>
+                            <li>Configure gateway and detection settings
+                                <div class="screenshot-placeholder">Screenshot: Gateway and detection configuration</div>
                             </li>
                         </ol>
                     </div>
                     
-                    <div class="tab-content" id="security-profiles-cli">
-                        <h3>CLI Security Profile Configuration</h3>
+                    <div class="tab-content" id="sdwan-zones-cli">
+                        <h3>CLI SD-WAN Zone Configuration</h3>
                         <ol>
-                            <li>Edit existing policy to add security profiles
-                                <pre><code>config firewall policy
-edit 1</code></pre>
+                            <li>Enable SD-WAN and add interfaces
+                                <pre><code>config system sd-wan
+    set status enable
+    config members
+        edit 1
+            set interface "port2"
+            set zone "virtual-wan-link"
+            set priority 1
+            set weight 100
+            set gateway 192.168.100.1
+        next
+        edit 2
+            set interface "port3"
+            set zone "virtual-wan-link"
+            set priority 2
+            set weight 50
+            set gateway 192.168.200.1
+        next
+    end</code></pre>
                             </li>
-                            <li>Apply antivirus profile
-                                <pre><code>set av-profile "default"</code></pre>
+                            <li>Configure health check settings
+                                <pre><code>    config health-check
+        edit "Default_Office_365"
+            set server "outlook.office365.com"
+            set protocol ping
+            set port 443
+            set interval 1000
+            set probe-timeout 1000
+            set failtime 3
+            set recoverytime 3
+            config members
+                edit 1
+                    set seq-num 1
+                next
+                edit 2
+                    set seq-num 2
+                next
+            end
+        next
+    end</code></pre>
                             </li>
-                            <li>Apply IPS sensor
-                                <pre><code>set ips-sensor "protect_client"</code></pre>
-                            </li>
-                            <li>Apply application control
-                                <pre><code>set application-list "default"</code></pre>
-                            </li>
-                            <li>Apply web filter
-                                <pre><code>set webfilter-profile "default"</code></pre>
-                            </li>
-                            <li>Apply SSL inspection
-                                <pre><code>set ssl-ssh-profile "certificate-inspection"</code></pre>
-                            </li>
-                            <li>Save configuration
-                                <pre><code>next
+                            <li>Configure basic load balancing rule
+                                <pre><code>    config service
+        edit 1
+            set name "Internet_Service"
+            set mode load-balance
+            set dst "all"
+            set src "all"
+            config sla
+                edit "Default_Office_365"
+                    set id 1
+                next
+            end
+            set priority-members 1 2
+        next
+    end
 end</code></pre>
                             </li>
                         </ol>
                     </div>
                 </div>
 
-                <h2 id="advanced-settings">Advanced Settings</h2>
+                <h2 id="performance-sla">Performance SLA</h2>
+                <p>Performance SLA monitoring ensures that traffic is routed over links that meet specific quality requirements.</p>
+                
+                <div class="tab-section">
+                    <div class="tab-header">
+                        <button class="tab-button active" onclick="switchTab('performance-sla', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('performance-sla', 'cli')">CLI Configuration</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="performance-sla-gui">
+                        <h3>Configuring Performance SLA</h3>
+                        <ol>
+                            <li>In SD-WAN settings, navigate to Performance SLA
+                                <div class="screenshot-placeholder">Screenshot: Performance SLA configuration page</div>
+                            </li>
+                            <li>Create new SLA profile
+                                <div class="screenshot-placeholder">Screenshot: Create new SLA profile form</div>
+                            </li>
+                            <li>Configure SLA parameters
+                                <table>
+                                    <tr>
+                                        <th>Parameter</th>
+                                        <th>Description</th>
+                                        <th>Example Value</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Latency Threshold</td>
+                                        <td>Maximum acceptable latency</td>
+                                        <td>150ms</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Jitter Threshold</td>
+                                        <td>Maximum acceptable jitter</td>
+                                        <td>50ms</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Packet Loss</td>
+                                        <td>Maximum acceptable packet loss</td>
+                                        <td>2%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Probe Interval</td>
+                                        <td>How often to test the link</td>
+                                        <td>10 seconds</td>
+                                    </tr>
+                                </table>
+                            </li>
+                            <li>Configure target servers for monitoring
+                                <div class="screenshot-placeholder">Screenshot: Target server configuration</div>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="tab-content" id="performance-sla-cli">
+                        <h3>CLI Performance SLA Configuration</h3>
+                        <ol>
+                            <li>Configure health check for critical applications
+                                <pre><code>config system sd-wan
+    config health-check
+        edit "VoIP_SLA"
+            set server "voip.company.com"
+            set protocol ping
+            set port 5060
+            set interval 5000
+            set probe-timeout 1000
+            set failtime 3
+            set recoverytime 3
+            set sla-fail-log-period 10
+            set sla-pass-log-period 10
+            config sla
+                edit 1
+                    set link-cost-factor latency jitter packet-loss
+                    set latency-threshold 100
+                    set jitter-threshold 20
+                    set packetloss-threshold 1
+                next
+            end
+        next
+    end</code></pre>
+                            </li>
+                            <li>Configure health check for general internet
+                                <pre><code>        edit "Internet_SLA"
+            set server "8.8.8.8"
+            set protocol ping
+            set interval 10000
+            set probe-timeout 2000
+            set failtime 5
+            set recoverytime 5
+            config sla
+                edit 1
+                    set link-cost-factor latency packet-loss
+                    set latency-threshold 200
+                    set packetloss-threshold 3
+                next
+            end
+        next
+    end
+end</code></pre>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h2 id="load-balancing">Load Balancing</h2>
+                <p>Configure load balancing algorithms to distribute traffic across multiple WAN links based on various criteria.</p>
                 
                 <div class="warning">
                     <h4>Warning</h4>
-                    <p>Advanced settings can significantly impact network performance. Test thoroughly before implementing in production environments.</p>
+                    <p>Load balancing algorithms can affect application performance. Test thoroughly with your specific traffic patterns.</p>
                 </div>
                 
-                <h3>Traffic Shaping</h3>
                 <div class="tab-section">
                     <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('advanced-settings', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('advanced-settings', 'cli')">CLI Configuration</button>
+                        <button class="tab-button active" onclick="switchTab('load-balancing', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('load-balancing', 'cli')">CLI Configuration</button>
                     </div>
                     
-                    <div class="tab-content active" id="advanced-settings-gui">
-                        <h3>Traffic Shaping Configuration</h3>
+                    <div class="tab-content active" id="load-balancing-gui">
+                        <h3>Load Balancing Configuration</h3>
                         <ol>
-                            <li>In policy configuration, expand Traffic Shaping section
-                                <div class="screenshot-placeholder">Screenshot: Traffic shaping options in policy</div>
+                            <li>Navigate to SD-WAN Rules section
+                                <div class="screenshot-placeholder">Screenshot: SD-WAN Rules configuration</div>
                             </li>
-                            <li>Configure bandwidth limits
-                                <div class="screenshot-placeholder">Screenshot: Bandwidth limit configuration</div>
+                            <li>Create new SD-WAN rule
+                                <div class="screenshot-placeholder">Screenshot: Create new SD-WAN rule form</div>
                             </li>
-                            <li>Set priority levels
-                                <div class="screenshot-placeholder">Screenshot: Priority level selection</div>
+                            <li>Configure load balancing algorithm
+                                <table>
+                                    <tr>
+                                        <th>Algorithm</th>
+                                        <th>Description</th>
+                                        <th>Best For</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Source IP</td>
+                                        <td>Based on source IP hash</td>
+                                        <td>Session persistence</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Weighted</td>
+                                        <td>Based on interface weight</td>
+                                        <td>Bandwidth proportional</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Spillover</td>
+                                        <td>Primary with failover</td>
+                                        <td>Active-passive setup</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Volume</td>
+                                        <td>Based on traffic volume</td>
+                                        <td>Equal distribution</td>
+                                    </tr>
+                                </table>
+                            </li>
+                            <li>Configure application-specific rules
+                                <div class="screenshot-placeholder">Screenshot: Application-specific rule configuration</div>
                             </li>
                         </ol>
                     </div>
                     
-                    <div class="tab-content" id="advanced-settings-cli">
-                        <h3>CLI Traffic Shaping</h3>
-                        <pre><code>config firewall policy
-edit 1
-    set traffic-shaper "bandwidth_limit_5mbps"
-    set traffic-shaper-reverse "bandwidth_limit_5mbps"
-    set per-ip-shaper "per_user_1mbps"
-next
+                    <div class="tab-content" id="load-balancing-cli">
+                        <h3>CLI Load Balancing Configuration</h3>
+                        <ol>
+                            <li>Configure weighted load balancing for general traffic
+                                <pre><code>config system sd-wan
+    config service
+        edit 1
+            set name "General_Internet"
+            set mode load-balance
+            set dst "all"
+            set src "all"
+            set priority-members 1 2
+            set tie-break farthest
+            set use-shortcut-sla disable
+        next
+    end</code></pre>
+                            </li>
+                            <li>Configure priority-based routing for VoIP
+                                <pre><code>        edit 2
+            set name "VoIP_Traffic"
+            set mode priority
+            set dst "all"
+            set src "all"
+            set internet-service-app-ctrl-group "VoIP.Audio"
+            config sla
+                edit "VoIP_SLA"
+                    set id 1
+                next
+            end
+            set priority-members 1 2
+        next</code></pre>
+                            </li>
+                            <li>Configure spillover for critical applications
+                                <pre><code>        edit 3
+            set name "Critical_Apps"
+            set mode manual
+            set dst "all"
+            set src "all"
+            set internet-service-app-ctrl-group "Business.Applications"
+            config sla
+                edit "Internet_SLA"
+                    set id 1
+                next
+            end
+            set priority-members 1
+        next
+    end
 end</code></pre>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h2 id="monitoring">Monitoring</h2>
+                <p>Monitor SD-WAN performance and health to ensure optimal operation and troubleshoot issues.</p>
+                
+                <div class="tab-section">
+                    <div class="tab-header">
+                        <button class="tab-button active" onclick="switchTab('monitoring', 'gui')">GUI Monitoring</button>
+                        <button class="tab-button" onclick="switchTab('monitoring', 'cli')">CLI Monitoring</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="monitoring-gui">
+                        <h3>GUI Monitoring Tools</h3>
+                        <ol>
+                            <li>Navigate to Dashboard > Network > SD-WAN
+                                <div class="screenshot-placeholder">Screenshot: SD-WAN dashboard showing interface status</div>
+                            </li>
+                            <li>Monitor interface performance metrics
+                                <div class="screenshot-placeholder">Screenshot: Interface performance graphs</div>
+                            </li>
+                            <li>Check SLA compliance status
+                                <div class="screenshot-placeholder">Screenshot: SLA compliance dashboard</div>
+                            </li>
+                            <li>Review traffic distribution
+                                <div class="screenshot-placeholder">Screenshot: Traffic distribution pie chart</div>
+                            </li>
+                            <li>Monitor health check results
+                                <div class="screenshot-placeholder">Screenshot: Health check status table</div>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="tab-content" id="monitoring-cli">
+                        <h3>CLI Monitoring Commands</h3>
+                        <ol>
+                            <li>Check SD-WAN status
+                                <pre><code>diagnose system sd-wan status</code></pre>
+                            </li>
+                            <li>Monitor health check results
+                                <pre><code>diagnose system sd-wan health-check</code></pre>
+                            </li>
+                            <li>View interface statistics
+                                <pre><code>diagnose system sd-wan member</code></pre>
+                            </li>
+                            <li>Check service statistics
+                                <pre><code>diagnose system sd-wan service</code></pre>
+                            </li>
+                            <li>Monitor real-time traffic
+                                <pre><code>diagnose system sd-wan route-tag-list</code></pre>
+                            </li>
+                        </ol>
                     </div>
                 </div>
 
                 <h2 id="troubleshooting">Troubleshooting</h2>
+                <p>Common SD-WAN issues and their solutions.</p>
                 
-                <h3>Common Policy Issues</h3>
                 <div class="tab-section">
                     <div class="tab-header">
                         <button class="tab-button active" onclick="switchTab('troubleshooting', 'gui')">GUI Troubleshooting</button>
@@ -982,19 +1245,31 @@ end</code></pre>
                     </div>
                     
                     <div class="tab-content active" id="troubleshooting-gui">
-                        <h3>Policy Troubleshooting via GUI</h3>
+                        <h3>Common Issues and Solutions</h3>
                         <ol>
-                            <li>Check policy hit counters
-                                <div class="screenshot-placeholder">Screenshot: Policy list showing hit counters</div>
+                            <li>Interface not showing in SD-WAN zone
+                                <div class="screenshot-placeholder">Screenshot: Interface troubleshooting steps</div>
+                                <ul>
+                                    <li>Check interface role is set to WAN</li>
+                                    <li>Verify interface is administratively up</li>
+                                    <li>Confirm IP configuration is correct</li>
+                                </ul>
                             </li>
-                            <li>Review log files for policy matches
-                                <div class="screenshot-placeholder">Screenshot: Log viewer showing policy matches</div>
+                            <li>Health check failing
+                                <div class="screenshot-placeholder">Screenshot: Health check failure indicators</div>
+                                <ul>
+                                    <li>Verify target server is reachable</li>
+                                    <li>Check firewall policies allow health check traffic</li>
+                                    <li>Adjust timeout and interval settings</li>
+                                </ul>
                             </li>
-                            <li>Use Policy Lookup tool
-                                <div class="screenshot-placeholder">Screenshot: Policy lookup tool interface</div>
-                            </li>
-                            <li>Check session table for active connections
-                                <div class="screenshot-placeholder">Screenshot: Session monitoring page</div>
+                            <li>Traffic not load balancing
+                                <div class="screenshot-placeholder">Screenshot: Traffic distribution analysis</div>
+                                <ul>
+                                    <li>Review SD-WAN rule configuration</li>
+                                    <li>Check interface weights and priorities</li>
+                                    <li>Verify SLA requirements are met</li>
+                                </ul>
                             </li>
                         </ol>
                     </div>
@@ -1002,32 +1277,35 @@ end</code></pre>
                     <div class="tab-content" id="troubleshooting-cli">
                         <h3>CLI Troubleshooting Commands</h3>
                         <ol>
-                            <li>Check policy statistics
-                                <pre><code>get firewall policy</code></pre>
+                            <li>Debug SD-WAN operations
+                                <pre><code>diagnose debug enable
+diagnose debug application sdwan -1
+diagnose debug enable</code></pre>
                             </li>
-                            <li>View detailed policy information
-                                <pre><code>show firewall policy 1</code></pre>
+                            <li>Check routing table
+                                <pre><code>get router info routing-table all</code></pre>
                             </li>
-                            <li>Check active sessions
-                                <pre><code>get system session list</code></pre>
+                            <li>Test connectivity
+                                <pre><code>execute ping-options source 192.168.100.2
+execute ping 8.8.8.8</code></pre>
                             </li>
-                            <li>Test policy matching
-                                <pre><code>diagnose firewall iprope lookup 192.168.1.100 80 192.168.1.1</code></pre>
+                            <li>Monitor session table
+                                <pre><code>diagnose sys session list</code></pre>
                             </li>
-                            <li>Monitor real-time traffic
-                                <pre><code>diagnose sniffer packet any 'host 192.168.1.100' 4 0 l</code></pre>
+                            <li>Check interface statistics
+                                <pre><code>diagnose hardware deviceinfo nic port2</code></pre>
                             </li>
                         </ol>
                     </div>
                 </div>
 
                 <h2 id="next-steps">Next Steps</h2>
-                <p>After mastering basic policy configuration, explore these advanced topics:</p>
+                <p>After implementing SD-WAN, consider these advanced topics:</p>
                 <ul>
-                    <li><a href="/assets/fortigate-sdwan.html">FortiGate SD-WAN Configuration</a></li>
+                    <li><a href="/assets/fortigate-policy.html">FortiGate Policy Configuration</a></li>
                     <li><a href="/assets/fortigate-ipsec.html">FortiGate IPSec VPN Setup</a></li>
-                    <li><a href="/assets/fortigate-ldap.html">FortiGate LDAP Authentication</a></li>
-                    <li><a href="/assets/fortigate-routing.html">FortiGate Routing Configuration</a></li>
+                    <li><a href="/assets/fortigate-sslvpn.html">FortiGate SSL VPN Configuration</a></li>
+                    <li><a href="/assets/fortigate-routing.html">Advanced Routing Configuration</a></li>
                 </ul>
             </main>
         </div>

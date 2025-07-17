@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en-us" dir="ltr">
 <head>
-    <title>FortiGate Firewall Policy Configuration | MSP Training Platform</title>
+    <title>FortiGate Routing Configuration | MSP Training Platform</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Complete guide to configuring firewall policies on FortiGate devices for security and traffic management." />
+    <meta name="description" content="Complete guide to configuring routing protocols and static routes on FortiGate devices for network connectivity." />
     <meta name="author" content="Velocity Lab" />
     <meta name="date" content="2025-07-17T14:13:00Z" />
 
@@ -714,10 +714,11 @@
                 <ul>
                     <li><a href="#overview">Overview</a></li>
                     <li><a href="#prerequisites">Prerequisites</a></li>
-                    <li><a href="#policy-basics">Policy Basics</a></li>
-                    <li><a href="#creating-policies">Creating Policies</a></li>
-                    <li><a href="#security-profiles">Security Profiles</a></li>
-                    <li><a href="#advanced-settings">Advanced Settings</a></li>
+                    <li><a href="#static-routes">Static Routes</a></li>
+                    <li><a href="#dynamic-routing">Dynamic Routing</a></li>
+                    <li><a href="#policy-routes">Policy Routes</a></li>
+                    <li><a href="#route-maps">Route Maps</a></li>
+                    <li><a href="#multicast">Multicast Routing</a></li>
                     <li><a href="#troubleshooting">Troubleshooting</a></li>
                     <li><a href="#next-steps">Next Steps</a></li>
                 </ul>
@@ -726,255 +727,597 @@
             <main class="content">
                 <a href="/assets/fortigate.html" class="back-button">← Back to FortiGate Guides</a>
                 
-                <h1>FortiGate Firewall Policy Configuration</h1>
+                <h1>FortiGate Routing Configuration</h1>
                 <p>Last updated: July 17, 2025</p>
-                <p>This comprehensive guide covers creating and managing firewall policies on FortiGate devices to control network traffic flow and implement security measures.</p>
+                <p>This comprehensive guide covers configuring static and dynamic routing on FortiGate devices to ensure proper network connectivity and optimal traffic flow.</p>
                 
                 <div class="important">
                     <h4>Important</h4>
-                    <p>Always test policy changes in a controlled environment before applying them to production networks. Misconfigured policies can block legitimate traffic.</p>
+                    <p>Routing changes can affect network connectivity. Always test routing configurations in a controlled environment before implementing in production.</p>
                 </div>
 
                 <h2 id="overview">Overview</h2>
-                <p>FortiGate firewall policies are rules that determine how traffic flows through the firewall. These policies define what traffic is allowed or denied based on various criteria such as source, destination, service, and time. Understanding policy configuration is fundamental to securing your network infrastructure.</p>
+                <p>FortiGate routing functionality includes static routes, dynamic routing protocols (OSPF, BGP, RIP), policy-based routing, and route maps. Understanding these components is essential for designing efficient and resilient network architectures.</p>
+                
+                <h3>Routing Components</h3>
+                <ul>
+                    <li><strong>Static Routes:</strong> Manually configured routes for specific destinations</li>
+                    <li><strong>Dynamic Protocols:</strong> OSPF, BGP, RIP for automatic route discovery</li>
+                    <li><strong>Policy Routes:</strong> Route traffic based on source, destination, or service</li>
+                    <li><strong>Route Maps:</strong> Control route redistribution and modification</li>
+                    <li><strong>Administrative Distance:</strong> Priority for route selection</li>
+                </ul>
                 
                 <h2 id="prerequisites">Prerequisites</h2>
                 <ul>
-                    <li>FortiGate device with FortiOS 7.0 or later</li>
-                    <li>Administrator access to FortiGate management interface</li>
-                    <li>Basic understanding of network security concepts</li>
-                    <li>Knowledge of your network topology and requirements</li>
-                    <li>Configured interfaces and routing</li>
+                    <li>FortiGate device with configured interfaces</li>
+                    <li>Network topology documentation</li>
+                    <li>IP addressing scheme planned</li>
+                    <li>Understanding of routing protocols and concepts</li>
+                    <li>Access to neighboring routers for dynamic routing</li>
                 </ul>
 
-                <h2 id="policy-basics">Policy Basics</h2>
-                <p>FortiGate policies are processed in order from top to bottom. When a packet matches a policy rule, that rule is applied and processing stops. Understanding this sequence is crucial for effective policy management.</p>
-                
-                <h3>Policy Components</h3>
-                <table>
-                    <tr>
-                        <th>Component</th>
-                        <th>Description</th>
-                        <th>Example</th>
-                    </tr>
-                    <tr>
-                        <td>Source Interface</td>
-                        <td>Interface traffic originates from</td>
-                        <td>port1 (LAN)</td>
-                    </tr>
-                    <tr>
-                        <td>Destination Interface</td>
-                        <td>Interface traffic is destined for</td>
-                        <td>port2 (WAN)</td>
-                    </tr>
-                    <tr>
-                        <td>Source Address</td>
-                        <td>IP address or range of source</td>
-                        <td>192.168.1.0/24</td>
-                    </tr>
-                    <tr>
-                        <td>Destination Address</td>
-                        <td>IP address or range of destination</td>
-                        <td>0.0.0.0/0 (any)</td>
-                    </tr>
-                    <tr>
-                        <td>Service</td>
-                        <td>Protocol and port definition</td>
-                        <td>HTTP, HTTPS, ALL</td>
-                    </tr>
-                    <tr>
-                        <td>Action</td>
-                        <td>Allow or deny traffic</td>
-                        <td>ACCEPT, DENY</td>
-                    </tr>
-                </table>
-
-                <h2 id="creating-policies">Creating Policies</h2>
+                <h2 id="static-routes">Static Routes</h2>
+                <p>Static routes are manually configured routes that provide explicit paths to specific destination networks.</p>
                 
                 <div class="tab-section">
                     <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('creating-policies', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('creating-policies', 'cli')">CLI Configuration</button>
+                        <button class="tab-button active" onclick="switchTab('static-routes', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('static-routes', 'cli')">CLI Configuration</button>
                     </div>
                     
-                    <div class="tab-content active" id="creating-policies-gui">
-                        <h3>Creating Policies via Web Interface</h3>
+                    <div class="tab-content active" id="static-routes-gui">
+                        <h3>Static Route Configuration via GUI</h3>
                         <ol>
-                            <li>Navigate to Policy & Objects > Firewall Policy
-                                <div class="screenshot-placeholder">Screenshot: Firewall Policy page showing existing policies</div>
+                            <li>Navigate to Network > Static Routes
+                                <div class="screenshot-placeholder">Screenshot: Static Routes page showing existing routes</div>
                             </li>
-                            <li>Click "Create New" to add a new policy
-                                <div class="screenshot-placeholder">Screenshot: Create New Policy button highlighted</div>
+                            <li>Click "Create New" to add a static route
+                                <div class="screenshot-placeholder">Screenshot: Create new static route form</div>
                             </li>
-                            <li>Configure basic policy settings
-                                <div class="screenshot-placeholder">Screenshot: Basic policy configuration form</div>
-                                <ul>
-                                    <li>Name: Descriptive policy name</li>
-                                    <li>Incoming Interface: Select source interface</li>
-                                    <li>Outgoing Interface: Select destination interface</li>
-                                    <li>Source: Define source addresses or groups</li>
-                                    <li>Destination: Define destination addresses or groups</li>
-                                    <li>Service: Select protocols and ports</li>
-                                    <li>Action: Accept or Deny</li>
-                                </ul>
+                            <li>Configure route parameters
+                                <div class="screenshot-placeholder">Screenshot: Static route configuration form</div>
+                                <table>
+                                    <tr>
+                                        <th>Parameter</th>
+                                        <th>Description</th>
+                                        <th>Example</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Destination IP/Mask</td>
+                                        <td>Target network</td>
+                                        <td>192.168.100.0/24</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Gateway</td>
+                                        <td>Next-hop IP address</td>
+                                        <td>192.168.1.1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Interface</td>
+                                        <td>Outgoing interface</td>
+                                        <td>port2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Administrative Distance</td>
+                                        <td>Route priority</td>
+                                        <td>10</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Priority</td>
+                                        <td>Load balancing priority</td>
+                                        <td>5</td>
+                                    </tr>
+                                </table>
                             </li>
                             <li>Configure advanced options
-                                <div class="screenshot-placeholder">Screenshot: Advanced policy options panel</div>
+                                <div class="screenshot-placeholder">Screenshot: Advanced static route options</div>
                             </li>
-                            <li>Apply security profiles if needed
-                                <div class="screenshot-placeholder">Screenshot: Security profiles selection</div>
-                            </li>
-                            <li>Save the policy configuration
-                                <div class="screenshot-placeholder">Screenshot: Save button and policy confirmation</div>
+                            <li>Enable route monitoring
+                                <div class="screenshot-placeholder">Screenshot: Route monitoring settings</div>
                             </li>
                         </ol>
                     </div>
                     
-                    <div class="tab-content" id="creating-policies-cli">
-                        <h3>CLI Policy Configuration</h3>
+                    <div class="tab-content" id="static-routes-cli">
+                        <h3>CLI Static Route Configuration</h3>
                         <ol>
-                            <li>Access the FortiGate CLI and enter policy configuration mode
-                                <pre><code>config firewall policy
-edit 0</code></pre>
+                            <li>Create basic static route
+                                <pre><code>config router static
+edit 1
+    set dst 192.168.100.0 255.255.255.0
+    set gateway 192.168.1.1
+    set device "port2"
+    set distance 10
+    set priority 5
+    set comment "Route to Branch Office"
+next
+end</code></pre>
                             </li>
-                            <li>Configure basic policy parameters
-                                <pre><code>set name "LAN_to_WAN_HTTP"
-set srcintf "port1"
-set dstintf "port2"
-set srcaddr "LAN_Network"
-set dstaddr "all"
-set service "HTTP" "HTTPS"
-set action accept</code></pre>
+                            <li>Create default route
+                                <pre><code>config router static
+edit 2
+    set dst 0.0.0.0 0.0.0.0
+    set gateway 203.0.113.1
+    set device "port1"
+    set distance 1
+    set comment "Default route to Internet"
+next
+end</code></pre>
                             </li>
-                            <li>Enable logging for the policy
-                                <pre><code>set logtraffic all
-set comments "Allow HTTP/HTTPS from LAN to WAN"</code></pre>
+                            <li>Create load-balanced routes
+                                <pre><code>config router static
+edit 3
+    set dst 10.0.0.0 255.0.0.0
+    set gateway 192.168.1.10
+    set device "port3"
+    set distance 15
+    set priority 10
+next
+edit 4
+    set dst 10.0.0.0 255.0.0.0
+    set gateway 192.168.1.11
+    set device "port4"
+    set distance 15
+    set priority 10
+next
+end</code></pre>
                             </li>
-                            <li>Configure NAT if required
-                                <pre><code>set nat enable
-set ippool "SNAT_Pool"</code></pre>
-                            </li>
-                            <li>Apply security profiles
-                                <pre><code>set av-profile "default"
-set ips-sensor "default"
-set application-list "default"
-set ssl-ssh-profile "certificate-inspection"</code></pre>
-                            </li>
-                            <li>Save the configuration
-                                <pre><code>next
+                            <li>Configure route with link monitoring
+                                <pre><code>config router static
+edit 5
+    set dst 172.16.0.0 255.255.0.0
+    set gateway 192.168.1.20
+    set device "port5"
+    set link-monitor-exempt disable
+    set comment "Monitored route"
+next
 end</code></pre>
                             </li>
                         </ol>
                     </div>
                 </div>
 
-                <h2 id="security-profiles">Security Profiles</h2>
-                <p>Security profiles provide additional protection layers that can be applied to firewall policies. These profiles inspect traffic for various threats and can block or log suspicious activity.</p>
+                <h2 id="dynamic-routing">Dynamic Routing</h2>
+                <p>Dynamic routing protocols automatically discover and maintain routing information between routers.</p>
                 
                 <div class="tab-section">
                     <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('security-profiles', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('security-profiles', 'cli')">CLI Configuration</button>
+                        <button class="tab-button active" onclick="switchTab('dynamic-routing', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('dynamic-routing', 'cli')">CLI Configuration</button>
                     </div>
                     
-                    <div class="tab-content active" id="security-profiles-gui">
-                        <h3>Applying Security Profiles</h3>
+                    <div class="tab-content active" id="dynamic-routing-gui">
+                        <h3>OSPF Configuration via GUI</h3>
                         <ol>
-                            <li>In the policy configuration, scroll to Security Profiles section
-                                <div class="screenshot-placeholder">Screenshot: Security Profiles section in policy editor</div>
+                            <li>Navigate to Network > Dynamic Routing
+                                <div class="screenshot-placeholder">Screenshot: Dynamic Routing page</div>
                             </li>
-                            <li>Configure Antivirus Profile
-                                <div class="screenshot-placeholder">Screenshot: Antivirus profile selection dropdown</div>
+                            <li>Select OSPF and click "Create New"
+                                <div class="screenshot-placeholder">Screenshot: OSPF configuration page</div>
                             </li>
-                            <li>Configure IPS (Intrusion Prevention System)
-                                <div class="screenshot-placeholder">Screenshot: IPS sensor configuration</div>
+                            <li>Configure OSPF global settings
+                                <div class="screenshot-placeholder">Screenshot: OSPF global configuration</div>
+                                <table>
+                                    <tr>
+                                        <th>Parameter</th>
+                                        <th>Description</th>
+                                        <th>Example</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Router ID</td>
+                                        <td>Unique OSPF identifier</td>
+                                        <td>1.1.1.1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Area ID</td>
+                                        <td>OSPF area identifier</td>
+                                        <td>0.0.0.0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Network Type</td>
+                                        <td>OSPF network type</td>
+                                        <td>Broadcast</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Hello Interval</td>
+                                        <td>Hello packet interval</td>
+                                        <td>10 seconds</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Dead Interval</td>
+                                        <td>Dead timer interval</td>
+                                        <td>40 seconds</td>
+                                    </tr>
+                                </table>
                             </li>
-                            <li>Configure Application Control
-                                <div class="screenshot-placeholder">Screenshot: Application control list selection</div>
+                            <li>Configure OSPF interfaces
+                                <div class="screenshot-placeholder">Screenshot: OSPF interface configuration</div>
                             </li>
-                            <li>Configure Web Filter
-                                <div class="screenshot-placeholder">Screenshot: Web filter profile options</div>
-                            </li>
-                            <li>Configure SSL/SSH Inspection
-                                <div class="screenshot-placeholder">Screenshot: SSL inspection profile settings</div>
+                            <li>Configure area settings
+                                <div class="screenshot-placeholder">Screenshot: OSPF area configuration</div>
                             </li>
                         </ol>
                     </div>
                     
-                    <div class="tab-content" id="security-profiles-cli">
-                        <h3>CLI Security Profile Configuration</h3>
+                    <div class="tab-content" id="dynamic-routing-cli">
+                        <h3>CLI Dynamic Routing Configuration</h3>
                         <ol>
-                            <li>Edit existing policy to add security profiles
-                                <pre><code>config firewall policy
-edit 1</code></pre>
+                            <li>Configure OSPF
+                                <pre><code>config router ospf
+    set router-id 1.1.1.1
+    set auto-cost-ref-bandwidth 100000
+    config area
+        edit 0.0.0.0
+            set type regular
+            set shortcut default
+        next
+    end
+    config ospf-interface
+        edit "internal"
+            set interface "internal"
+            set cost 10
+            set hello-interval 10
+            set dead-interval 40
+            set priority 1
+        next
+        edit "dmz"
+            set interface "dmz"
+            set cost 20
+            set hello-interval 10
+            set dead-interval 40
+        next
+    end
+    config network
+        edit 1
+            set prefix 192.168.1.0 255.255.255.0
+            set area 0.0.0.0
+        next
+        edit 2
+            set prefix 192.168.2.0 255.255.255.0
+            set area 0.0.0.0
+        next
+    end
+end</code></pre>
                             </li>
-                            <li>Apply antivirus profile
-                                <pre><code>set av-profile "default"</code></pre>
+                            <li>Configure BGP
+                                <pre><code>config router bgp
+    set as 65001
+    set router-id 1.1.1.1
+    set keepalive-timer 60
+    set holdtime-timer 180
+    config neighbor
+        edit "203.0.113.1"
+            set remote-as 65000
+            set update-source "port1"
+            set route-map-out "BGP_OUT"
+            set route-map-in "BGP_IN"
+        next
+    end
+    config network
+        edit 1
+            set prefix 192.168.1.0 255.255.255.0
+        next
+    end
+end</code></pre>
                             </li>
-                            <li>Apply IPS sensor
-                                <pre><code>set ips-sensor "protect_client"</code></pre>
-                            </li>
-                            <li>Apply application control
-                                <pre><code>set application-list "default"</code></pre>
-                            </li>
-                            <li>Apply web filter
-                                <pre><code>set webfilter-profile "default"</code></pre>
-                            </li>
-                            <li>Apply SSL inspection
-                                <pre><code>set ssl-ssh-profile "certificate-inspection"</code></pre>
-                            </li>
-                            <li>Save configuration
-                                <pre><code>next
+                            <li>Configure RIP
+                                <pre><code>config router rip
+    set default-information-originate enable
+    set default-metric 5
+    set max-out-metric 15
+    set timeout-timer 180
+    set update-timer 30
+    config interface
+        edit "internal"
+            set auth-mode text
+            set auth-string "ripkey123"
+            set send-version 2
+            set receive-version 2
+        next
+    end
+    config network
+        edit 1
+            set prefix 192.168.1.0 255.255.255.0
+        next
+    end
 end</code></pre>
                             </li>
                         </ol>
                     </div>
                 </div>
 
-                <h2 id="advanced-settings">Advanced Settings</h2>
+                <h2 id="policy-routes">Policy Routes</h2>
+                <p>Policy-based routing allows you to route traffic based on criteria other than destination IP address.</p>
                 
                 <div class="warning">
                     <h4>Warning</h4>
-                    <p>Advanced settings can significantly impact network performance. Test thoroughly before implementing in production environments.</p>
+                    <p>Policy routes are processed before normal routing table lookups. Incorrect policy routes can cause traffic to be misrouted.</p>
                 </div>
                 
-                <h3>Traffic Shaping</h3>
                 <div class="tab-section">
                     <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('advanced-settings', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('advanced-settings', 'cli')">CLI Configuration</button>
+                        <button class="tab-button active" onclick="switchTab('policy-routes', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('policy-routes', 'cli')">CLI Configuration</button>
                     </div>
                     
-                    <div class="tab-content active" id="advanced-settings-gui">
-                        <h3>Traffic Shaping Configuration</h3>
+                    <div class="tab-content active" id="policy-routes-gui">
+                        <h3>Policy Route Configuration via GUI</h3>
                         <ol>
-                            <li>In policy configuration, expand Traffic Shaping section
-                                <div class="screenshot-placeholder">Screenshot: Traffic shaping options in policy</div>
+                            <li>Navigate to Network > Policy Routes
+                                <div class="screenshot-placeholder">Screenshot: Policy Routes page</div>
                             </li>
-                            <li>Configure bandwidth limits
-                                <div class="screenshot-placeholder">Screenshot: Bandwidth limit configuration</div>
+                            <li>Click "Create New" to add policy route
+                                <div class="screenshot-placeholder">Screenshot: Create policy route form</div>
                             </li>
-                            <li>Set priority levels
-                                <div class="screenshot-placeholder">Screenshot: Priority level selection</div>
+                            <li>Configure policy route criteria
+                                <div class="screenshot-placeholder">Screenshot: Policy route criteria configuration</div>
+                                <table>
+                                    <tr>
+                                        <th>Criteria</th>
+                                        <th>Description</th>
+                                        <th>Example</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Source</td>
+                                        <td>Source IP or subnet</td>
+                                        <td>192.168.10.0/24</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Destination</td>
+                                        <td>Destination IP or subnet</td>
+                                        <td>0.0.0.0/0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Protocol</td>
+                                        <td>IP protocol</td>
+                                        <td>TCP</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Service</td>
+                                        <td>Service or port</td>
+                                        <td>HTTP</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Input Interface</td>
+                                        <td>Incoming interface</td>
+                                        <td>internal</td>
+                                    </tr>
+                                </table>
+                            </li>
+                            <li>Configure routing action
+                                <div class="screenshot-placeholder">Screenshot: Policy route action configuration</div>
+                            </li>
+                            <li>Set priority and enable status
+                                <div class="screenshot-placeholder">Screenshot: Policy route priority settings</div>
                             </li>
                         </ol>
                     </div>
                     
-                    <div class="tab-content" id="advanced-settings-cli">
-                        <h3>CLI Traffic Shaping</h3>
-                        <pre><code>config firewall policy
+                    <div class="tab-content" id="policy-routes-cli">
+                        <h3>CLI Policy Route Configuration</h3>
+                        <ol>
+                            <li>Create policy route for specific traffic
+                                <pre><code>config router policy
 edit 1
-    set traffic-shaper "bandwidth_limit_5mbps"
-    set traffic-shaper-reverse "bandwidth_limit_5mbps"
-    set per-ip-shaper "per_user_1mbps"
+    set input-device "internal"
+    set src "192.168.10.0/24"
+    set dst "0.0.0.0/0"
+    set protocol 6
+    set start-port 80
+    set end-port 80
+    set gateway 192.168.1.10
+    set output-device "port2"
+    set comments "Route web traffic via backup link"
 next
 end</code></pre>
+                            </li>
+                            <li>Create policy route based on source
+                                <pre><code>config router policy
+edit 2
+    set input-device "internal"
+    set src "192.168.20.0/24"
+    set dst "0.0.0.0/0"
+    set gateway 192.168.1.20
+    set output-device "port3"
+    set comments "Route marketing subnet via dedicated link"
+next
+end</code></pre>
+                            </li>
+                            <li>Create policy route with TOS matching
+                                <pre><code>config router policy
+edit 3
+    set input-device "internal"
+    set src "192.168.1.0/24"
+    set dst "0.0.0.0/0"
+    set tos 0x10
+    set tos-mask 0xFC
+    set gateway 192.168.1.5
+    set output-device "port4"
+    set comments "Route high priority traffic"
+next
+end</code></pre>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h2 id="route-maps">Route Maps</h2>
+                <p>Route maps provide advanced control over route redistribution and modification in dynamic routing protocols.</p>
+                
+                <div class="tab-section">
+                    <div class="tab-header">
+                        <button class="tab-button active" onclick="switchTab('route-maps', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('route-maps', 'cli')">CLI Configuration</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="route-maps-gui">
+                        <h3>Route Map Configuration via GUI</h3>
+                        <ol>
+                            <li>Navigate to Network > Route Maps
+                                <div class="screenshot-placeholder">Screenshot: Route Maps page</div>
+                            </li>
+                            <li>Create new route map
+                                <div class="screenshot-placeholder">Screenshot: Create route map form</div>
+                            </li>
+                            <li>Configure route map rules
+                                <div class="screenshot-placeholder">Screenshot: Route map rules configuration</div>
+                            </li>
+                            <li>Set match conditions
+                                <div class="screenshot-placeholder">Screenshot: Route map match conditions</div>
+                            </li>
+                            <li>Configure set actions
+                                <div class="screenshot-placeholder">Screenshot: Route map set actions</div>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="tab-content" id="route-maps-cli">
+                        <h3>CLI Route Map Configuration</h3>
+                        <ol>
+                            <li>Create route map for BGP
+                                <pre><code>config router route-map
+edit "BGP_OUT"
+    config rule
+        edit 1
+            set action permit
+            set match-ip-address "INTERNAL_NETWORKS"
+            set set-metric 100
+            set set-local-preference 200
+        next
+        edit 2
+            set action deny
+        next
+    end
+next
+end</code></pre>
+                            </li>
+                            <li>Create access list for route map
+                                <pre><code>config router access-list
+edit "INTERNAL_NETWORKS"
+    config rule
+        edit 1
+            set action permit
+            set prefix 192.168.1.0 255.255.255.0
+        next
+        edit 2
+            set action permit
+            set prefix 192.168.2.0 255.255.255.0
+        next
+        edit 3
+            set action deny
+            set prefix 0.0.0.0 0.0.0.0
+        next
+    end
+next
+end</code></pre>
+                            </li>
+                            <li>Create prefix list for route filtering
+                                <pre><code>config router prefix-list
+edit "ALLOWED_PREFIXES"
+    config rule
+        edit 1
+            set action permit
+            set prefix 192.168.0.0 255.255.0.0
+            set ge 24
+            set le 30
+        next
+        edit 2
+            set action deny
+            set prefix 0.0.0.0 0.0.0.0
+            set le 32
+        next
+    end
+next
+end</code></pre>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h2 id="multicast">Multicast Routing</h2>
+                <p>Configure multicast routing for applications that require one-to-many communication.</p>
+                
+                <div class="tab-section">
+                    <div class="tab-header">
+                        <button class="tab-button active" onclick="switchTab('multicast', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('multicast', 'cli')">CLI Configuration</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="multicast-gui">
+                        <h3>Multicast Configuration via GUI</h3>
+                        <ol>
+                            <li>Navigate to Network > Multicast
+                                <div class="screenshot-placeholder">Screenshot: Multicast configuration page</div>
+                            </li>
+                            <li>Enable multicast routing
+                                <div class="screenshot-placeholder">Screenshot: Enable multicast routing</div>
+                            </li>
+                            <li>Configure PIM (Protocol Independent Multicast)
+                                <div class="screenshot-placeholder">Screenshot: PIM configuration</div>
+                            </li>
+                            <li>Configure IGMP settings
+                                <div class="screenshot-placeholder">Screenshot: IGMP configuration</div>
+                            </li>
+                            <li>Configure multicast policies
+                                <div class="screenshot-placeholder">Screenshot: Multicast policy configuration</div>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="tab-content" id="multicast-cli">
+                        <h3>CLI Multicast Configuration</h3>
+                        <ol>
+                            <li>Enable multicast routing
+                                <pre><code>config router multicast
+    set multicast-routing enable
+    config interface
+        edit "internal"
+            set pim-mode sparse-mode
+            set igmp-version 3
+            set join-group "224.0.0.0/4"
+        next
+        edit "dmz"
+            set pim-mode sparse-mode
+            set igmp-version 3
+        next
+    end
+end</code></pre>
+                            </li>
+                            <li>Configure PIM settings
+                                <pre><code>config router multicast
+    config pim-sm-global
+        set message-interval 60
+        set join-prune-holdtime 210
+        set accept-register-checksum enable
+        set accept-source-checksum enable
+        set bsr-candidate enable
+        set bsr-interface "internal"
+        set bsr-priority 10
+        set bsr-hash 10
+        set rp-candidate enable
+        set rp-candidate-interface "internal"
+        set rp-candidate-priority 10
+        set rp-candidate-interval 60
+    end
+end</code></pre>
+                            </li>
+                            <li>Configure multicast flow control
+                                <pre><code>config router multicast-flow
+edit "VIDEO_STREAM"
+    set group-addr 239.1.1.1 255.255.255.255
+    set source-addr 192.168.1.100 255.255.255.255
+    set comments "Video streaming multicast"
+next
+end</code></pre>
+                            </li>
+                        </ol>
                     </div>
                 </div>
 
                 <h2 id="troubleshooting">Troubleshooting</h2>
+                <p>Common routing issues and diagnostic techniques.</p>
                 
-                <h3>Common Policy Issues</h3>
                 <div class="tab-section">
                     <div class="tab-header">
                         <button class="tab-button active" onclick="switchTab('troubleshooting', 'gui')">GUI Troubleshooting</button>
@@ -982,19 +1325,19 @@ end</code></pre>
                     </div>
                     
                     <div class="tab-content active" id="troubleshooting-gui">
-                        <h3>Policy Troubleshooting via GUI</h3>
+                        <h3>Routing Troubleshooting via GUI</h3>
                         <ol>
-                            <li>Check policy hit counters
-                                <div class="screenshot-placeholder">Screenshot: Policy list showing hit counters</div>
+                            <li>Check routing table
+                                <div class="screenshot-placeholder">Screenshot: Routing table display</div>
                             </li>
-                            <li>Review log files for policy matches
-                                <div class="screenshot-placeholder">Screenshot: Log viewer showing policy matches</div>
+                            <li>Monitor routing protocols
+                                <div class="screenshot-placeholder">Screenshot: Dynamic routing status</div>
                             </li>
-                            <li>Use Policy Lookup tool
-                                <div class="screenshot-placeholder">Screenshot: Policy lookup tool interface</div>
+                            <li>Test connectivity
+                                <div class="screenshot-placeholder">Screenshot: Connectivity test tools</div>
                             </li>
-                            <li>Check session table for active connections
-                                <div class="screenshot-placeholder">Screenshot: Session monitoring page</div>
+                            <li>Review routing logs
+                                <div class="screenshot-placeholder">Screenshot: Routing event logs</div>
                             </li>
                         </ol>
                     </div>
@@ -1002,32 +1345,39 @@ end</code></pre>
                     <div class="tab-content" id="troubleshooting-cli">
                         <h3>CLI Troubleshooting Commands</h3>
                         <ol>
-                            <li>Check policy statistics
-                                <pre><code>get firewall policy</code></pre>
+                            <li>Check routing table
+                                <pre><code>get router info routing-table all
+get router info routing-table database</code></pre>
                             </li>
-                            <li>View detailed policy information
-                                <pre><code>show firewall policy 1</code></pre>
+                            <li>Test connectivity
+                                <pre><code>execute ping 192.168.100.1
+execute traceroute 192.168.100.1</code></pre>
                             </li>
-                            <li>Check active sessions
-                                <pre><code>get system session list</code></pre>
+                            <li>Check OSPF status
+                                <pre><code>get router info ospf status
+get router info ospf neighbor
+get router info ospf database</code></pre>
                             </li>
-                            <li>Test policy matching
-                                <pre><code>diagnose firewall iprope lookup 192.168.1.100 80 192.168.1.1</code></pre>
+                            <li>Check BGP status
+                                <pre><code>get router info bgp summary
+get router info bgp neighbors 203.0.113.1
+get router info bgp network</code></pre>
                             </li>
-                            <li>Monitor real-time traffic
-                                <pre><code>diagnose sniffer packet any 'host 192.168.1.100' 4 0 l</code></pre>
+                            <li>Monitor routing in real-time
+                                <pre><code>diagnose debug enable
+diagnose debug application rtmd 255</code></pre>
                             </li>
                         </ol>
                     </div>
                 </div>
 
                 <h2 id="next-steps">Next Steps</h2>
-                <p>After mastering basic policy configuration, explore these advanced topics:</p>
+                <p>After mastering FortiGate routing, explore these advanced topics:</p>
                 <ul>
-                    <li><a href="/assets/fortigate-sdwan.html">FortiGate SD-WAN Configuration</a></li>
-                    <li><a href="/assets/fortigate-ipsec.html">FortiGate IPSec VPN Setup</a></li>
-                    <li><a href="/assets/fortigate-ldap.html">FortiGate LDAP Authentication</a></li>
-                    <li><a href="/assets/fortigate-routing.html">FortiGate Routing Configuration</a></li>
+                    <li><a href="/assets/fortigate-policy.html">Advanced Policy Configuration</a></li>
+                    <li><a href="/assets/fortigate-sdwan.html">SD-WAN Configuration</a></li>
+                    <li><a href="/assets/fortigate-ipsec.html">IPSec VPN Setup</a></li>
+                    <li><a href="/assets/fortigate-cli.html">CLI Administration</a></li>
                 </ul>
             </main>
         </div>

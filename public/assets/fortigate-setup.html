@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en-us" dir="ltr">
 <head>
-    <title>FortiGate Firewall Policy Configuration | MSP Training Platform</title>
+    <title>FortiGate Initial Setup | MSP Training Platform</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Complete guide to configuring firewall policies on FortiGate devices for security and traffic management." />
+    <meta name="description" content="Complete guide to initial setup and configuration of FortiGate devices for network security deployment." />
     <meta name="author" content="Velocity Lab" />
     <meta name="date" content="2025-07-17T14:13:00Z" />
 
@@ -714,11 +714,12 @@
                 <ul>
                     <li><a href="#overview">Overview</a></li>
                     <li><a href="#prerequisites">Prerequisites</a></li>
-                    <li><a href="#policy-basics">Policy Basics</a></li>
-                    <li><a href="#creating-policies">Creating Policies</a></li>
-                    <li><a href="#security-profiles">Security Profiles</a></li>
-                    <li><a href="#advanced-settings">Advanced Settings</a></li>
-                    <li><a href="#troubleshooting">Troubleshooting</a></li>
+                    <li><a href="#first-boot">First Boot</a></li>
+                    <li><a href="#initial-config">Initial Configuration</a></li>
+                    <li><a href="#network-setup">Network Setup</a></li>
+                    <li><a href="#security-setup">Security Setup</a></li>
+                    <li><a href="#system-config">System Configuration</a></li>
+                    <li><a href="#verification">Verification</a></li>
                     <li><a href="#next-steps">Next Steps</a></li>
                 </ul>
             </aside>
@@ -726,308 +727,655 @@
             <main class="content">
                 <a href="/assets/fortigate.html" class="back-button">← Back to FortiGate Guides</a>
                 
-                <h1>FortiGate Firewall Policy Configuration</h1>
+                <h1>FortiGate Initial Setup</h1>
                 <p>Last updated: July 17, 2025</p>
-                <p>This comprehensive guide covers creating and managing firewall policies on FortiGate devices to control network traffic flow and implement security measures.</p>
+                <p>This comprehensive guide covers the initial setup and configuration of FortiGate devices from first boot through basic security configuration.</p>
                 
                 <div class="important">
                     <h4>Important</h4>
-                    <p>Always test policy changes in a controlled environment before applying them to production networks. Misconfigured policies can block legitimate traffic.</p>
+                    <p>Always perform initial setup in a secure environment. Change default passwords immediately and ensure firmware is up to date.</p>
                 </div>
 
                 <h2 id="overview">Overview</h2>
-                <p>FortiGate firewall policies are rules that determine how traffic flows through the firewall. These policies define what traffic is allowed or denied based on various criteria such as source, destination, service, and time. Understanding policy configuration is fundamental to securing your network infrastructure.</p>
+                <p>FortiGate initial setup involves configuring basic network settings, security policies, and system parameters to prepare the device for production deployment. This process establishes the foundation for all subsequent configuration.</p>
+                
+                <h3>Setup Process Overview</h3>
+                <ul>
+                    <li><strong>Physical Setup:</strong> Hardware installation and connection</li>
+                    <li><strong>First Boot:</strong> Initial system startup and access</li>
+                    <li><strong>Basic Configuration:</strong> Network interfaces and system settings</li>
+                    <li><strong>Security Setup:</strong> Admin accounts and basic policies</li>
+                    <li><strong>System Configuration:</strong> Time, DNS, and logging</li>
+                    <li><strong>Verification:</strong> Testing and validation</li>
+                </ul>
                 
                 <h2 id="prerequisites">Prerequisites</h2>
                 <ul>
-                    <li>FortiGate device with FortiOS 7.0 or later</li>
-                    <li>Administrator access to FortiGate management interface</li>
-                    <li>Basic understanding of network security concepts</li>
-                    <li>Knowledge of your network topology and requirements</li>
-                    <li>Configured interfaces and routing</li>
+                    <li>FortiGate device with power adapter</li>
+                    <li>Ethernet cables for WAN and LAN connections</li>
+                    <li>Computer with web browser for management</li>
+                    <li>Console cable for CLI access (optional)</li>
+                    <li>Network configuration plan (IP addresses, subnets)</li>
+                    <li>Internet connection for license registration</li>
                 </ul>
 
-                <h2 id="policy-basics">Policy Basics</h2>
-                <p>FortiGate policies are processed in order from top to bottom. When a packet matches a policy rule, that rule is applied and processing stops. Understanding this sequence is crucial for effective policy management.</p>
-                
-                <h3>Policy Components</h3>
-                <table>
-                    <tr>
-                        <th>Component</th>
-                        <th>Description</th>
-                        <th>Example</th>
-                    </tr>
-                    <tr>
-                        <td>Source Interface</td>
-                        <td>Interface traffic originates from</td>
-                        <td>port1 (LAN)</td>
-                    </tr>
-                    <tr>
-                        <td>Destination Interface</td>
-                        <td>Interface traffic is destined for</td>
-                        <td>port2 (WAN)</td>
-                    </tr>
-                    <tr>
-                        <td>Source Address</td>
-                        <td>IP address or range of source</td>
-                        <td>192.168.1.0/24</td>
-                    </tr>
-                    <tr>
-                        <td>Destination Address</td>
-                        <td>IP address or range of destination</td>
-                        <td>0.0.0.0/0 (any)</td>
-                    </tr>
-                    <tr>
-                        <td>Service</td>
-                        <td>Protocol and port definition</td>
-                        <td>HTTP, HTTPS, ALL</td>
-                    </tr>
-                    <tr>
-                        <td>Action</td>
-                        <td>Allow or deny traffic</td>
-                        <td>ACCEPT, DENY</td>
-                    </tr>
-                </table>
-
-                <h2 id="creating-policies">Creating Policies</h2>
+                <h2 id="first-boot">First Boot</h2>
+                <p>The first boot process involves powering on the device and establishing initial connectivity.</p>
                 
                 <div class="tab-section">
                     <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('creating-policies', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('creating-policies', 'cli')">CLI Configuration</button>
+                        <button class="tab-button active" onclick="switchTab('first-boot', 'gui')">GUI Access</button>
+                        <button class="tab-button" onclick="switchTab('first-boot', 'cli')">CLI Access</button>
                     </div>
                     
-                    <div class="tab-content active" id="creating-policies-gui">
-                        <h3>Creating Policies via Web Interface</h3>
+                    <div class="tab-content active" id="first-boot-gui">
+                        <h3>Web-based First Boot</h3>
                         <ol>
-                            <li>Navigate to Policy & Objects > Firewall Policy
-                                <div class="screenshot-placeholder">Screenshot: Firewall Policy page showing existing policies</div>
-                            </li>
-                            <li>Click "Create New" to add a new policy
-                                <div class="screenshot-placeholder">Screenshot: Create New Policy button highlighted</div>
-                            </li>
-                            <li>Configure basic policy settings
-                                <div class="screenshot-placeholder">Screenshot: Basic policy configuration form</div>
+                            <li>Connect the FortiGate device
+                                <div class="screenshot-placeholder">Screenshot: Physical connection diagram</div>
                                 <ul>
-                                    <li>Name: Descriptive policy name</li>
-                                    <li>Incoming Interface: Select source interface</li>
-                                    <li>Outgoing Interface: Select destination interface</li>
-                                    <li>Source: Define source addresses or groups</li>
-                                    <li>Destination: Define destination addresses or groups</li>
-                                    <li>Service: Select protocols and ports</li>
-                                    <li>Action: Accept or Deny</li>
+                                    <li>Connect power adapter and power on device</li>
+                                    <li>Connect port1 (WAN) to internet connection</li>
+                                    <li>Connect port2 (internal) to management computer</li>
+                                    <li>Wait for boot process to complete (2-3 minutes)</li>
                                 </ul>
                             </li>
-                            <li>Configure advanced options
-                                <div class="screenshot-placeholder">Screenshot: Advanced policy options panel</div>
+                            <li>Access the web interface
+                                <div class="screenshot-placeholder">Screenshot: Browser address bar with default IP</div>
+                                <table>
+                                    <tr>
+                                        <th>Setting</th>
+                                        <th>Default Value</th>
+                                        <th>Description</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Management IP</td>
+                                        <td>192.168.1.99</td>
+                                        <td>Default internal interface IP</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Username</td>
+                                        <td>admin</td>
+                                        <td>Default administrator account</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Password</td>
+                                        <td>(blank)</td>
+                                        <td>No default password</td>
+                                    </tr>
+                                </table>
                             </li>
-                            <li>Apply security profiles if needed
-                                <div class="screenshot-placeholder">Screenshot: Security profiles selection</div>
+                            <li>Complete the Setup Wizard
+                                <div class="screenshot-placeholder">Screenshot: FortiGate setup wizard welcome screen</div>
                             </li>
-                            <li>Save the policy configuration
-                                <div class="screenshot-placeholder">Screenshot: Save button and policy confirmation</div>
+                            <li>Accept license agreement
+                                <div class="screenshot-placeholder">Screenshot: License agreement page</div>
+                            </li>
+                            <li>Configure initial settings
+                                <div class="screenshot-placeholder">Screenshot: Initial configuration form</div>
                             </li>
                         </ol>
                     </div>
                     
-                    <div class="tab-content" id="creating-policies-cli">
-                        <h3>CLI Policy Configuration</h3>
+                    <div class="tab-content" id="first-boot-cli">
+                        <h3>Console-based First Boot</h3>
                         <ol>
-                            <li>Access the FortiGate CLI and enter policy configuration mode
-                                <pre><code>config firewall policy
-edit 0</code></pre>
+                            <li>Connect console cable
+                                <pre><code># Connect console cable to FortiGate console port
+# Use terminal emulator with settings:
+# 9600 baud, 8 data bits, 1 stop bit, no parity, no flow control</code></pre>
                             </li>
-                            <li>Configure basic policy parameters
-                                <pre><code>set name "LAN_to_WAN_HTTP"
-set srcintf "port1"
-set dstintf "port2"
-set srcaddr "LAN_Network"
-set dstaddr "all"
-set service "HTTP" "HTTPS"
-set action accept</code></pre>
+                            <li>Power on and monitor boot process
+                                <pre><code>System is starting...
+FortiGate-60F (03:12:34) #
+Please wait for system to boot up.
+System is ready.</code></pre>
                             </li>
-                            <li>Enable logging for the policy
-                                <pre><code>set logtraffic all
-set comments "Allow HTTP/HTTPS from LAN to WAN"</code></pre>
+                            <li>Login with default credentials
+                                <pre><code>FortiGate-60F login: admin
+Password: (press Enter for blank password)
+
+Welcome to FortiGate
+
+FortiGate-60F # </code></pre>
                             </li>
-                            <li>Configure NAT if required
-                                <pre><code>set nat enable
-set ippool "SNAT_Pool"</code></pre>
-                            </li>
-                            <li>Apply security profiles
-                                <pre><code>set av-profile "default"
-set ips-sensor "default"
-set application-list "default"
-set ssl-ssh-profile "certificate-inspection"</code></pre>
-                            </li>
-                            <li>Save the configuration
-                                <pre><code>next
-end</code></pre>
+                            <li>Check system status
+                                <pre><code>get system status
+get system interface
+get system global</code></pre>
                             </li>
                         </ol>
                     </div>
                 </div>
 
-                <h2 id="security-profiles">Security Profiles</h2>
-                <p>Security profiles provide additional protection layers that can be applied to firewall policies. These profiles inspect traffic for various threats and can block or log suspicious activity.</p>
+                <h2 id="initial-config">Initial Configuration</h2>
+                <p>Configure basic system settings including hostname, time zone, and administrator password.</p>
                 
                 <div class="tab-section">
                     <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('security-profiles', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('security-profiles', 'cli')">CLI Configuration</button>
+                        <button class="tab-button active" onclick="switchTab('initial-config', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('initial-config', 'cli')">CLI Configuration</button>
                     </div>
                     
-                    <div class="tab-content active" id="security-profiles-gui">
-                        <h3>Applying Security Profiles</h3>
+                    <div class="tab-content active" id="initial-config-gui">
+                        <h3>Initial Configuration via GUI</h3>
                         <ol>
-                            <li>In the policy configuration, scroll to Security Profiles section
-                                <div class="screenshot-placeholder">Screenshot: Security Profiles section in policy editor</div>
+                            <li>Navigate to System > Settings
+                                <div class="screenshot-placeholder">Screenshot: System Settings page</div>
                             </li>
-                            <li>Configure Antivirus Profile
-                                <div class="screenshot-placeholder">Screenshot: Antivirus profile selection dropdown</div>
+                            <li>Configure system settings
+                                <div class="screenshot-placeholder">Screenshot: System configuration form</div>
+                                <table>
+                                    <tr>
+                                        <th>Setting</th>
+                                        <th>Description</th>
+                                        <th>Example</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Hostname</td>
+                                        <td>Device hostname</td>
+                                        <td>FG-Branch-01</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Time Zone</td>
+                                        <td>Local time zone</td>
+                                        <td>GMT-5:00 Eastern Time</td>
+                                    </tr>
+                                    <tr>
+                                        <td>GUI Language</td>
+                                        <td>Management interface language</td>
+                                        <td>English</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Idle Timeout</td>
+                                        <td>Session timeout</td>
+                                        <td>60 minutes</td>
+                                    </tr>
+                                </table>
                             </li>
-                            <li>Configure IPS (Intrusion Prevention System)
-                                <div class="screenshot-placeholder">Screenshot: IPS sensor configuration</div>
+                            <li>Configure administrator password
+                                <div class="screenshot-placeholder">Screenshot: Administrator password change form</div>
                             </li>
-                            <li>Configure Application Control
-                                <div class="screenshot-placeholder">Screenshot: Application control list selection</div>
+                            <li>Set up DNS servers
+                                <div class="screenshot-placeholder">Screenshot: DNS configuration</div>
                             </li>
-                            <li>Configure Web Filter
-                                <div class="screenshot-placeholder">Screenshot: Web filter profile options</div>
-                            </li>
-                            <li>Configure SSL/SSH Inspection
-                                <div class="screenshot-placeholder">Screenshot: SSL inspection profile settings</div>
+                            <li>Configure NTP servers
+                                <div class="screenshot-placeholder">Screenshot: NTP server configuration</div>
                             </li>
                         </ol>
                     </div>
                     
-                    <div class="tab-content" id="security-profiles-cli">
-                        <h3>CLI Security Profile Configuration</h3>
+                    <div class="tab-content" id="initial-config-cli">
+                        <h3>CLI Initial Configuration</h3>
                         <ol>
-                            <li>Edit existing policy to add security profiles
-                                <pre><code>config firewall policy
-edit 1</code></pre>
+                            <li>Configure system global settings
+                                <pre><code>config system global
+    set hostname "FG-Branch-01"
+    set timezone "GMT-5:00"
+    set gui-language english
+    set gui-theme mariner
+    set admintimeout 60
+    set admin-sport 443
+    set admin-ssh-port 22
+    set alias "Branch Office FortiGate"
+end</code></pre>
                             </li>
-                            <li>Apply antivirus profile
-                                <pre><code>set av-profile "default"</code></pre>
+                            <li>Change administrator password
+                                <pre><code>config system admin
+    edit "admin"
+        set password "SecureAdminPassword123!"
+        set gui-ignore-release-overview-version "7.0.0"
+    next
+end</code></pre>
                             </li>
-                            <li>Apply IPS sensor
-                                <pre><code>set ips-sensor "protect_client"</code></pre>
+                            <li>Configure DNS servers
+                                <pre><code>config system dns
+    set primary 8.8.8.8
+    set secondary 8.8.4.4
+end</code></pre>
                             </li>
-                            <li>Apply application control
-                                <pre><code>set application-list "default"</code></pre>
+                            <li>Configure NTP servers
+                                <pre><code>config system ntp
+    set ntpsync enable
+    set type fortiguard
+    set server-mode disable
+end</code></pre>
                             </li>
-                            <li>Apply web filter
-                                <pre><code>set webfilter-profile "default"</code></pre>
-                            </li>
-                            <li>Apply SSL inspection
-                                <pre><code>set ssl-ssh-profile "certificate-inspection"</code></pre>
-                            </li>
-                            <li>Save configuration
-                                <pre><code>next
+                            <li>Set management interface access
+                                <pre><code>config system interface
+    edit "internal"
+        set allowaccess ping https ssh
+        set ip 192.168.1.99 255.255.255.0
+    next
 end</code></pre>
                             </li>
                         </ol>
                     </div>
                 </div>
 
-                <h2 id="advanced-settings">Advanced Settings</h2>
+                <h2 id="network-setup">Network Setup</h2>
+                <p>Configure network interfaces, IP addressing, and basic routing for network connectivity.</p>
+                
+                <div class="tab-section">
+                    <div class="tab-header">
+                        <button class="tab-button active" onclick="switchTab('network-setup', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('network-setup', 'cli')">CLI Configuration</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="network-setup-gui">
+                        <h3>Network Interface Configuration</h3>
+                        <ol>
+                            <li>Navigate to Network > Interfaces
+                                <div class="screenshot-placeholder">Screenshot: Network Interfaces page</div>
+                            </li>
+                            <li>Configure WAN interface (port1)
+                                <div class="screenshot-placeholder">Screenshot: WAN interface configuration</div>
+                                <table>
+                                    <tr>
+                                        <th>Setting</th>
+                                        <th>Description</th>
+                                        <th>Example</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Alias</td>
+                                        <td>Interface description</td>
+                                        <td>WAN</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Role</td>
+                                        <td>Interface role</td>
+                                        <td>WAN</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Addressing Mode</td>
+                                        <td>IP configuration method</td>
+                                        <td>DHCP</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Administrative Access</td>
+                                        <td>Management protocols</td>
+                                        <td>HTTPS, SSH</td>
+                                    </tr>
+                                </table>
+                            </li>
+                            <li>Configure LAN interface (internal)
+                                <div class="screenshot-placeholder">Screenshot: Internal interface configuration</div>
+                            </li>
+                            <li>Configure additional interfaces as needed
+                                <div class="screenshot-placeholder">Screenshot: Additional interface configuration</div>
+                            </li>
+                            <li>Set up default routes
+                                <div class="screenshot-placeholder">Screenshot: Static routes configuration</div>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="tab-content" id="network-setup-cli">
+                        <h3>CLI Network Configuration</h3>
+                        <ol>
+                            <li>Configure WAN interface
+                                <pre><code>config system interface
+    edit "port1"
+        set vdom "root"
+        set mode dhcp
+        set allowaccess ping https ssh
+        set type physical
+        set alias "WAN"
+        set role wan
+        set snmp-index 1
+    next
+end</code></pre>
+                            </li>
+                            <li>Configure internal interface
+                                <pre><code>config system interface
+    edit "internal"
+        set vdom "root"
+        set ip 192.168.1.1 255.255.255.0
+        set allowaccess ping https ssh telnet fgfm
+        set type physical
+        set alias "LAN"
+        set role lan
+        set snmp-index 2
+    next
+end</code></pre>
+                            </li>
+                            <li>Configure DMZ interface (if needed)
+                                <pre><code>config system interface
+    edit "port3"
+        set vdom "root"
+        set ip 192.168.2.1 255.255.255.0
+        set allowaccess ping https ssh
+        set type physical
+        set alias "DMZ"
+        set role dmz
+        set snmp-index 3
+    next
+end</code></pre>
+                            </li>
+                            <li>Configure DHCP server for internal network
+                                <pre><code>config system dhcp server
+    edit 1
+        set dns-service default
+        set default-gateway 192.168.1.1
+        set netmask 255.255.255.0
+        set interface "internal"
+        config ip-range
+            edit 1
+                set start-ip 192.168.1.100
+                set end-ip 192.168.1.200
+            next
+        end
+    next
+end</code></pre>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h2 id="security-setup">Security Setup</h2>
+                <p>Configure basic security settings including firewall policies and security profiles.</p>
                 
                 <div class="warning">
                     <h4>Warning</h4>
-                    <p>Advanced settings can significantly impact network performance. Test thoroughly before implementing in production environments.</p>
+                    <p>Default security policies may be very permissive. Review and adjust policies according to your security requirements.</p>
                 </div>
                 
-                <h3>Traffic Shaping</h3>
                 <div class="tab-section">
                     <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('advanced-settings', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('advanced-settings', 'cli')">CLI Configuration</button>
+                        <button class="tab-button active" onclick="switchTab('security-setup', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('security-setup', 'cli')">CLI Configuration</button>
                     </div>
                     
-                    <div class="tab-content active" id="advanced-settings-gui">
-                        <h3>Traffic Shaping Configuration</h3>
+                    <div class="tab-content active" id="security-setup-gui">
+                        <h3>Security Configuration via GUI</h3>
                         <ol>
-                            <li>In policy configuration, expand Traffic Shaping section
-                                <div class="screenshot-placeholder">Screenshot: Traffic shaping options in policy</div>
+                            <li>Navigate to Policy & Objects > Firewall Policy
+                                <div class="screenshot-placeholder">Screenshot: Firewall Policy page</div>
                             </li>
-                            <li>Configure bandwidth limits
-                                <div class="screenshot-placeholder">Screenshot: Bandwidth limit configuration</div>
+                            <li>Review default policies
+                                <div class="screenshot-placeholder">Screenshot: Default firewall policies</div>
                             </li>
-                            <li>Set priority levels
-                                <div class="screenshot-placeholder">Screenshot: Priority level selection</div>
+                            <li>Create basic security policy
+                                <div class="screenshot-placeholder">Screenshot: Create security policy form</div>
+                                <table>
+                                    <tr>
+                                        <th>Setting</th>
+                                        <th>Description</th>
+                                        <th>Example</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Name</td>
+                                        <td>Policy name</td>
+                                        <td>Internal_to_Internet</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Source Interface</td>
+                                        <td>Incoming interface</td>
+                                        <td>internal</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Destination Interface</td>
+                                        <td>Outgoing interface</td>
+                                        <td>port1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Source Address</td>
+                                        <td>Source network</td>
+                                        <td>all</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Destination Address</td>
+                                        <td>Destination network</td>
+                                        <td>all</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Service</td>
+                                        <td>Allowed services</td>
+                                        <td>ALL</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Action</td>
+                                        <td>Policy action</td>
+                                        <td>ACCEPT</td>
+                                    </tr>
+                                    <tr>
+                                        <td>NAT</td>
+                                        <td>Enable NAT</td>
+                                        <td>ON</td>
+                                    </tr>
+                                </table>
+                            </li>
+                            <li>Configure security profiles
+                                <div class="screenshot-placeholder">Screenshot: Security profiles configuration</div>
+                            </li>
+                            <li>Enable logging
+                                <div class="screenshot-placeholder">Screenshot: Logging configuration</div>
                             </li>
                         </ol>
                     </div>
                     
-                    <div class="tab-content" id="advanced-settings-cli">
-                        <h3>CLI Traffic Shaping</h3>
-                        <pre><code>config firewall policy
-edit 1
-    set traffic-shaper "bandwidth_limit_5mbps"
-    set traffic-shaper-reverse "bandwidth_limit_5mbps"
-    set per-ip-shaper "per_user_1mbps"
-next
+                    <div class="tab-content" id="security-setup-cli">
+                        <h3>CLI Security Configuration</h3>
+                        <ol>
+                            <li>Create basic firewall policy
+                                <pre><code>config firewall policy
+    edit 1
+        set name "Internal_to_Internet"
+        set srcintf "internal"
+        set dstintf "port1"
+        set srcaddr "all"
+        set dstaddr "all"
+        set action accept
+        set schedule "always"
+        set service "ALL"
+        set nat enable
+        set logtraffic all
+        set comments "Allow internal users to access internet"
+    next
 end</code></pre>
+                            </li>
+                            <li>Create address objects
+                                <pre><code>config firewall address
+    edit "Internal_Network"
+        set subnet 192.168.1.0 255.255.255.0
+        set comment "Internal LAN network"
+    next
+    edit "DMZ_Network"
+        set subnet 192.168.2.0 255.255.255.0
+        set comment "DMZ network"
+    next
+end</code></pre>
+                            </li>
+                            <li>Configure security profiles
+                                <pre><code>config firewall policy
+    edit 1
+        set av-profile "default"
+        set ips-sensor "default"
+        set application-list "default"
+        set ssl-ssh-profile "certificate-inspection"
+    next
+end</code></pre>
+                            </li>
+                            <li>Configure admin access restrictions
+                                <pre><code>config system admin
+    edit "admin"
+        set trusthost1 192.168.1.0 255.255.255.0
+        set accprofile "super_admin"
+        set vdom "root"
+        set gui-ignore-release-overview-version "7.0.0"
+    next
+end</code></pre>
+                            </li>
+                        </ol>
                     </div>
                 </div>
 
-                <h2 id="troubleshooting">Troubleshooting</h2>
+                <h2 id="system-config">System Configuration</h2>
+                <p>Configure system services, logging, and monitoring features.</p>
                 
-                <h3>Common Policy Issues</h3>
                 <div class="tab-section">
                     <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('troubleshooting', 'gui')">GUI Troubleshooting</button>
-                        <button class="tab-button" onclick="switchTab('troubleshooting', 'cli')">CLI Troubleshooting</button>
+                        <button class="tab-button active" onclick="switchTab('system-config', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('system-config', 'cli')">CLI Configuration</button>
                     </div>
                     
-                    <div class="tab-content active" id="troubleshooting-gui">
-                        <h3>Policy Troubleshooting via GUI</h3>
+                    <div class="tab-content active" id="system-config-gui">
+                        <h3>System Services Configuration</h3>
                         <ol>
-                            <li>Check policy hit counters
-                                <div class="screenshot-placeholder">Screenshot: Policy list showing hit counters</div>
+                            <li>Navigate to System > Feature Visibility
+                                <div class="screenshot-placeholder">Screenshot: Feature Visibility page</div>
                             </li>
-                            <li>Review log files for policy matches
-                                <div class="screenshot-placeholder">Screenshot: Log viewer showing policy matches</div>
+                            <li>Enable required features
+                                <div class="screenshot-placeholder">Screenshot: Feature selection</div>
                             </li>
-                            <li>Use Policy Lookup tool
-                                <div class="screenshot-placeholder">Screenshot: Policy lookup tool interface</div>
+                            <li>Configure logging settings
+                                <div class="screenshot-placeholder">Screenshot: Log settings configuration</div>
                             </li>
-                            <li>Check session table for active connections
-                                <div class="screenshot-placeholder">Screenshot: Session monitoring page</div>
+                            <li>Set up SNMP (if required)
+                                <div class="screenshot-placeholder">Screenshot: SNMP configuration</div>
+                            </li>
+                            <li>Configure backup settings
+                                <div class="screenshot-placeholder">Screenshot: Backup configuration</div>
                             </li>
                         </ol>
                     </div>
                     
-                    <div class="tab-content" id="troubleshooting-cli">
-                        <h3>CLI Troubleshooting Commands</h3>
+                    <div class="tab-content" id="system-config-cli">
+                        <h3>CLI System Configuration</h3>
                         <ol>
-                            <li>Check policy statistics
+                            <li>Configure logging settings
+                                <pre><code>config log setting
+    set status enable
+    set local-in-policy enable
+    set local-in-deny-unicast enable
+    set local-out enable
+    set daemon enable
+end</code></pre>
+                            </li>
+                            <li>Configure SNMP (if required)
+                                <pre><code>config system snmp sysinfo
+    set status enable
+    set description "FortiGate Branch Office"
+    set contact-info "IT Support: support@company.com"
+    set location "Branch Office"
+end
+
+config system snmp community
+    edit 1
+        set name "public"
+        set query-v1-status enable
+        set query-v2c-status enable
+        set trap-v1-status enable
+        set trap-v2c-status enable
+        config hosts
+            edit 1
+                set ip 192.168.1.10 255.255.255.255
+            next
+        end
+    next
+end</code></pre>
+                            </li>
+                            <li>Configure FortiGuard services
+                                <pre><code>config system fortiguard
+    set antispam-force-off disable
+    set antispam-cache enable
+    set antispam-expiration 1618300800
+    set outbreak-prevention-force-off disable
+    set outbreak-prevention-cache enable
+    set outbreak-prevention-expiration 1618300800
+    set webfilter-force-off disable
+    set webfilter-cache enable
+    set webfilter-expiration 1618300800
+    set sdns-server-ip "208.91.112.220"
+    set sdns-server-port 53
+    set anycast-sdns-server-ip "208.91.112.220"
+    set anycast-sdns-server-port 53
+    set sdns-options include-question
+    set source-ip 0.0.0.0
+    set source-ip6 ::
+    set auto-join-forticloud enable
+    set update-server-location automatic
+end</code></pre>
+                            </li>
+                            <li>Configure firmware auto-update
+                                <pre><code>config system autoupdate schedule
+    set status enable
+    set frequency every
+    set time 02:00
+    set day sunday
+end</code></pre>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h2 id="verification">Verification</h2>
+                <p>Verify the configuration and test basic functionality.</p>
+                
+                <div class="tab-section">
+                    <div class="tab-header">
+                        <button class="tab-button active" onclick="switchTab('verification', 'gui')">GUI Verification</button>
+                        <button class="tab-button" onclick="switchTab('verification', 'cli')">CLI Verification</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="verification-gui">
+                        <h3>System Verification via GUI</h3>
+                        <ol>
+                            <li>Check dashboard status
+                                <div class="screenshot-placeholder">Screenshot: Dashboard overview</div>
+                            </li>
+                            <li>Verify network connectivity
+                                <div class="screenshot-placeholder">Screenshot: Network status indicators</div>
+                            </li>
+                            <li>Test internet access
+                                <div class="screenshot-placeholder">Screenshot: Connectivity test results</div>
+                            </li>
+                            <li>Review system information
+                                <div class="screenshot-placeholder">Screenshot: System information page</div>
+                            </li>
+                            <li>Check license status
+                                <div class="screenshot-placeholder">Screenshot: License information</div>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="tab-content" id="verification-cli">
+                        <h3>CLI Verification Commands</h3>
+                        <ol>
+                            <li>Check system status
+                                <pre><code>get system status
+get system performance status
+get system interface</code></pre>
+                            </li>
+                            <li>Verify connectivity
+                                <pre><code>execute ping google.com
+execute ping 8.8.8.8</code></pre>
+                            </li>
+                            <li>Check routing table
+                                <pre><code>get router info routing-table all</code></pre>
+                            </li>
+                            <li>Verify policies
                                 <pre><code>get firewall policy</code></pre>
                             </li>
-                            <li>View detailed policy information
-                                <pre><code>show firewall policy 1</code></pre>
+                            <li>Check license status
+                                <pre><code>get system status | grep License
+diagnose sys license</code></pre>
                             </li>
-                            <li>Check active sessions
-                                <pre><code>get system session list</code></pre>
-                            </li>
-                            <li>Test policy matching
-                                <pre><code>diagnose firewall iprope lookup 192.168.1.100 80 192.168.1.1</code></pre>
-                            </li>
-                            <li>Monitor real-time traffic
-                                <pre><code>diagnose sniffer packet any 'host 192.168.1.100' 4 0 l</code></pre>
+                            <li>Save configuration
+                                <pre><code>execute backup config flash</code></pre>
                             </li>
                         </ol>
                     </div>
                 </div>
 
                 <h2 id="next-steps">Next Steps</h2>
-                <p>After mastering basic policy configuration, explore these advanced topics:</p>
+                <p>After completing the initial setup, proceed with advanced configuration:</p>
                 <ul>
-                    <li><a href="/assets/fortigate-sdwan.html">FortiGate SD-WAN Configuration</a></li>
-                    <li><a href="/assets/fortigate-ipsec.html">FortiGate IPSec VPN Setup</a></li>
-                    <li><a href="/assets/fortigate-ldap.html">FortiGate LDAP Authentication</a></li>
-                    <li><a href="/assets/fortigate-routing.html">FortiGate Routing Configuration</a></li>
+                    <li><a href="/assets/fortigate-policy.html">Configure Advanced Firewall Policies</a></li>
+                    <li><a href="/assets/fortigate-sslvpn.html">Setup SSL VPN for Remote Access</a></li>
+                    <li><a href="/assets/fortigate-ipsec.html">Configure IPSec VPN Tunnels</a></li>
+                    <li><a href="/assets/fortigate-ldap.html">Integrate with LDAP Authentication</a></li>
+                    <li><a href="/assets/fortigate-cli.html">Learn CLI Administration</a></li>
                 </ul>
             </main>
         </div>

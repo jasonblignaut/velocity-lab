@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en-us" dir="ltr">
 <head>
-    <title>FortiGate Firewall Policy Configuration | MSP Training Platform</title>
+    <title>FortiGate CLI Administration | MSP Training Platform</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Complete guide to configuring firewall policies on FortiGate devices for security and traffic management." />
+    <meta name="description" content="Complete guide to FortiGate CLI administration including commands, configuration, and troubleshooting techniques." />
     <meta name="author" content="Velocity Lab" />
     <meta name="date" content="2025-07-17T14:13:00Z" />
 
@@ -476,55 +476,6 @@
             transform: translateY(-1px);
         }
 
-        /* Enhanced Tab System */
-        .tab-section {
-            margin: 1.5rem 0;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow: hidden;
-            background: var(--background);
-        }
-
-        .tab-header {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 0;
-            display: flex;
-        }
-
-        .tab-button {
-            padding: 1rem 1.5rem;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-weight: 500;
-            flex: 1;
-            text-align: center;
-            border-bottom: 3px solid transparent;
-        }
-
-        .tab-button:hover {
-            background: var(--surface-hover);
-            color: var(--text);
-        }
-
-        .tab-button.active {
-            color: var(--primary);
-            background: var(--background);
-            border-bottom-color: var(--primary);
-        }
-
-        .tab-content {
-            padding: 1.5rem;
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
         /* Code and pre styling */
         pre {
             background: var(--surface);
@@ -581,26 +532,28 @@
             background: var(--bg-secondary);
         }
 
-        /* Screenshot placeholders */
-        .screenshot-placeholder {
-            width: 100%;
-            height: 200px;
+        /* Command Reference Sections */
+        .command-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
             background: var(--surface);
-            border: 1px dashed var(--border);
-            text-align: center;
-            line-height: 200px;
-            color: var(--text-secondary);
-            margin: 1rem 0;
             border-radius: 8px;
+            border-left: 4px solid var(--primary);
         }
 
-        .step-image {
-            width: 100%;
-            max-width: 600px;
-            height: auto;
+        .command-section h4 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .command-example {
+            background: var(--background);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            margin: 1rem 0;
+            border-radius: 4px;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
         }
 
         /* Footer */
@@ -643,14 +596,6 @@
             .content {
                 margin-left: 0;
                 max-width: 100%;
-            }
-
-            .tab-header {
-                flex-direction: column;
-            }
-
-            .tab-button {
-                text-align: left;
             }
 
             table {
@@ -713,12 +658,13 @@
                 <h3>In this article</h3>
                 <ul>
                     <li><a href="#overview">Overview</a></li>
-                    <li><a href="#prerequisites">Prerequisites</a></li>
-                    <li><a href="#policy-basics">Policy Basics</a></li>
-                    <li><a href="#creating-policies">Creating Policies</a></li>
-                    <li><a href="#security-profiles">Security Profiles</a></li>
-                    <li><a href="#advanced-settings">Advanced Settings</a></li>
+                    <li><a href="#cli-basics">CLI Basics</a></li>
+                    <li><a href="#navigation">Navigation</a></li>
+                    <li><a href="#essential-commands">Essential Commands</a></li>
+                    <li><a href="#configuration">Configuration</a></li>
+                    <li><a href="#monitoring">Monitoring</a></li>
                     <li><a href="#troubleshooting">Troubleshooting</a></li>
+                    <li><a href="#advanced-commands">Advanced Commands</a></li>
                     <li><a href="#next-steps">Next Steps</a></li>
                 </ul>
             </aside>
@@ -726,308 +672,622 @@
             <main class="content">
                 <a href="/assets/fortigate.html" class="back-button">← Back to FortiGate Guides</a>
                 
-                <h1>FortiGate Firewall Policy Configuration</h1>
+                <h1>FortiGate CLI Administration</h1>
                 <p>Last updated: July 17, 2025</p>
-                <p>This comprehensive guide covers creating and managing firewall policies on FortiGate devices to control network traffic flow and implement security measures.</p>
+                <p>This comprehensive guide covers FortiGate CLI administration including navigation, essential commands, configuration management, and troubleshooting techniques.</p>
                 
                 <div class="important">
                     <h4>Important</h4>
-                    <p>Always test policy changes in a controlled environment before applying them to production networks. Misconfigured policies can block legitimate traffic.</p>
+                    <p>CLI commands can significantly impact system operation. Always verify commands before execution and maintain configuration backups.</p>
                 </div>
 
                 <h2 id="overview">Overview</h2>
-                <p>FortiGate firewall policies are rules that determine how traffic flows through the firewall. These policies define what traffic is allowed or denied based on various criteria such as source, destination, service, and time. Understanding policy configuration is fundamental to securing your network infrastructure.</p>
+                <p>The FortiGate CLI provides powerful command-line access to configure, monitor, and troubleshoot FortiGate devices. Understanding CLI fundamentals is essential for advanced administration and automation.</p>
                 
-                <h2 id="prerequisites">Prerequisites</h2>
+                <h3>CLI Access Methods</h3>
                 <ul>
-                    <li>FortiGate device with FortiOS 7.0 or later</li>
-                    <li>Administrator access to FortiGate management interface</li>
-                    <li>Basic understanding of network security concepts</li>
-                    <li>Knowledge of your network topology and requirements</li>
-                    <li>Configured interfaces and routing</li>
+                    <li><strong>Console Port:</strong> Direct serial connection to device</li>
+                    <li><strong>SSH:</strong> Secure network access over IP</li>
+                    <li><strong>Telnet:</strong> Legacy network access (not recommended)</li>
+                    <li><strong>Web GUI CLI:</strong> CLI widget within web interface</li>
                 </ul>
-
-                <h2 id="policy-basics">Policy Basics</h2>
-                <p>FortiGate policies are processed in order from top to bottom. When a packet matches a policy rule, that rule is applied and processing stops. Understanding this sequence is crucial for effective policy management.</p>
                 
-                <h3>Policy Components</h3>
-                <table>
-                    <tr>
-                        <th>Component</th>
-                        <th>Description</th>
-                        <th>Example</th>
-                    </tr>
-                    <tr>
-                        <td>Source Interface</td>
-                        <td>Interface traffic originates from</td>
-                        <td>port1 (LAN)</td>
-                    </tr>
-                    <tr>
-                        <td>Destination Interface</td>
-                        <td>Interface traffic is destined for</td>
-                        <td>port2 (WAN)</td>
-                    </tr>
-                    <tr>
-                        <td>Source Address</td>
-                        <td>IP address or range of source</td>
-                        <td>192.168.1.0/24</td>
-                    </tr>
-                    <tr>
-                        <td>Destination Address</td>
-                        <td>IP address or range of destination</td>
-                        <td>0.0.0.0/0 (any)</td>
-                    </tr>
-                    <tr>
-                        <td>Service</td>
-                        <td>Protocol and port definition</td>
-                        <td>HTTP, HTTPS, ALL</td>
-                    </tr>
-                    <tr>
-                        <td>Action</td>
-                        <td>Allow or deny traffic</td>
-                        <td>ACCEPT, DENY</td>
-                    </tr>
-                </table>
-
-                <h2 id="creating-policies">Creating Policies</h2>
+                <h2 id="cli-basics">CLI Basics</h2>
+                <p>Understanding CLI structure, command syntax, and basic navigation is fundamental to effective FortiGate administration.</p>
                 
-                <div class="tab-section">
-                    <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('creating-policies', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('creating-policies', 'cli')">CLI Configuration</button>
-                    </div>
-                    
-                    <div class="tab-content active" id="creating-policies-gui">
-                        <h3>Creating Policies via Web Interface</h3>
-                        <ol>
-                            <li>Navigate to Policy & Objects > Firewall Policy
-                                <div class="screenshot-placeholder">Screenshot: Firewall Policy page showing existing policies</div>
-                            </li>
-                            <li>Click "Create New" to add a new policy
-                                <div class="screenshot-placeholder">Screenshot: Create New Policy button highlighted</div>
-                            </li>
-                            <li>Configure basic policy settings
-                                <div class="screenshot-placeholder">Screenshot: Basic policy configuration form</div>
-                                <ul>
-                                    <li>Name: Descriptive policy name</li>
-                                    <li>Incoming Interface: Select source interface</li>
-                                    <li>Outgoing Interface: Select destination interface</li>
-                                    <li>Source: Define source addresses or groups</li>
-                                    <li>Destination: Define destination addresses or groups</li>
-                                    <li>Service: Select protocols and ports</li>
-                                    <li>Action: Accept or Deny</li>
-                                </ul>
-                            </li>
-                            <li>Configure advanced options
-                                <div class="screenshot-placeholder">Screenshot: Advanced policy options panel</div>
-                            </li>
-                            <li>Apply security profiles if needed
-                                <div class="screenshot-placeholder">Screenshot: Security profiles selection</div>
-                            </li>
-                            <li>Save the policy configuration
-                                <div class="screenshot-placeholder">Screenshot: Save button and policy confirmation</div>
-                            </li>
-                        </ol>
-                    </div>
-                    
-                    <div class="tab-content" id="creating-policies-cli">
-                        <h3>CLI Policy Configuration</h3>
-                        <ol>
-                            <li>Access the FortiGate CLI and enter policy configuration mode
-                                <pre><code>config firewall policy
-edit 0</code></pre>
-                            </li>
-                            <li>Configure basic policy parameters
-                                <pre><code>set name "LAN_to_WAN_HTTP"
-set srcintf "port1"
-set dstintf "port2"
-set srcaddr "LAN_Network"
-set dstaddr "all"
-set service "HTTP" "HTTPS"
-set action accept</code></pre>
-                            </li>
-                            <li>Enable logging for the policy
-                                <pre><code>set logtraffic all
-set comments "Allow HTTP/HTTPS from LAN to WAN"</code></pre>
-                            </li>
-                            <li>Configure NAT if required
-                                <pre><code>set nat enable
-set ippool "SNAT_Pool"</code></pre>
-                            </li>
-                            <li>Apply security profiles
-                                <pre><code>set av-profile "default"
-set ips-sensor "default"
-set application-list "default"
-set ssl-ssh-profile "certificate-inspection"</code></pre>
-                            </li>
-                            <li>Save the configuration
-                                <pre><code>next
-end</code></pre>
-                            </li>
-                        </ol>
+                <div class="command-section">
+                    <h4>Command Structure</h4>
+                    <p>FortiGate CLI commands follow a hierarchical structure:</p>
+                    <div class="command-example">
+                        <strong>Format:</strong> [command] [sub-command] [parameters]<br>
+                        <strong>Example:</strong> config system interface
                     </div>
                 </div>
-
-                <h2 id="security-profiles">Security Profiles</h2>
-                <p>Security profiles provide additional protection layers that can be applied to firewall policies. These profiles inspect traffic for various threats and can block or log suspicious activity.</p>
                 
-                <div class="tab-section">
-                    <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('security-profiles', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('security-profiles', 'cli')">CLI Configuration</button>
-                    </div>
-                    
-                    <div class="tab-content active" id="security-profiles-gui">
-                        <h3>Applying Security Profiles</h3>
-                        <ol>
-                            <li>In the policy configuration, scroll to Security Profiles section
-                                <div class="screenshot-placeholder">Screenshot: Security Profiles section in policy editor</div>
-                            </li>
-                            <li>Configure Antivirus Profile
-                                <div class="screenshot-placeholder">Screenshot: Antivirus profile selection dropdown</div>
-                            </li>
-                            <li>Configure IPS (Intrusion Prevention System)
-                                <div class="screenshot-placeholder">Screenshot: IPS sensor configuration</div>
-                            </li>
-                            <li>Configure Application Control
-                                <div class="screenshot-placeholder">Screenshot: Application control list selection</div>
-                            </li>
-                            <li>Configure Web Filter
-                                <div class="screenshot-placeholder">Screenshot: Web filter profile options</div>
-                            </li>
-                            <li>Configure SSL/SSH Inspection
-                                <div class="screenshot-placeholder">Screenshot: SSL inspection profile settings</div>
-                            </li>
-                        </ol>
-                    </div>
-                    
-                    <div class="tab-content" id="security-profiles-cli">
-                        <h3>CLI Security Profile Configuration</h3>
-                        <ol>
-                            <li>Edit existing policy to add security profiles
-                                <pre><code>config firewall policy
-edit 1</code></pre>
-                            </li>
-                            <li>Apply antivirus profile
-                                <pre><code>set av-profile "default"</code></pre>
-                            </li>
-                            <li>Apply IPS sensor
-                                <pre><code>set ips-sensor "protect_client"</code></pre>
-                            </li>
-                            <li>Apply application control
-                                <pre><code>set application-list "default"</code></pre>
-                            </li>
-                            <li>Apply web filter
-                                <pre><code>set webfilter-profile "default"</code></pre>
-                            </li>
-                            <li>Apply SSL inspection
-                                <pre><code>set ssl-ssh-profile "certificate-inspection"</code></pre>
-                            </li>
-                            <li>Save configuration
-                                <pre><code>next
-end</code></pre>
-                            </li>
-                        </ol>
-                    </div>
-                </div>
-
-                <h2 id="advanced-settings">Advanced Settings</h2>
-                
-                <div class="warning">
-                    <h4>Warning</h4>
-                    <p>Advanced settings can significantly impact network performance. Test thoroughly before implementing in production environments.</p>
+                <div class="command-section">
+                    <h4>Command Types</h4>
+                    <table>
+                        <tr>
+                            <th>Command Type</th>
+                            <th>Purpose</th>
+                            <th>Example</th>
+                        </tr>
+                        <tr>
+                            <td>config</td>
+                            <td>Enter configuration mode</td>
+                            <td>config system global</td>
+                        </tr>
+                        <tr>
+                            <td>get</td>
+                            <td>Display configuration</td>
+                            <td>get system status</td>
+                        </tr>
+                        <tr>
+                            <td>show</td>
+                            <td>Show configuration details</td>
+                            <td>show firewall policy</td>
+                        </tr>
+                        <tr>
+                            <td>execute</td>
+                            <td>Execute operational commands</td>
+                            <td>execute ping 8.8.8.8</td>
+                        </tr>
+                        <tr>
+                            <td>diagnose</td>
+                            <td>Diagnostic and troubleshooting</td>
+                            <td>diagnose sys top</td>
+                        </tr>
+                    </table>
                 </div>
                 
-                <h3>Traffic Shaping</h3>
-                <div class="tab-section">
-                    <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('advanced-settings', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('advanced-settings', 'cli')">CLI Configuration</button>
-                    </div>
-                    
-                    <div class="tab-content active" id="advanced-settings-gui">
-                        <h3>Traffic Shaping Configuration</h3>
-                        <ol>
-                            <li>In policy configuration, expand Traffic Shaping section
-                                <div class="screenshot-placeholder">Screenshot: Traffic shaping options in policy</div>
-                            </li>
-                            <li>Configure bandwidth limits
-                                <div class="screenshot-placeholder">Screenshot: Bandwidth limit configuration</div>
-                            </li>
-                            <li>Set priority levels
-                                <div class="screenshot-placeholder">Screenshot: Priority level selection</div>
-                            </li>
-                        </ol>
-                    </div>
-                    
-                    <div class="tab-content" id="advanced-settings-cli">
-                        <h3>CLI Traffic Shaping</h3>
-                        <pre><code>config firewall policy
-edit 1
-    set traffic-shaper "bandwidth_limit_5mbps"
-    set traffic-shaper-reverse "bandwidth_limit_5mbps"
-    set per-ip-shaper "per_user_1mbps"
+                <div class="command-section">
+                    <h4>Special Characters and Shortcuts</h4>
+                    <table>
+                        <tr>
+                            <th>Character/Key</th>
+                            <th>Function</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>?</td>
+                            <td>Help</td>
+                            <td>Shows available commands</td>
+                        </tr>
+                        <tr>
+                            <td>Tab</td>
+                            <td>Auto-complete</td>
+                            <td>Completes command or parameter</td>
+                        </tr>
+                        <tr>
+                            <td>Ctrl+C</td>
+                            <td>Cancel</td>
+                            <td>Cancels current command</td>
+                        </tr>
+                        <tr>
+                            <td>Ctrl+Z</td>
+                            <td>Logout</td>
+                            <td>Exits CLI session</td>
+                        </tr>
+                        <tr>
+                            <td>Arrow Keys</td>
+                            <td>History</td>
+                            <td>Navigate command history</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h2 id="navigation">Navigation</h2>
+                <p>Efficient CLI navigation is crucial for productivity. Learn how to move between configuration contexts and access help.</p>
+                
+                <div class="command-section">
+                    <h4>Basic Navigation Commands</h4>
+                    <pre><code># Enter configuration mode
+config system global
+
+# Exit configuration mode
+end
+
+# Move up one level
 next
+
+# Show current context
+pwd
+
+# Show available commands
+?
+
+# Show command syntax
+command ?
+
+# Cancel current operation
+abort</code></pre>
+                </div>
+                
+                <div class="command-section">
+                    <h4>Configuration Context Navigation</h4>
+                    <pre><code># Enter system configuration
+config system global
+    # System-level settings
+    set hostname "FortiGate-Lab"
+    set timezone "GMT-5:00"
+end
+
+# Enter interface configuration
+config system interface
+    edit "port1"
+        # Interface-specific settings
+        set ip 192.168.1.1 255.255.255.0
+        set allowaccess ping https ssh
+    next
+end
+
+# Enter firewall policy configuration
+config firewall policy
+    edit 1
+        # Policy-specific settings
+        set srcintf "internal"
+        set dstintf "port1"
+    next
 end</code></pre>
-                    </div>
+                </div>
+                
+                <div class="command-section">
+                    <h4>Help and Documentation</h4>
+                    <pre><code># Get help for current context
+?
+
+# Get help for specific command
+get ?
+config ?
+execute ?
+
+# Show command syntax
+set ?
+edit ?
+
+# Show available parameters
+set hostname ?
+set timezone ?</code></pre>
+                </div>
+
+                <h2 id="essential-commands">Essential Commands</h2>
+                <p>Master these essential commands for daily FortiGate administration tasks.</p>
+                
+                <div class="command-section">
+                    <h4>System Information</h4>
+                    <pre><code># Display system status
+get system status
+
+# Show system performance
+get system performance status
+
+# Display interface information
+get system interface
+
+# Show system configuration
+show system global
+
+# Display version information
+get system version
+
+# Show hardware information
+get hardware status</code></pre>
+                </div>
+                
+                <div class="command-section">
+                    <h4>Network Information</h4>
+                    <pre><code># Display routing table
+get router info routing-table all
+
+# Show interface statistics
+get system interface ?
+
+# Display ARP table
+get system arp
+
+# Show session information
+get system session list
+
+# Display IPSec status
+get vpn ipsec tunnel summary
+
+# Show DHCP lease information
+get system dhcp status</code></pre>
+                </div>
+                
+                <div class="command-section">
+                    <h4>Security Information</h4>
+                    <pre><code># Display firewall policies
+get firewall policy
+
+# Show security profiles
+get system security-profile
+
+# Display user information
+get user info
+
+# Show VPN status
+get vpn status
+
+# Display log information
+get log statistics</code></pre>
+                </div>
+
+                <h2 id="configuration">Configuration</h2>
+                <p>Learn how to configure FortiGate devices using CLI commands for various components.</p>
+                
+                <div class="command-section">
+                    <h4>System Configuration</h4>
+                    <pre><code># Configure system global settings
+config system global
+    set hostname "FortiGate-Branch"
+    set timezone "GMT-5:00"
+    set gui-theme mariner
+    set admintimeout 60
+    set admin-sport 443
+    set admin-ssh-port 22
+end
+
+# Configure DNS settings
+config system dns
+    set primary 8.8.8.8
+    set secondary 8.8.4.4
+end
+
+# Configure NTP
+config system ntp
+    set ntpsync enable
+    set type fortiguard
+end</code></pre>
+                </div>
+                
+                <div class="command-section">
+                    <h4>Interface Configuration</h4>
+                    <pre><code># Configure WAN interface
+config system interface
+    edit "port1"
+        set vdom "root"
+        set mode dhcp
+        set allowaccess ping https ssh
+        set type physical
+        set alias "WAN"
+        set role wan
+    next
+end
+
+# Configure LAN interface
+config system interface
+    edit "internal"
+        set vdom "root"
+        set ip 192.168.1.1 255.255.255.0
+        set allowaccess ping https ssh telnet fgfm
+        set type physical
+        set alias "LAN"
+        set role lan
+    next
+end</code></pre>
+                </div>
+                
+                <div class="command-section">
+                    <h4>Firewall Policy Configuration</h4>
+                    <pre><code># Create firewall policy
+config firewall policy
+    edit 1
+        set name "LAN_to_WAN"
+        set srcintf "internal"
+        set dstintf "port1"
+        set srcaddr "all"
+        set dstaddr "all"
+        set action accept
+        set schedule "always"
+        set service "ALL"
+        set nat enable
+        set logtraffic all
+    next
+end
+
+# Create address objects
+config firewall address
+    edit "Internal_Network"
+        set subnet 192.168.1.0 255.255.255.0
+        set comment "Internal LAN"
+    next
+end</code></pre>
+                </div>
+                
+                <div class="command-section">
+                    <h4>Configuration Management</h4>
+                    <pre><code># Save configuration
+execute backup config flash
+
+# Restore configuration
+execute restore config flash
+
+# Factory reset
+execute factoryreset
+
+# Reboot system
+execute reboot
+
+# Show full configuration
+show full-configuration
+
+# Show specific configuration section
+show firewall policy</code></pre>
+                </div>
+
+                <h2 id="monitoring">Monitoring</h2>
+                <p>Use CLI commands to monitor system performance, network traffic, and security events.</p>
+                
+                <div class="command-section">
+                    <h4>System Monitoring</h4>
+                    <pre><code># Display system resource usage
+diagnose sys top
+
+# Monitor CPU usage
+diagnose sys top-summary
+
+# Check memory usage
+diagnose hardware sysinfo memory
+
+# Monitor disk usage
+diagnose sys flash list
+
+# Check system sensors
+diagnose hardware sysinfo sensors
+
+# Monitor processes
+diagnose sys process list</code></pre>
+                </div>
+                
+                <div class="command-section">
+                    <h4>Network Monitoring</h4>
+                    <pre><code># Monitor interface traffic
+diagnose sys interface list
+
+# Monitor network connections
+diagnose sys session list
+
+# Check bandwidth usage
+diagnose sys bandwidth
+
+# Monitor routing table changes
+diagnose debug enable
+diagnose debug application rtmd 255
+
+# Monitor ARP table
+diagnose sys arp list
+
+# Check DNS resolution
+diagnose test application dnsproxy 6</code></pre>
+                </div>
+                
+                <div class="command-section">
+                    <h4>Security Monitoring</h4>
+                    <pre><code># Monitor firewall sessions
+diagnose sys session list
+
+# Check security profiles
+diagnose sys security-profile list
+
+# Monitor VPN connections
+diagnose vpn tunnel list
+
+# Check authentication events
+diagnose debug application fnbamd 255
+
+# Monitor IPS events
+diagnose log read
+
+# Check antivirus status
+diagnose test application av 1</code></pre>
                 </div>
 
                 <h2 id="troubleshooting">Troubleshooting</h2>
+                <p>Essential troubleshooting commands for diagnosing and resolving FortiGate issues.</p>
                 
-                <h3>Common Policy Issues</h3>
-                <div class="tab-section">
-                    <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('troubleshooting', 'gui')">GUI Troubleshooting</button>
-                        <button class="tab-button" onclick="switchTab('troubleshooting', 'cli')">CLI Troubleshooting</button>
-                    </div>
-                    
-                    <div class="tab-content active" id="troubleshooting-gui">
-                        <h3>Policy Troubleshooting via GUI</h3>
-                        <ol>
-                            <li>Check policy hit counters
-                                <div class="screenshot-placeholder">Screenshot: Policy list showing hit counters</div>
-                            </li>
-                            <li>Review log files for policy matches
-                                <div class="screenshot-placeholder">Screenshot: Log viewer showing policy matches</div>
-                            </li>
-                            <li>Use Policy Lookup tool
-                                <div class="screenshot-placeholder">Screenshot: Policy lookup tool interface</div>
-                            </li>
-                            <li>Check session table for active connections
-                                <div class="screenshot-placeholder">Screenshot: Session monitoring page</div>
-                            </li>
-                        </ol>
-                    </div>
-                    
-                    <div class="tab-content" id="troubleshooting-cli">
-                        <h3>CLI Troubleshooting Commands</h3>
-                        <ol>
-                            <li>Check policy statistics
-                                <pre><code>get firewall policy</code></pre>
-                            </li>
-                            <li>View detailed policy information
-                                <pre><code>show firewall policy 1</code></pre>
-                            </li>
-                            <li>Check active sessions
-                                <pre><code>get system session list</code></pre>
-                            </li>
-                            <li>Test policy matching
-                                <pre><code>diagnose firewall iprope lookup 192.168.1.100 80 192.168.1.1</code></pre>
-                            </li>
-                            <li>Monitor real-time traffic
-                                <pre><code>diagnose sniffer packet any 'host 192.168.1.100' 4 0 l</code></pre>
-                            </li>
-                        </ol>
-                    </div>
+                <div class="warning">
+                    <h4>Warning</h4>
+                    <p>Debug commands can generate significant output and impact system performance. Use with caution in production environments.</p>
+                </div>
+                
+                <div class="command-section">
+                    <h4>Network Troubleshooting</h4>
+                    <pre><code># Test connectivity
+execute ping 8.8.8.8
+execute ping-options source 192.168.1.1
+execute ping6 2001:4860:4860::8888
+
+# Trace network path
+execute traceroute 8.8.8.8
+
+# Test DNS resolution
+execute nslookup google.com
+
+# Monitor packet flow
+diagnose sniffer packet any "host 192.168.1.100" 4 0 l
+
+# Debug routing
+diagnose debug enable
+diagnose debug application rtmd 255
+
+# Check interface status
+diagnose netlink interface list</code></pre>
+                </div>
+                
+                <div class="command-section">
+                    <h4>VPN Troubleshooting</h4>
+                    <pre><code># Debug IPSec VPN
+diagnose debug reset
+diagnose debug enable
+diagnose debug application ike 255
+diagnose debug application ipsec 255
+
+# Check IPSec tunnel status
+diagnose vpn ipsec tunnel list
+
+# Test IPSec connectivity
+diagnose vpn ipsec tunnel up tunnel_name
+
+# Debug SSL VPN
+diagnose debug application sslvpn -1
+
+# Check SSL VPN users
+diagnose vpn ssl list
+
+# Monitor VPN logs
+diagnose log read | grep vpn</code></pre>
+                </div>
+                
+                <div class="command-section">
+                    <h4>Performance Troubleshooting</h4>
+                    <pre><code># Check system performance
+diagnose sys performance top
+
+# Monitor memory usage
+diagnose sys memory
+
+# Check disk space
+diagnose sys diskusage
+
+# Monitor CPU usage per process
+diagnose sys top-summary
+
+# Check system logs
+diagnose log read
+
+# Monitor system calls
+diagnose sys syscall</code></pre>
+                </div>
+
+                <h2 id="advanced-commands">Advanced Commands</h2>
+                <p>Advanced CLI commands for complex administration tasks and system optimization.</p>
+                
+                <div class="command-section">
+                    <h4>Advanced System Commands</h4>
+                    <pre><code># Enter global VDOM context
+config global
+
+# Switch between VDOMs
+config vdom
+    edit "root"
+        # VDOM-specific commands
+    next
+end
+
+# Configure HA (High Availability)
+config system ha
+    set mode a-p
+    set hbdev "port3" 50
+    set session-pickup enable
+    set session-pickup-connectionless enable
+    set session-pickup-nat enable
+    set session-pickup-expectation enable
+    set override disable
+end
+
+# Configure link monitoring
+config system link-monitor
+    edit "wan_monitor"
+        set srcintf "port1"
+        set server "8.8.8.8"
+        set protocol ping
+        set interval 1
+        set timeout 1
+        set failtime 5
+        set recoverytime 5
+    next
+end</code></pre>
+                </div>
+                
+                <div class="command-section">
+                    <h4>Scripting and Automation</h4>
+                    <pre><code># Execute script from file
+execute script run script_name
+
+# Create configuration script
+config system script
+    edit "backup_config"
+        set type cli
+        set content "
+            execute backup config flash
+            execute log filter category 0
+            execute log display
+        "
+    next
+end
+
+# Schedule script execution
+config system automation-trigger
+    edit "daily_backup"
+        set trigger-type scheduled
+        set trigger-frequency daily
+        set trigger-hour 2
+        set trigger-minute 0
+    next
+end</code></pre>
+                </div>
+                
+                <div class="command-section">
+                    <h4>Advanced Debugging</h4>
+                    <pre><code># Enable comprehensive debugging
+diagnose debug reset
+diagnose debug duration 300
+diagnose debug enable
+diagnose debug application rtmd 255
+diagnose debug application ike 255
+diagnose debug application ipsec 255
+
+# Debug specific modules
+diagnose debug application fnbamd 255    # Authentication
+diagnose debug application sslvpn -1     # SSL VPN
+diagnose debug application httpsd 255    # Web interface
+diagnose debug application fgd 255       # FortiGuard
+
+# Monitor system calls
+diagnose sys syscall enable
+diagnose sys syscall disable
+
+# Advanced packet capture
+diagnose sniffer packet any "icmp" 4 100 a
+diagnose sniffer packet port1 "tcp port 80" 6 0 l
+
+# Check system integrity
+diagnose sys checksum all</code></pre>
+                </div>
+                
+                <div class="command-section">
+                    <h4>Log Analysis</h4>
+                    <pre><code># Real-time log monitoring
+execute log display
+
+# Filter logs by category
+execute log filter category 0    # Traffic logs
+execute log filter category 1    # UTM logs
+execute log filter category 2    # Event logs
+
+# Search logs
+execute log filter field srcip 192.168.1.100
+execute log filter field dstport 80
+execute log filter field action deny
+
+# Export logs
+execute log archive-hourly
+execute log archive-daily
+
+# Clear log filters
+execute log filter clear</code></pre>
                 </div>
 
                 <h2 id="next-steps">Next Steps</h2>
-                <p>After mastering basic policy configuration, explore these advanced topics:</p>
+                <p>Continue expanding your FortiGate CLI skills with these advanced topics:</p>
                 <ul>
-                    <li><a href="/assets/fortigate-sdwan.html">FortiGate SD-WAN Configuration</a></li>
-                    <li><a href="/assets/fortigate-ipsec.html">FortiGate IPSec VPN Setup</a></li>
-                    <li><a href="/assets/fortigate-ldap.html">FortiGate LDAP Authentication</a></li>
-                    <li><a href="/assets/fortigate-routing.html">FortiGate Routing Configuration</a></li>
+                    <li><a href="/assets/fortigate-setup.html">FortiGate Initial Setup</a></li>
+                    <li><a href="/assets/fortigate-policy.html">Advanced Policy Configuration</a></li>
+                    <li><a href="/assets/fortigate-routing.html">Routing Configuration</a></li>
+                    <li><a href="/assets/fortigate-ipsec.html">IPSec VPN Configuration</a></li>
+                    <li><a href="/assets/fortigate-sslvpn.html">SSL VPN Configuration</a></li>
+                    <li><a href="/assets/fortigate-sdwan.html">SD-WAN Configuration</a></li>
                 </ul>
             </main>
         </div>
@@ -1105,32 +1365,6 @@ end</code></pre>
                 accessDenied.classList.remove('hidden');
                 mainWrapper.classList.remove('authenticated');
             }
-        }
-
-        // Tab switching system - PROFESSIONAL IMPLEMENTATION
-        function switchTab(section, tabType) {
-            // Hide all tab contents for this section
-            const tabContents = document.querySelectorAll(`#${section}-gui, #${section}-cli`);
-            tabContents.forEach(content => {
-                content.classList.remove('active');
-            });
-            
-            // Remove active class from all tab buttons in this section
-            const sectionElement = document.querySelector(`#${section}-gui`).closest('.tab-section');
-            const tabButtons = sectionElement.querySelectorAll('.tab-button');
-            tabButtons.forEach(button => {
-                button.classList.remove('active');
-            });
-            
-            // Show selected tab content
-            const selectedContent = document.getElementById(`${section}-${tabType}`);
-            if (selectedContent) {
-                selectedContent.classList.add('active');
-            }
-            
-            // Add active class to clicked button
-            const clickedButton = event.target;
-            clickedButton.classList.add('active');
         }
 
         // Theme management

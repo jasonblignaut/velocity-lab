@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en-us" dir="ltr">
 <head>
-    <title>FortiGate Firewall Policy Configuration | MSP Training Platform</title>
+    <title>FortiGate IPSec VPN Setup | MSP Training Platform</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Complete guide to configuring firewall policies on FortiGate devices for security and traffic management." />
+    <meta name="description" content="Complete guide to configuring IPSec VPN tunnels on FortiGate devices for secure site-to-site connectivity." />
     <meta name="author" content="Velocity Lab" />
     <meta name="date" content="2025-07-17T14:13:00Z" />
 
@@ -714,10 +714,11 @@
                 <ul>
                     <li><a href="#overview">Overview</a></li>
                     <li><a href="#prerequisites">Prerequisites</a></li>
-                    <li><a href="#policy-basics">Policy Basics</a></li>
-                    <li><a href="#creating-policies">Creating Policies</a></li>
-                    <li><a href="#security-profiles">Security Profiles</a></li>
-                    <li><a href="#advanced-settings">Advanced Settings</a></li>
+                    <li><a href="#phase1-setup">Phase 1 Setup</a></li>
+                    <li><a href="#phase2-setup">Phase 2 Setup</a></li>
+                    <li><a href="#static-routes">Static Routes</a></li>
+                    <li><a href="#firewall-policies">Firewall Policies</a></li>
+                    <li><a href="#testing">Testing</a></li>
                     <li><a href="#troubleshooting">Troubleshooting</a></li>
                     <li><a href="#next-steps">Next Steps</a></li>
                 </ul>
@@ -726,255 +727,484 @@
             <main class="content">
                 <a href="/assets/fortigate.html" class="back-button">← Back to FortiGate Guides</a>
                 
-                <h1>FortiGate Firewall Policy Configuration</h1>
+                <h1>FortiGate IPSec VPN Setup</h1>
                 <p>Last updated: July 17, 2025</p>
-                <p>This comprehensive guide covers creating and managing firewall policies on FortiGate devices to control network traffic flow and implement security measures.</p>
+                <p>This comprehensive guide covers configuring IPSec VPN tunnels on FortiGate devices for secure site-to-site connectivity between networks.</p>
                 
                 <div class="important">
                     <h4>Important</h4>
-                    <p>Always test policy changes in a controlled environment before applying them to production networks. Misconfigured policies can block legitimate traffic.</p>
+                    <p>IPSec VPN requires compatible encryption algorithms and proper firewall policies. Ensure both endpoints can reach each other's public IP addresses.</p>
                 </div>
 
                 <h2 id="overview">Overview</h2>
-                <p>FortiGate firewall policies are rules that determine how traffic flows through the firewall. These policies define what traffic is allowed or denied based on various criteria such as source, destination, service, and time. Understanding policy configuration is fundamental to securing your network infrastructure.</p>
+                <p>IPSec (Internet Protocol Security) VPN creates secure encrypted tunnels between FortiGate devices over the internet. This allows branch offices to securely connect to headquarters or connect multiple sites in a hub-and-spoke topology.</p>
+                
+                <h3>IPSec Components</h3>
+                <ul>
+                    <li><strong>Phase 1 (IKE):</strong> Establishes secure channel and authenticates peers</li>
+                    <li><strong>Phase 2 (IPSec):</strong> Negotiates encryption parameters for data transfer</li>
+                    <li><strong>Tunnels:</strong> Virtual interfaces that carry encrypted traffic</li>
+                    <li><strong>Policies:</strong> Firewall rules controlling traffic flow through tunnels</li>
+                </ul>
                 
                 <h2 id="prerequisites">Prerequisites</h2>
                 <ul>
-                    <li>FortiGate device with FortiOS 7.0 or later</li>
-                    <li>Administrator access to FortiGate management interface</li>
-                    <li>Basic understanding of network security concepts</li>
-                    <li>Knowledge of your network topology and requirements</li>
-                    <li>Configured interfaces and routing</li>
+                    <li>Two FortiGate devices with public IP addresses</li>
+                    <li>Administrative access to both FortiGate devices</li>
+                    <li>Non-overlapping private IP subnets at each site</li>
+                    <li>Pre-shared key or certificate for authentication</li>
+                    <li>Knowledge of remote site's public IP and internal subnets</li>
                 </ul>
 
-                <h2 id="policy-basics">Policy Basics</h2>
-                <p>FortiGate policies are processed in order from top to bottom. When a packet matches a policy rule, that rule is applied and processing stops. Understanding this sequence is crucial for effective policy management.</p>
-                
-                <h3>Policy Components</h3>
-                <table>
-                    <tr>
-                        <th>Component</th>
-                        <th>Description</th>
-                        <th>Example</th>
-                    </tr>
-                    <tr>
-                        <td>Source Interface</td>
-                        <td>Interface traffic originates from</td>
-                        <td>port1 (LAN)</td>
-                    </tr>
-                    <tr>
-                        <td>Destination Interface</td>
-                        <td>Interface traffic is destined for</td>
-                        <td>port2 (WAN)</td>
-                    </tr>
-                    <tr>
-                        <td>Source Address</td>
-                        <td>IP address or range of source</td>
-                        <td>192.168.1.0/24</td>
-                    </tr>
-                    <tr>
-                        <td>Destination Address</td>
-                        <td>IP address or range of destination</td>
-                        <td>0.0.0.0/0 (any)</td>
-                    </tr>
-                    <tr>
-                        <td>Service</td>
-                        <td>Protocol and port definition</td>
-                        <td>HTTP, HTTPS, ALL</td>
-                    </tr>
-                    <tr>
-                        <td>Action</td>
-                        <td>Allow or deny traffic</td>
-                        <td>ACCEPT, DENY</td>
-                    </tr>
-                </table>
-
-                <h2 id="creating-policies">Creating Policies</h2>
+                <h2 id="phase1-setup">Phase 1 Setup</h2>
+                <p>Phase 1 establishes the secure channel between the two FortiGate devices and handles authentication.</p>
                 
                 <div class="tab-section">
                     <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('creating-policies', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('creating-policies', 'cli')">CLI Configuration</button>
+                        <button class="tab-button active" onclick="switchTab('phase1-setup', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('phase1-setup', 'cli')">CLI Configuration</button>
                     </div>
                     
-                    <div class="tab-content active" id="creating-policies-gui">
-                        <h3>Creating Policies via Web Interface</h3>
+                    <div class="tab-content active" id="phase1-setup-gui">
+                        <h3>Phase 1 Configuration via GUI</h3>
                         <ol>
-                            <li>Navigate to Policy & Objects > Firewall Policy
-                                <div class="screenshot-placeholder">Screenshot: Firewall Policy page showing existing policies</div>
+                            <li>Navigate to VPN > IPSec Tunnels
+                                <div class="screenshot-placeholder">Screenshot: IPSec Tunnels page with existing tunnels</div>
                             </li>
-                            <li>Click "Create New" to add a new policy
-                                <div class="screenshot-placeholder">Screenshot: Create New Policy button highlighted</div>
+                            <li>Click "Create New" > "IPSec Tunnel"
+                                <div class="screenshot-placeholder">Screenshot: Create new IPSec tunnel dialog</div>
                             </li>
-                            <li>Configure basic policy settings
-                                <div class="screenshot-placeholder">Screenshot: Basic policy configuration form</div>
-                                <ul>
-                                    <li>Name: Descriptive policy name</li>
-                                    <li>Incoming Interface: Select source interface</li>
-                                    <li>Outgoing Interface: Select destination interface</li>
-                                    <li>Source: Define source addresses or groups</li>
-                                    <li>Destination: Define destination addresses or groups</li>
-                                    <li>Service: Select protocols and ports</li>
-                                    <li>Action: Accept or Deny</li>
-                                </ul>
+                            <li>Configure basic Phase 1 settings
+                                <div class="screenshot-placeholder">Screenshot: Phase 1 configuration form</div>
+                                <table>
+                                    <tr>
+                                        <th>Setting</th>
+                                        <th>Description</th>
+                                        <th>Example</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Name</td>
+                                        <td>Tunnel identifier</td>
+                                        <td>Branch_Office_VPN</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Remote Gateway</td>
+                                        <td>Static IP Address</td>
+                                        <td>203.0.113.50</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Interface</td>
+                                        <td>Local WAN interface</td>
+                                        <td>port1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Pre-shared Key</td>
+                                        <td>Authentication key</td>
+                                        <td>SecureKey123!</td>
+                                    </tr>
+                                </table>
                             </li>
-                            <li>Configure advanced options
-                                <div class="screenshot-placeholder">Screenshot: Advanced policy options panel</div>
+                            <li>Configure advanced Phase 1 settings
+                                <div class="screenshot-placeholder">Screenshot: Advanced Phase 1 settings</div>
                             </li>
-                            <li>Apply security profiles if needed
-                                <div class="screenshot-placeholder">Screenshot: Security profiles selection</div>
-                            </li>
-                            <li>Save the policy configuration
-                                <div class="screenshot-placeholder">Screenshot: Save button and policy confirmation</div>
+                            <li>Set encryption and authentication algorithms
+                                <div class="screenshot-placeholder">Screenshot: Encryption algorithm selection</div>
                             </li>
                         </ol>
                     </div>
                     
-                    <div class="tab-content" id="creating-policies-cli">
-                        <h3>CLI Policy Configuration</h3>
+                    <div class="tab-content" id="phase1-setup-cli">
+                        <h3>CLI Phase 1 Configuration</h3>
                         <ol>
-                            <li>Access the FortiGate CLI and enter policy configuration mode
-                                <pre><code>config firewall policy
-edit 0</code></pre>
+                            <li>Configure Phase 1 interface
+                                <pre><code>config vpn ipsec phase1-interface
+edit "Branch_Office_VPN"
+    set interface "port1"
+    set keylife 86400
+    set peertype any
+    set net-device disable
+    set proposal aes256-sha256 aes256-sha1 aes128-sha256 aes128-sha1
+    set dhgrp 14 5
+    set remote-gw 203.0.113.50
+    set psksecret "SecureKey123!"
+    set dpd-retryinterval 60
+next
+end</code></pre>
                             </li>
-                            <li>Configure basic policy parameters
-                                <pre><code>set name "LAN_to_WAN_HTTP"
-set srcintf "port1"
-set dstintf "port2"
-set srcaddr "LAN_Network"
-set dstaddr "all"
-set service "HTTP" "HTTPS"
-set action accept</code></pre>
+                            <li>Configure Dead Peer Detection (DPD)
+                                <pre><code>config vpn ipsec phase1-interface
+edit "Branch_Office_VPN"
+    set dpd enable
+    set dpd-retrycount 3
+    set dpd-retryinterval 20
+next
+end</code></pre>
                             </li>
-                            <li>Enable logging for the policy
-                                <pre><code>set logtraffic all
-set comments "Allow HTTP/HTTPS from LAN to WAN"</code></pre>
-                            </li>
-                            <li>Configure NAT if required
-                                <pre><code>set nat enable
-set ippool "SNAT_Pool"</code></pre>
-                            </li>
-                            <li>Apply security profiles
-                                <pre><code>set av-profile "default"
-set ips-sensor "default"
-set application-list "default"
-set ssl-ssh-profile "certificate-inspection"</code></pre>
-                            </li>
-                            <li>Save the configuration
-                                <pre><code>next
+                            <li>Configure NAT traversal if needed
+                                <pre><code>config vpn ipsec phase1-interface
+edit "Branch_Office_VPN"
+    set nattraversal enable
+    set fragmentation enable
+next
 end</code></pre>
                             </li>
                         </ol>
                     </div>
                 </div>
 
-                <h2 id="security-profiles">Security Profiles</h2>
-                <p>Security profiles provide additional protection layers that can be applied to firewall policies. These profiles inspect traffic for various threats and can block or log suspicious activity.</p>
+                <h2 id="phase2-setup">Phase 2 Setup</h2>
+                <p>Phase 2 defines the encryption parameters for the actual data transfer and specifies which traffic should be encrypted.</p>
                 
                 <div class="tab-section">
                     <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('security-profiles', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('security-profiles', 'cli')">CLI Configuration</button>
+                        <button class="tab-button active" onclick="switchTab('phase2-setup', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('phase2-setup', 'cli')">CLI Configuration</button>
                     </div>
                     
-                    <div class="tab-content active" id="security-profiles-gui">
-                        <h3>Applying Security Profiles</h3>
+                    <div class="tab-content active" id="phase2-setup-gui">
+                        <h3>Phase 2 Configuration via GUI</h3>
                         <ol>
-                            <li>In the policy configuration, scroll to Security Profiles section
-                                <div class="screenshot-placeholder">Screenshot: Security Profiles section in policy editor</div>
+                            <li>In the same IPSec tunnel dialog, configure Phase 2
+                                <div class="screenshot-placeholder">Screenshot: Phase 2 configuration tab</div>
                             </li>
-                            <li>Configure Antivirus Profile
-                                <div class="screenshot-placeholder">Screenshot: Antivirus profile selection dropdown</div>
+                            <li>Set local and remote subnets
+                                <div class="screenshot-placeholder">Screenshot: Local and remote subnet configuration</div>
+                                <table>
+                                    <tr>
+                                        <th>Setting</th>
+                                        <th>Description</th>
+                                        <th>Example</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Local Subnet</td>
+                                        <td>Local network range</td>
+                                        <td>192.168.1.0/24</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Remote Subnet</td>
+                                        <td>Remote network range</td>
+                                        <td>192.168.100.0/24</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Encryption</td>
+                                        <td>Data encryption algorithm</td>
+                                        <td>AES-256</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Authentication</td>
+                                        <td>Data authentication</td>
+                                        <td>SHA-256</td>
+                                    </tr>
+                                </table>
                             </li>
-                            <li>Configure IPS (Intrusion Prevention System)
-                                <div class="screenshot-placeholder">Screenshot: IPS sensor configuration</div>
+                            <li>Configure PFS (Perfect Forward Secrecy)
+                                <div class="screenshot-placeholder">Screenshot: PFS configuration options</div>
                             </li>
-                            <li>Configure Application Control
-                                <div class="screenshot-placeholder">Screenshot: Application control list selection</div>
-                            </li>
-                            <li>Configure Web Filter
-                                <div class="screenshot-placeholder">Screenshot: Web filter profile options</div>
-                            </li>
-                            <li>Configure SSL/SSH Inspection
-                                <div class="screenshot-placeholder">Screenshot: SSL inspection profile settings</div>
+                            <li>Set key lifetime and replay protection
+                                <div class="screenshot-placeholder">Screenshot: Key lifetime and replay settings</div>
                             </li>
                         </ol>
                     </div>
                     
-                    <div class="tab-content" id="security-profiles-cli">
-                        <h3>CLI Security Profile Configuration</h3>
+                    <div class="tab-content" id="phase2-setup-cli">
+                        <h3>CLI Phase 2 Configuration</h3>
                         <ol>
-                            <li>Edit existing policy to add security profiles
-                                <pre><code>config firewall policy
-edit 1</code></pre>
+                            <li>Configure Phase 2 interface
+                                <pre><code>config vpn ipsec phase2-interface
+edit "Branch_Office_VPN"
+    set phase1name "Branch_Office_VPN"
+    set proposal aes256-sha256 aes256-sha1 aes128-sha256 aes128-sha1
+    set pfs enable
+    set dhgrp 14 5
+    set replay enable
+    set keylifeseconds 43200
+    set src-subnet 192.168.1.0 255.255.255.0
+    set dst-subnet 192.168.100.0 255.255.255.0
+next
+end</code></pre>
                             </li>
-                            <li>Apply antivirus profile
-                                <pre><code>set av-profile "default"</code></pre>
+                            <li>Configure multiple subnets if needed
+                                <pre><code>config vpn ipsec phase2-interface
+edit "Branch_Office_VPN_DMZ"
+    set phase1name "Branch_Office_VPN"
+    set proposal aes256-sha256
+    set pfs enable
+    set dhgrp 14
+    set src-subnet 192.168.2.0 255.255.255.0
+    set dst-subnet 192.168.101.0 255.255.255.0
+next
+end</code></pre>
                             </li>
-                            <li>Apply IPS sensor
-                                <pre><code>set ips-sensor "protect_client"</code></pre>
-                            </li>
-                            <li>Apply application control
-                                <pre><code>set application-list "default"</code></pre>
-                            </li>
-                            <li>Apply web filter
-                                <pre><code>set webfilter-profile "default"</code></pre>
-                            </li>
-                            <li>Apply SSL inspection
-                                <pre><code>set ssl-ssh-profile "certificate-inspection"</code></pre>
-                            </li>
-                            <li>Save configuration
-                                <pre><code>next
+                            <li>Enable auto-negotiate
+                                <pre><code>config vpn ipsec phase2-interface
+edit "Branch_Office_VPN"
+    set auto-negotiate enable
+next
 end</code></pre>
                             </li>
                         </ol>
                     </div>
                 </div>
 
-                <h2 id="advanced-settings">Advanced Settings</h2>
+                <h2 id="static-routes">Static Routes</h2>
+                <p>Configure static routes to direct traffic through the IPSec tunnel to reach remote subnets.</p>
+                
+                <div class="tab-section">
+                    <div class="tab-header">
+                        <button class="tab-button active" onclick="switchTab('static-routes', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('static-routes', 'cli')">CLI Configuration</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="static-routes-gui">
+                        <h3>Static Route Configuration via GUI</h3>
+                        <ol>
+                            <li>Navigate to Network > Static Routes
+                                <div class="screenshot-placeholder">Screenshot: Static Routes page</div>
+                            </li>
+                            <li>Click "Create New" to add route
+                                <div class="screenshot-placeholder">Screenshot: Create new static route form</div>
+                            </li>
+                            <li>Configure route to remote subnet
+                                <table>
+                                    <tr>
+                                        <th>Field</th>
+                                        <th>Value</th>
+                                        <th>Description</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Destination</td>
+                                        <td>192.168.100.0/24</td>
+                                        <td>Remote subnet</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Gateway</td>
+                                        <td>0.0.0.0</td>
+                                        <td>Not applicable for VPN</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Interface</td>
+                                        <td>Branch_Office_VPN</td>
+                                        <td>VPN tunnel interface</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Administrative Distance</td>
+                                        <td>10</td>
+                                        <td>Route priority</td>
+                                    </tr>
+                                </table>
+                            </li>
+                            <li>Verify route configuration
+                                <div class="screenshot-placeholder">Screenshot: Static route verification</div>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="tab-content" id="static-routes-cli">
+                        <h3>CLI Static Route Configuration</h3>
+                        <ol>
+                            <li>Add static route for remote subnet
+                                <pre><code>config router static
+edit 0
+    set dst 192.168.100.0 255.255.255.0
+    set device "Branch_Office_VPN"
+    set comment "Route to branch office LAN"
+next
+end</code></pre>
+                            </li>
+                            <li>Add route for additional remote subnets
+                                <pre><code>config router static
+edit 0
+    set dst 192.168.101.0 255.255.255.0
+    set device "Branch_Office_VPN"
+    set comment "Route to branch office DMZ"
+next
+end</code></pre>
+                            </li>
+                            <li>Verify routing table
+                                <pre><code>get router info routing-table static</code></pre>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h2 id="firewall-policies">Firewall Policies</h2>
+                <p>Create firewall policies to allow traffic through the IPSec tunnel between local and remote networks.</p>
                 
                 <div class="warning">
                     <h4>Warning</h4>
-                    <p>Advanced settings can significantly impact network performance. Test thoroughly before implementing in production environments.</p>
+                    <p>Without proper firewall policies, traffic will not flow through the IPSec tunnel even if it's established successfully.</p>
                 </div>
                 
-                <h3>Traffic Shaping</h3>
                 <div class="tab-section">
                     <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('advanced-settings', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('advanced-settings', 'cli')">CLI Configuration</button>
+                        <button class="tab-button active" onclick="switchTab('firewall-policies', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('firewall-policies', 'cli')">CLI Configuration</button>
                     </div>
                     
-                    <div class="tab-content active" id="advanced-settings-gui">
-                        <h3>Traffic Shaping Configuration</h3>
+                    <div class="tab-content active" id="firewall-policies-gui">
+                        <h3>Firewall Policy Configuration via GUI</h3>
                         <ol>
-                            <li>In policy configuration, expand Traffic Shaping section
-                                <div class="screenshot-placeholder">Screenshot: Traffic shaping options in policy</div>
+                            <li>Navigate to Policy & Objects > Firewall Policy
+                                <div class="screenshot-placeholder">Screenshot: Firewall Policy page</div>
                             </li>
-                            <li>Configure bandwidth limits
-                                <div class="screenshot-placeholder">Screenshot: Bandwidth limit configuration</div>
+                            <li>Create policy for local to remote traffic
+                                <div class="screenshot-placeholder">Screenshot: Policy creation form</div>
+                                <table>
+                                    <tr>
+                                        <th>Field</th>
+                                        <th>Value</th>
+                                        <th>Description</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Name</td>
+                                        <td>Local_to_Branch</td>
+                                        <td>Policy identifier</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Incoming Interface</td>
+                                        <td>internal</td>
+                                        <td>Local LAN interface</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Outgoing Interface</td>
+                                        <td>Branch_Office_VPN</td>
+                                        <td>VPN tunnel interface</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Source</td>
+                                        <td>192.168.1.0/24</td>
+                                        <td>Local subnet</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Destination</td>
+                                        <td>192.168.100.0/24</td>
+                                        <td>Remote subnet</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Service</td>
+                                        <td>ALL</td>
+                                        <td>All services</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Action</td>
+                                        <td>ACCEPT</td>
+                                        <td>Allow traffic</td>
+                                    </tr>
+                                </table>
                             </li>
-                            <li>Set priority levels
-                                <div class="screenshot-placeholder">Screenshot: Priority level selection</div>
+                            <li>Create policy for remote to local traffic
+                                <div class="screenshot-placeholder">Screenshot: Reverse policy configuration</div>
+                            </li>
+                            <li>Enable logging for troubleshooting
+                                <div class="screenshot-placeholder">Screenshot: Logging configuration</div>
                             </li>
                         </ol>
                     </div>
                     
-                    <div class="tab-content" id="advanced-settings-cli">
-                        <h3>CLI Traffic Shaping</h3>
-                        <pre><code>config firewall policy
-edit 1
-    set traffic-shaper "bandwidth_limit_5mbps"
-    set traffic-shaper-reverse "bandwidth_limit_5mbps"
-    set per-ip-shaper "per_user_1mbps"
+                    <div class="tab-content" id="firewall-policies-cli">
+                        <h3>CLI Firewall Policy Configuration</h3>
+                        <ol>
+                            <li>Create policy for local to remote traffic
+                                <pre><code>config firewall policy
+edit 0
+    set name "Local_to_Branch"
+    set srcintf "internal"
+    set dstintf "Branch_Office_VPN"
+    set srcaddr "192.168.1.0/24"
+    set dstaddr "192.168.100.0/24"
+    set action accept
+    set schedule "always"
+    set service "ALL"
+    set logtraffic all
 next
 end</code></pre>
+                            </li>
+                            <li>Create policy for remote to local traffic
+                                <pre><code>config firewall policy
+edit 0
+    set name "Branch_to_Local"
+    set srcintf "Branch_Office_VPN"
+    set dstintf "internal"
+    set srcaddr "192.168.100.0/24"
+    set dstaddr "192.168.1.0/24"
+    set action accept
+    set schedule "always"
+    set service "ALL"
+    set logtraffic all
+next
+end</code></pre>
+                            </li>
+                            <li>Configure address objects for easier management
+                                <pre><code>config firewall address
+edit "Local_LAN"
+    set subnet 192.168.1.0 255.255.255.0
+    set comment "Local office LAN"
+next
+edit "Branch_LAN"
+    set subnet 192.168.100.0 255.255.255.0
+    set comment "Branch office LAN"
+next
+end</code></pre>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h2 id="testing">Testing</h2>
+                <p>Test the IPSec VPN tunnel to ensure proper connectivity and troubleshoot any issues.</p>
+                
+                <div class="tab-section">
+                    <div class="tab-header">
+                        <button class="tab-button active" onclick="switchTab('testing', 'gui')">GUI Testing</button>
+                        <button class="tab-button" onclick="switchTab('testing', 'cli')">CLI Testing</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="testing-gui">
+                        <h3>Testing via GUI</h3>
+                        <ol>
+                            <li>Check IPSec tunnel status
+                                <div class="screenshot-placeholder">Screenshot: IPSec tunnel status showing UP</div>
+                            </li>
+                            <li>Monitor VPN statistics
+                                <div class="screenshot-placeholder">Screenshot: VPN statistics dashboard</div>
+                            </li>
+                            <li>Test connectivity from GUI tools
+                                <div class="screenshot-placeholder">Screenshot: Built-in ping tool</div>
+                            </li>
+                            <li>Review log files for any errors
+                                <div class="screenshot-placeholder">Screenshot: VPN log entries</div>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="tab-content" id="testing-cli">
+                        <h3>CLI Testing Commands</h3>
+                        <ol>
+                            <li>Check IPSec tunnel status
+                                <pre><code>get vpn ipsec tunnel summary</code></pre>
+                            </li>
+                            <li>View detailed tunnel information
+                                <pre><code>get vpn ipsec tunnel details Branch_Office_VPN</code></pre>
+                            </li>
+                            <li>Test connectivity to remote subnet
+                                <pre><code>execute ping-options source 192.168.1.1
+execute ping 192.168.100.1</code></pre>
+                            </li>
+                            <li>Monitor real-time VPN logs
+                                <pre><code>diagnose debug enable
+diagnose debug application ike 255
+diagnose debug application ipsec 255</code></pre>
+                            </li>
+                            <li>Check routing table
+                                <pre><code>get router info routing-table all</code></pre>
+                            </li>
+                        </ol>
                     </div>
                 </div>
 
                 <h2 id="troubleshooting">Troubleshooting</h2>
+                <p>Common IPSec VPN issues and their solutions.</p>
                 
-                <h3>Common Policy Issues</h3>
                 <div class="tab-section">
                     <div class="tab-header">
                         <button class="tab-button active" onclick="switchTab('troubleshooting', 'gui')">GUI Troubleshooting</button>
@@ -982,19 +1212,32 @@ end</code></pre>
                     </div>
                     
                     <div class="tab-content active" id="troubleshooting-gui">
-                        <h3>Policy Troubleshooting via GUI</h3>
+                        <h3>Common Issues and Solutions</h3>
                         <ol>
-                            <li>Check policy hit counters
-                                <div class="screenshot-placeholder">Screenshot: Policy list showing hit counters</div>
+                            <li>Phase 1 not establishing
+                                <div class="screenshot-placeholder">Screenshot: Phase 1 failure indicators</div>
+                                <ul>
+                                    <li>Verify pre-shared key matches on both sides</li>
+                                    <li>Check that remote gateway IP is correct</li>
+                                    <li>Ensure encryption proposals match</li>
+                                    <li>Verify UDP ports 500 and 4500 are open</li>
+                                </ul>
                             </li>
-                            <li>Review log files for policy matches
-                                <div class="screenshot-placeholder">Screenshot: Log viewer showing policy matches</div>
+                            <li>Phase 2 not establishing
+                                <div class="screenshot-placeholder">Screenshot: Phase 2 failure indicators</div>
+                                <ul>
+                                    <li>Check that local and remote subnets are correctly configured</li>
+                                    <li>Verify encryption and authentication algorithms match</li>
+                                    <li>Ensure PFS settings are compatible</li>
+                                </ul>
                             </li>
-                            <li>Use Policy Lookup tool
-                                <div class="screenshot-placeholder">Screenshot: Policy lookup tool interface</div>
-                            </li>
-                            <li>Check session table for active connections
-                                <div class="screenshot-placeholder">Screenshot: Session monitoring page</div>
+                            <li>Tunnel up but no traffic flow
+                                <div class="screenshot-placeholder">Screenshot: Traffic flow troubleshooting</div>
+                                <ul>
+                                    <li>Check firewall policies allow VPN traffic</li>
+                                    <li>Verify static routes are configured</li>
+                                    <li>Ensure no IP conflicts between sites</li>
+                                </ul>
                             </li>
                         </ol>
                     </div>
@@ -1002,32 +1245,37 @@ end</code></pre>
                     <div class="tab-content" id="troubleshooting-cli">
                         <h3>CLI Troubleshooting Commands</h3>
                         <ol>
-                            <li>Check policy statistics
-                                <pre><code>get firewall policy</code></pre>
+                            <li>Debug Phase 1 negotiations
+                                <pre><code>diagnose debug reset
+diagnose debug enable
+diagnose debug application ike 255</code></pre>
                             </li>
-                            <li>View detailed policy information
-                                <pre><code>show firewall policy 1</code></pre>
+                            <li>Debug Phase 2 negotiations
+                                <pre><code>diagnose debug application ipsec 255</code></pre>
                             </li>
-                            <li>Check active sessions
-                                <pre><code>get system session list</code></pre>
+                            <li>Reset IPSec tunnel
+                                <pre><code>diagnose vpn ike restart
+diagnose vpn ipsec tunnel down Branch_Office_VPN
+diagnose vpn ipsec tunnel up Branch_Office_VPN</code></pre>
                             </li>
-                            <li>Test policy matching
-                                <pre><code>diagnose firewall iprope lookup 192.168.1.100 80 192.168.1.1</code></pre>
+                            <li>Check system resources
+                                <pre><code>get system performance status
+get system status</code></pre>
                             </li>
-                            <li>Monitor real-time traffic
-                                <pre><code>diagnose sniffer packet any 'host 192.168.1.100' 4 0 l</code></pre>
+                            <li>Monitor packet flow
+                                <pre><code>diagnose sniffer packet any 'host 192.168.100.1' 4 0 l</code></pre>
                             </li>
                         </ol>
                     </div>
                 </div>
 
                 <h2 id="next-steps">Next Steps</h2>
-                <p>After mastering basic policy configuration, explore these advanced topics:</p>
+                <p>After establishing your IPSec VPN, consider these enhancements:</p>
                 <ul>
+                    <li><a href="/assets/fortigate-sslvpn.html">FortiGate SSL VPN Configuration</a></li>
+                    <li><a href="/assets/fortigate-routing.html">Advanced Routing Configuration</a></li>
+                    <li><a href="/assets/fortigate-policy.html">FortiGate Policy Management</a></li>
                     <li><a href="/assets/fortigate-sdwan.html">FortiGate SD-WAN Configuration</a></li>
-                    <li><a href="/assets/fortigate-ipsec.html">FortiGate IPSec VPN Setup</a></li>
-                    <li><a href="/assets/fortigate-ldap.html">FortiGate LDAP Authentication</a></li>
-                    <li><a href="/assets/fortigate-routing.html">FortiGate Routing Configuration</a></li>
                 </ul>
             </main>
         </div>

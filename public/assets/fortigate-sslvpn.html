@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en-us" dir="ltr">
 <head>
-    <title>FortiGate Firewall Policy Configuration | MSP Training Platform</title>
+    <title>FortiGate SSL VPN Configuration | MSP Training Platform</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Complete guide to configuring firewall policies on FortiGate devices for security and traffic management." />
+    <meta name="description" content="Complete guide to configuring SSL VPN on FortiGate devices for secure remote access connectivity." />
     <meta name="author" content="Velocity Lab" />
     <meta name="date" content="2025-07-17T14:13:00Z" />
 
@@ -714,10 +714,11 @@
                 <ul>
                     <li><a href="#overview">Overview</a></li>
                     <li><a href="#prerequisites">Prerequisites</a></li>
-                    <li><a href="#policy-basics">Policy Basics</a></li>
-                    <li><a href="#creating-policies">Creating Policies</a></li>
-                    <li><a href="#security-profiles">Security Profiles</a></li>
-                    <li><a href="#advanced-settings">Advanced Settings</a></li>
+                    <li><a href="#ssl-settings">SSL Settings</a></li>
+                    <li><a href="#portal-configuration">Portal Configuration</a></li>
+                    <li><a href="#user-groups">User Groups</a></li>
+                    <li><a href="#access-policies">Access Policies</a></li>
+                    <li><a href="#client-setup">Client Setup</a></li>
                     <li><a href="#troubleshooting">Troubleshooting</a></li>
                     <li><a href="#next-steps">Next Steps</a></li>
                 </ul>
@@ -726,255 +727,564 @@
             <main class="content">
                 <a href="/assets/fortigate.html" class="back-button">← Back to FortiGate Guides</a>
                 
-                <h1>FortiGate Firewall Policy Configuration</h1>
+                <h1>FortiGate SSL VPN Configuration</h1>
                 <p>Last updated: July 17, 2025</p>
-                <p>This comprehensive guide covers creating and managing firewall policies on FortiGate devices to control network traffic flow and implement security measures.</p>
+                <p>This comprehensive guide covers configuring SSL VPN on FortiGate devices to provide secure remote access for users connecting to corporate networks.</p>
                 
                 <div class="important">
                     <h4>Important</h4>
-                    <p>Always test policy changes in a controlled environment before applying them to production networks. Misconfigured policies can block legitimate traffic.</p>
+                    <p>SSL VPN requires a valid SSL certificate and proper DNS configuration. Ensure TCP port 443 is accessible from the internet.</p>
                 </div>
 
                 <h2 id="overview">Overview</h2>
-                <p>FortiGate firewall policies are rules that determine how traffic flows through the firewall. These policies define what traffic is allowed or denied based on various criteria such as source, destination, service, and time. Understanding policy configuration is fundamental to securing your network infrastructure.</p>
+                <p>FortiGate SSL VPN provides secure remote access using standard web browsers or the FortiClient application. It supports both web-based access and tunnel mode for full network connectivity.</p>
+                
+                <h3>SSL VPN Components</h3>
+                <ul>
+                    <li><strong>SSL VPN Portal:</strong> Web-based interface for user access</li>
+                    <li><strong>User Groups:</strong> Define access permissions and resources</li>
+                    <li><strong>Realms:</strong> Authentication domains for different user types</li>
+                    <li><strong>Policies:</strong> Control traffic flow for SSL VPN users</li>
+                    <li><strong>Client Certificates:</strong> Optional two-factor authentication</li>
+                </ul>
                 
                 <h2 id="prerequisites">Prerequisites</h2>
                 <ul>
-                    <li>FortiGate device with FortiOS 7.0 or later</li>
-                    <li>Administrator access to FortiGate management interface</li>
-                    <li>Basic understanding of network security concepts</li>
-                    <li>Knowledge of your network topology and requirements</li>
-                    <li>Configured interfaces and routing</li>
+                    <li>FortiGate device with SSL VPN license</li>
+                    <li>Valid SSL certificate (self-signed or CA-signed)</li>
+                    <li>DNS name pointing to FortiGate's public IP</li>
+                    <li>User authentication source (local, LDAP, or RADIUS)</li>
+                    <li>Firewall policies allowing SSL VPN traffic</li>
                 </ul>
 
-                <h2 id="policy-basics">Policy Basics</h2>
-                <p>FortiGate policies are processed in order from top to bottom. When a packet matches a policy rule, that rule is applied and processing stops. Understanding this sequence is crucial for effective policy management.</p>
-                
-                <h3>Policy Components</h3>
-                <table>
-                    <tr>
-                        <th>Component</th>
-                        <th>Description</th>
-                        <th>Example</th>
-                    </tr>
-                    <tr>
-                        <td>Source Interface</td>
-                        <td>Interface traffic originates from</td>
-                        <td>port1 (LAN)</td>
-                    </tr>
-                    <tr>
-                        <td>Destination Interface</td>
-                        <td>Interface traffic is destined for</td>
-                        <td>port2 (WAN)</td>
-                    </tr>
-                    <tr>
-                        <td>Source Address</td>
-                        <td>IP address or range of source</td>
-                        <td>192.168.1.0/24</td>
-                    </tr>
-                    <tr>
-                        <td>Destination Address</td>
-                        <td>IP address or range of destination</td>
-                        <td>0.0.0.0/0 (any)</td>
-                    </tr>
-                    <tr>
-                        <td>Service</td>
-                        <td>Protocol and port definition</td>
-                        <td>HTTP, HTTPS, ALL</td>
-                    </tr>
-                    <tr>
-                        <td>Action</td>
-                        <td>Allow or deny traffic</td>
-                        <td>ACCEPT, DENY</td>
-                    </tr>
-                </table>
-
-                <h2 id="creating-policies">Creating Policies</h2>
+                <h2 id="ssl-settings">SSL Settings</h2>
+                <p>Configure the basic SSL VPN settings including interfaces, ports, and authentication methods.</p>
                 
                 <div class="tab-section">
                     <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('creating-policies', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('creating-policies', 'cli')">CLI Configuration</button>
+                        <button class="tab-button active" onclick="switchTab('ssl-settings', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('ssl-settings', 'cli')">CLI Configuration</button>
                     </div>
                     
-                    <div class="tab-content active" id="creating-policies-gui">
-                        <h3>Creating Policies via Web Interface</h3>
+                    <div class="tab-content active" id="ssl-settings-gui">
+                        <h3>SSL VPN Global Settings</h3>
                         <ol>
-                            <li>Navigate to Policy & Objects > Firewall Policy
-                                <div class="screenshot-placeholder">Screenshot: Firewall Policy page showing existing policies</div>
+                            <li>Navigate to VPN > SSL-VPN Settings
+                                <div class="screenshot-placeholder">Screenshot: SSL-VPN Settings page</div>
                             </li>
-                            <li>Click "Create New" to add a new policy
-                                <div class="screenshot-placeholder">Screenshot: Create New Policy button highlighted</div>
+                            <li>Configure listen interfaces and port
+                                <div class="screenshot-placeholder">Screenshot: Interface and port configuration</div>
+                                <table>
+                                    <tr>
+                                        <th>Setting</th>
+                                        <th>Value</th>
+                                        <th>Description</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Listen on Interface</td>
+                                        <td>port1 (WAN)</td>
+                                        <td>External interface</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Listen on Port</td>
+                                        <td>443</td>
+                                        <td>HTTPS port</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Server Certificate</td>
+                                        <td>Fortinet_Factory</td>
+                                        <td>SSL certificate</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Source Interface</td>
+                                        <td>internal</td>
+                                        <td>Internal interface</td>
+                                    </tr>
+                                </table>
                             </li>
-                            <li>Configure basic policy settings
-                                <div class="screenshot-placeholder">Screenshot: Basic policy configuration form</div>
-                                <ul>
-                                    <li>Name: Descriptive policy name</li>
-                                    <li>Incoming Interface: Select source interface</li>
-                                    <li>Outgoing Interface: Select destination interface</li>
-                                    <li>Source: Define source addresses or groups</li>
-                                    <li>Destination: Define destination addresses or groups</li>
-                                    <li>Service: Select protocols and ports</li>
-                                    <li>Action: Accept or Deny</li>
-                                </ul>
+                            <li>Configure authentication settings
+                                <div class="screenshot-placeholder">Screenshot: Authentication configuration</div>
                             </li>
-                            <li>Configure advanced options
-                                <div class="screenshot-placeholder">Screenshot: Advanced policy options panel</div>
+                            <li>Set tunnel mode client settings
+                                <div class="screenshot-placeholder">Screenshot: Tunnel mode configuration</div>
                             </li>
-                            <li>Apply security profiles if needed
-                                <div class="screenshot-placeholder">Screenshot: Security profiles selection</div>
-                            </li>
-                            <li>Save the policy configuration
-                                <div class="screenshot-placeholder">Screenshot: Save button and policy confirmation</div>
+                            <li>Configure DNS and routing for clients
+                                <div class="screenshot-placeholder">Screenshot: DNS and routing settings</div>
                             </li>
                         </ol>
                     </div>
                     
-                    <div class="tab-content" id="creating-policies-cli">
-                        <h3>CLI Policy Configuration</h3>
+                    <div class="tab-content" id="ssl-settings-cli">
+                        <h3>CLI SSL VPN Configuration</h3>
                         <ol>
-                            <li>Access the FortiGate CLI and enter policy configuration mode
-                                <pre><code>config firewall policy
-edit 0</code></pre>
+                            <li>Configure global SSL VPN settings
+                                <pre><code>config vpn ssl settings
+    set servercert "Fortinet_Factory"
+    set tunnel-ip-pools "SSLVPN_TUNNEL_ADDR1"
+    set tunnel-ipv6-pools "SSLVPN_TUNNEL_IPv6_ADDR1"
+    set port 443
+    set source-interface "internal"
+    set source-address "all"
+    set source-address6 "all"
+    set default-portal "full-access"
+end</code></pre>
                             </li>
-                            <li>Configure basic policy parameters
-                                <pre><code>set name "LAN_to_WAN_HTTP"
-set srcintf "port1"
-set dstintf "port2"
-set srcaddr "LAN_Network"
-set dstaddr "all"
-set service "HTTP" "HTTPS"
-set action accept</code></pre>
+                            <li>Configure IP pools for tunnel clients
+                                <pre><code>config firewall address
+    edit "SSLVPN_TUNNEL_ADDR1"
+        set type iprange
+        set start-ip 192.168.210.1
+        set end-ip 192.168.210.50
+        set comment "SSL VPN tunnel mode address pool"
+    next
+end</code></pre>
                             </li>
-                            <li>Enable logging for the policy
-                                <pre><code>set logtraffic all
-set comments "Allow HTTP/HTTPS from LAN to WAN"</code></pre>
+                            <li>Configure DNS servers for clients
+                                <pre><code>config vpn ssl settings
+    set dns-server1 192.168.1.10
+    set dns-server2 8.8.8.8
+    set wins-server1 192.168.1.10
+end</code></pre>
                             </li>
-                            <li>Configure NAT if required
-                                <pre><code>set nat enable
-set ippool "SNAT_Pool"</code></pre>
-                            </li>
-                            <li>Apply security profiles
-                                <pre><code>set av-profile "default"
-set ips-sensor "default"
-set application-list "default"
-set ssl-ssh-profile "certificate-inspection"</code></pre>
-                            </li>
-                            <li>Save the configuration
-                                <pre><code>next
+                            <li>Enable SSL VPN on interface
+                                <pre><code>config system interface
+    edit "port1"
+        set allowaccess ping https ssh
+    next
 end</code></pre>
                             </li>
                         </ol>
                     </div>
                 </div>
 
-                <h2 id="security-profiles">Security Profiles</h2>
-                <p>Security profiles provide additional protection layers that can be applied to firewall policies. These profiles inspect traffic for various threats and can block or log suspicious activity.</p>
+                <h2 id="portal-configuration">Portal Configuration</h2>
+                <p>Configure SSL VPN portals to define the user experience and available resources.</p>
                 
                 <div class="tab-section">
                     <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('security-profiles', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('security-profiles', 'cli')">CLI Configuration</button>
+                        <button class="tab-button active" onclick="switchTab('portal-configuration', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('portal-configuration', 'cli')">CLI Configuration</button>
                     </div>
                     
-                    <div class="tab-content active" id="security-profiles-gui">
-                        <h3>Applying Security Profiles</h3>
+                    <div class="tab-content active" id="portal-configuration-gui">
+                        <h3>Creating SSL VPN Portals</h3>
                         <ol>
-                            <li>In the policy configuration, scroll to Security Profiles section
-                                <div class="screenshot-placeholder">Screenshot: Security Profiles section in policy editor</div>
+                            <li>Navigate to VPN > SSL-VPN Portals
+                                <div class="screenshot-placeholder">Screenshot: SSL-VPN Portals page</div>
                             </li>
-                            <li>Configure Antivirus Profile
-                                <div class="screenshot-placeholder">Screenshot: Antivirus profile selection dropdown</div>
+                            <li>Create new portal or edit existing
+                                <div class="screenshot-placeholder">Screenshot: Portal configuration form</div>
                             </li>
-                            <li>Configure IPS (Intrusion Prevention System)
-                                <div class="screenshot-placeholder">Screenshot: IPS sensor configuration</div>
+                            <li>Configure portal settings
+                                <div class="screenshot-placeholder">Screenshot: Portal basic settings</div>
+                                <table>
+                                    <tr>
+                                        <th>Setting</th>
+                                        <th>Description</th>
+                                        <th>Example</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Portal Name</td>
+                                        <td>Unique identifier</td>
+                                        <td>employee-portal</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Tunnel Mode</td>
+                                        <td>Enable full tunnel access</td>
+                                        <td>Enable</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Web Mode</td>
+                                        <td>Enable web-based access</td>
+                                        <td>Enable</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Split Tunneling</td>
+                                        <td>Route only corporate traffic</td>
+                                        <td>Enable</td>
+                                    </tr>
+                                </table>
                             </li>
-                            <li>Configure Application Control
-                                <div class="screenshot-placeholder">Screenshot: Application control list selection</div>
+                            <li>Configure bookmarks for web access
+                                <div class="screenshot-placeholder">Screenshot: Bookmark configuration</div>
                             </li>
-                            <li>Configure Web Filter
-                                <div class="screenshot-placeholder">Screenshot: Web filter profile options</div>
-                            </li>
-                            <li>Configure SSL/SSH Inspection
-                                <div class="screenshot-placeholder">Screenshot: SSL inspection profile settings</div>
+                            <li>Set client download options
+                                <div class="screenshot-placeholder">Screenshot: Client download settings</div>
                             </li>
                         </ol>
                     </div>
                     
-                    <div class="tab-content" id="security-profiles-cli">
-                        <h3>CLI Security Profile Configuration</h3>
+                    <div class="tab-content" id="portal-configuration-cli">
+                        <h3>CLI Portal Configuration</h3>
                         <ol>
-                            <li>Edit existing policy to add security profiles
-                                <pre><code>config firewall policy
-edit 1</code></pre>
+                            <li>Create SSL VPN portal
+                                <pre><code>config vpn ssl web portal
+    edit "employee-portal"
+        set tunnel-mode enable
+        set web-mode enable
+        set ip-pools "SSLVPN_TUNNEL_ADDR1"
+        set split-tunneling enable
+        set theme blue
+        set host-check custom
+        set limit-user-logins disable
+        set mac-addr-check disable
+        set os-check disable
+        set forticlient-download enable
+        set skip-check-for-unsupported-browser disable
+        set skip-check-for-browser disable
+        set hide-sso-credential disable
+        set auto-connect disable
+        set keep-alive disable
+        set save-password disable
+        set use-sdwan disable
+    next
+end</code></pre>
                             </li>
-                            <li>Apply antivirus profile
-                                <pre><code>set av-profile "default"</code></pre>
+                            <li>Configure split tunneling routes
+                                <pre><code>config vpn ssl web portal
+    edit "employee-portal"
+        config split-tunneling-routing-address
+            edit "Internal_Networks"
+                set addr "192.168.1.0/24"
+            next
+            edit "Server_Network"
+                set addr "192.168.10.0/24"
+            next
+        end
+    next
+end</code></pre>
                             </li>
-                            <li>Apply IPS sensor
-                                <pre><code>set ips-sensor "protect_client"</code></pre>
-                            </li>
-                            <li>Apply application control
-                                <pre><code>set application-list "default"</code></pre>
-                            </li>
-                            <li>Apply web filter
-                                <pre><code>set webfilter-profile "default"</code></pre>
-                            </li>
-                            <li>Apply SSL inspection
-                                <pre><code>set ssl-ssh-profile "certificate-inspection"</code></pre>
-                            </li>
-                            <li>Save configuration
-                                <pre><code>next
+                            <li>Add bookmarks for web access
+                                <pre><code>config vpn ssl web portal
+    edit "employee-portal"
+        config bookmarks
+            config group
+                edit "Servers"
+                    config bookmarks
+                        edit "File Server"
+                            set url "https://192.168.1.100"
+                            set host "192.168.1.100"
+                            set port 443
+                        next
+                        edit "Email Server"
+                            set url "https://mail.company.com"
+                            set host "mail.company.com"
+                            set port 443
+                        next
+                    end
+                next
+            end
+        end
+    next
 end</code></pre>
                             </li>
                         </ol>
                     </div>
                 </div>
 
-                <h2 id="advanced-settings">Advanced Settings</h2>
+                <h2 id="user-groups">User Groups</h2>
+                <p>Configure user groups to define access permissions and assign portals to different user types.</p>
+                
+                <div class="tab-section">
+                    <div class="tab-header">
+                        <button class="tab-button active" onclick="switchTab('user-groups', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('user-groups', 'cli')">CLI Configuration</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="user-groups-gui">
+                        <h3>Creating User Groups</h3>
+                        <ol>
+                            <li>Navigate to User & Authentication > User Groups
+                                <div class="screenshot-placeholder">Screenshot: User Groups page</div>
+                            </li>
+                            <li>Create new group for SSL VPN users
+                                <div class="screenshot-placeholder">Screenshot: Create user group form</div>
+                            </li>
+                            <li>Configure group settings
+                                <table>
+                                    <tr>
+                                        <th>Setting</th>
+                                        <th>Description</th>
+                                        <th>Example</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Group Name</td>
+                                        <td>Unique identifier</td>
+                                        <td>SSL_VPN_Users</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Group Type</td>
+                                        <td>Firewall group</td>
+                                        <td>Firewall</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Member</td>
+                                        <td>Add users to group</td>
+                                        <td>john.doe, jane.smith</td>
+                                    </tr>
+                                </table>
+                            </li>
+                            <li>Assign SSL VPN portal to group
+                                <div class="screenshot-placeholder">Screenshot: Portal assignment</div>
+                            </li>
+                            <li>Configure group permissions
+                                <div class="screenshot-placeholder">Screenshot: Group permissions settings</div>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="tab-content" id="user-groups-cli">
+                        <h3>CLI User Group Configuration</h3>
+                        <ol>
+                            <li>Create user group
+                                <pre><code>config user group
+    edit "SSL_VPN_Users"
+        set member "john.doe" "jane.smith"
+        config group-authentication
+            set authtimeout 480
+            set sslvpn-portal "employee-portal"
+        end
+    next
+end</code></pre>
+                            </li>
+                            <li>Create local users
+                                <pre><code>config user local
+    edit "john.doe"
+        set type password
+        set passwd "SecurePassword123!"
+        set status enable
+        set email-to "john.doe@company.com"
+        set sms-phone "555-0123"
+        set sms-server "fortiguard"
+        set two-factor disable
+    next
+    edit "jane.smith"
+        set type password
+        set passwd "SecurePassword456!"
+        set status enable
+        set email-to "jane.smith@company.com"
+        set two-factor disable
+    next
+end</code></pre>
+                            </li>
+                            <li>Configure two-factor authentication
+                                <pre><code>config user local
+    edit "john.doe"
+        set two-factor fortitoken
+        set fortitoken "FTKMOB1234567890"
+    next
+end</code></pre>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h2 id="access-policies">Access Policies</h2>
+                <p>Create firewall policies to control SSL VPN user access to internal resources.</p>
                 
                 <div class="warning">
                     <h4>Warning</h4>
-                    <p>Advanced settings can significantly impact network performance. Test thoroughly before implementing in production environments.</p>
+                    <p>SSL VPN policies should follow the principle of least privilege. Only grant access to required resources.</p>
                 </div>
                 
-                <h3>Traffic Shaping</h3>
                 <div class="tab-section">
                     <div class="tab-header">
-                        <button class="tab-button active" onclick="switchTab('advanced-settings', 'gui')">GUI Configuration</button>
-                        <button class="tab-button" onclick="switchTab('advanced-settings', 'cli')">CLI Configuration</button>
+                        <button class="tab-button active" onclick="switchTab('access-policies', 'gui')">GUI Configuration</button>
+                        <button class="tab-button" onclick="switchTab('access-policies', 'cli')">CLI Configuration</button>
                     </div>
                     
-                    <div class="tab-content active" id="advanced-settings-gui">
-                        <h3>Traffic Shaping Configuration</h3>
+                    <div class="tab-content active" id="access-policies-gui">
+                        <h3>SSL VPN Access Policies</h3>
                         <ol>
-                            <li>In policy configuration, expand Traffic Shaping section
-                                <div class="screenshot-placeholder">Screenshot: Traffic shaping options in policy</div>
+                            <li>Navigate to Policy & Objects > Firewall Policy
+                                <div class="screenshot-placeholder">Screenshot: Firewall Policy page</div>
                             </li>
-                            <li>Configure bandwidth limits
-                                <div class="screenshot-placeholder">Screenshot: Bandwidth limit configuration</div>
+                            <li>Create policy for SSL VPN users
+                                <div class="screenshot-placeholder">Screenshot: SSL VPN policy creation</div>
+                                <table>
+                                    <tr>
+                                        <th>Field</th>
+                                        <th>Value</th>
+                                        <th>Description</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Name</td>
+                                        <td>SSL_VPN_to_Internal</td>
+                                        <td>Policy identifier</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Incoming Interface</td>
+                                        <td>ssl.root</td>
+                                        <td>SSL VPN interface</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Outgoing Interface</td>
+                                        <td>internal</td>
+                                        <td>Internal network</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Source</td>
+                                        <td>SSLVPN_TUNNEL_ADDR1</td>
+                                        <td>SSL VPN client pool</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Destination</td>
+                                        <td>Internal_Networks</td>
+                                        <td>Internal subnets</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Users</td>
+                                        <td>SSL_VPN_Users</td>
+                                        <td>User group</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Service</td>
+                                        <td>HTTP, HTTPS, SSH</td>
+                                        <td>Allowed services</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Action</td>
+                                        <td>ACCEPT</td>
+                                        <td>Allow traffic</td>
+                                    </tr>
+                                </table>
                             </li>
-                            <li>Set priority levels
-                                <div class="screenshot-placeholder">Screenshot: Priority level selection</div>
+                            <li>Configure authentication in policy
+                                <div class="screenshot-placeholder">Screenshot: Authentication settings in policy</div>
+                            </li>
+                            <li>Enable logging for monitoring
+                                <div class="screenshot-placeholder">Screenshot: Logging configuration</div>
                             </li>
                         </ol>
                     </div>
                     
-                    <div class="tab-content" id="advanced-settings-cli">
-                        <h3>CLI Traffic Shaping</h3>
-                        <pre><code>config firewall policy
-edit 1
-    set traffic-shaper "bandwidth_limit_5mbps"
-    set traffic-shaper-reverse "bandwidth_limit_5mbps"
-    set per-ip-shaper "per_user_1mbps"
-next
+                    <div class="tab-content" id="access-policies-cli">
+                        <h3>CLI Access Policy Configuration</h3>
+                        <ol>
+                            <li>Create SSL VPN access policy
+                                <pre><code>config firewall policy
+    edit 0
+        set name "SSL_VPN_to_Internal"
+        set srcintf "ssl.root"
+        set dstintf "internal"
+        set srcaddr "SSLVPN_TUNNEL_ADDR1"
+        set dstaddr "Internal_Networks"
+        set action accept
+        set schedule "always"
+        set service "HTTP" "HTTPS" "SSH" "PING"
+        set users "SSL_VPN_Users"
+        set logtraffic all
+        set nat enable
+    next
 end</code></pre>
+                            </li>
+                            <li>Create address objects for internal networks
+                                <pre><code>config firewall address
+    edit "Internal_Networks"
+        set subnet 192.168.1.0 255.255.255.0
+        set comment "Internal LAN network"
+    next
+    edit "Server_Network"
+        set subnet 192.168.10.0 255.255.255.0
+        set comment "Server network"
+    next
+end</code></pre>
+                            </li>
+                            <li>Create service objects for specific applications
+                                <pre><code>config firewall service custom
+    edit "RDP"
+        set tcp-portrange 3389
+        set comment "Remote Desktop Protocol"
+    next
+    edit "File_Server"
+        set tcp-portrange 445
+        set comment "SMB file sharing"
+    next
+end</code></pre>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h2 id="client-setup">Client Setup</h2>
+                <p>Configure client devices to connect to the SSL VPN using web browser or FortiClient.</p>
+                
+                <div class="tab-section">
+                    <div class="tab-header">
+                        <button class="tab-button active" onclick="switchTab('client-setup', 'gui')">Web Client</button>
+                        <button class="tab-button" onclick="switchTab('client-setup', 'cli')">FortiClient</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="client-setup-gui">
+                        <h3>Web-based SSL VPN Access</h3>
+                        <ol>
+                            <li>Access the SSL VPN portal via web browser
+                                <div class="screenshot-placeholder">Screenshot: SSL VPN login page</div>
+                            </li>
+                            <li>Enter credentials and authenticate
+                                <div class="screenshot-placeholder">Screenshot: Login form with username/password</div>
+                            </li>
+                            <li>Navigate the SSL VPN portal
+                                <div class="screenshot-placeholder">Screenshot: SSL VPN portal dashboard</div>
+                            </li>
+                            <li>Access bookmarked resources
+                                <div class="screenshot-placeholder">Screenshot: Available bookmarks and resources</div>
+                            </li>
+                            <li>Download FortiClient for full access
+                                <div class="screenshot-placeholder">Screenshot: FortiClient download page</div>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="tab-content" id="client-setup-cli">
+                        <h3>FortiClient Configuration</h3>
+                        <ol>
+                            <li>Download and install FortiClient
+                                <div class="screenshot-placeholder">Screenshot: FortiClient installation</div>
+                            </li>
+                            <li>Configure new SSL VPN connection
+                                <div class="screenshot-placeholder">Screenshot: New connection wizard</div>
+                                <table>
+                                    <tr>
+                                        <th>Setting</th>
+                                        <th>Value</th>
+                                        <th>Description</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Connection Name</td>
+                                        <td>Company VPN</td>
+                                        <td>Display name</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Server</td>
+                                        <td>vpn.company.com</td>
+                                        <td>FQDN or IP address</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Port</td>
+                                        <td>443</td>
+                                        <td>SSL VPN port</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Username</td>
+                                        <td>john.doe</td>
+                                        <td>User credentials</td>
+                                    </tr>
+                                </table>
+                            </li>
+                            <li>Test connection and troubleshoot
+                                <div class="screenshot-placeholder">Screenshot: Connection status and logs</div>
+                            </li>
+                            <li>Configure auto-connect options
+                                <div class="screenshot-placeholder">Screenshot: Auto-connect settings</div>
+                            </li>
+                        </ol>
                     </div>
                 </div>
 
                 <h2 id="troubleshooting">Troubleshooting</h2>
+                <p>Common SSL VPN issues and their solutions.</p>
                 
-                <h3>Common Policy Issues</h3>
                 <div class="tab-section">
                     <div class="tab-header">
                         <button class="tab-button active" onclick="switchTab('troubleshooting', 'gui')">GUI Troubleshooting</button>
@@ -982,19 +1292,34 @@ end</code></pre>
                     </div>
                     
                     <div class="tab-content active" id="troubleshooting-gui">
-                        <h3>Policy Troubleshooting via GUI</h3>
+                        <h3>Common Issues and Solutions</h3>
                         <ol>
-                            <li>Check policy hit counters
-                                <div class="screenshot-placeholder">Screenshot: Policy list showing hit counters</div>
+                            <li>Cannot access SSL VPN portal
+                                <div class="screenshot-placeholder">Screenshot: Connection error indicators</div>
+                                <ul>
+                                    <li>Check firewall allows port 443 access</li>
+                                    <li>Verify DNS resolution of VPN server</li>
+                                    <li>Ensure SSL certificate is valid</li>
+                                    <li>Check FortiGate system time</li>
+                                </ul>
                             </li>
-                            <li>Review log files for policy matches
-                                <div class="screenshot-placeholder">Screenshot: Log viewer showing policy matches</div>
+                            <li>Authentication failures
+                                <div class="screenshot-placeholder">Screenshot: Authentication error messages</div>
+                                <ul>
+                                    <li>Verify user credentials are correct</li>
+                                    <li>Check user account is enabled</li>
+                                    <li>Ensure user is in correct group</li>
+                                    <li>Verify LDAP/RADIUS connectivity</li>
+                                </ul>
                             </li>
-                            <li>Use Policy Lookup tool
-                                <div class="screenshot-placeholder">Screenshot: Policy lookup tool interface</div>
-                            </li>
-                            <li>Check session table for active connections
-                                <div class="screenshot-placeholder">Screenshot: Session monitoring page</div>
+                            <li>Tunnel connects but no network access
+                                <div class="screenshot-placeholder">Screenshot: Tunnel status indicators</div>
+                                <ul>
+                                    <li>Check firewall policies allow SSL VPN traffic</li>
+                                    <li>Verify routing configuration</li>
+                                    <li>Ensure IP pool is correctly configured</li>
+                                    <li>Check DNS settings for clients</li>
+                                </ul>
                             </li>
                         </ol>
                     </div>
@@ -1002,32 +1327,37 @@ end</code></pre>
                     <div class="tab-content" id="troubleshooting-cli">
                         <h3>CLI Troubleshooting Commands</h3>
                         <ol>
-                            <li>Check policy statistics
-                                <pre><code>get firewall policy</code></pre>
+                            <li>Check SSL VPN status
+                                <pre><code>get vpn ssl monitor
+diagnose vpn ssl list</code></pre>
                             </li>
-                            <li>View detailed policy information
-                                <pre><code>show firewall policy 1</code></pre>
+                            <li>Monitor authentication attempts
+                                <pre><code>diagnose debug enable
+diagnose debug application sslvpn -1</code></pre>
                             </li>
-                            <li>Check active sessions
-                                <pre><code>get system session list</code></pre>
+                            <li>Check user sessions
+                                <pre><code>get vpn ssl stats
+diagnose vpn ssl list</code></pre>
                             </li>
-                            <li>Test policy matching
-                                <pre><code>diagnose firewall iprope lookup 192.168.1.100 80 192.168.1.1</code></pre>
+                            <li>Test DNS resolution
+                                <pre><code>diagnose test application dnsproxy 6
+execute nslookup vpn.company.com</code></pre>
                             </li>
-                            <li>Monitor real-time traffic
-                                <pre><code>diagnose sniffer packet any 'host 192.168.1.100' 4 0 l</code></pre>
+                            <li>Monitor real-time logs
+                                <pre><code>execute log filter category 2
+execute log display</code></pre>
                             </li>
                         </ol>
                     </div>
                 </div>
 
                 <h2 id="next-steps">Next Steps</h2>
-                <p>After mastering basic policy configuration, explore these advanced topics:</p>
+                <p>After implementing SSL VPN, consider these enhancements:</p>
                 <ul>
-                    <li><a href="/assets/fortigate-sdwan.html">FortiGate SD-WAN Configuration</a></li>
-                    <li><a href="/assets/fortigate-ipsec.html">FortiGate IPSec VPN Setup</a></li>
                     <li><a href="/assets/fortigate-ldap.html">FortiGate LDAP Authentication</a></li>
-                    <li><a href="/assets/fortigate-routing.html">FortiGate Routing Configuration</a></li>
+                    <li><a href="/assets/fortigate-ipsec.html">FortiGate IPSec VPN Setup</a></li>
+                    <li><a href="/assets/fortigate-policy.html">Advanced Policy Configuration</a></li>
+                    <li><a href="/assets/fortigate-setup.html">FortiGate Initial Setup</a></li>
                 </ul>
             </main>
         </div>
